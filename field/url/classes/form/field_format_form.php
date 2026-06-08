@@ -28,6 +28,22 @@ class field_format_form extends \mod_datalynx\form\field_format_base_form {
      * Define the specific elements for the url format.
      */
     protected function format_definition() {
-        // Default implementation has no extra elements.
+        $mform = &$this->_form;
+
+        $options = [
+            'link'       => get_string('fieldformat_option_link', 'datalynxfield_url'),
+            'image'      => get_string('fieldformat_option_image', 'datalynxfield_url'),
+            'imageflex'  => get_string('fieldformat_option_imageflex', 'datalynxfield_url'),
+            'media'      => get_string('fieldformat_option_media', 'datalynxfield_url'),
+        ];
+        $mform->addElement(
+            'select',
+            'option',
+            get_string('fieldformatoption', 'mod_datalynx'),
+            $options
+        );
+        $mform->setType('option', PARAM_ALPHA);
+        $mform->addRule('option', get_string('required'), 'required', null, 'client');
+        $mform->addHelpButton('option', 'fieldformat_option', 'datalynxfield_url');
     }
 }

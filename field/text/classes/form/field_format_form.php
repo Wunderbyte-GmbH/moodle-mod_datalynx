@@ -28,6 +28,15 @@ class field_format_form extends \mod_datalynx\form\field_format_base_form {
      * Define the specific elements for the text format.
      */
     protected function format_definition() {
-        // Default implementation has no extra elements.
+        $mform = &$this->_form;
+
+        $mform->addElement(
+            'text',
+            'maxlength',
+            get_string('fieldformat_maxlength', 'datalynxfield_text'),
+            ['size' => 6]
+        );
+        $mform->setType('maxlength', PARAM_INT);
+        $mform->addHelpButton('maxlength', 'fieldformat_maxlength', 'datalynxfield_text');
     }
 }

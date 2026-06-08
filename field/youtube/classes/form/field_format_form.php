@@ -28,6 +28,23 @@ class field_format_form extends \mod_datalynx\form\field_format_base_form {
      * Define the specific elements for the youtube format.
      */
     protected function format_definition() {
-        // Default implementation has no extra elements.
+        $mform = &$this->_form;
+
+        $mform->addElement(
+            'text',
+            'width',
+            get_string('fieldformat_width', 'datalynxfield_youtube'),
+            ['size' => 5]
+        );
+        $mform->setType('width', PARAM_INT);
+
+        $mform->addElement(
+            'text',
+            'height',
+            get_string('fieldformat_height', 'datalynxfield_youtube'),
+            ['size' => 5]
+        );
+        $mform->setType('height', PARAM_INT);
+        $mform->addHelpButton('width', 'fieldformat_dimensions', 'datalynxfield_youtube');
     }
 }

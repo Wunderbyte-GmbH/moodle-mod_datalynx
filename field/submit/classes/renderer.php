@@ -99,7 +99,7 @@ class renderer extends datalynxfield_renderer {
      */
     public function display_edit(&$mform, $entry, array $options = []) {
         $label = get_string('savechanges');
-        $class = 'btn btn-primary datalynx-custom-submit';
+        $class = 'datalynx-custom-submit';
 
         $format = $options['field_format'] ?? null;
         if ($format) {

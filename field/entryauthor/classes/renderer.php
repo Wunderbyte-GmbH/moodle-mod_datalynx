@@ -69,6 +69,11 @@ class renderer extends datalynxfield_renderer {
 
         foreach ($tags as $tag) {
             $stripped = trim($tag, '@');
+            // Plain ##author## tag — picture + linked fullname (matches fullnamewithpicturelink).
+            if ($stripped === '##author##') {
+                $replacements[$tag] = ['html', $this->display_namewithpicture($entry)];
+                continue;
+            }
             if (strpos($stripped, '##author:') === 0) {
                 $suffix = substr($stripped, strlen('##author:'), -2);
             } else {
@@ -213,6 +218,31 @@ class renderer extends datalynxfield_renderer {
             fullname($user)
         );
     }
+
+    // phpcs:disable moodle.PHP.ForbiddenGlobalUse.BadGlobal
+    /**
+     * Display user picture + fullname linked to profile (matches reportbuilder fullnamewithpicturelink).
+     *
+     * @param stdClass $entry The entry object.
+     * @return string HTML: avatar image + fullname, both wrapped in a profile link.
+     */
+    public function display_namewithpicture($entry) {
+        global $OUTPUT, $USER, $DB;
+
+        if ($entry->id < 0) { // New entry.
+            $user = $USER;
+        } else {
+            $user = $DB->get_record('user', ['id' => $entry->userid]);
+        }
+        if (!$user) {
+            return '';
+        }
+        $dlx = $this->field->dlx();
+        $profileurl = new moodle_url('/user/view.php', ['id' => $user->id, 'course' => $dlx->course->id]);
+        $picture = $OUTPUT->user_picture($user, ['link' => false, 'alttext' => false, 'courseid' => $dlx->course->id]);
+        return html_writer::link($profileurl, $picture . fullname($user));
+    }
+    // phpcs:enable moodle.PHP.ForbiddenGlobalUse.BadGlobal
 
     /**
      * Display firstname.
@@ -607,6 +637,11 @@ class renderer extends datalynxfield_renderer {
         // A dedicated profile-editor pseudo-field exclusively owns its own format tag.
         if ($fieldinternalname === 'profileeditor') {
             return ["##author:{$this->field->name()}##" => [true, $cat]];
+        }
+
+        // Entryauthor tag ##author## is always available as the plain default (full name, no format applied).
+        if ($fieldinternalname === 'name') {
+            $patterns['##author##'] = [true, $cat];
         }
 
         $formats = \mod_datalynx\local\field_format\manager::get_formats_for_instance(

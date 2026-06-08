@@ -28,6 +28,15 @@ class field_format_form extends \mod_datalynx\form\field_format_base_form {
      * Define the specific elements for the gradeitem format.
      */
     protected function format_definition() {
-        // Default implementation has no extra elements.
+        $mform = &$this->_form;
+
+        $mform->addElement(
+            'text',
+            'decimals',
+            get_string('fieldformat_decimals', 'datalynxfield_gradeitem'),
+            ['size' => 3]
+        );
+        $mform->setType('decimals', PARAM_INT);
+        $mform->addHelpButton('decimals', 'fieldformat_decimals', 'datalynxfield_gradeitem');
     }
 }
