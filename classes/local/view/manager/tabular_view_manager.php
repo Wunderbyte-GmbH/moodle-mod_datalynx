@@ -215,9 +215,6 @@ class tabular_view_manager {
                 }
 
                 $tag = '[[' . $field->field->name . ']]';
-                if ($field->type === 'userinfo') {
-                    $tag = "##author:{$field->field->name}##";
-                }
 
                 $cells[] = [
                     'valuehtml' => $this->resolve_definition_html(

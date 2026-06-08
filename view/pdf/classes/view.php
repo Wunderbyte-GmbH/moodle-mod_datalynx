@@ -587,11 +587,7 @@ class view extends base {
             if (is_numeric($field->field->id) && $field->field->id > 0) {
                 $name = new html_table_cell($field->name() . ':');
                 $name->style = 'text-align:right;';
-                if ($field->type == "userinfo") {
-                    $content = new html_table_cell("##author:{$field->name()}##");
-                } else {
-                    $content = new html_table_cell("[[{$field->name()}]]");
-                }
+                $content = new html_table_cell("[[{$field->name()}]]");
                 $row = new html_table_row();
                 $row->cells = [$name, $content];
                 $table->data[] = $row;

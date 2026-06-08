@@ -149,14 +149,6 @@ final class field_formats_test extends advanced_testcase {
         $field->description = '';
         $DB->insert_record('datalynx_fields', $field);
 
-        // Add a field of type 'userinfo' named 'myuserinfo'.
-        $field2 = new stdClass();
-        $field2->dataid = $dlx->id();
-        $field2->name = 'myuserinfo';
-        $field2->type = 'userinfo';
-        $field2->description = '';
-        $DB->insert_record('datalynx_fields', $field2);
-
         // Create a view with legacy patterns.
         $view = new stdClass();
         $view->dataid = $dlx->id();
@@ -166,15 +158,12 @@ final class field_formats_test extends advanced_testcase {
         $view->section = 'Date field display: ##mytime:legacyformat##';
         $view->param1 = 'Details: [[mytime:anotherlegacy]]';
         $view->param2 = 'Author info: ##author:idnumber##';
-        $view->param3 = 'User info format: [[myuserinfo:checkbox]] and ##myuserinfo:customfieldformat##';
         $DB->insert_record('datalynx_views', $view);
 
         // Verify formats do not exist yet.
         $this->assertNull(\mod_datalynx\local\field_format\manager::get_format_by_name($dlx->id(), 'legacyformat'));
         $this->assertNull(\mod_datalynx\local\field_format\manager::get_format_by_name($dlx->id(), 'anotherlegacy'));
         $this->assertNull(\mod_datalynx\local\field_format\manager::get_format_by_name($dlx->id(), 'idnumber'));
-        $this->assertNull(\mod_datalynx\local\field_format\manager::get_format_by_name($dlx->id(), 'checkbox'));
-        $this->assertNull(\mod_datalynx\local\field_format\manager::get_format_by_name($dlx->id(), 'customfieldformat'));
 
         // Run the auto-creation scanner.
         \mod_datalynx\local\field_format\manager::auto_create_formats_from_templates($dlx->id());
@@ -192,16 +181,6 @@ final class field_formats_test extends advanced_testcase {
         $this->assertNotNull($format3);
         $this->assertEquals('entryauthor', $format3->get_fieldtype());
         $this->assertEquals('idnumber', $format3->get_setting('option'));
-
-        $format4 = \mod_datalynx\local\field_format\manager::get_format_by_name($dlx->id(), 'checkbox');
-        $this->assertNotNull($format4);
-        $this->assertEquals('userinfo', $format4->get_fieldtype());
-        $this->assertEquals('checkbox', $format4->get_setting('option'));
-
-        $format5 = \mod_datalynx\local\field_format\manager::get_format_by_name($dlx->id(), 'customfieldformat');
-        $this->assertNotNull($format5);
-        $this->assertEquals('userinfo', $format5->get_fieldtype());
-        $this->assertEquals('customfieldformat', $format5->get_setting('option'));
     }
 
     /**
@@ -245,149 +224,96 @@ final class field_formats_test extends advanced_testcase {
     }
 
     /**
-     * Test userinfo field pattern replacement with custom field format.
+     * Test that an entryauthor profile-editor format displays the entry author's custom profile field.
      */
-    public function test_userinfo_replacements_with_field_format(): void {
+    public function test_entryauthor_profile_editor_display(): void {
         global $DB;
 
         $course = $this->getDataGenerator()->create_course();
         $dlx = new datalynx($this->getDataGenerator()->create_module('datalynx', ['course' => $course->id])->id);
 
-        // Add user info field.
-        $fieldrecord = new stdClass();
-        $fieldrecord->dataid = $dlx->id();
-        $fieldrecord->name = 'custominfo';
-        $fieldrecord->type = 'userinfo';
-        $fieldrecord->description = '';
-        $fieldrecord->param1 = $DB->insert_record('user_info_field', [
-            'shortname' => 'zweitname',
-            'name' => 'Zweitname',
-            'datatype' => 'text',
-            'categoryid' => 1,
+        // Custom user profile field targeted by the format.
+        $proffield = $this->getDataGenerator()->create_custom_profile_field([
+            'datatype' => 'text', 'shortname' => 'zweitname', 'name' => 'Zweitname',
         ]);
-        $fieldrecord->param2 = 'zweitname';
-        $fieldrecord->param3 = 'text';
-        $fieldid = $DB->insert_record('datalynx_fields', $fieldrecord);
 
-        // Get userinfo field object.
-        $field = new \datalynxfield_userinfo\field($dlx, $DB->get_record('datalynx_fields', ['id' => $fieldid]));
-        $renderer = $field->renderer();
+        // entryauthor profile-editor format named 'custominfo' -> ##author:custominfo##.
+        \mod_datalynx\local\field_format\manager::save_format((object) [
+            'dataid' => $dlx->id(),
+            'name' => 'custominfo',
+            'fieldtype' => 'entryauthor',
+            'settings' => json_encode(['option' => 'zweitname', 'editable' => 1, 'mandatory' => 0]),
+        ]);
 
-        // Add custom profile field data for a user.
+        // Author with a value in the profile field.
         $user = $this->getDataGenerator()->create_user();
         $DB->insert_record('user_info_data', [
-            'userid' => $user->id,
-            'fieldid' => $fieldrecord->param1,
-            'data' => 'Hubert',
+            'userid' => $user->id, 'fieldid' => $proffield->id, 'data' => 'Hubert',
         ]);
 
-        // Create format option for userinfo field.
-        $record = new \stdClass();
-        $record->dataid = $dlx->id();
-        $record->name = 'myuserformat';
-        $record->fieldtype = 'userinfo';
-        $record->settings = json_encode(['option' => 'text']);
-        \mod_datalynx\local\field_format\manager::save_format($record);
-
-        // Create an entry where this user is the author.
         $entryid = (int) $DB->insert_record('datalynx_entries', (object) [
-            'dataid' => $dlx->id(),
-            'userid' => $user->id,
-            'timecreated' => time(),
-            'timemodified' => time(),
+            'dataid' => $dlx->id(), 'userid' => $user->id,
+            'timecreated' => time(), 'timemodified' => time(),
         ]);
         $entry = $DB->get_record('datalynx_entries', ['id' => $entryid]);
-        $entry->{"c{$fieldid}_content"} = 'Hubert';
 
-        // Call replacements.
-        $replacements = $renderer->replacements(['##custominfo:myuserformat##'], $entry);
+        // Resolve the dedicated profile-editor pseudo-field and render in (non-edit) display mode.
+        $fields = $dlx->get_fields();
+        $this->assertArrayHasKey('custominfo', $fields);
+        $renderer = $fields['custominfo']->renderer();
 
-        $this->assertIsArray($replacements);
-        $this->assertArrayHasKey('##custominfo:myuserformat##', $replacements);
-        $this->assertEquals('Hubert', $replacements['##custominfo:myuserformat##'][1]);
+        $replacements = $renderer->replacements(['##author:custominfo##'], $entry);
+        $this->assertArrayHasKey('##author:custominfo##', $replacements);
+        $this->assertSame('html', $replacements['##author:custominfo##'][0]);
+        $this->assertStringContainsString('Hubert', (string) $replacements['##author:custominfo##'][1]);
     }
 
     /**
-     * Test userinfo field format option set to a custom user profile field.
+     * Test that editing an entryauthor profile-editor format saves to the author's user profile field.
      */
-    public function test_userinfo_custom_profile_field_option(): void {
+    public function test_entryauthor_profile_editor_validation_saves_profile(): void {
         global $DB;
+
+        $this->setAdminUser();
 
         $course = $this->getDataGenerator()->create_course();
         $dlx = new datalynx($this->getDataGenerator()->create_module('datalynx', ['course' => $course->id])->id);
 
-        // Add user info field (main field, shortname 'zweitname').
-        $fieldrecord = new stdClass();
-        $fieldrecord->dataid = $dlx->id();
-        $fieldrecord->name = 'custominfo';
-        $fieldrecord->type = 'userinfo';
-        $fieldrecord->description = '';
-        $fieldrecord->param1 = $DB->insert_record('user_info_field', [
-            'shortname' => 'zweitname',
-            'name' => 'Zweitname',
-            'datatype' => 'text',
-            'categoryid' => 1,
-        ]);
-        $fieldrecord->param2 = 'zweitname';
-        $fieldrecord->param3 = 'text';
-        $fieldid = $DB->insert_record('datalynx_fields', $fieldrecord);
-
-        // Add another custom profile field ('birthday').
-        $birthdayfieldid = $DB->insert_record('user_info_field', [
-            'shortname' => 'birthday',
-            'name' => 'Birthday',
-            'datatype' => 'text',
-            'categoryid' => 1,
+        $proffield = $this->getDataGenerator()->create_custom_profile_field([
+            'datatype' => 'text', 'shortname' => 'birthday', 'name' => 'Birthday',
         ]);
 
-        // Create format option for userinfo field pointing to 'birthday'.
-        $record = new \stdClass();
-        $record->dataid = $dlx->id();
-        $record->name = 'mybirthdayformat';
-        $record->fieldtype = 'userinfo';
-        $record->settings = json_encode(['option' => 'birthday']);
-        \mod_datalynx\local\field_format\manager::save_format($record);
-
-        // Create an entry where a user is the author.
-        $user = $this->getDataGenerator()->create_user();
-        $entryid = (int) $DB->insert_record('datalynx_entries', (object) [
+        \mod_datalynx\local\field_format\manager::save_format((object) [
             'dataid' => $dlx->id(),
-            'userid' => $user->id,
-            'timecreated' => time(),
-            'timemodified' => time(),
+            'name' => 'mybirthday',
+            'fieldtype' => 'entryauthor',
+            'settings' => json_encode(['option' => 'birthday', 'editable' => 1, 'mandatory' => 1]),
         ]);
-        $entry = $DB->get_record('datalynx_entries', ['id' => $entryid]);
 
-        // Insert initial data for birthday.
+        $user = $this->getDataGenerator()->create_user();
         $DB->insert_record('user_info_data', [
-            'userid' => $user->id,
-            'fieldid' => $birthdayfieldid,
-            'data' => '1990-01-01',
+            'userid' => $user->id, 'fieldid' => $proffield->id, 'data' => '1990-01-01',
+        ]);
+        $entryid = (int) $DB->insert_record('datalynx_entries', (object) [
+            'dataid' => $dlx->id(), 'userid' => $user->id,
+            'timecreated' => time(), 'timemodified' => time(),
         ]);
 
-        // Get userinfo field object.
-        $field = new \datalynxfield_userinfo\field($dlx, $DB->get_record('datalynx_fields', ['id' => $fieldid]));
-        $renderer = $field->renderer();
+        $fields = $dlx->get_fields();
+        $this->assertArrayHasKey('mybirthday', $fields);
+        $renderer = $fields['mybirthday']->renderer();
 
-        // 1. Test view mode replacement.
-        $replacements = $renderer->replacements(['##custominfo:mybirthdayformat##'], $entry);
-        $this->assertIsArray($replacements);
-        $this->assertArrayHasKey('##custominfo:mybirthdayformat##', $replacements);
-        $this->assertEquals('1990-01-01', $replacements['##custominfo:mybirthdayformat##'][1]);
+        // The inline edit element is named field_{formatname}_{entryid}.
+        $formfieldname = "field_mybirthday_{$entryid}";
+        $formdata = (object) [$formfieldname => '1995-05-05'];
 
-        // 2. Test edit mode and validation/saving.
-        // We mock submitted form data.
-        $formfieldname = "field_{$fieldid}_{$entryid}_birthday";
-        $formdata = new stdClass();
-        $formdata->{$formfieldname} = '1995-05-05';
-
-        // Run validate which should update the profile data.
-        $errors = $renderer->validate($entryid, ['##custominfo:mybirthdayformat##'], $formdata);
+        $errors = $renderer->validate($entryid, ['##author:mybirthday##'], $formdata);
         $this->assertEmpty($errors);
 
-        // Verify that the birthday was updated on the user profile in the database.
-        $updatedval = $DB->get_field('user_info_data', 'data', ['userid' => $user->id, 'fieldid' => $birthdayfieldid]);
+        // The value is saved to the user profile field (never to datalynx content) and stripped from form data.
+        $updatedval = $DB->get_field('user_info_data', 'data', ['userid' => $user->id, 'fieldid' => $proffield->id]);
         $this->assertEquals('1995-05-05', $updatedval);
+        $this->assertFalse(property_exists($formdata, $formfieldname));
     }
 
     /**

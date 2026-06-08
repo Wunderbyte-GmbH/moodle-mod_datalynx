@@ -77,10 +77,6 @@ class view extends base {
                 $thisfield['tag'] = "[[{$field->name()}]]";
                 $thisfield['size'] = 3; // Show four elements per row, extend if necessary.
 
-                if ($field->type == "userinfo") {
-                    $thisfield['tag'] = "##author:{$field->name()}##";
-                }
-
                 $mustache['fields'][] = $thisfield;
             }
         }

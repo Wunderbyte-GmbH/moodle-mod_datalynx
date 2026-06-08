@@ -30,20 +30,39 @@ use ReflectionClass;
  * @covers \mod_datalynx\local\view\base::get_entry_form_patterns
  * @covers \mod_datalynx\local\view\base::get_entry_form_fields
  * @covers \mod_datalynx\local\view\datalynxview_entries_form::validation
- * @covers \datalynxfield_userinfo\renderer::validate
+ * @covers \datalynxfield_entryauthor\renderer::validate
  */
 final class entry_form_validation_test extends advanced_testcase {
     /**
-     * Build a grid fixture with a text field in the new-entry template and a userinfo field elsewhere in the view.
+     * Build a grid fixture with a text field in the new-entry template and an editable entryauthor
+     * profile-editor format (##author:Driver##) referenced elsewhere in the view (the section).
      *
-     * @return array
+     * @return array [datalynx, view record, text field record, profile-editor pseudo-field id]
      */
     private function create_grid_fixture(): array {
         global $DB;
 
+        // Custom user profile field targeted by the entryauthor profile-editor format.
+        $this->getDataGenerator()->create_custom_profile_field([
+            'datatype' => 'text',
+            'shortname' => 'driverinfo',
+            'name' => 'Driver info',
+        ]);
+
         $course = $this->getDataGenerator()->create_course();
         $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
         $dlx = new datalynx($instance->id);
+
+        // Editable entryauthor field format that targets the custom profile field. Its name "Driver"
+        // becomes the dedicated profile-editor pseudo-field id and the ##author:Driver## tag owner.
+        // Use save_format so the manager's static cache is invalidated (important under PHPUnit where
+        // datalynx ids are reused across rolled-back tests).
+        \mod_datalynx\local\field_format\manager::save_format((object) [
+            'dataid' => $dlx->id(),
+            'name' => 'Driver',
+            'fieldtype' => 'entryauthor',
+            'settings' => json_encode(['option' => 'driverinfo', 'editable' => 1, 'mandatory' => 1]),
+        ]);
 
         $view = (object) [
             'dataid' => $dlx->id(),
@@ -79,25 +98,7 @@ final class entry_form_validation_test extends advanced_testcase {
         ];
         $textfield->id = (int) $DB->insert_record('datalynx_fields', $textfield);
 
-        $userinfofield = (object) [
-            'dataid' => $dlx->id(),
-            'type' => 'userinfo',
-            'name' => 'Driver',
-            'description' => '',
-            'param1' => 0,
-            'param2' => 'driverinfo',
-            'param3' => 'text',
-            'param4' => '',
-            'param5' => '',
-            'param6' => 1,
-            'param7' => 1,
-            'param8' => '',
-            'param9' => '',
-            'param10' => '',
-        ];
-        $userinfofield->id = (int) $DB->insert_record('datalynx_fields', $userinfofield);
-
-        return [$dlx, $view, $textfield, $userinfofield];
+        return [$dlx, $view, $textfield, 'Driver'];
     }
 
     /**
@@ -130,7 +131,7 @@ final class entry_form_validation_test extends advanced_testcase {
         $this->resetAfterTest();
         $this->setAdminUser();
 
-        [$dlx, $viewrecord, $textfield, $userinfofield] = $this->create_grid_fixture();
+        [$dlx, $viewrecord, $textfield, $profilefieldid] = $this->create_grid_fixture();
 
         $view = $dlx->get_view('grid', $viewrecord);
 
@@ -138,15 +139,15 @@ final class entry_form_validation_test extends advanced_testcase {
         $fields = $view->get_entry_form_fields();
 
         $this->assertArrayHasKey($textfield->id, $patterns);
-        $this->assertArrayNotHasKey($userinfofield->id, $patterns);
+        $this->assertArrayNotHasKey($profilefieldid, $patterns);
         $this->assertArrayHasKey($textfield->id, $fields);
-        $this->assertArrayNotHasKey($userinfofield->id, $fields);
+        $this->assertArrayNotHasKey($profilefieldid, $fields);
     }
 
     /**
-     * New-entry validation must not touch userinfo fields omitted from the template.
+     * New-entry validation must not touch profile-editor fields omitted from the template.
      */
-    public function test_new_entry_validation_skips_userinfo_field_not_in_template(): void {
+    public function test_new_entry_validation_skips_profile_editor_field_not_in_template(): void {
         $this->resetAfterTest();
         $this->setAdminUser();
 
@@ -164,17 +165,19 @@ final class entry_form_validation_test extends advanced_testcase {
     }
 
     /**
-     * Userinfo validation should safely no-op if the form field was never rendered.
+     * Profile-editor validation should safely no-op if the form field was never rendered.
      */
-    public function test_userinfo_validation_ignores_missing_form_property(): void {
+    public function test_profile_editor_validation_ignores_missing_form_property(): void {
         $this->resetAfterTest();
         $this->setAdminUser();
 
-        [$dlx, , , $userinfofield] = $this->create_grid_fixture();
+        [$dlx, , , $profilefieldid] = $this->create_grid_fixture();
 
-        $field = $dlx->get_field_from_id($userinfofield->id);
+        $fields = $dlx->get_fields();
+        $this->assertArrayHasKey($profilefieldid, $fields);
+        $field = $fields[$profilefieldid];
 
-        $errors = $field->renderer()->validate(-1, ["##author:{$userinfofield->name}##"], (object) []);
+        $errors = $field->renderer()->validate(-1, ["##author:{$profilefieldid}##"], (object) []);
 
         $this->assertSame([], $errors);
     }

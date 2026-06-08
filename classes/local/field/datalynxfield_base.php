@@ -265,7 +265,6 @@ abstract class datalynxfield_base {
             'textarea'                     => 'fa-solid fa-align-left',
             'time'                         => 'fa-solid fa-clock',
             'url'                          => 'fa-solid fa-link',
-            'userinfo'                     => 'fa-solid fa-circle-user',
             'youtube'                      => 'fa-brands fa-youtube',
         ];
         $classes = $iconmap[$this->type] ?? 'fa-solid fa-question-circle';
@@ -665,8 +664,19 @@ abstract class datalynxfield_base {
     public function get_sort_from_sql($paramname = 'sortie', $paramcount = '') {
         $fieldid = $this->field->id;
         if (is_numeric($fieldid) && $fieldid > 0) {
-            $sql = " LEFT JOIN {datalynx_contents} c$fieldid
-            ON (c$fieldid.entryid = e.id AND c$fieldid.fieldid = :$paramname$paramcount)";
+            // Use a subquery with GROUP BY to ensure at most one row per entry.
+            // A direct JOIN on datalynx_contents can produce multiple rows for multi-value
+            // (fieldgroup) fields, causing duplicate e.id values that break SELECT DISTINCT.
+            $sql = " LEFT JOIN (SELECT MIN(id) AS id, entryid,
+                                       MIN(content) AS content,
+                                       MIN(content1) AS content1,
+                                       MIN(content2) AS content2,
+                                       MIN(content3) AS content3,
+                                       MIN(content4) AS content4
+                                FROM {datalynx_contents}
+                                WHERE fieldid = :$paramname$paramcount
+                                GROUP BY entryid) c$fieldid
+                    ON c$fieldid.entryid = e.id";
             return [$sql, $fieldid];
         } else {
             return null;

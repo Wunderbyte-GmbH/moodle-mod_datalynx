@@ -16,14 +16,11 @@
 
 /**
  *
- * @package datalynxfield_userinfo
- * @subpackage userinfo
+ * @package datalynxfield_entryauthor
+ * @subpackage entryauthor
  * @copyright 2013 onwards edulabs.org and associated programmers
- * @copyright based on the work by 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') || die();
-
-$plugin->version = 2012061800;
-$plugin->requires = 2010112400;
-$plugin->component = 'datalynxfield_userinfo';
+$string['infofield_editable_help'] = 'Erlaubt dem Eintragsautor (und Personen, die dessen Profil bearbeiten dürfen), dieses Nutzerprofilfeld direkt zu bearbeiten. Gilt nur, wenn das Format auf ein benutzerdefiniertes Profilfeld verweist.';
+$string['infofield_mandatory_help'] = 'Dieses Feld als Pflichtfeld festlegen; es darf nicht leer gespeichert werden. Gilt nur, wenn das Feld bearbeitbar ist.';
+$string['profilefieldtype'] = 'Typ';

@@ -1391,6 +1391,16 @@ function xmldb_datalynx_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2026060701, 'datalynx');
     }
 
+    if ($oldversion < 2026060702) {
+        // The userinfo field type has been removed. Its feature (inline editing of a user profile
+        // field) is now an entryauthor field format. Migrate every legacy userinfo field instance
+        // into an entryauthor field format and delete the legacy field rows. Pure DB, so it does
+        // not depend on the removed datalynxfield_userinfo classes.
+        \mod_datalynx\local\field_format\manager::migrate_userinfo_fields();
+
+        upgrade_mod_savepoint(true, 2026060702, 'datalynx');
+    }
+
     return true;
 }
 

@@ -650,11 +650,7 @@ class view extends base {
         foreach ($fields as $field) {
             if (is_numeric($field->field->id) && $field->field->id > 0) {
                 $fieldname = $field->name();
-                if ($field->type == "userinfo") {
-                    $this->view->param2 .= "##author:{$fieldname}##\n";
-                } else {
-                    $this->view->param2 .= "[[$fieldname]]\n";
-                }
+                $this->view->param2 .= "[[$fieldname]]\n";
             }
         }
     }

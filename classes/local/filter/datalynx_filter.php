@@ -28,7 +28,6 @@ use datalynxfield_no_content_can_join;
 use datalynxfield_option_single;
 use datalynxfield_select;
 use datalynxfield_teammemberselect;
-use datalynxfield_userinfo;
 use mod_datalynx\local\field\datalynxfield_option_multiple;
 use stdClass;
 
@@ -361,23 +360,6 @@ class datalynx_filter {
                                     $searchparams[$paramid] = $field->id();
                                     $i++;
                                 }
-                            }
-                        } else {
-                            if ($field instanceof datalynxfield_userinfo) {
-                                $paramlike = "fieldquicksearch$i";
-                                $paramid = "fieldid$i";
-                                $searchlike[$paramlike] = "(" .
-                                        $DB->sql_like(
-                                            "c{$field->id()}.data",
-                                            ":$paramlike",
-                                            false,
-                                            false
-                                        ) . ")";
-                                $searchparams[$paramlike] = '%' . $DB->sql_like_escape(
-                                    $simplesearch
-                                ) . '%';
-                                $searchparams[$paramid] = $field->id();
-                                $i++;
                             }
                         }
                     }

@@ -26,7 +26,6 @@ Feature: Datalynx multi-step form with redirect-and-continue editing option
     And I am on "Course 1" course homepage
     And I add to the "Datalynx Test Instance" datalynx the following fields:
       | type     | name      | description | param1 | param6 | param2 |
-      | userinfo | UserInfo1 |             | uinfo  | 1      |        |
       | text     | Text1     |             |        |        |        |
       | text     | Text2     |             |        |        |        |
       | text     | Text3     |             |        |        |        |
@@ -55,7 +54,7 @@ Feature: Datalynx multi-step form with redirect-and-continue editing option
     And I press "Save changes"
     And I click on "Edit Step1View" "link"
     And I click on "Entry template" "link"
-    And I set the "id_eparam2_editor" editor to "UserInfo1: ##author:Datalynx field UserInfo1## Text1: [[Datalynx field Text1]] ##submit## ##cancel##"
+    And I set the "id_eparam2_editor" editor to "Text1: [[Datalynx field Text1]] ##submit## ##cancel##"
     And I press "Save changes"
     # Configure View 2
     And I follow "Manage"
@@ -83,7 +82,7 @@ Feature: Datalynx multi-step form with redirect-and-continue editing option
     And I follow "Manage"
     And I click on "Edit Step4View" "link"
     And I click on "Entry template" "link"
-    And I set the "id_eparam2_editor" editor to "UserInfo1: ##author:Datalynx field UserInfo1## Text1: [[Datalynx field Text1]] Text2: [[Datalynx field Text2]] Text3: [[Datalynx field Text3]] Text4: [[Datalynx field Text4]] Text5: [[Datalynx field Text5]]"
+    And I set the "id_eparam2_editor" editor to "Text1: [[Datalynx field Text1]] Text2: [[Datalynx field Text2]] Text3: [[Datalynx field Text3]] Text4: [[Datalynx field Text4]] Text5: [[Datalynx field Text5]]"
     And I press "Save changes"
     And I log out
 
@@ -93,12 +92,10 @@ Feature: Datalynx multi-step form with redirect-and-continue editing option
     And I follow "Datalynx Test Instance"
     And I follow "Add a new entry"
     # Fill View 1
-    Then I should see "UserInfo1"
     And I should see "Text1"
     And I should not see "default_save"
     And I fill in the entry form fields
       | type     | name      | value          |
-      | userinfo | UserInfo1 | student1       |
       | text     | Text1     | Value for view1|
     And I press "Save changes"
     # Redirection to View 2 in Edit Mode
@@ -118,8 +115,7 @@ Feature: Datalynx multi-step form with redirect-and-continue editing option
       | text     | Text5     | More view3 val |
     And I press "Save changes"
     # Redirection to View 4 in View/Display Mode
-    Then I should see "student1"
-    And I should see "Value for view1"
+    Then I should see "Value for view1"
     And I should see "Value for view2"
     And I should see "More view2 val"
     And I should see "Value for view3"
@@ -131,9 +127,7 @@ Feature: Datalynx multi-step form with redirect-and-continue editing option
     And I am on "Course 1" course homepage
     And I follow "Datalynx Test Instance"
     And I follow "Add a new entry"
-    Then I should see "UserInfo1"
-    And I should see "Text1"
+    Then I should see "Text1"
     And I press "Cancel"
-    Then I should not see "UserInfo1"
-    And I should not see "Text1"
+    Then I should not see "Text1"
     And I should not see "updated"
