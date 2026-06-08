@@ -22,5 +22,10 @@
  * @copyright based on the work  by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+$string['fieldformat_option'] = 'Display format';
+$string['fieldformat_option_default'] = 'Label only';
+$string['fieldformat_option_help'] = 'Controls what is displayed in views. "Label only" shows the human-readable option label. "Key-value pairs" renders label=key. "Key/index" shows only the stored key or index value.';
+$string['fieldformat_option_key'] = 'Selected option key/index';
+$string['fieldformat_option_options'] = 'Key-value pairs';
 $string['pluginname'] = 'Select';
 $string['privacy:metadata'] = 'Selectboxes do not store personal data.';

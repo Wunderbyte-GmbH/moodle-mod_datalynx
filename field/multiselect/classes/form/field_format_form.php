@@ -28,6 +28,23 @@ class field_format_form extends \mod_datalynx\form\field_format_base_form {
      * Define the specific elements for the multiselect format.
      */
     protected function format_definition() {
-        // Default implementation has no extra elements.
+        $mform = &$this->_form;
+
+        $options = [
+            'newline'    => get_string('fieldformat_separator_newline', 'datalynxfield_multiselect'),
+            'space'      => get_string('fieldformat_separator_space', 'datalynxfield_multiselect'),
+            'comma'      => get_string('fieldformat_separator_comma', 'datalynxfield_multiselect'),
+            'commaspace' => get_string('fieldformat_separator_commaspace', 'datalynxfield_multiselect'),
+            'list'       => get_string('fieldformat_separator_list', 'datalynxfield_multiselect'),
+        ];
+        $mform->addElement(
+            'select',
+            'option',
+            get_string('fieldformatoption', 'mod_datalynx'),
+            $options
+        );
+        $mform->setType('option', PARAM_ALPHA);
+        $mform->addRule('option', get_string('required'), 'required', null, 'client');
+        $mform->addHelpButton('option', 'fieldformat_separator', 'datalynxfield_multiselect');
     }
 }

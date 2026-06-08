@@ -24,6 +24,12 @@
  */
 $string['applymediafilter'] = 'Apply media filter';
 $string['displaylinktext'] = 'Display input field for specifying a link text in edit mode.';
+$string['fieldformat_option'] = 'Display format';
+$string['fieldformat_option_help'] = 'Controls how the URL is rendered in views. "Link" renders a clickable hyperlink. "Image" embeds the URL as an image at its natural size. "Image flexible" embeds it as a responsive image. "Media player" uses the Moodle media filter to play audio/video.';
+$string['fieldformat_option_image'] = 'Image';
+$string['fieldformat_option_imageflex'] = 'Image flexible';
+$string['fieldformat_option_link'] = 'Link';
+$string['fieldformat_option_media'] = 'Media player';
 $string['forcename'] = 'Force name for the link';
 $string['linktext'] = 'Link text';
 $string['makeimage'] = 'Make the url an image';

@@ -22,5 +22,7 @@
  * @copyright based on the work  by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+$string['fieldformat_maxlength'] = 'Excerpt length (characters)';
+$string['fieldformat_maxlength_help'] = 'Creates an excerpt by showing only the first N characters of the text in views, followed by an ellipsis (…). This only affects how the value is displayed — the full text is always stored and available for editing. Leave empty or 0 to display the full text.';
 $string['pluginname'] = 'Text';
 $string['privacy:metadata'] = 'Textfields do not store personal data.';

@@ -90,6 +90,11 @@ $menufield = [];
 
 foreach ($directories as $directory) {
     if ($directory[0] != '_' && strpos($directory, 'entry') !== 0) {
+        // Skip internal fields that cannot be manually added.
+        $fieldclass = "datalynxfield_{$directory}\\field";
+        if (class_exists($fieldclass) && $fieldclass::is_internal()) {
+            continue;
+        }
         // Get name from language files.
         $menufield[$directory] = get_string('pluginname', "datalynxfield_$directory");
     }

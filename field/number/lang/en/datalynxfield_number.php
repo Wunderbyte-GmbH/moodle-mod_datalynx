@@ -23,6 +23,8 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 $string['decimals'] = 'Decimals';
+$string['fieldformat_decimals'] = 'Decimal places';
+$string['fieldformat_decimals_help'] = 'Number of decimal places to display for the number value. Leave empty to use the field\'s own decimal setting. For example, a value of 1 renders 3.5, while 0 renders 4.';
 $string['outputemptystring'] = 'When the field ist left empty: Output empty string instead of 0.';
 $string['pluginname'] = 'Number';
 $string['privacy:metadata'] = 'Numbers do not store personal data.';
