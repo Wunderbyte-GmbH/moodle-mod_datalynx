@@ -63,6 +63,15 @@ final class entryauthor_field_renderer_test extends advanced_testcase {
         $record->settings = json_encode([]);
         \mod_datalynx\local\field_format\manager::save_format($record);
 
+        // The ##author:edit## tag is no longer a default; it must be opted into by creating an
+        // entryauthor field format (here named 'edit') whose option is set to 'edit'.
+        $editrecord = new \stdClass();
+        $editrecord->dataid = $dlx->id();
+        $editrecord->name = 'edit';
+        $editrecord->fieldtype = 'entryauthor';
+        $editrecord->settings = json_encode(['option' => 'edit']);
+        \mod_datalynx\local\field_format\manager::save_format($editrecord);
+
         // Use reflection to call the protected patterns() method.
         $method = new ReflectionMethod($renderer, 'patterns');
         $method->setAccessible(true);
