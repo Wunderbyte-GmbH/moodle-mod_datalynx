@@ -23,6 +23,7 @@
  *
  */
 $string['action'] = 'Action';
+$string['actionnotallowed'] = 'You are not allowed to perform this action in this view.';
 $string['actions'] = 'Entry actions';
 $string['activate'] = 'activate';
 $string['addline'] = 'Add {$a}';
@@ -875,6 +876,8 @@ $string['viewcustomhours'] = 'Custom refresh interval: hours';
 $string['viewcustomminutes'] = 'Custom refresh interval: minutes';
 $string['viewdescription'] = 'View description';
 $string['viewedit'] = 'Editing \'{$a}\'';
+$string['vieweditnotallowed'] = 'This view cannot be edited. You will be redirected to the default view.';
+$string['vieweditnotallowedtitle'] = 'Cannot edit';
 $string['vieweditthis'] = 'Edit this view';
 $string['viewfieldtags'] = 'Field tags';
 $string['viewfilter'] = 'Filter';

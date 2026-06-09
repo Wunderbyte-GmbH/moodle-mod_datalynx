@@ -149,6 +149,15 @@ abstract class base {
     protected bool $returntoentriesform = false;
 
     /**
+     * Set to true when the user tries to edit entries via this view but the view's entry template
+     * does not contain an edit action tag (e.g. ##edit##, ##submit## or ##multiedit##). In that case
+     * the edit form must not be shown; instead the user is informed and redirected to the default view.
+     *
+     * @var bool
+     */
+    protected bool $editnotallowed = false;
+
+    /**
      * View id used for post-action redirect.
      *
      * @var int
@@ -772,7 +781,24 @@ abstract class base {
      * @return string (empty string of tohtml = false, html when tohtml is true)
      */
     public function display(array $options = []): string {
-        global $OUTPUT;
+        global $OUTPUT, $PAGE;
+
+        // The user requested to edit entries through a view whose entry template does not allow
+        // editing. Inform the user with a modal and redirect to the default view once acknowledged.
+        // The view itself is still rendered (read only) behind the modal.
+        if ($this->editnotallowed) {
+            $defaultviewid = $this->dlx->get_default_view_id() ?: ($this->redirect ?: $this->id());
+            $redirecturl = new moodle_url('/mod/datalynx/' . $this->dlx->pagefile_for_urls() . '.php', [
+                'd' => $this->dlx->id(),
+                'view' => $defaultviewid,
+            ]);
+            $PAGE->requires->js_call_amd('mod_datalynx/editnotallowed', 'init', [
+                $redirecturl->out(false),
+                get_string('vieweditnotallowedtitle', 'datalynx'),
+                get_string('vieweditnotallowed', 'datalynx'),
+            ]);
+        }
+
         // Set display options.
         $new = optional_param('new', 0, PARAM_INT);
         $displaycontrols = $options['controls'] ?? true;
@@ -2152,6 +2178,13 @@ abstract class base {
                     ]);
                     redirect($url);
                 }
+            } else if ($action === 'edit') {
+                // An edit was submitted (e.g. a stale or forged request) for a view that does not
+                // allow editing. Show the modal informing the user instead of silently redirecting
+                // and losing the submitted data without feedback.
+                $this->editnotallowed = true;
+                $this->editentries = [];
+                return false;
             } else {
                 $illegalaction = true;
             }
@@ -2159,6 +2192,25 @@ abstract class base {
 
         // TODO: MDL-00000 Check if this is the right place to assign the var.
         $this->editentries = $editentries;
+
+        // Editing existing entries was requested via URL (e.g. ?editentries=1&eids=1) without a form
+        // submission. Make sure the view's entry template actually allows editing (contains an edit
+        // action tag such as ##edit##, ##submit## or ##multiedit##). Without this check the edit form
+        // would be shown for views that cannot be edited, and saving would silently fail.
+        if (!empty($this->editentries) && !$new) {
+            $editsexisting = false;
+            foreach ($this->editentries as $eid) {
+                if ((int) $eid >= 0) {
+                    $editsexisting = true;
+                    break;
+                }
+            }
+            if ($editsexisting && !$this->confirm_view_action('edit')) {
+                $this->editnotallowed = true;
+                $this->editentries = [];
+                return false;
+            }
+        }
 
         if ($new) {
             if (
@@ -2214,7 +2266,7 @@ abstract class base {
 
         if ($illegalaction) {
             $url = new moodle_url('view.php', ['d' => $this->dlx->id(), 'view' => $this->id()]);
-            redirect($url);
+            redirect($url, get_string('actionnotallowed', 'datalynx'), null, \core\output\notification::NOTIFY_ERROR);
         }
 
         return false;
@@ -2232,7 +2284,9 @@ abstract class base {
      */
     private function confirm_view_action($action): bool {
         global $DB;
-        $targetview = optional_param('view', 0, PARAM_INT);
+        // Fall back to the current view when no explicit target view is given in the request, e.g.
+        // when editing on the default view without a 'view' URL parameter.
+        $targetview = optional_param('view', 0, PARAM_INT) ?: $this->id();
         $view = $DB->get_record('datalynx_views', ['id' => $targetview]);
         if (!$view) {
             return false;
@@ -2247,11 +2301,15 @@ abstract class base {
             return true;
         }
         if ($action === 'edit' || $action === 'addnewentry') {
-            if (
-                (strpos($view->param2 ?? '', '##submit') !== false) ||
-                    (strpos($view->section ?? '', '##submit') !== false)
-            ) {
-                return true;
+            // The ##submit## field and the ##multiedit## action both let the user edit existing
+            // entries, so a view containing either of them must be treated as editable.
+            foreach (['##submit', '##multiedit'] as $edittag) {
+                if (
+                    (strpos($view->param2 ?? '', $edittag) !== false) ||
+                        (strpos($view->section ?? '', $edittag) !== false)
+                ) {
+                    return true;
+                }
             }
         }
         return false;

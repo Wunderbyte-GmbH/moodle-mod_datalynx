@@ -21,6 +21,7 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
  */
+$string['actionnotallowed'] = 'Sie dürfen diese Aktion in dieser Ansicht nicht ausführen.';
 $string['actions'] = 'Aktionen nach Hinzufügen eines Eintrags';
 $string['activate'] = 'Aktivieren';
 $string['addline'] = 'Füge {$a} hinzu';
@@ -844,6 +845,8 @@ $string['viewcustomhours'] = 'Custom refresh interval: Stunden';
 $string['viewcustomminutes'] = 'Custom refresh interval: Minuten';
 $string['viewdescription'] = 'Beschreibung anzeigen';
 $string['viewedit'] = 'Bearbeite \'{$a}\'';
+$string['vieweditnotallowed'] = 'Diese Ansicht kann nicht bearbeitet werden. Sie werden zur Standardansicht weitergeleitet.';
+$string['vieweditnotallowedtitle'] = 'Bearbeiten nicht möglich';
 $string['viewfieldtags'] = 'Feldbetzeichnungen';
 $string['viewfilter'] = 'Filter';
 $string['viewfilteroverride'] = 'Filteroverride';
