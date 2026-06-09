@@ -17,6 +17,26 @@
 /**
  * Field formats list page in mod_datalynx.
  *
+ * This page lists, and lets a manager add, edit and delete, the custom "field
+ * formats" defined for a single datalynx instance.
+ *
+ * What is a field format?
+ * A field format is a named, reusable display configuration that is bound to a
+ * particular field type (e.g. text, date, teammemberselect). Instead of changing
+ * how a field looks everywhere, a field format captures a set of presentation
+ * settings (stored as JSON in the datalynx_field_formats table) that can be
+ * applied selectively wherever the field is output.
+ *
+ * A format is applied by referencing its name in a template tag with a colon
+ * suffix, e.g. ##author:myformat## or [[fieldname:myformat]]. When the entry is
+ * rendered, the matching format's settings are used to alter the field's display
+ * output (via {@see \mod_datalynx\local\field_format\base::format_display()}) or
+ * its edit form (via format_edit()). The same field can therefore be shown in
+ * different ways in different views by referencing different formats — for
+ * example a date field rendered as "2026-06-09" in one view and "9 June 2026" in
+ * another. The available settings per format are defined by the field type's own
+ * format class, which extends {@see \mod_datalynx\local\field_format\base}.
+ *
  * @package    mod_datalynx
  * @copyright  2026 David Bogner
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -110,9 +130,14 @@ if ($formats) {
             $OUTPUT->pix_icon('t/edit', get_string('edit'))
         );
 
-        $delete = html_writer::link(
-            new moodle_url('/mod/datalynx/fieldformat/index.php', $linkparams + ['delete' => $formatid]),
-            $OUTPUT->pix_icon('t/delete', get_string('delete'))
+        $deleteurl = new moodle_url('/mod/datalynx/fieldformat/index.php', $linkparams + ['delete' => $formatid]);
+        $confirmaction = new confirm_action(
+            get_string('fieldformatconfirmdelete', 'datalynx', $format->get_name())
+        );
+        $delete = $OUTPUT->action_icon(
+            $deleteurl,
+            new pix_icon('t/delete', get_string('delete')),
+            $confirmaction
         );
 
         $table->add_data([$name, $fieldtype, $edit, $delete]);

@@ -462,4 +462,78 @@ final class field_formats_test extends advanced_testcase {
         $defaults = $gradeformat->get_default_settings_for_name('3');
         $this->assertEquals(3, $defaults['decimals']);
     }
+
+    /**
+     * Legacy ##field:suffix## tags must map to the setting keys the renderers read, so formats
+     * auto-created during upgrade/restore reproduce the legacy rendering instead of empty settings.
+     *
+     * @dataProvider legacy_suffix_defaults_provider
+     * @param string $fieldtype The field type.
+     * @param string $name The legacy suffix / format name.
+     * @param array $expected The expected default settings.
+     */
+    public function test_legacy_suffix_default_settings(string $fieldtype, string $name, array $expected): void {
+        $format = \mod_datalynx\local\field_format\manager::get_format_instance((object)[
+            'fieldtype' => $fieldtype,
+            'name' => $name,
+            'settings' => json_encode([]),
+        ]);
+        $this->assertNotNull($format);
+        $this->assertSame($expected, $format->get_default_settings_for_name($name));
+    }
+
+    /**
+     * Data provider for {@see test_legacy_suffix_default_settings}.
+     *
+     * @return array
+     */
+    public static function legacy_suffix_defaults_provider(): array {
+        return [
+            'time:timestamp' => ['time', 'timestamp', ['dateformat' => 'timestamp']],
+            'time:date' => ['time', 'date', ['dateformat' => get_string('strftimedate')]],
+            'time:year' => ['time', 'year', ['dateformat' => '%Y']],
+            'time:unknown' => ['time', 'whatever', []],
+            'picture:thumb' => ['picture', 'thumb', ['mode' => 'thumb']],
+            'picture:tn' => ['picture', 'tn', ['mode' => 'thumb']],
+            'picture:lightbox' => ['picture', 'lightbox', ['mode' => 'lightbox']],
+            'file:url' => ['file', 'url', ['mode' => 'url']],
+            'file:download' => ['file', 'download', ['mode' => 'download']],
+            'coursegroup:course' => ['coursegroup', 'course', ['mode' => 'course']],
+            'coursegroup:groupid' => ['coursegroup', 'groupid', ['mode' => 'groupid']],
+            'duration:unit' => ['duration', 'unit', ['mode' => 'unit']],
+            'duration:interval' => ['duration', 'interval', ['mode' => 'interval']],
+            'editor:excerpt' => ['editor', 'excerpt', ['excerpt' => 1]],
+            'teammemberselect:subscribe' => ['teammemberselect', 'subscribe', ['subscribe' => 1]],
+        ];
+    }
+
+    /**
+     * The auto-creation scanner must not create format records for field types whose formats carry
+     * no settings (has_options() === false, e.g. tag); doing so would only shadow the legacy
+     * ##field:suffix## option (such as tag's :nolink) at render time without reproducing it.
+     */
+    public function test_auto_create_skips_optionless_field_types(): void {
+        global $DB;
+        $dlx = $this->create_test_datalynx();
+
+        // A tag field (has_options() === false) and a time field (has_options() === true).
+        $DB->insert_record('datalynx_fields', (object)[
+            'dataid' => $dlx->id(), 'name' => 'mytag', 'type' => 'tag', 'description' => '',
+        ]);
+        $DB->insert_record('datalynx_fields', (object)[
+            'dataid' => $dlx->id(), 'name' => 'mytime', 'type' => 'time', 'description' => '',
+        ]);
+
+        $DB->insert_record('datalynx_views', (object)[
+            'dataid' => $dlx->id(), 'name' => 'View', 'type' => 'grid', 'description' => '',
+            'section' => 'Tag: [[mytag:nolink]] Time: ##mytime:datey##',
+        ]);
+
+        \mod_datalynx\local\field_format\manager::auto_create_formats_from_templates($dlx->id());
+
+        // The option-less tag format must NOT be created, so the legacy $options['nolink'] path survives.
+        $this->assertNull(\mod_datalynx\local\field_format\manager::get_format_by_name($dlx->id(), 'nolink'));
+        // The option-bearing time format is still created as before.
+        $this->assertNotNull(\mod_datalynx\local\field_format\manager::get_format_by_name($dlx->id(), 'datey'));
+    }
 }

@@ -40,4 +40,18 @@ class field_format extends \mod_datalynx\local\field_format\base {
         $mform->addElement('select', 'mode', 'Output mode', $modes);
         $mform->setType('mode', PARAM_ALPHA);
     }
+
+    /**
+     * Map legacy ##field:suffix## tags to the mode setting so formats auto-created during
+     * upgrade/restore reproduce the legacy rendering.
+     *
+     * @param string $name
+     * @return array
+     */
+    public function get_default_settings_for_name(string $name): array {
+        if (in_array($name, ['course', 'group', 'courseid', 'groupid'], true)) {
+            return ['mode' => $name];
+        }
+        return [];
+    }
 }

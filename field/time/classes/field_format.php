@@ -34,4 +34,31 @@ class field_format extends \mod_datalynx\local\field_format\base {
         $mform->setType('dateformat', PARAM_TEXT);
         $mform->addHelpButton('dateformat', 'dateformat', 'datalynxfield_time');
     }
+
+    /**
+     * Inferred defaults mapping legacy ##field:suffix## tags to a dateformat setting, so formats
+     * auto-created during upgrade/restore reproduce the legacy rendering (mirrors entrytime).
+     *
+     * @param string $name
+     * @return array
+     */
+    public function get_default_settings_for_name(string $name): array {
+        $map = [
+            'date'      => get_string('strftimedate'),
+            'timestamp' => 'timestamp',
+            'minute'    => '%M',
+            'hour'      => '%H',
+            'day'       => '%a',
+            'd'         => '%a',
+            'week'      => '%V',
+            'month'     => '%b',
+            'm'         => '%m',
+            'year'      => '%Y',
+            'Y'         => '%Y',
+        ];
+        if (isset($map[$name])) {
+            return ['dateformat' => $map[$name]];
+        }
+        return [];
+    }
 }

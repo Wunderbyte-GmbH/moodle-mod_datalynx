@@ -146,12 +146,12 @@ class renderer extends datalynxfield_renderer {
             $content = $entry->{"c{$fieldid}_content"};
             $contentprepare = str_replace("#", "", $content);
 
-            $options = $field->options_menu();
+            $menuoptions = $field->options_menu();
 
             $contents = explode(',', $contentprepare);
 
             $str = [];
-            foreach ($options as $key => $option) {
+            foreach ($menuoptions as $key => $option) {
                 $selected = (int) in_array($key, $contents);
                 if ($selected) {
                     $str[] = $option;

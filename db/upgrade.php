@@ -1233,60 +1233,30 @@ function xmldb_datalynx_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2026052500, 'datalynx');
     }
 
-    if ($oldversion < 2026060600) {
-        // Define table datalynx_field_formats to be created.
-        $table = new xmldb_table('datalynx_field_formats');
+    if ($oldversion < 2026060900) {
+        // Field Formats: single, clean migration from the pre-Field-Format codebase.
+        // The Field Format feature was built up over several incremental upgrade steps
+        // (2026060600-2026060703) that were only ever deployed to development sites. Because the
+        // code has not been released, those steps are collapsed here into one idempotent
+        // migration: production sites (all still < 2026060600) upgrade in a single pass, and
+        // re-running on an already-migrated development site is a no-op.
 
-        // Adding fields to table datalynx_field_formats.
+        // 1. Create the datalynx_field_formats table.
+        $table = new xmldb_table('datalynx_field_formats');
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
         $table->add_field('dataid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
         $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
         $table->add_field('fieldtype', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
         $table->add_field('settings', XMLDB_TYPE_TEXT, null, null, null, null, null);
-
-        // Adding keys to table datalynx_field_formats.
         $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
         $table->add_key('dataid', XMLDB_KEY_FOREIGN, ['dataid'], 'datalynx', ['id']);
-
-        // Conditionally launch create table for datalynx_field_formats.
         if (!$dbman->table_exists($table)) {
             $dbman->create_table($table);
         }
 
-        // Migrate existing legacy field formats by scanning views.
-        \mod_datalynx\local\field_format\manager::auto_create_formats_from_all_instances();
-
-        // Datalynx savepoint reached.
-        upgrade_mod_savepoint(true, 2026060600, 'datalynx');
-    }
-
-    if ($oldversion < 2026060601) {
-        // Re-run the scan to auto-create formats for newly supported virtual field tags (ratings, comments, etc.).
-        \mod_datalynx\local\field_format\manager::auto_create_formats_from_all_instances();
-
-        // Populate inferred default settings (like dateformat for entrytime formats).
-        $formats = $DB->get_records('datalynx_field_formats');
-        foreach ($formats as $formatrec) {
-            $existing = json_decode($formatrec->settings ?? '{}', true);
-            if (!empty($existing)) {
-                continue;
-            }
-            $classname = "\\datalynxfield_{$formatrec->fieldtype}\\field_format";
-            if (class_exists($classname)) {
-                $instance  = new $classname($formatrec);
-                $defaults  = $instance->get_default_settings_for_name($formatrec->name);
-                if (!empty($defaults)) {
-                    $formatrec->settings = json_encode($defaults);
-                    $DB->update_record('datalynx_field_formats', $formatrec);
-                }
-            }
-        }
-
-        upgrade_mod_savepoint(true, 2026060601, 'datalynx');
-    }
-
-    if ($oldversion < 2026060602) {
-        // 1. Update views template text to replace rating double colon tags with single colon tags.
+        // 2. Normalise legacy rating tags in the view templates (##ratings:avg:bar## -> avgbar and
+        // avg:star -> avgstar, in both ##...## and [[...]] styles) so the scan in step 4 creates
+        // correctly named rating formats.
         $textfields = [
             'patterns', 'section', 'param1', 'param2', 'param3',
             'param4', 'param5', 'param6', 'param7', 'param8',
@@ -1313,92 +1283,18 @@ function xmldb_datalynx_upgrade($oldversion) {
             }
         }
 
-        // 2. Update existing datalynx_field_formats database records for rating double colons.
-        $formats = $DB->get_records('datalynx_field_formats', ['fieldtype' => 'rating']);
-        foreach ($formats as $formatrec) {
-            $name = $formatrec->name;
-            if ($name === 'avg:bar' || $name === 'avg:star') {
-                $newname = str_replace(':', '', $name);
-                $exists = $DB->record_exists('datalynx_field_formats', [
-                    'dataid' => $formatrec->dataid,
-                    'fieldtype' => 'rating',
-                    'name' => $newname,
-                ]);
-                if (!$exists) {
-                    $formatrec->name = $newname;
-                    $formatrec->settings = json_encode(['option' => $newname]);
-                    $DB->update_record('datalynx_field_formats', $formatrec);
-                } else {
-                    // Delete the duplicate.
-                    $DB->delete_records('datalynx_field_formats', ['id' => $formatrec->id]);
-                }
-            }
-        }
-
-        // 3. Re-run scan to auto-create formats and populate missing default settings.
-        \mod_datalynx\local\field_format\manager::auto_create_formats_from_all_instances();
-
-        $formats = $DB->get_records('datalynx_field_formats');
-        foreach ($formats as $formatrec) {
-            $existing = json_decode($formatrec->settings ?? '{}', true);
-            if (!empty($existing)) {
-                continue;
-            }
-            $classname = "\\datalynxfield_{$formatrec->fieldtype}\\field_format";
-            if (class_exists($classname)) {
-                $instance  = new $classname($formatrec);
-                $defaults  = $instance->get_default_settings_for_name($formatrec->name);
-                if (!empty($defaults)) {
-                    $formatrec->settings = json_encode($defaults);
-                    $DB->update_record('datalynx_field_formats', $formatrec);
-                }
-            }
-        }
-
-        upgrade_mod_savepoint(true, 2026060602, 'datalynx');
-    }
-
-    if ($oldversion < 2026060700) {
-        // Auto-create formats from templates and populate missing defaults (including new option fields).
-        \mod_datalynx\local\field_format\manager::auto_create_formats_from_all_instances();
-
-        $formats = $DB->get_records('datalynx_field_formats');
-        foreach ($formats as $formatrec) {
-            $existing = json_decode($formatrec->settings ?? '{}', true);
-            if (!empty($existing)) {
-                continue;
-            }
-            $classname = "\\datalynxfield_{$formatrec->fieldtype}\\field_format";
-            if (class_exists($classname)) {
-                $instance  = new $classname($formatrec);
-                $defaults  = $instance->get_default_settings_for_name($formatrec->name);
-                if (!empty($defaults)) {
-                    $formatrec->settings = json_encode($defaults);
-                    $DB->update_record('datalynx_field_formats', $formatrec);
-                }
-            }
-        }
-
-        upgrade_mod_savepoint(true, 2026060700, 'datalynx');
-    }
-
-    if ($oldversion < 2026060701) {
-        // The userinfo field does not use the Field Format API.
-        // Remove any field format records that were erroneously created for userinfo fields
-        // during earlier upgrade steps or template scans.
-        $DB->delete_records('datalynx_field_formats', ['fieldtype' => 'userinfo']);
-
-        upgrade_mod_savepoint(true, 2026060701, 'datalynx');
-    }
-
-    if ($oldversion < 2026060702) {
-        // The userinfo field type has been removed. Its feature (inline editing of a user profile
-        // field) is now an entryauthor field format. Migrate every legacy userinfo field instance
-        // into an entryauthor field format and delete the legacy field rows. Pure DB, so it does
-        // not depend on the removed datalynxfield_userinfo classes.
+        // 3. Migrate legacy `userinfo` fields into entryauthor field formats and drop the field rows.
+        // The userinfo field type has been removed; this converter is pure DB, so it does not
+        // depend on the removed datalynxfield_userinfo classes.
         \mod_datalynx\local\field_format\manager::migrate_userinfo_fields();
 
-        upgrade_mod_savepoint(true, 2026060702, 'datalynx');
+        // 4. Auto-create field formats from all view templates. The scanner names each format after
+        // the legacy tag suffix, applies the field type's inferred default settings, skips field
+        // types whose formats carry no settings (has_options() === false), and skips formats
+        // that already exist (e.g. those created by step 3).
+        \mod_datalynx\local\field_format\manager::auto_create_formats_from_all_instances();
+
+        upgrade_mod_savepoint(true, 2026060900, 'datalynx');
     }
 
     return true;

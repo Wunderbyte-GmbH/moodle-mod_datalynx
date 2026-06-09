@@ -236,9 +236,6 @@ abstract class base {
         $baseurlparams = [];
         $baseurlparams['d'] = $this->dlx->id();
         $baseurlparams['view'] = $this->id();
-        if (!empty($eids)) {
-            $baseurlparams['eids'] = $eids;
-        }
 
         if ($this->dlx->currentgroup) {
             $baseurlparams['currentgroup'] = $this->dlx->currentgroup;
@@ -387,6 +384,15 @@ abstract class base {
         // Keep page to allow for pagination.
         if (isset($urlparams['page'])) {
             $urloptions['page'] = $urlparams['page'];
+        }
+
+        // The eids parameter is a direct entry selection (e.g. editing or linking to specific
+        // entries), not a regular filter setting. Honor it from the URL even when the view forces
+        // a filter and otherwise ignores URL filter options. It is applied as an additional
+        // constraint in datalynx_entries::get_entries(), so entries that do not match the (forced)
+        // filter are still excluded.
+        if (isset($urlparams['eids'])) {
+            $urloptions['eids'] = $urlparams['eids'];
         }
 
         // Add all url parameters.

@@ -296,6 +296,7 @@ $string['fieldformat_showarrow'] = 'Pfeil anzeigen';
 $string['fieldformat_subscribe'] = 'Eintragen-Button aktivieren';
 $string['fieldformat_tagusage_help'] = 'Nachdem Sie ein Format erstellt haben, können Sie es im Template verwenden, indem Sie :formatname an das Feld-Tag anhängen, z.B. ##author:meinformat## oder [[fieldname:meinformat]].';
 $string['fieldformatadd'] = 'Feldformat hinzufügen';
+$string['fieldformatconfirmdelete'] = 'Sie sind im Begriff, das Feldformat "{$a}" zu löschen. Wollen Sie fortfahren?';
 $string['fieldformatname'] = 'Feldformat-Name';
 $string['fieldformatname_help'] = 'Alphanumerischer Name für das Feldformat.';
 $string['fieldformatnone'] = 'Keine benutzerdefinierten Feldformate definiert.';

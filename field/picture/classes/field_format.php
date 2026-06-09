@@ -42,4 +42,28 @@ class field_format extends \mod_datalynx\local\field_format\base {
         $mform->addElement('select', 'mode', 'Output mode', $modes);
         $mform->setType('mode', PARAM_ALPHANUMEXT);
     }
+
+    /**
+     * Map legacy ##field:suffix## tags to the mode setting so formats auto-created during
+     * upgrade/restore reproduce the legacy rendering. The hyphenated legacy suffix tn-linked
+     * cannot be captured by the migration scanner (alphanumeric only) so it has no entry.
+     *
+     * @param string $name
+     * @return array
+     */
+    public function get_default_settings_for_name(string $name): array {
+        $map = [
+            'thumb'         => 'thumb',
+            'tn'            => 'thumb',
+            'linked'        => 'linked',
+            'linked_thumb'  => 'linked_thumb',
+            'lightbox'      => 'lightbox',
+            'alt'           => 'alt',
+            'downloadcount' => 'downloadcount',
+        ];
+        if (isset($map[$name])) {
+            return ['mode' => $map[$name]];
+        }
+        return [];
+    }
 }

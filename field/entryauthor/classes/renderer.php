@@ -650,9 +650,6 @@ class renderer extends datalynxfield_renderer {
         );
         if (empty($formats)) {
             $patterns["##author:{$fieldinternalname}##"] = [true, $cat];
-            if ($fieldinternalname === 'name') {
-                $patterns["##author:edit##"] = [true, $cat];
-            }
             if ($fieldinternalname === 'picture') {
                 $patterns["##author:picturelarge##"] = [true, $cat];
             }
@@ -681,16 +678,10 @@ class renderer extends datalynxfield_renderer {
                 if (!empty($exactfields)) {
                     if ($fieldinternalname === $option) {
                         $patterns["##author:{$name}##"] = [true, $cat];
-                        if ($option === 'name') {
-                            $patterns["##author:edit##"] = [true, $cat];
-                        }
                     }
                 } else {
                     if ($fieldinternalname === 'name') {
                         $patterns["##author:{$name}##"] = [true, $cat];
-                        if ($option === 'name') {
-                            $patterns["##author:edit##"] = [true, $cat];
-                        }
                     }
                 }
             }
