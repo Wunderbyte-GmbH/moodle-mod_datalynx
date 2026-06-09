@@ -318,6 +318,19 @@ class manager {
                 continue;
             }
 
+            // Skip field types whose formats carry no settings (has_options() === false).
+            // Creating a format record for them would only shadow the legacy ##field:suffix##
+            // option at render time (datalynxfield_renderer::replacements sets field_format
+            // instead of $options[suffix]) without being able to reproduce the behaviour —
+            // e.g. tag's :nolink. Leaving the format uncreated preserves the legacy path.
+            $probe = new \stdClass();
+            $probe->fieldtype = $fieldtype;
+            $probe->name = '';
+            $probe->settings = json_encode([]);
+            if (!(new $classname($probe))->has_options()) {
+                continue;
+            }
+
             foreach ($formatnames as $formatname) {
                 // Check if already exists.
                 $exists = $DB->record_exists('datalynx_field_formats', [

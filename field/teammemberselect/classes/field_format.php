@@ -33,4 +33,18 @@ class field_format extends \mod_datalynx\local\field_format\base {
         $mform->addElement('advcheckbox', 'subscribe', get_string('subscribe', 'datalynx'));
         $mform->setType('subscribe', PARAM_BOOL);
     }
+
+    /**
+     * Map the legacy ##field:subscribe## tag to the subscribe setting so formats auto-created
+     * during upgrade/restore reproduce the legacy subscribe/unsubscribe link.
+     *
+     * @param string $name
+     * @return array
+     */
+    public function get_default_settings_for_name(string $name): array {
+        if ($name === 'subscribe') {
+            return ['subscribe' => 1];
+        }
+        return [];
+    }
 }

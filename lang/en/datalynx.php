@@ -335,6 +335,7 @@ $string['fieldformat_showarrow'] = 'Show arrow';
 $string['fieldformat_subscribe'] = 'Enable subscribe button';
 $string['fieldformat_tagusage_help'] = 'After creating a format, reference it in the template by appending :formatname to the field tag, e.g. ##author:myformat## or [[fieldname:myformat]].';
 $string['fieldformatadd'] = 'Add field format';
+$string['fieldformatconfirmdelete'] = 'You are about to delete the field format "{$a}". Would you like to proceed?';
 $string['fieldformatname'] = 'Field format name';
 $string['fieldformatname_help'] = 'Alphanumeric name for the field format.';
 $string['fieldformatnone'] = 'No custom field formats defined.';

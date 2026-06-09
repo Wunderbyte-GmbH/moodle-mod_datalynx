@@ -33,4 +33,18 @@ class field_format extends \mod_datalynx\local\field_format\base {
         $mform->addElement('advcheckbox', 'excerpt', 'Excerpt only');
         $mform->setType('excerpt', PARAM_BOOL);
     }
+
+    /**
+     * Map the legacy ##field:excerpt## tag to the excerpt setting so formats auto-created
+     * during upgrade/restore reproduce the legacy rendering.
+     *
+     * @param string $name
+     * @return array
+     */
+    public function get_default_settings_for_name(string $name): array {
+        if ($name === 'excerpt') {
+            return ['excerpt' => 1];
+        }
+        return [];
+    }
 }

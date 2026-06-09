@@ -395,7 +395,7 @@ class restore_datalynx_activity_task extends restore_activity_task {
         }
 
         // Older backups may still carry `userinfo` field rows; migrate them into entryauthor field
-        // formats for this restored instance (mirrors the 2026060702 upgrade step).
+        // formats for this restored instance (mirrors the Field Format upgrade migration).
         \mod_datalynx\local\field_format\manager::migrate_userinfo_fields($this->get_activityid());
 
         // 2. Check if the backup version is older than our breaking change.
