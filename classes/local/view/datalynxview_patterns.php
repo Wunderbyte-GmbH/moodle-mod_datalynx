@@ -496,6 +496,9 @@ class datalynxview_patterns {
                     break;
                 }
 
+                // Remember the view the entry is added from so the cancel button can return here.
+                $baseurl->param('sourceview', $view->id());
+
                 if ($tag == '##addnewentry##') {
                     if (!empty($dlx->data->singleedit)) {
                         $baseurl->param('view', $dlx->data->singleedit);
@@ -549,6 +552,8 @@ class datalynxview_patterns {
 
             case '##multiedit##':
                 if ($showentryactions) {
+                    // Remember the view the entries are edited from so the cancel button can return here.
+                    $baseurl->param('sourceview', $view->id());
                     $replacement = html_writer::empty_tag(
                         'input',
                         ['type' => 'button', 'name' => 'multiedit',
@@ -562,6 +567,8 @@ class datalynxview_patterns {
 
             case '##multiedit:icon##':
                 if ($showentryactions) {
+                    // Remember the view the entries are edited from so the cancel button can return here.
+                    $baseurl->param('sourceview', $view->id());
                     $replacement = html_writer::tag(
                         'button',
                         $OUTPUT->pix_icon('t/edit', get_string('multiedit', 'datalynx')),

@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * English strings for cancel Datalynx field.
+ * German strings for cancel Datalynx field.
  *
  * @package    datalynxfield_cancel
  * @copyright  2026 Wunderbyte GmbH
@@ -24,10 +24,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['buttontext'] = 'Button text';
-$string['cancel'] = 'Cancel';
-$string['cssclasses'] = 'CSS classes';
-$string['pluginname'] = 'Cancel button';
-$string['returntoorigin'] = 'Return to originating page';
-$string['returntoorigin_help'] = 'When enabled, cancelling returns the user to the page they came from (the view where they clicked the edit or add link). If the originating page cannot be determined, the user is sent to the default view.';
-$string['showarrow'] = 'Show arrow';
+$string['buttontext'] = 'Beschriftung der Schaltfläche';
+$string['cancel'] = 'Abbrechen';
+$string['cssclasses'] = 'CSS-Klassen';
+$string['pluginname'] = 'Abbrechen-Schaltfläche';
+$string['returntoorigin'] = 'Zur Ausgangsseite zurückkehren';
+$string['returntoorigin_help'] = 'Wenn aktiviert, kehrt der Benutzer beim Abbrechen zu der Seite zurück, von der er gekommen ist (die Ansicht, in der er den Bearbeiten- oder Hinzufügen-Link angeklickt hat). Kann die Ausgangsseite nicht ermittelt werden, wird der Benutzer zur Standardansicht weitergeleitet.';
+$string['showarrow'] = 'Pfeil anzeigen';

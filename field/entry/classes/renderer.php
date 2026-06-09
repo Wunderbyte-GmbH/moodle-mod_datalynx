@@ -141,6 +141,10 @@ class renderer extends datalynxfield_renderer {
 
         $field = $this->field;
         $params = ['editentries' => $entry->id, 'eids' => $entry->id, 'sesskey' => sesskey()];
+        // Remember the view the user is editing from so the cancel button can return here.
+        if ($currentview = $field->dlx()->get_current_view()) {
+            $params['sourceview'] = $currentview->id();
+        }
         $url = new moodle_url($entry->baseurl, $params);
         if ($field->dlx()->data->singleedit) {
             $url->param('view', $field->dlx()->data->singleedit);
