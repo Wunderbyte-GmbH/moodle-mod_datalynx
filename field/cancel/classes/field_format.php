@@ -36,5 +36,8 @@ class field_format extends \mod_datalynx\local\field_format\base {
         $mform->setType('cssclasses', PARAM_TEXT);
         $mform->addElement('advcheckbox', 'showarrow', get_string('showarrow', 'datalynxfield_cancel'));
         $mform->setType('showarrow', PARAM_BOOL);
+        $mform->addElement('advcheckbox', 'returntoorigin', get_string('returntoorigin', 'datalynxfield_cancel'));
+        $mform->setType('returntoorigin', PARAM_BOOL);
+        $mform->addHelpButton('returntoorigin', 'returntoorigin', 'datalynxfield_cancel');
     }
 }

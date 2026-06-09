@@ -1745,6 +1745,11 @@ abstract class base {
                 'eids' => $this->filter->eids,
                 'update' => implode(',', $this->editentries),
             ];
+            // Carry the originating view (set on the edit/add links) through the form submission so
+            // the cancel button can return the user to where they came from.
+            if ($sourceview = optional_param('sourceview', 0, PARAM_INT)) {
+                $actionparams['sourceview'] = $sourceview;
+            }
             $actionurl = new moodle_url("/mod/datalynx/{$this->dlx->pagefile_for_urls()}.php", $actionparams);
             $customdata = ['view' => $this, 'update' => implode(',', $this->editentries)];
 
@@ -2173,10 +2178,7 @@ abstract class base {
                         return [implode('<br>', $errors), []];
                     }
                 } else {
-                    $redirectid = $this->redirect ?: $this->id();
-                    $url = new moodle_url($this->baseurl, ['view' => $redirectid,
-                    ]);
-                    redirect($url);
+                    redirect($this->get_cancel_redirect_url());
                 }
             } else if ($action === 'edit') {
                 // An edit was submitted (e.g. a stale or forged request) for a view that does not
@@ -2313,6 +2315,60 @@ abstract class base {
             }
         }
         return false;
+    }
+
+    /**
+     * Determine where to send the user after they cancel an entry edit/add form.
+     *
+     * Default behaviour: return to the originating view (the 'sourceview' param set on the
+     * ##edit##/##addnewentry##/##multiedit## links), otherwise the datalynx default view. For
+     * inline editing the originating view is the current view, so the user stays put; for edits
+     * reached via a ##viewsesslink## (which carries no 'sourceview') the user lands on the default
+     * view.
+     *
+     * When the ##cancel## field format opts in via the 'cancelreturnorigin' flag, a validated HTTP
+     * referer is used as an additional fallback so "go back" also works for ##viewsesslink## arrivals.
+     *
+     * @return moodle_url
+     */
+    protected function get_cancel_redirect_url(): moodle_url {
+        global $CFG;
+
+        $defaultviewid = $this->dlx->get_default_view_id() ?: $this->id();
+        $returntoorigin = optional_param('cancelreturnorigin', 0, PARAM_INT);
+
+        // Prefer the originating view when it is a valid, visible view of this datalynx instance.
+        $sourceview = optional_param('sourceview', 0, PARAM_INT);
+        if ($sourceview && $this->is_valid_redirect_view($sourceview)) {
+            return new moodle_url($this->baseurl, ['view' => $sourceview]);
+        }
+
+        // Opt-in: fall back to the page the user came from when it is a local datalynx URL.
+        if ($returntoorigin && !empty($_SERVER['HTTP_REFERER'])) {
+            $referer = $_SERVER['HTTP_REFERER'];
+            $datalynxroot = $CFG->wwwroot . '/mod/datalynx/';
+            if (strpos($referer, $datalynxroot) === 0) {
+                return new moodle_url($referer);
+            }
+        }
+
+        return new moodle_url($this->baseurl, ['view' => $defaultviewid]);
+    }
+
+    /**
+     * Whether a view id is a safe target for a cancel redirect: it must belong to this datalynx
+     * instance and be visible to the current user.
+     *
+     * @param int $viewid
+     * @return bool
+     */
+    private function is_valid_redirect_view(int $viewid): bool {
+        global $DB;
+        $view = $DB->get_record('datalynx_views', ['id' => $viewid, 'dataid' => $this->dlx->id()]);
+        if (!$view) {
+            return false;
+        }
+        return $this->dlx->is_visible_to_user($view);
     }
 
     /**

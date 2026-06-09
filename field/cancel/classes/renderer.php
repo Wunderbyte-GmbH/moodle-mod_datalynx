@@ -113,6 +113,11 @@ class renderer extends datalynxfield_renderer {
             if (!empty($settings['showarrow'])) {
                 $label = '← ' . $label;
             }
+            if (!empty($settings['returntoorigin'])) {
+                // Tell the cancel handler to return the user to the page they came from.
+                $mform->addElement('hidden', 'cancelreturnorigin', 1);
+                $mform->setType('cancelreturnorigin', PARAM_INT);
+            }
         } else {
             // Process options from pattern (e.g. ##cancel:arrow:text=Go_Back##).
             foreach (array_keys($options) as $option) {
