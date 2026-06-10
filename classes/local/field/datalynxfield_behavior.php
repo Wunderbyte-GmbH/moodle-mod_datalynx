@@ -57,6 +57,32 @@ class datalynxfield_behavior {
     /** @var bool Whether this field is required. */
     private bool $required;
 
+    /** @var array Availability conditions based on other fields' values. */
+    private array $conditions = [];
+
+    /**
+     * Field types that may be used as a condition source. Each already implements the search
+     * machinery (get_supported_search_operators / render_search_mode / get_search_sql) that the
+     * conditions feature reuses.
+     *
+     * @var string[]
+     */
+    public const CONDITION_SOURCE_TYPES = [
+            'select', 'radiobutton', 'text', 'teammemberselect', 'time', 'duration'];
+
+    /** @var array Per-request cache of matching entry ids keyed by dataid + serialized rule. */
+    private static array $matchingentryidscache = [];
+
+    /**
+     * Reset the per-request condition-evaluation cache. Mainly useful in tests that mutate content
+     * and re-evaluate the same rule.
+     *
+     * @return void
+     */
+    public static function reset_condition_cache(): void {
+        self::$matchingentryidscache = [];
+    }
+
     /**
      * @var datalynx The related datalynx instance object.
      */
@@ -80,6 +106,7 @@ class datalynxfield_behavior {
         $this->visibleto = isset($record->visibleto) ? unserialize($record->visibleto) : [];
         $this->editableby = isset($record->editableby) ? unserialize($record->editableby) : [];
         $this->required = isset($record->required) ? $record->required : false;
+        $this->conditions = !empty($record->conditions) ? (json_decode($record->conditions, true) ?: []) : [];
 
         if (isset($record->dlx)) {
             $this->dlx = $record->dlx;
@@ -136,7 +163,8 @@ class datalynxfield_behavior {
                     mod_datalynx\datalynx::PERMISSION_AUTHOR,
                     mod_datalynx\datalynx::PERMISSION_GUEST]],
             'editableby' => [mod_datalynx\datalynx::PERMISSION_MANAGER, mod_datalynx\datalynx::PERMISSION_TEACHER,
-                    mod_datalynx\datalynx::PERMISSION_STUDENT, mod_datalynx\datalynx::PERMISSION_AUTHOR], 'required' => false];
+                    mod_datalynx\datalynx::PERMISSION_STUDENT, mod_datalynx\datalynx::PERMISSION_AUTHOR], 'required' => false,
+            'conditions' => ''];
 
     /**
      * The default behavior used in any instance without user settings applied.
@@ -289,6 +317,9 @@ class datalynxfield_behavior {
         $formdata->visibletoteammember = $visible['teammember'] ?? [];
         $formdata->editableby = unserialize($record->editableby);
         $formdata->required = $record->required;
+        $formdata->conditions = !empty($record->conditions)
+                ? (json_decode($record->conditions, true) ?: ['match' => 'all', 'rules' => []])
+                : ['match' => 'all', 'rules' => []];
         return $formdata;
     }
 
@@ -325,6 +356,10 @@ class datalynxfield_behavior {
         $record->visibleto = serialize($formdata->visibleto);
         $record->editableby = serialize(isset($formdata->editableby) ? $formdata->editableby : []);
         $record->required = $formdata->required;
+        $record->conditions = !empty($formdata->conditions['rules'])
+                ? json_encode(['match' => $formdata->conditions['match'] ?? 'all',
+                        'rules' => array_values($formdata->conditions['rules'])])
+                : null;
 
         return $record;
     }
@@ -568,5 +603,105 @@ class datalynxfield_behavior {
      */
     public function is_required() {
         return $this->required;
+    }
+
+    /**
+     * Get the raw availability conditions array for this behavior.
+     *
+     * @return array
+     */
+    public function get_conditions(): array {
+        return $this->conditions;
+    }
+
+    /**
+     * Whether this behavior has any availability conditions defined.
+     *
+     * @return bool
+     */
+    public function has_conditions(): bool {
+        return !empty($this->conditions['rules']);
+    }
+
+    /**
+     * Evaluate the availability conditions of this behavior against a given entry.
+     *
+     * Conditions gate both visibility and editability: when they are not met the field is hidden in
+     * both view and edit mode. Evaluation reuses each source field's filter/search machinery
+     * (get_search_sql / get_search_from_sql) so no parallel comparison logic is needed.
+     *
+     * Note: conditions only take effect for saved entries. A brand-new, unsaved entry (id <= 0) has no
+     * stored source value yet, so the field is shown (the cross-view scenario saves before the
+     * dependent view is reached).
+     *
+     * @param stdClass $entry The entry record.
+     * @return bool True if the field should be available (conditions met or none defined).
+     */
+    public function passes_conditions(stdClass $entry): bool {
+        if (empty($this->conditions['rules'])) {
+            return true;
+        }
+        if (empty($entry->id) || (int) $entry->id <= 0) {
+            return true;
+        }
+
+        $match = $this->conditions['match'] ?? 'all';
+        foreach ($this->conditions['rules'] as $rule) {
+            $matching = self::matching_entryids($this->dlx, $rule);
+            $ok = ($matching === true) || in_array((int) $entry->id, $matching, true);
+            if ($match === 'any' && $ok) {
+                return true;
+            }
+            if ($match === 'all' && !$ok) {
+                return false;
+            }
+        }
+        return $match === 'all';
+    }
+
+    /**
+     * Get the set of entry ids in the instance whose source field matches a single condition rule.
+     *
+     * Reuses the field's own search SQL (the same code the customsearch filter uses), so every
+     * operator/field type is handled identically to filtering. Result is cached per request.
+     *
+     * @param datalynx $dlx The datalynx instance.
+     * @param array $rule A rule: ['sourcefieldid' => int, 'not' => string, 'operator' => string, 'value' => mixed].
+     * @return array|true Array of matching entry ids, or true when the rule imposes no constraint
+     *                    (i.e. every entry matches).
+     */
+    public static function matching_entryids(mod_datalynx\datalynx $dlx, array $rule) {
+        global $DB;
+
+        $cachekey = $dlx->id() . ':' . json_encode($rule);
+        if (array_key_exists($cachekey, self::$matchingentryidscache)) {
+            return self::$matchingentryidscache[$cachekey];
+        }
+
+        $field = $dlx->get_field_from_id((int) ($rule['sourcefieldid'] ?? 0));
+        if (!$field) {
+            return self::$matchingentryidscache[$cachekey] = [];
+        }
+
+        $search = [$rule['not'] ?? '', $rule['operator'] ?? '', $rule['value'] ?? ''];
+        $result = $field->get_search_sql($search);
+        if (empty($result)) {
+            return self::$matchingentryidscache[$cachekey] = true;
+        }
+        [$fieldsql, $params, $fromcontent] = $result;
+        if (empty($fieldsql)) {
+            // The field imposed no constraint (e.g. a NOT rule that excludes nothing): every entry matches.
+            return self::$matchingentryidscache[$cachekey] = true;
+        }
+
+        $from = $fromcontent ? $field->get_search_from_sql() : '';
+        $params['conddataid'] = $dlx->id();
+        $sql = "SELECT e.id
+                  FROM {datalynx_entries} e
+                       $from
+                 WHERE e.dataid = :conddataid AND ($fieldsql)";
+        $ids = $DB->get_fieldset_sql($sql, $params);
+
+        return self::$matchingentryidscache[$cachekey] = array_map('intval', $ids);
     }
 }

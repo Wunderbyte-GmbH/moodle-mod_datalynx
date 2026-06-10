@@ -129,13 +129,16 @@ abstract class datalynxfield_renderer {
                 }
             }
 
-            $currentoptions['visible'] = $behavior->is_visible_to_user($entry);
+            // Availability conditions (based on other fields' values) gate visibility and editability:
+            // when not met the field is hidden in both view and edit mode, and cannot be required.
+            $conditionsmet = $behavior->passes_conditions($entry);
+            $currentoptions['visible'] = $behavior->is_visible_to_user($entry) && $conditionsmet;
             // Pass isentryauthor: for new entries the current user will be the author;
             // for existing entries compare entry userid with current user.
             global $USER;
             $isentryauthor = empty($entry->id) || (isset($entry->userid) && (string)$entry->userid === (string)$USER->id);
-            $currentoptions['editable'] = $behavior->is_editable_by_user(null, $isentryauthor);
-            $currentoptions['required'] = $behavior->is_required();
+            $currentoptions['editable'] = $behavior->is_editable_by_user(null, $isentryauthor) && $conditionsmet;
+            $currentoptions['required'] = $behavior->is_required() && $conditionsmet;
             $currentoptions['internal'] = $this->field->is_internal();
 
             if (!$currentoptions['visible']) {
@@ -434,6 +437,28 @@ abstract class datalynxfield_renderer {
      */
     public function validate($entryid, $tags, $data) {
         return [];
+    }
+
+    /**
+     * Whether this field's availability conditions are met for the given entry.
+     *
+     * Conditionally-hidden fields render no input and must not be validated (e.g. a hidden but
+     * "required" field should not block submission). The governing behavior is taken from the field
+     * pattern(s), mirroring how replacements() resolves it.
+     *
+     * @param array $tags The field pattern tags being rendered.
+     * @param int|string $entryid The entry id (negative/non-numeric for new or fieldgroup entries).
+     * @return bool True if the field is available (so it should be validated).
+     */
+    public function conditions_met($tags, $entryid): bool {
+        $entry = (object) ['id' => is_numeric($entryid) ? (int) $entryid : 0];
+        foreach ((array) $tags as $tag) {
+            [, $behavior, ] = $this->process_tag($tag);
+            if ($behavior && !$behavior->passes_conditions($entry)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**

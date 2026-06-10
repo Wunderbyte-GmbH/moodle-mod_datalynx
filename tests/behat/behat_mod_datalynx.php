@@ -744,4 +744,220 @@ class behat_mod_datalynx extends behat_base {
         }
         $found[$n - 1]->click();
     }
+
+    // phpcs:disable moodle.Files.LineLength
+    /**
+     * Normalises a datalynx field name by stripping the "Datalynx field " label prefix.
+     *
+     * @param string $name
+     * @return string
+     */
+    protected static function normalize_field_name(string $name): string {
+        return preg_replace('/^Datalynx field\s+/u', '', trim($name));
+    }
+
+    /**
+     * Map a comma-separated list of role keywords to datalynx permission integers.
+     *
+     * @param string $roles e.g. "manager,teacher,student,author".
+     * @return int[]
+     */
+    protected static function roles_to_permissions(string $roles): array {
+        $map = ['manager' => 1, 'teacher' => 2, 'student' => 4, 'guest' => 8, 'author' => 16, 'mentor' => 32];
+        $permissions = [];
+        foreach (explode(',', $roles) as $role) {
+            $role = strtolower(trim($role));
+            if ($role !== '' && isset($map[$role])) {
+                $permissions[] = $map[$role];
+            }
+        }
+        return $permissions;
+    }
+
+    /**
+     * Parse a compact condition spec into behavior condition rules.
+     *
+     * Spec format: semicolon-separated conditions, each "Field=Value" (equal), "Field~Value"
+     * (contains), "Field!=Value" (not equal) or "Field=" (empty). Field names may omit the
+     * "Datalynx field " prefix. Select/radiobutton values are resolved to their option index.
+     *
+     * @param \mod_datalynx\datalynx $dlx
+     * @param string $spec
+     * @return array[] Rules, each ['sourcefieldid' => int, 'not' => string, 'operator' => string, 'value' => mixed].
+     */
+    protected static function parse_condition_spec(\mod_datalynx\datalynx $dlx, string $spec): array {
+        $fields = $dlx->get_fields();
+        $byname = [];
+        foreach ($fields as $field) {
+            $byname[self::normalize_field_name($field->name())] = $field;
+        }
+
+        $rules = [];
+        foreach (explode(';', $spec) as $cond) {
+            $cond = trim($cond);
+            if ($cond === '') {
+                continue;
+            }
+
+            $not = '';
+            if (strpos($cond, '!=') !== false) {
+                [$fname, $val] = explode('!=', $cond, 2);
+                $not = 'NOT';
+                $optoken = '=';
+            } else if (strpos($cond, '~') !== false) {
+                [$fname, $val] = explode('~', $cond, 2);
+                $optoken = '~';
+            } else {
+                [$fname, $val] = explode('=', $cond, 2);
+                $optoken = '=';
+            }
+            $fname = self::normalize_field_name($fname);
+            $val = trim($val);
+
+            if (!isset($byname[$fname])) {
+                throw new \Exception("Unknown condition source field: {$fname}");
+            }
+            $field = $byname[$fname];
+
+            if ($val === '') {
+                // Empty operator (no argument).
+                $operator = '';
+                $value = '';
+            } else if ($optoken === '~') {
+                $operator = 'LIKE';
+                $value = $val;
+            } else if (in_array($field->type, ['select', 'radiobutton'], true)) {
+                $operator = 'ANY_OF';
+                $value = [(int) $field->get_search_value($val)];
+            } else {
+                $operator = '=';
+                $value = $val;
+            }
+
+            $rules[] = [
+                'sourcefieldid' => (int) $field->field->id,
+                'not' => $not,
+                'operator' => $operator,
+                'value' => $value,
+            ];
+        }
+        return $rules;
+    }
+
+    /**
+     * Creates field behaviors (including value-based availability conditions and role visibility)
+     * directly for the specified datalynx instance.
+     *
+     * Table columns: name, visibleto, editableby (comma-separated role keywords), match (all|any,
+     * optional, default all) and conditions (compact spec, optional).
+     *
+     * @Given /^the "(?P<activityname_string>(?:[^"]|\\")*)" datalynx has the following behaviors:$/
+     *
+     * @param string $activityname
+     * @param TableNode $table
+     */
+    public function the_datalynx_has_the_following_behaviors($activityname, TableNode $table) {
+        global $DB;
+
+        $record = $DB->get_record('datalynx', ['name' => $activityname], '*', MUST_EXIST);
+        $dlx = new \mod_datalynx\datalynx($record->id);
+
+        foreach ($table->getHash() as $row) {
+            $visibleto = ['permissions' => self::roles_to_permissions($row['visibleto'] ?? '')];
+            $editableby = self::roles_to_permissions($row['editableby'] ?? '');
+            $rules = isset($row['conditions']) ? self::parse_condition_spec($dlx, $row['conditions']) : [];
+            $conditions = $rules
+                ? json_encode(['match' => $row['match'] ?? 'all', 'rules' => $rules])
+                : null;
+
+            $DB->insert_record('datalynx_behaviors', (object) [
+                'dataid' => $dlx->id(),
+                'name' => $row['name'],
+                'description' => '',
+                'visibleto' => serialize($visibleto),
+                'editableby' => serialize($editableby),
+                'required' => 0,
+                'conditions' => $conditions,
+            ]);
+        }
+    }
+
+    /**
+     * Sets the entry template (param2) of a named view directly.
+     *
+     * @Given /^the "(?P<viewname_string>(?:[^"]|\\")*)" view of "(?P<activityname_string>(?:[^"]|\\")*)" datalynx has the entry template "(?P<template_string>(?:[^"]|\\")*)"$/
+     *
+     * @param string $viewname
+     * @param string $activityname
+     * @param string $template
+     */
+    public function the_view_of_datalynx_has_the_entry_template($viewname, $activityname, $template) {
+        global $DB;
+
+        $record = $DB->get_record('datalynx', ['name' => $activityname], '*', MUST_EXIST);
+        $view = $DB->get_record(
+            'datalynx_views',
+            ['dataid' => $record->id, 'name' => $viewname],
+            '*',
+            MUST_EXIST
+        );
+        $view->param2 = $template;
+        $DB->update_record('datalynx_views', $view);
+    }
+
+    /**
+     * Configures a named view to redirect to another view after entry submission, optionally
+     * continuing to edit the same entry on the target view.
+     *
+     * @Given /^the "(?P<viewname_string>(?:[^"]|\\")*)" view of "(?P<activityname_string>(?:[^"]|\\")*)" datalynx redirects to the "(?P<target_string>(?:[^"]|\\")*)" view continuing editing "(?P<flag>[01])"$/
+     *
+     * @param string $viewname
+     * @param string $activityname
+     * @param string $target
+     * @param string $flag "1" to continue editing the same entry, "0" otherwise.
+     */
+    public function the_view_of_datalynx_redirects_to_view($viewname, $activityname, $target, $flag) {
+        global $DB;
+
+        $record = $DB->get_record('datalynx', ['name' => $activityname], '*', MUST_EXIST);
+        $view = $DB->get_record(
+            'datalynx_views',
+            ['dataid' => $record->id, 'name' => $viewname],
+            '*',
+            MUST_EXIST
+        );
+        $targetview = $DB->get_record(
+            'datalynx_views',
+            ['dataid' => $record->id, 'name' => $target],
+            '*',
+            MUST_EXIST
+        );
+        $view->param10 = (int) $targetview->id;
+        $view->param9 = (int) $flag;
+        $DB->update_record('datalynx_views', $view);
+    }
+
+    /**
+     * Makes a named view both the default view and the single edit view of the instance.
+     *
+     * @Given /^the "(?P<viewname_string>(?:[^"]|\\")*)" view is the default and edit view of "(?P<activityname_string>(?:[^"]|\\")*)" datalynx$/
+     *
+     * @param string $viewname
+     * @param string $activityname
+     */
+    public function the_view_is_the_default_and_edit_view_of_datalynx($viewname, $activityname) {
+        global $DB;
+
+        $record = $DB->get_record('datalynx', ['name' => $activityname], '*', MUST_EXIST);
+        $view = $DB->get_record(
+            'datalynx_views',
+            ['dataid' => $record->id, 'name' => $viewname],
+            '*',
+            MUST_EXIST
+        );
+        $record->defaultview = (int) $view->id;
+        $record->singleedit = (int) $view->id;
+        $DB->update_record('datalynx', $record);
+    }
+    // phpcs:enable moodle.Files.LineLength
 }

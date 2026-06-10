@@ -1297,6 +1297,17 @@ function xmldb_datalynx_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2026060900, 'datalynx');
     }
 
+    if ($oldversion < 2026060901) {
+        // Add the conditions column to datalynx_behaviors for value-based availability conditions.
+        $table = new xmldb_table('datalynx_behaviors');
+        $field = new xmldb_field('conditions', XMLDB_TYPE_TEXT, null, null, null, null, null, 'required');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, 2026060901, 'datalynx');
+    }
+
     return true;
 }
 
