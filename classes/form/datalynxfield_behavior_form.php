@@ -27,6 +27,7 @@ use coding_exception;
 use dml_exception;
 use html_writer;
 use mod_datalynx;
+use mod_datalynx\local\field\datalynxfield_behavior;
 use moodleform;
 use stdClass;
 
@@ -44,6 +45,12 @@ class datalynxfield_behavior_form extends moodleform {
      * @var mod_datalynx\datalynx
      */
     private $dlx;
+
+    /** @var int Maximum number of availability condition rows offered in the form. */
+    private const MAXCONDITIONS = 5;
+
+    /** @var array Stored conditions (from set_data) used to seed the dynamic condition rows. */
+    private array $storedconditions = ['match' => 'all', 'rules' => []];
 
     /**
      * datalynx_field_behavior_form constructor.
@@ -245,7 +252,107 @@ class datalynxfield_behavior_form extends moodleform {
         }
         $mform->disabledIf('required', 'editable', 'notchecked');
 
+        // AVAILABILITY CONDITIONS.
+        // The individual condition rows (operator + value widgets, which depend on the chosen source
+        // field) are built in definition_after_data() so they can reuse each field's own search widget.
+        $mform->addElement('header', 'conditionsheader', get_string('conditions', 'datalynx'));
+        $mform->addHelpButton('conditionsheader', 'conditions', 'datalynx');
+
+        $mform->addElement('select', 'conditionmatch', get_string('conditionmatch', 'datalynx'), [
+                'all' => get_string('conditionmatchall', 'datalynx'),
+                'any' => get_string('conditionmatchany', 'datalynx'),
+        ]);
+        $mform->setDefault('conditionmatch', 'all');
+
+        $mform->registerNoSubmitButton('reloadconditions');
+
+        // Action buttons are added at the end of definition_after_data() so the dynamic condition
+        // rows appear above them.
+    }
+
+    /**
+     * Build the dynamic availability-condition rows and the action buttons.
+     *
+     * Each row reuses the source field's own search machinery: the operator list comes from
+     * {@see datalynxfield_base::get_supported_search_operators()} and the value input from the field
+     * renderer's {@see datalynxfield_renderer::render_search_mode()}. Because those widgets depend on
+     * the field selected in the same form, they are rendered here (after data) rather than in
+     * definition(). This method is finalised exactly once per request by the forms API.
+     */
+    public function definition_after_data() {
+        parent::definition_after_data();
+        $mform = &$this->_form;
+
+        $sourcefields = $this->get_condition_source_fields();
+        $isnotoptions = ['' => get_string('is', 'datalynx'), 'NOT' => get_string('not', 'datalynx')];
+        $rules = $this->storedconditions['rules'] ?? [];
+        $issubmitted = $mform->isSubmitted();
+
+        for ($i = 0; $i < self::MAXCONDITIONS; $i++) {
+            $storedrule = $rules[$i] ?? null;
+
+            // Determine the chosen source field: submitted value wins, otherwise the stored rule.
+            $submitted = $mform->getSubmitValue("condfield$i");
+            if ($submitted !== null && $submitted !== '') {
+                $fieldid = (int) $submitted;
+            } else {
+                $fieldid = $storedrule ? (int) $storedrule['sourcefieldid'] : 0;
+            }
+            $field = $fieldid ? $this->dlx->get_field_from_id($fieldid) : false;
+
+            $rowelements = [];
+            $rowelements[] = $mform->createElement('select', "condfield$i", '', $sourcefields);
+            $rowelements[] = $mform->createElement('select', "condnot$i", '', $isnotoptions);
+
+            $value = '';
+            if ($field && in_array($field->type, datalynxfield_behavior::CONDITION_SOURCE_TYPES, true)) {
+                $rowelements[] = $mform->createElement(
+                    'select',
+                    "searchoperator$i",
+                    '',
+                    $field->get_supported_search_operators()
+                );
+                if (!$issubmitted && $storedrule && isset($storedrule['value'])) {
+                    $value = is_array($storedrule['value']) ? json_encode($storedrule['value']) : (string) $storedrule['value'];
+                }
+                [$valueelements] = $field->renderer()->render_search_mode($mform, $i, $value);
+                $rowelements = array_merge($rowelements, $valueelements);
+            }
+
+            $label = get_string('conditionrowlabel', 'datalynx', $i + 1);
+            $mform->addGroup($rowelements, "condrow$i", $label, ' ', false);
+            $mform->setType("condfield$i", PARAM_INT);
+
+            // Seed defaults from the stored rule on initial (non-submitted) display.
+            if (!$issubmitted) {
+                $mform->setDefault("condfield$i", $fieldid);
+                if ($storedrule) {
+                    $mform->setDefault("condnot$i", $storedrule['not'] ?? '');
+                    if ($field) {
+                        $mform->setDefault("searchoperator$i", $storedrule['operator'] ?? '');
+                    }
+                }
+            }
+        }
+
+        $mform->addElement('submit', 'reloadconditions', get_string('conditionreload', 'datalynx'));
+
         $this->add_action_buttons();
+    }
+
+    /**
+     * Get the source-field options for condition rows, limited to supported source field types.
+     *
+     * @return array fieldid => field name (with a leading "choose" entry keyed 0).
+     */
+    protected function get_condition_source_fields(): array {
+        $options = [0 => get_string('choosedots')];
+        foreach ($this->dlx->get_fields() as $fieldid => $field) {
+            if (in_array($field->type, datalynxfield_behavior::CONDITION_SOURCE_TYPES, true)) {
+                $options[$fieldid] = $field->field->name;
+            }
+        }
+        return $options;
     }
 
     /**
@@ -325,6 +432,31 @@ class datalynxfield_behavior_form extends moodleform {
             if (!isset($data->required)) {
                 $data->required = false;
             }
+
+            // Collapse the dynamic condition rows into a single conditions structure.
+            $rules = [];
+            for ($i = 0; $i < self::MAXCONDITIONS; $i++) {
+                $fieldid = (int) ($data->{"condfield$i"} ?? 0);
+                if (!$fieldid) {
+                    continue;
+                }
+                $field = $this->dlx->get_field_from_id($fieldid);
+                if (!$field || !in_array($field->type, datalynxfield_behavior::CONDITION_SOURCE_TYPES, true)) {
+                    continue;
+                }
+                $operator = isset($data->{"searchoperator$i"}) ? $data->{"searchoperator$i"} : '';
+                $not = !empty($data->{"condnot$i"}) ? 'NOT' : '';
+                $value = $field->parse_search($data, $i);
+                // Skip rows whose operator needs a value but none was provided.
+                if ($field->get_argument_count($operator) > 0 && ($value === false || $value === '' || $value === null)) {
+                    continue;
+                }
+                if ($value === false) {
+                    $value = '';
+                }
+                $rules[] = ['sourcefieldid' => $fieldid, 'not' => $not, 'operator' => $operator, 'value' => $value];
+            }
+            $data->conditions = ['match' => $data->conditionmatch ?? 'all', 'rules' => $rules];
         }
         return $data;
     }
@@ -356,6 +488,15 @@ class datalynxfield_behavior_form extends moodleform {
         if (!isset($data->required)) {
             $data->required = false;
         }
+
+        // Stash conditions so definition_after_data() can seed the dynamic rows, and preselect the match mode.
+        if (isset($data->conditions) && is_array($data->conditions)) {
+            $this->storedconditions = $data->conditions + ['match' => 'all', 'rules' => []];
+        } else {
+            $this->storedconditions = ['match' => 'all', 'rules' => []];
+        }
+        $data->conditionmatch = $this->storedconditions['match'] ?? 'all';
+
         parent::set_data($data);
     }
 

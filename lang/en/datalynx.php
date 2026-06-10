@@ -93,6 +93,15 @@ $string['completionentries'] = 'Number of (approved) entries';
 $string['completionentriesgroup'] = 'Require (approved) entries';
 $string['completionentriesgroup_help'] = 'Make sure you enable approval for entries above!<br />
 Number of (approved) entries: Entries a user has to make. If \'Require approval\' is set: Number of entries equals number of approved entries only.';
+$string['conditionmatch'] = 'When';
+$string['conditionmatchall'] = 'all conditions are met';
+$string['conditionmatchany'] = 'any condition is met';
+$string['conditionreload'] = 'Reload conditions';
+$string['conditionrowlabel'] = 'Condition {$a}';
+$string['conditions'] = 'Availability conditions';
+$string['conditions_help'] = 'Show and allow editing of this field only when the value of another field in the same entry matches the condition(s) you define here. Each condition compares a source field against a value using the same operators as the search filters. Choose whether the field is available when all conditions are met or when any single condition is met.
+
+Conditions are evaluated when the entry is displayed or edited, based on the saved value of the source field (for example, a value set on a previous view). Leave empty to apply no conditions.';
 $string['configanonymousentries'] = 'This switch will enable the possibility of guest/anonymous entries for all datalynxs. You will still need to turn anonymous on manually in the settings for each datalynx.';
 $string['configenablerssfeeds'] = 'This switch will enable the possibility of RSS feeds for all datalynxs. You will still need to turn feeds on manually in the settings for each datalynx.';
 $string['configmaxentries'] = 'This value determines the maximum number of entries that may be added to a datalynx activity.';

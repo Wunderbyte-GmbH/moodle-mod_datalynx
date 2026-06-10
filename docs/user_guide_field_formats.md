@@ -86,10 +86,29 @@ Displays information about the user who created the entry.
 | `picture` | Profile picture (small) |
 | `picturelarge` | Profile picture (large) |
 | `badges` | User badges |
-| `edit` | Edit action link for the entry |
-| *(custom profile field shortname)* | Any custom user profile field with an alphanumeric shortname |
+| `edit` | **Author selector** — in edit mode, lets a user with `mod/datalynx:manageentries` reassign the entry to a different author (a user dropdown); otherwise falls back to the linked author name |
+| *(custom profile field shortname)* | Displays — and optionally **inline-edits** — any custom user profile field with an alphanumeric shortname (see *Inline editing of custom profile fields* below) |
 
 **Example tags:** `##author:firstname##`, `##author:email##`, `##author:idnumber##`
+
+> **Important — the `edit` option is not a default**  
+> `##author:edit##` is **no longer a built-in tag**. To use it you must explicitly create an
+> Entryauthor field format with the option set to `edit` (you can name the format `edit`). Without a
+> matching format the tag renders nothing.
+
+#### Inline editing of custom profile fields
+
+When the **option** is a *custom user profile field shortname* (not one of the built-in options above),
+two extra settings become available. These turn the entry author's profile field into an inline-editable
+widget — this is the feature that previously lived in the separate **User Info** field type (see below).
+
+| Setting | What it does |
+|---|---|
+| **Editable** (`editable`) | Renders an inline edit widget for the author's profile field. The submitted value is saved to the **user's profile** (via `profile_save_data`), *not* to Datalynx entry content. Editing is gated by Moodle's `moodle/user:editprofile` (or `moodle/user:editownprofile`) capability. |
+| **Mandatory** (`mandatory`) | Requires a non-empty value when editing inline. Only available when **Editable** is ticked. |
+
+The widget type follows the targeted profile field's type — text input, dropdown menu, checkbox, or date
+selector. When **Editable** is off, the format displays the profile field value read-only.
 
 ---
 
@@ -215,17 +234,22 @@ Controls the rendering of URL fields.
 
 ---
 
-### User Info (`userinfo`)
+### User Info — replaced by Entry Author formats
 
-Controls which user profile field type or custom field is rendered.
+The standalone **User Info (`userinfo`)** field type has been **removed**. Its job — displaying and
+inline-editing a custom user profile field of the entry author — is now handled entirely by an
+**Entry Author** field format:
 
-| Option value | What it renders |
-|---|---|
-| `text` | Text-type custom profile field |
-| `checkbox` | Checkbox-type custom profile field |
-| `datetime` | Date/time-type custom profile field |
-| `richtext` | Rich text / textarea-type custom profile field |
-| *(custom field shortname)* | Any alphanumeric custom user profile field shortname |
+1. Add an **Entryauthor** field format and set its **option** to the custom profile field's shortname.
+2. Tick **Editable** (and optionally **Mandatory**) to allow inline editing of that profile field.
+3. Reference it in templates as `##author:{formatname}##`.
+
+See *Inline editing of custom profile fields* under [Entry Author](#entry-author-entryauthor) above.
+
+> **Automatic migration**  
+> Existing activities are converted automatically on upgrade: legacy `userinfo` fields become Entryauthor
+> field formats, and their `##userinfo:xyz##` template tags are rewritten to `##author:xyz##` with the
+> editable/mandatory settings preserved.
 
 ---
 
@@ -313,6 +337,10 @@ The following special field names are automatically resolved to their internal t
 | `timemodified` | `entrytime` |
 | `ratings` | `rating` |
 | `comments` | `comment` |
+
+**Removed `userinfo` field migration:** In addition to the tag-suffix scan above, any legacy `userinfo`
+field is converted into an Entryauthor field format that targets the same custom profile field (preserving
+its editable/mandatory behavior), and its `##userinfo:...##` template tags are rewritten to `##author:...##`.
 
 > **Pro-Tip**  
 > After upgrading, visit **Field Formats** in each Datalynx activity to review the automatically created formats and adjust settings if needed.

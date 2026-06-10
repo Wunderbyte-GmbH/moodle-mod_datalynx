@@ -135,6 +135,10 @@ class datalynxview_entries_form extends moodleform {
                             if (!isset($currentpatterns[$fid])) {
                                 continue;
                             }
+                            // Skip conditionally-hidden fields: they render no input and must not be validated.
+                            if (!$field->renderer()->conditions_met($currentpatterns[$fid], $thisentryid)) {
+                                continue;
+                            }
                             $newerrors = $field->renderer()->validate($thisentryid, $currentpatterns[$fid], (object) $data);
                             $errors = array_merge($errors, $newerrors);
                         }
@@ -143,6 +147,10 @@ class datalynxview_entries_form extends moodleform {
                     // If no fieldgroup use standard behaviour.
                     foreach ($fields as $fid => $field) {
                         if (!isset($patterns[$fid])) {
+                            continue;
+                        }
+                        // Skip conditionally-hidden fields: they render no input and must not be validated.
+                        if (!$field->renderer()->conditions_met($patterns[$fid], $entryid)) {
                             continue;
                         }
                         $errors = array_merge(

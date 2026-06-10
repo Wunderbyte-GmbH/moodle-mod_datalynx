@@ -202,6 +202,7 @@
         <FIELD NAME="visibleto" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="editableby" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="required" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="conditions" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="JSON-encoded availability conditions based on other fields' values"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

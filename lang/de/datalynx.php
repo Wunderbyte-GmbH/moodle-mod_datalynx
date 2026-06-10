@@ -91,6 +91,15 @@ $string['completionentries'] = 'Anzahl der (zugelassenen) Abgaben';
 $string['completionentriesgroup'] = 'Zulassung der Abgaben fordern';
 $string['completionentriesgroup_help'] = 'Schalten Sie eine obligate Zulassung der Abgaben oben im Formular frei!<br />
 Anzahl der (zugelassenen) Abgaben: Anzahl der Abgaben, die ein Benutzer tätigen muss. Wenn \'Freischaltung erforderlich\' eingestellt ist werden nur zugelassene Abgaben berücksichtigt.';
+$string['conditionmatch'] = 'Wenn';
+$string['conditionmatchall'] = 'alle Bedingungen erfüllt sind';
+$string['conditionmatchany'] = 'eine beliebige Bedingung erfüllt ist';
+$string['conditionreload'] = 'Bedingungen neu laden';
+$string['conditionrowlabel'] = 'Bedingung {$a}';
+$string['conditions'] = 'Sichtbarkeitsbedingungen';
+$string['conditions_help'] = 'Dieses Feld wird nur angezeigt und kann nur bearbeitet werden, wenn der Wert eines anderen Feldes desselben Eintrags die hier definierten Bedingungen erfüllt. Jede Bedingung vergleicht ein Quellfeld mit einem Wert und verwendet dieselben Operatoren wie die Suchfilter. Legen Sie fest, ob das Feld verfügbar ist, wenn alle Bedingungen oder wenn eine beliebige Bedingung erfüllt ist.
+
+Die Bedingungen werden beim Anzeigen oder Bearbeiten des Eintrags anhand des gespeicherten Werts des Quellfeldes ausgewertet (zum Beispiel ein in einer vorherigen Ansicht gesetzter Wert). Leer lassen, um keine Bedingungen anzuwenden.';
 $string['configanonymousentries'] = 'Diese Einstellung ermöglicht es mit einem Gastzugang (anonym, ohne Login) Einträge für alle Datalynx Instanzen zu verfassen. Diese Einstellung muss für jede Instanz zusätzlich aktiviert werden.';
 $string['configenablerssfeeds'] = 'Diese Einstellung ermöglicht RSS feeds für alle Datalynx Instanzen zu generieren.';
 $string['configmaxentries'] = 'Dieser Wert bestimmt die Höchstanzahl an Einträgen, die zu einer Datalynx Aktivität hinzugefügt werden können.';
