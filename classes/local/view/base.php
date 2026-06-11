@@ -236,6 +236,10 @@ abstract class base {
             $this->view->param9 = 0;
         }
 
+        if (!isset($this->view->param10)) {
+            $this->view->param10 = 0;
+        }
+
         $this->redirect = $this->view->param10;
 
         // Set editors and patterns.
