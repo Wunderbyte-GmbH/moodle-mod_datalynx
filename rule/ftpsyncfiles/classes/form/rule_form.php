@@ -42,7 +42,7 @@ class rule_form extends base_rule_form {
         $mform->addElement('hidden', 'param2', '');
         $mform->setType('param2', PARAM_TEXT);
 
-        // SFTP connection and credentials. Save in param2 as serialized data.
+        // SFTP connection and credentials. Saved in param2 as JSON.
         $grp = [];
         $grp[] = &$mform->createElement(
             'static',
@@ -192,7 +192,7 @@ class rule_form extends base_rule_form {
      */
     public function set_data($data) {
         if (!empty($data->param2)) {
-            $sftpsetting = unserialize($data->param2);
+            $sftpsetting = json_decode($data->param2, true) ?? [];
             if (isset($sftpsetting['sftpserver'])) {
                 $data->sftpserver = $sftpsetting['sftpserver'];
             }
@@ -238,7 +238,7 @@ class rule_form extends base_rule_form {
         }
         // Aggregate all form fields into param2 table field.
         if (isset($sftpsetting) && isset($data)) {
-            $data->param2 = serialize($sftpsetting);
+            $data->param2 = json_encode($sftpsetting);
         }
         return $data;
     }

@@ -263,8 +263,8 @@ class rule_form extends base_rule_form {
     public function set_data($data) {
         $recipients = [];
         if (!empty($data->param3)) {
-            $unserialized = @unserialize($data->param3);
-            $recipients = is_array($unserialized) ? $unserialized : [];
+            $decoded = json_decode($data->param3, true);
+            $recipients = is_array($decoded) ? $decoded : [];
         }
         if (isset($recipients['author'])) {
             $data->author = $recipients['author'];
@@ -280,8 +280,8 @@ class rule_form extends base_rule_form {
         }
 
         if (!empty($data->param4)) {
-            $unserialized = @unserialize($data->param4);
-            $data->param4 = is_array($unserialized) ? $unserialized : [];
+            $decoded = json_decode($data->param4, true);
+            $data->param4 = is_array($decoded) ? $decoded : [];
         }
         if (!empty($data->param7)) {
             $decoded = json_decode($data->param7);
@@ -316,8 +316,8 @@ class rule_form extends base_rule_form {
             if (isset($data->specificuserid)) {
                 $recipients['specificuserid'] = $data->specificuserid;
             }
-            $data->param3 = serialize($recipients);
-            $data->param4 = serialize(!empty($data->param4) && is_array($data->param4) ? $data->param4 : []);
+            $data->param3 = json_encode($recipients);
+            $data->param4 = json_encode(!empty($data->param4) && is_array($data->param4) ? $data->param4 : []);
             $data->param7 = json_encode(!empty($data->param7) && is_array($data->param7) ? $data->param7 : []);
         }
         return $data;
