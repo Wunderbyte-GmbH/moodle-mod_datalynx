@@ -589,6 +589,10 @@ class datalynx_entries {
         $dlx = $this->dlx;
         $errorstring = '';
 
+        // Whether this submission edits fields flagged editable-after-final (whitelist set by the view).
+        // Lets the owner of a final entry through the ownership gate; per-field filtering happens below.
+        $allowfinaledit = ($action === 'update' && is_object($data) && !empty($data->editablefinalfieldids));
+
         $entries = [];
         // Some entries may be specified for action.
         if ($eids) {
@@ -670,7 +674,7 @@ class datalynx_entries {
                         $errorstring .= get_string('affectedid', 'mod_datalynx', $eid) . '<br>';
                         // Filter managable entries.
                     } else {
-                        if (!$dlx->user_can_manage_entry($entry)) {
+                        if (!$dlx->user_can_manage_entry($entry, $allowfinaledit)) {
                             unset($entries[$eid]);
                             $capname = get_string('updateentry', 'mod_datalynx');
                             $errorstring .= get_string('missingrequiredcapability', 'webservice', $capname);
@@ -833,24 +837,39 @@ class datalynx_entries {
                             $addorupdate = '';
                             foreach ($entries as $eid => $entry) {
                                 if ($eid > 0) {
-                                    if (isset($contents[$eid]['info']['status'])) {
-                                        // Find current state of entry in db.
-                                        $entrystatus = $DB->get_field(
-                                            'datalynx_entries',
-                                            'status',
-                                            ['id' => $eid],
-                                            'MUST_EXIST'
-                                        );
-                                        if (
-                                                $entrystatus == datalynxfield_status::STATUS_FINAL_SUBMISSION
-                                                && !has_capability('mod/datalynx:manageentries', $this->dlx->context)
-                                        ) {
-                                            continue; // Check user has capacity & status is final. If stop update.
+                                    // Find current state of entry in db.
+                                    $entrystatus = $DB->get_field(
+                                        'datalynx_entries',
+                                        'status',
+                                        ['id' => $eid],
+                                        'MUST_EXIST'
+                                    );
+                                    if (
+                                            $entrystatus == datalynxfield_status::STATUS_FINAL_SUBMISSION
+                                            && !has_capability('mod/datalynx:manageentries', $this->dlx->context)
+                                    ) {
+                                        // Final-submission lock. Never change the status, and persist only the
+                                        // fields explicitly flagged "editable after final submission" by the
+                                        // submitting view. This is the authoritative server-side guard and does
+                                        // not trust the posted form. With no whitelist the entry stays fully
+                                        // locked, preserving the historical behaviour.
+                                        unset($contents[$eid]['info']['status']);
+                                        $allowedfields = isset($data->editablefinalfieldids)
+                                                ? array_map('intval', (array) $data->editablefinalfieldids) : [];
+                                        if (empty($allowedfields)) {
+                                            continue; // Nothing may be edited while final.
+                                        }
+                                        if (!empty($contents[$eid]['fields'])) {
+                                            foreach (array_keys($contents[$eid]['fields']) as $fid) {
+                                                if (!in_array((int) $fid, $allowedfields, true)) {
+                                                    unset($contents[$eid]['fields'][$fid]);
+                                                }
+                                            }
                                         }
                                     }
                                 }
 
-                                if ($entry->id = $this->update_entry($entry, $contents[$eid]['info'])) {
+                                if ($entry->id = $this->update_entry($entry, $contents[$eid]['info'], true, $allowfinaledit)) {
                                     $emptycontent = []; // Array with lines and deleted contentids.
                                     $countfgfields = 0; // Store how many fields exist per line.
 
@@ -1354,7 +1373,7 @@ class datalynx_entries {
      * @param boolean $updatetime
      * @return boolean|integer <boolean, number>
      */
-    public function update_entry($entry, $data = null, $updatetime = true) {
+    public function update_entry($entry, $data = null, $updatetime = true, $allowfinalfieldedit = false) {
         global $CFG, $DB, $USER;
 
         $dlx = $this->dlx;
@@ -1374,7 +1393,7 @@ class datalynx_entries {
 
         // Update existing entry (only authenticated users).
         if ($entry->id > 0) {
-            if ($dlx->user_can_manage_entry($entry)) { // Just in case the user opens two forms at the same time.
+            if ($dlx->user_can_manage_entry($entry, $allowfinalfieldedit)) { // Just in case two forms are open.
                 if (
                         !has_capability('mod/datalynx:approve', $dlx->context)
                         && ($dlx->data->approval == mod_datalynx\datalynx::APPROVAL_ON_UPDATE)

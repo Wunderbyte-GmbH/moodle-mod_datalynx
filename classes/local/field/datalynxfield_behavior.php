@@ -57,6 +57,9 @@ class datalynxfield_behavior {
     /** @var bool Whether this field is required. */
     private bool $required;
 
+    /** @var bool Whether this field may still be edited after the entry reached final submission. */
+    private bool $editableafterfinal = false;
+
     /** @var array Availability conditions based on other fields' values. */
     private array $conditions = [];
 
@@ -106,6 +109,7 @@ class datalynxfield_behavior {
         $this->visibleto = isset($record->visibleto) ? unserialize($record->visibleto) : [];
         $this->editableby = isset($record->editableby) ? unserialize($record->editableby) : [];
         $this->required = isset($record->required) ? $record->required : false;
+        $this->editableafterfinal = !empty($record->editableafterfinal);
         $this->conditions = !empty($record->conditions) ? (json_decode($record->conditions, true) ?: []) : [];
 
         if (isset($record->dlx)) {
@@ -164,7 +168,7 @@ class datalynxfield_behavior {
                     mod_datalynx\datalynx::PERMISSION_GUEST]],
             'editableby' => [mod_datalynx\datalynx::PERMISSION_MANAGER, mod_datalynx\datalynx::PERMISSION_TEACHER,
                     mod_datalynx\datalynx::PERMISSION_STUDENT, mod_datalynx\datalynx::PERMISSION_AUTHOR], 'required' => false,
-            'conditions' => ''];
+            'editableafterfinal' => 0, 'conditions' => ''];
 
     /**
      * The default behavior used in any instance without user settings applied.
@@ -298,6 +302,16 @@ class datalynxfield_behavior {
     }
 
     /**
+     * Whether a field carrying this behavior may still be edited once the entry has reached the
+     * "final submission" status. Used to grant a per-field exception to the entry-level final lock.
+     *
+     * @return bool
+     */
+    public function is_editable_after_final(): bool {
+        return $this->editableafterfinal;
+    }
+
+    /**
      * Given a db record make it ready for the form.
      *
      * @param stdClass $record
@@ -317,6 +331,7 @@ class datalynxfield_behavior {
         $formdata->visibletoteammember = $visible['teammember'] ?? [];
         $formdata->editableby = unserialize($record->editableby);
         $formdata->required = $record->required;
+        $formdata->editableafterfinal = $record->editableafterfinal ?? 0;
         $formdata->conditions = !empty($record->conditions)
                 ? (json_decode($record->conditions, true) ?: ['match' => 'all', 'rules' => []])
                 : ['match' => 'all', 'rules' => []];
@@ -356,6 +371,8 @@ class datalynxfield_behavior {
         $record->visibleto = serialize($formdata->visibleto);
         $record->editableby = serialize(isset($formdata->editableby) ? $formdata->editableby : []);
         $record->required = $formdata->required;
+        // Only meaningful when the field is editable at all.
+        $record->editableafterfinal = (!empty($formdata->editable) && !empty($formdata->editableafterfinal)) ? 1 : 0;
         $record->conditions = !empty($formdata->conditions['rules'])
                 ? json_encode(['match' => $formdata->conditions['match'] ?? 'all',
                         'rules' => array_values($formdata->conditions['rules'])])
