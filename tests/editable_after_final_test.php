@@ -31,6 +31,8 @@ use mod_datalynx\local\field\datalynxfield_behavior;
 use mod_datalynx\local\filter\datalynx_filter;
 
 /**
+ * Tests for the "editable after final submission" per-field behavior flag.
+ *
  * @covers \mod_datalynx\local\field\datalynxfield_behavior::is_editable_after_final
  * @covers \mod_datalynx\local\view\base::get_editable_after_final_fieldids
  * @covers \mod_datalynx\local\datalynx_entries::process_entries
@@ -177,7 +179,7 @@ final class editable_after_final_test extends advanced_testcase {
         );
     }
 
-    // --- helpers ---------------------------------------------------------------------------------
+    // Helpers.
 
     /**
      * Run a confirmed update through the entries processor and return its result.
@@ -228,8 +230,10 @@ final class editable_after_final_test extends advanced_testcase {
             'timecreated' => time(), 'timemodified' => time(),
         ]);
         foreach ($content as $fieldid => $value) {
-            $DB->insert_record('datalynx_contents',
-                (object) ['fieldid' => $fieldid, 'entryid' => $entryid, 'lineid' => 0, 'content' => $value]);
+            $DB->insert_record(
+                'datalynx_contents',
+                (object) ['fieldid' => $fieldid, 'entryid' => $entryid, 'lineid' => 0, 'content' => $value]
+            );
         }
         return $entryid;
     }
@@ -260,7 +264,10 @@ final class editable_after_final_test extends advanced_testcase {
      */
     private function content(int $fieldid, int $entryid) {
         global $DB;
-        return $DB->get_field('datalynx_contents', 'content',
-            ['fieldid' => $fieldid, 'entryid' => $entryid, 'lineid' => 0]);
+        return $DB->get_field(
+            'datalynx_contents',
+            'content',
+            ['fieldid' => $fieldid, 'entryid' => $entryid, 'lineid' => 0]
+        );
     }
 }

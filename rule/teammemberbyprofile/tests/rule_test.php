@@ -69,8 +69,11 @@ final class rule_test extends advanced_testcase {
         $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
         $this->dlx = new datalynx($instance->id);
 
-        $this->selectid = $this->create_field('select', 'Department manager',
-            ['param1' => self::FACULTY1 . "\n" . self::FACULTY2 . "\nCoordinator"]);
+        $this->selectid = $this->create_field(
+            'select',
+            'Department manager',
+            ['param1' => self::FACULTY1 . "\n" . self::FACULTY2 . "\nCoordinator"]
+        );
         $this->dlx->get_fields(null, false, true);
 
         $profilefield = $this->getDataGenerator()->create_custom_profile_field([
@@ -143,8 +146,10 @@ final class rule_test extends advanced_testcase {
         $rule = $this->make_rule($teamid, 'overwrite');
         $this->run_rule($rule, $entryid);
 
-        $this->assertFalse($DB->record_exists('datalynx_contents',
-            ['entryid' => $entryid, 'fieldid' => $teamid]));
+        $this->assertFalse($DB->record_exists(
+            'datalynx_contents',
+            ['entryid' => $entryid, 'fieldid' => $teamid]
+        ));
     }
 
     /**
@@ -174,7 +179,7 @@ final class rule_test extends advanced_testcase {
         $this->assertEquals([$this->teachera->id], $this->get_team($teamid, $entryid));
     }
 
-    // --- helpers ---------------------------------------------------------------------------------
+    // Helpers.
 
     /**
      * Insert a datalynx field record and return its id.
@@ -288,8 +293,11 @@ final class rule_test extends advanced_testcase {
      */
     private function get_team(int $teamid, int $entryid): array {
         global $DB;
-        $content = $DB->get_field('datalynx_contents', 'content',
-            ['entryid' => $entryid, 'fieldid' => $teamid, 'lineid' => 0]);
+        $content = $DB->get_field(
+            'datalynx_contents',
+            'content',
+            ['entryid' => $entryid, 'fieldid' => $teamid, 'lineid' => 0]
+        );
         $ids = $content ? array_map('intval', json_decode($content, true)) : [];
         sort($ids);
         return $ids;

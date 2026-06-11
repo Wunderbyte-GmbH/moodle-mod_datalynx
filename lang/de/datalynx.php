@@ -766,6 +766,7 @@ $string['statisticsfor'] = 'Statistik für \'{$a}\'';
 $string['status'] = 'Status';
 $string['statusdraft'] = 'Entwurf';
 $string['statusfinalsubmission'] = 'Endgültige Abgabe';
+$string['statusmarkfinal'] = 'Als endgültige Abgabe markieren';
 $string['statusnotcreated'] = 'Nicht gesetzt';
 $string['statusrequired'] = 'Status muss gesetzt werden!';
 $string['statussubmission'] = 'Abgabe';

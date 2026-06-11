@@ -78,8 +78,11 @@ class rule extends base {
         }
 
         // The entry's selected option key (a single select stores the scalar 1-based key).
-        $optionkey = $DB->get_field('datalynx_contents', 'content',
-            ['entryid' => $entryid, 'fieldid' => $selectfieldid, 'lineid' => 0]);
+        $optionkey = $DB->get_field(
+            'datalynx_contents',
+            'content',
+            ['entryid' => $entryid, 'fieldid' => $selectfieldid, 'lineid' => 0]
+        );
         if ($optionkey === false || $optionkey === null || $optionkey === '') {
             return true; // Nothing selected; leave the team field untouched.
         }
@@ -98,8 +101,10 @@ class rule extends base {
         }
 
         // Current team content for this entry.
-        $row = $DB->get_record('datalynx_contents',
-            ['entryid' => $entryid, 'fieldid' => $teamfieldid, 'lineid' => 0]);
+        $row = $DB->get_record(
+            'datalynx_contents',
+            ['entryid' => $entryid, 'fieldid' => $teamfieldid, 'lineid' => 0]
+        );
         $existing = [];
         if ($row && $row->content !== null && $row->content !== '') {
             $decoded = json_decode($row->content, true);

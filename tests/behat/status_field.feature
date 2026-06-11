@@ -74,14 +74,14 @@ Feature: Test datalynx _status internal field
       | text | Text | Entry by s1    |
     And I press "Save changes"
     And I press "Continue"
-    Then I should see "Not set"
+    Then I should see "Draft"
     When I click on the 1st entry "Edit" link
-    And I set the field with xpath "//select[contains(@name,'field_status_')]" to "1"
+    And I set the field with xpath "//input[@type='checkbox' and contains(@name,'field_status_')]" to ""
     And I press "Save changes"
     And I press "Continue"
     Then I should see "Draft"
     When I click on the 1st entry "Edit" link
-    And I set the field with xpath "//select[contains(@name,'field_status_')]" to "2"
+    And I set the field with xpath "//input[@type='checkbox' and contains(@name,'field_status_')]" to "1"
     And I press "Save changes"
     And I press "Continue"
     Then I should see "Final submission"
@@ -96,9 +96,9 @@ Feature: Test datalynx _status internal field
       | text | Text | Final entry |
     And I press "Save changes"
     And I press "Continue"
-    Then I should see "Not set"
+    Then I should see "Draft"
     When I click on the 1st entry "Edit" link
-    And I set the field with xpath "//select[contains(@name,'field_status_')]" to "2"
+    And I set the field with xpath "//input[@type='checkbox' and contains(@name,'field_status_')]" to "1"
     And I press "Save changes"
     And I press "Continue"
     Then I should see "Final submission"
@@ -122,7 +122,7 @@ Feature: Test datalynx _status internal field
     And I press "Save changes"
     And I press "Continue"
     When I click on the 1st entry "Edit" link
-    And I set the field with xpath "//select[contains(@name,'field_status_')]" to "1"
+    And I set the field with xpath "//input[@type='checkbox' and contains(@name,'field_status_')]" to ""
     And I press "Save changes"
     And I press "Continue"
     And I log out
@@ -136,7 +136,7 @@ Feature: Test datalynx _status internal field
     And I press "Save changes"
     And I press "Continue"
     When I click on the 1st entry "Edit" link
-    And I set the field with xpath "//select[contains(@name,'field_status_')]" to "2"
+    And I set the field with xpath "//input[@type='checkbox' and contains(@name,'field_status_')]" to "1"
     And I press "Save changes"
     And I press "Continue"
     And I log out
