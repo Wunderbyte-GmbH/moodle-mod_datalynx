@@ -85,24 +85,24 @@ class rule extends base {
         parent::__construct($dlx, $rule);
 
         $this->sender = $this->rule->param2;
-        $this->recipient = $this->unserialize_array($this->rule->param3 ?? null);
-        $this->targetviews = $this->unserialize_array($this->rule->param4 ?? null);
+        $this->recipient = $this->decode_array($this->rule->param3 ?? null);
+        $this->targetviews = $this->decode_array($this->rule->param4 ?? null);
         $this->emailtemplateviewid = !empty($this->rule->param8) ? (int) $this->rule->param8 : 0;
     }
 
     /**
-     * Normalize serialized rule values that are expected to decode to arrays.
+     * JSON-decode a rule param value that is expected to be an array.
      *
      * @param mixed $value
      * @return array
      */
-    private function unserialize_array($value): array {
+    private function decode_array($value): array {
         if (empty($value)) {
             return [];
         }
 
-        $unserialized = @unserialize($value);
-        return is_array($unserialized) ? $unserialized : [];
+        $decoded = json_decode($value, true);
+        return is_array($decoded) ? $decoded : [];
     }
 
     /**
@@ -113,7 +113,8 @@ class rule extends base {
      */
     private function checkteam(\core\event\base $event) {
         $teamid = $event->get_data()['other']['fieldid'];
-        $triggers = unserialize($this->rule->param1);
+        $param1 = $this->rule->param1 ?? null;
+        $triggers = empty($param1) ? [] : (json_decode($param1, true) ?? []);
         foreach ($triggers as $trigger) {
             if (strpos($trigger, "$teamid") !== false) {
                 return true;

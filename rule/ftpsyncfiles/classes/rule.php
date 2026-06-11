@@ -110,7 +110,7 @@ class rule extends base {
     public function __construct($dlx = 0, $rule = 0) {
         parent::__construct($dlx, $rule);
         if (isset($this->rule->param2)) {
-            $this->sftpsetting = unserialize($this->rule->param2);
+            $this->sftpsetting = json_decode($this->rule->param2, true) ?? [];
             $this->sftpserver = $this->sftpsetting['sftpserver'];
             $this->sftpport = $this->sftpsetting['sftpport'];
             $this->sftpusername = $this->sftpsetting['sftpusername'];

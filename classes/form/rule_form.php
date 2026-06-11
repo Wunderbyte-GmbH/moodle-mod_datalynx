@@ -156,11 +156,9 @@ class rule_form extends moodleform {
      */
     public function set_data($data) {
         if (!empty($data->param1)) {
-            $selectedevents = unserialize($data->param1);
-            if ($selectedevents) {
-                foreach ($selectedevents as $eventname) {
-                    $data->$eventname = true;
-                }
+            $selectedevents = json_decode($data->param1, true) ?? [];
+            foreach ($selectedevents as $eventname) {
+                $data->$eventname = true;
             }
         }
         parent::set_data($data);
@@ -182,7 +180,7 @@ class rule_form extends moodleform {
                     $selectedevents[] = $eventname;
                 }
             }
-            $data->param1 = serialize($selectedevents);
+            $data->param1 = json_encode($selectedevents);
         }
         return $data;
     }

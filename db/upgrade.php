@@ -1320,6 +1320,34 @@ function xmldb_datalynx_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2026061101, 'datalynx');
     }
 
+    if ($oldversion < 2026061103) {
+        // Migrate datalynx_rules serialized params to JSON.
+        // param1 (all rules): selected trigger events.
+        // param2 (ftpsyncfiles): SFTP connection settings.
+        // param3 (eventnotification): recipient configuration.
+        // param4 (eventnotification): target views per permission level.
+        $rules = $DB->get_records('datalynx_rules', null, '', 'id, param1, param2, param3, param4');
+        foreach ($rules as $rule) {
+            $update = (object)['id' => $rule->id];
+            $changed = false;
+            foreach (['param1', 'param2', 'param3', 'param4'] as $param) {
+                $value = $rule->$param;
+                if (!empty($value) && is_string($value)) {
+                    $decoded = @unserialize($value);
+                    if (is_array($decoded)) {
+                        $update->$param = json_encode($decoded);
+                        $changed = true;
+                    }
+                }
+            }
+            if ($changed) {
+                $DB->update_record('datalynx_rules', $update);
+            }
+        }
+
+        upgrade_mod_savepoint(true, 2026061103, 'datalynx');
+    }
+
     return true;
 }
 

@@ -112,11 +112,15 @@ abstract class base {
         }
 
         $eventname = explode('\\', trim($eventname, '\\'))[2];
+        $param1 = $this->rule->param1 ?? null;
+        if (empty($param1)) {
+            return false;
+        }
         $triggers = array_map(
             function ($element) {
                 return explode(':', $element)[0];
             },
-            unserialize($this->rule->param1)
+            json_decode($param1, true) ?? []
         );
         return array_search($eventname, $triggers) !== false;
     }
@@ -129,11 +133,12 @@ abstract class base {
     public function get_triggers() {
         static $triggers = [];
         if (empty($triggers)) {
-            $triggers = array_map(
+            $param1 = $this->rule->param1 ?? null;
+            $triggers = empty($param1) ? [] : array_map(
                 function ($element) {
                     return explode(':', $element)[0];
                 },
-                unserialize($this->rule->param1)
+                json_decode($param1, true) ?? []
             );
         }
         return $triggers;
