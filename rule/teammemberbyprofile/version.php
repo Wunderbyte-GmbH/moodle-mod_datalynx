@@ -16,13 +16,13 @@
 
 /**
  *
- * @package datalynxfield_select
- * @subpackage select
- * @copyright 2015 David Bogner {@link https://www.edulabs.org}.
+ * @package datalynxrule_teammemberbyprofile
+ * @subpackage teammemberbyprofile
+ * @copyright 2026 David Bogner {@link https://www.edulabs.org}.
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'datalynxfield_select';
+$plugin->component = 'datalynxrule_teammemberbyprofile';
 $plugin->version = 2026061100;
 $plugin->requires = 2022112800;

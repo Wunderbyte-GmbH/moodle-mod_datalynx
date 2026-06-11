@@ -171,9 +171,24 @@ class renderer extends datalynxfield_renderer {
         $elements = [];
         $elements[] = $mform->createElement('autocomplete', $fieldname, null, $menu, $options);
         $mform->setType($fieldname, PARAM_INT);
-        $value = json_decode($value);
-        $mform->setDefault($fieldname, $value);
-        $mform->disabledIf($fieldname, "searchoperator{$i}", 'eq', '');
+        // The option list operand only applies to ANY_OF; for MY_PROFILE the stored operand is
+        // a profile field shortname, so json_decode returns null and the default is left unset.
+        $decoded = json_decode($value);
+        if (is_array($decoded)) {
+            $mform->setDefault($fieldname, $decoded);
+        }
+        $mform->disabledIf($fieldname, "searchoperator{$i}", 'neq', 'ANY_OF');
+
+        // Profile field selector, used by the MY_PROFILE operator.
+        $profilename = "f_{$i}_{$fieldid}_profile";
+        $profilemenu = ['' => get_string('choosedots')] + \datalynxfield_select\field::get_profile_field_menu();
+        $elements[] = $mform->createElement('select', $profilename, null, $profilemenu);
+        $mform->setType($profilename, PARAM_ALPHANUMEXT);
+        if (!is_array($decoded) && $value !== '') {
+            $mform->setDefault($profilename, $value);
+        }
+        $mform->disabledIf($profilename, "searchoperator{$i}", 'neq', 'MY_PROFILE');
+
         return [$elements, null];
     }
 

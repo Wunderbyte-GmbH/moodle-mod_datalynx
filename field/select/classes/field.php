@@ -25,6 +25,7 @@
 
 namespace datalynxfield_select;
 
+use core_text;
 use mod_datalynx\local\field\datalynxfield_base;
 use mod_datalynx\local\field\datalynxfield_option_single;
 
@@ -83,5 +84,157 @@ class field extends datalynxfield_option_single {
         } else {
             return 1;
         }
+    }
+
+    /**
+     *
+     * {@inheritDoc}
+     * @see datalynxfield_option_single::get_supported_search_operators()
+     * @return array
+     */
+    public function get_supported_search_operators() {
+        return [
+            'ANY_OF' => get_string('anyof', 'datalynx'),
+            'MY_PROFILE' => get_string('matchesmyprofilefield', 'datalynxfield_select'),
+            '' => get_string('empty', 'datalynx'),
+        ];
+    }
+
+    /**
+     * Extracts the search value for this field from submitted form data.
+     *
+     * For the MY_PROFILE operator the operand is the shortname of a user profile field
+     * (rendered as a separate dropdown), so it is read from its own form element.
+     *
+     * {@inheritDoc}
+     * @see \mod_datalynx\local\field\datalynxfield_option::parse_search()
+     * @param \stdClass $formdata Form data object.
+     * @param int $i Filter index.
+     * @return mixed
+     */
+    public function parse_search($formdata, $i) {
+        $operator = optional_param("searchoperator$i", '', PARAM_ALPHANUMEXT);
+        if ($operator === 'MY_PROFILE') {
+            $shortname = optional_param("f_{$i}_{$this->field->id}_profile", '', PARAM_ALPHANUMEXT);
+            return $shortname !== '' ? $shortname : false;
+        }
+        return parent::parse_search($formdata, $i);
+    }
+
+    /**
+     * Get search sql for this field.
+     *
+     * Adds the MY_PROFILE operator on top of the standard option search: it resolves the
+     * current user's value for the chosen profile field, maps it to the matching option key
+     * and then reuses the regular equality search so NOT handling and joins stay consistent.
+     *
+     * {@inheritDoc}
+     * @see datalynxfield_option_single::get_search_sql()
+     * @param array $search Search criteria array [$not, $operator, $value].
+     * @return array
+     */
+    public function get_search_sql(array $search): array {
+        if (($search[1] ?? '') === 'MY_PROFILE') {
+            $not = $search[0];
+            $optionkey = $this->resolve_my_profile_option_key($search[2]);
+            if ($optionkey === false) {
+                // The user's profile value matches no option: use an impossible key so the
+                // standard equality search matches nothing (and NOT matches everything else).
+                $optionkey = -1;
+            }
+            return parent::get_search_sql([$not, '=', $optionkey]);
+        }
+        return parent::get_search_sql($search);
+    }
+
+    /**
+     * Resolves the current user's value for the given profile field and maps it to the
+     * matching select option key.
+     *
+     * @param mixed $value The stored operand: the profile field shortname.
+     * @return int|false The matching option key, or false if there is no match.
+     */
+    protected function resolve_my_profile_option_key($value) {
+        global $USER;
+
+        $shortname = is_array($value) ? reset($value) : $value;
+        if (empty($shortname)) {
+            return false;
+        }
+
+        $profilevalue = $this->resolve_user_profile_value($USER, (string) $shortname);
+        return $this->get_option_key_for_value($profilevalue);
+    }
+
+    /**
+     * Maps a value to the option key whose label matches it (case-insensitive, trimmed).
+     *
+     * Shared by the MY_PROFILE filter operator and the teammemberbyprofile rule so both match
+     * a profile value against the field options in exactly the same way.
+     *
+     * @param string|null $value The value to look up against this field's option labels.
+     * @return int|false The matching option key, or false if there is no match.
+     */
+    public function get_option_key_for_value(?string $value) {
+        if ($value === null || trim($value) === '') {
+            return false;
+        }
+
+        $target = core_text::strtolower(trim($value));
+        foreach ($this->options_menu() as $key => $label) {
+            if (core_text::strtolower(trim((string) $label)) === $target) {
+                return (int) $key;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Reads a user's profile field value, supporting both standard user fields
+     * (e.g. department, institution) and custom profile fields (by shortname).
+     *
+     * @param \stdClass $user The user record (typically $USER).
+     * @param string $shortname The profile field shortname.
+     * @return string|null The value, or null if the field is not set for the user.
+     */
+    public function resolve_user_profile_value($user, string $shortname): ?string {
+        global $CFG;
+
+        // Standard user-table field.
+        if (isset($user->$shortname) && is_scalar($user->$shortname)) {
+            return (string) $user->$shortname;
+        }
+
+        // Custom profile field by shortname.
+        require_once($CFG->dirroot . '/user/profile/lib.php');
+        $custom = profile_user_record($user->id);
+        if (isset($custom->$shortname) && is_scalar($custom->$shortname)) {
+            return (string) $custom->$shortname;
+        }
+
+        return null;
+    }
+
+    /**
+     * Builds the menu of profile fields that can be matched against this field's options:
+     * a curated set of standard user fields plus all custom profile fields.
+     *
+     * @return array shortname => human readable label
+     */
+    public static function get_profile_field_menu(): array {
+        global $DB;
+
+        $menu = [];
+        $standard = ['department', 'institution', 'city', 'address', 'country', 'idnumber'];
+        foreach ($standard as $name) {
+            $menu[$name] = get_string($name) . ' (' . get_string('user') . ')';
+        }
+
+        $custom = $DB->get_records_menu('user_info_field', null, 'name', 'shortname, name');
+        foreach ($custom as $shortname => $name) {
+            $menu[$shortname] = format_string($name);
+        }
+
+        return $menu;
     }
 }

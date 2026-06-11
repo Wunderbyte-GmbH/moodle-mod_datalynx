@@ -260,6 +260,61 @@ class behat_mod_datalynx extends behat_base {
     }
 
     /**
+     * Creates a "matches my profile field" (MY_PROFILE) custom-search filter for the given datalynx.
+     *
+     * Each row defines one filter with the columns:
+     *  - name:    the filter name (referenced by name when attaching it to a view)
+     *  - field:   the name of a select field whose option is matched against the profile value
+     *  - profile: the shortname of the user profile field to compare against (standard or custom)
+     *  - not:     optional, "1"/"yes" to negate the match (defaults to a positive match)
+     *
+     * @Given /^the "(?P<activityname_string>(?:[^"]|\\")*)" datalynx has the following "matches my profile field" filters:$/
+     *
+     * @param string $activityname
+     * @param TableNode $filtersdata
+     */
+    public function the_datalynx_has_the_following_my_profile_filters($activityname, TableNode $filtersdata) {
+        global $DB;
+
+        $record = $DB->get_record('datalynx', ['name' => $activityname], '*', MUST_EXIST);
+        $dlx = new \mod_datalynx\datalynx($record->id);
+        $fields = $dlx->get_fields();
+        $normalizefieldname = static function (string $name): string {
+            return preg_replace('/^Datalynx field\s+/u', '', trim($name));
+        };
+
+        foreach ($filtersdata->getHash() as $filterdata) {
+            $fieldid = 0;
+            foreach ($fields as $field) {
+                if ($normalizefieldname($field->name()) === $normalizefieldname($filterdata['field'])) {
+                    $fieldid = (int) $field->field->id;
+                    break;
+                }
+            }
+            if (!$fieldid) {
+                throw new \Exception('Unable to find the select field "' . $filterdata['field'] . '".');
+            }
+
+            $not = !empty($filterdata['not']) && !in_array(strtolower($filterdata['not']), ['0', 'no', 'false'], true)
+                ? 'NOT' : '';
+            $customsearch = [$fieldid => ['AND' => [[$not, 'MY_PROFILE', $filterdata['profile']]]]];
+
+            $DB->insert_record('datalynx_filters', (object) [
+                'dataid' => $dlx->id(),
+                'name' => $filterdata['name'],
+                'description' => '',
+                'visible' => 1,
+                'perpage' => 10,
+                'selection' => 0,
+                'groupby' => '',
+                'search' => '',
+                'customsort' => '',
+                'customsearch' => serialize($customsearch),
+            ]);
+        }
+    }
+
+    /**
      * Opens the specified datalynx view directly.
      *
      * @When /^I open the "(?P<viewname_string>(?:[^"]|\\")*)" view of "(?P<activityname_string>(?:[^"]|\\")*)" datalynx$/
