@@ -224,6 +224,13 @@ trait behavior_form_elements {
         }
         $mform->disabledIf('required', 'editable', 'notchecked');
 
+        $mform->addElement('advcheckbox', 'editableafterfinal', get_string('editableafterfinal', 'datalynx'));
+        $mform->addHelpButton('editableafterfinal', 'editableafterfinal', 'datalynx');
+        if ($new) {
+            $mform->setDefault('editableafterfinal', false);
+        }
+        $mform->disabledIf('editableafterfinal', 'editable', 'notchecked');
+
         // AVAILABILITY CONDITIONS.
         // The individual condition rows (operator + value widgets, which depend on the chosen source
         // field) are built in definition_after_data() so they can reuse each field's own search widget.
@@ -347,9 +354,13 @@ trait behavior_form_elements {
         if (empty($data->editable)) {
             $data->editableby = [];
             $data->editable = false;
+            $data->editableafterfinal = false;
         }
         if (!isset($data->required)) {
             $data->required = false;
+        }
+        if (!isset($data->editableafterfinal)) {
+            $data->editableafterfinal = false;
         }
 
         // Collapse the dynamic condition rows into a single conditions structure.
@@ -407,6 +418,9 @@ trait behavior_form_elements {
         }
         if (!isset($data->required)) {
             $data->required = false;
+        }
+        if (!isset($data->editableafterfinal)) {
+            $data->editableafterfinal = false;
         }
 
         // Stash conditions so definition_after_data() can seed the dynamic rows, and preselect the match mode.

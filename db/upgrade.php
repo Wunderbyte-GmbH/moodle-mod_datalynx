@@ -1308,6 +1308,18 @@ function xmldb_datalynx_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2026060901, 'datalynx');
     }
 
+    if ($oldversion < 2026061101) {
+        // Add the editableafterfinal flag to datalynx_behaviors: lets specific fields stay editable
+        // after an entry reached final submission.
+        $table = new xmldb_table('datalynx_behaviors');
+        $field = new xmldb_field('editableafterfinal', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'required');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, 2026061101, 'datalynx');
+    }
+
     return true;
 }
 

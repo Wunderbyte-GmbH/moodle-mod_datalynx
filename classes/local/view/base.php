@@ -27,6 +27,7 @@ use calc_formula;
 use coding_exception;
 use datalynxfield_rating\field as datalynxfield_rating;
 use datalynxfield_status\field as datalynxfield_status;
+use mod_datalynx\local\field\datalynxfield_behavior;
 use HTML_QuickForm;
 use html_writer;
 use mod_datalynx\datalynx;
@@ -1665,7 +1666,10 @@ abstract class base {
                         !has_capability('mod/datalynx:manageentries', $this->dlx->context) &&
                              $entrystatus == datalynxfield_status::STATUS_FINAL_SUBMISSION
                     ) {
-                        $editallowed = false;
+                        // The whole entry is locked once final, unless this view carries fields that are
+                        // explicitly flagged "editable after final submission": then the form is still
+                        // rendered so those fields (only) can be edited (see datalynxfield_renderer).
+                        $editallowed = !empty($this->get_editable_after_final_fieldids());
                     }
                 }
             }
@@ -1683,6 +1687,37 @@ abstract class base {
         }
         // Process calculations if any.
         return $this->process_calculations($html);
+    }
+
+    /**
+     * Field ids in this view's template whose behavior keeps them editable after final submission.
+     *
+     * Only content fields rendered with an explicitly named behavior carrying the "editable after
+     * final" flag qualify. Internal fields (such as the status field) are never included, so a final
+     * entry cannot be reverted to draft to bypass the lock. Used by both the render gate and the
+     * server-side save gate so they agree on which fields the final-submission lock excepts.
+     *
+     * @return int[] Field ids.
+     */
+    public function get_editable_after_final_fieldids(): array {
+        $allowed = [];
+        $fieldtags = $this->tags['field'] ?? [];
+        $pattern = '/\[\[([^\|\]]+)(?:\|([^\|\]]*))?(?:\|([^\|\]]*))?\]\]/';
+        foreach ($fieldtags as $fieldid => $patterns) {
+            if (!is_numeric($fieldid)) {
+                continue; // Internal fields (status, …) are never excepted from the lock.
+            }
+            foreach ((array) $patterns as $tag) {
+                if (preg_match($pattern, $tag, $matches) && !empty($matches[2])) {
+                    $behavior = datalynxfield_behavior::from_name($matches[2], $this->dlx->id());
+                    if ($behavior && $behavior->is_editable_after_final()) {
+                        $allowed[(int) $fieldid] = (int) $fieldid;
+                        break;
+                    }
+                }
+            }
+        }
+        return array_values($allowed);
     }
 
     /**
@@ -2148,6 +2183,9 @@ abstract class base {
                 // Process the form if not cancelled.
                 if (!$entriesform->is_cancelled()) {
                     if ($data = $entriesform->get_data()) {
+                        // Tell the save gate which fields this view keeps editable after final submission,
+                        // so a final entry's lock is enforced server-side per field (not via the form).
+                        $data->editablefinalfieldids = $this->get_editable_after_final_fieldids();
                         // Validated successfully so process request.
                         $processed = $this->entries->process_entries(
                             'update',

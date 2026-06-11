@@ -2282,10 +2282,13 @@ class datalynx {
      * Has the actual user the right to edit any entries or the optional single entry parameter?
      *
      * @param ?object $entry The entry object to check, or null for any entry.
+     * @param bool $allowfinalfieldedit When true, an entry in "final submission" is not treated as
+     *        locked for its owner. Used only by the save path when editing fields explicitly flagged
+     *        "editable after final submission"; the per-field filtering happens in process_entries.
      * @return boolean
      * @throws \coding_exception
      */
-    public function user_can_manage_entry(?object $entry = null) {
+    public function user_can_manage_entry(?object $entry = null, bool $allowfinalfieldedit = false) {
         global $USER, $CFG;
 
         // Teachers can always manage entries.
@@ -2338,8 +2341,10 @@ class datalynx {
                     return false; // Who are you anyway???
                 }
 
-                // If nor status 'draft' neither status 'not set' user is not allowed to manage this entry.
+                // If neither status 'draft' nor 'not set' the entry is locked for its owner, unless the
+                // caller is editing fields explicitly flagged editable after final submission.
                 if (
+                    !$allowfinalfieldedit &&
                     !($entry->status == datalynxfield_status::STATUS_DRAFT ||
                         $entry->status == datalynxfield_status::STATUS_NOT_SET)
                 ) {
