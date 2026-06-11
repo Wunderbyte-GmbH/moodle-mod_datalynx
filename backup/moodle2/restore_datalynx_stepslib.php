@@ -429,7 +429,7 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
         }
 
         // Update the text comment reference to be sent with the notification.
-        $param7 = json_decode($data->param7);
+        $param7 = !empty($data->param7) ? json_decode($data->param7) : null;
         if (!empty($param7) && $data->type == 'eventnotification') {
             $newparam = [];
             foreach ($param7 as $paramid) {
