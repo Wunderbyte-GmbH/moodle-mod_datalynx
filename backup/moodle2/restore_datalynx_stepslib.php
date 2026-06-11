@@ -438,6 +438,18 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
             $data->param7 = json_encode($newparam);
         }
 
+        // Update field references for the "team member by profile" rule:
+        // param6 = source select field id, param8 = target teammemberselect field id.
+        // (param7 holds a profile-field shortname, not an id, so it is left untouched.)
+        if ($data->type == 'teammemberbyprofile') {
+            if (!empty($data->param6)) {
+                $data->param6 = $this->get_mappingid('datalynx_field', $data->param6);
+            }
+            if (!empty($data->param8)) {
+                $data->param8 = $this->get_mappingid('datalynx_field', $data->param8);
+            }
+        }
+
         // Insert the datalynx_rules record.
         $newitemid = $DB->insert_record('datalynx_rules', $data);
         $this->set_mapping('datalynx_rule', $oldid, $newitemid, false); // No files.
@@ -525,7 +537,24 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
 
         $data->dataid = $this->get_new_parentid('datalynx');
 
-        // Insert the datalynx_fields record.
+        // Remap the field ids referenced by value-based availability conditions.
+        // (Fields are restored before behaviors, so their mappings already exist.)
+        if (!empty($data->conditions)) {
+            $decoded = json_decode($data->conditions, true);
+            if (!empty($decoded['rules']) && is_array($decoded['rules'])) {
+                foreach ($decoded['rules'] as $key => $rule) {
+                    if (!empty($rule['sourcefieldid'])) {
+                        $newfieldid = $this->get_mappingid('datalynx_field', $rule['sourcefieldid']);
+                        if ($newfieldid) {
+                            $decoded['rules'][$key]['sourcefieldid'] = $newfieldid;
+                        }
+                    }
+                }
+                $data->conditions = json_encode($decoded);
+            }
+        }
+
+        // Insert the datalynx_behaviors record.
         $newitemid = $DB->insert_record('datalynx_behaviors', $data);
         $this->set_mapping('datalynx_behavior', $oldid, $newitemid, false); // No files.
     }

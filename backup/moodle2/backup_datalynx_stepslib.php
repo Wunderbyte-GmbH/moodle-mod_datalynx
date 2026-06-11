@@ -146,6 +146,7 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
             'behavior',
             ['id'],
             ['dataid', 'name', 'description', 'visibleto', 'editableby', 'required',
+                        'editableafterfinal', 'conditions',
             ]
         );
 
