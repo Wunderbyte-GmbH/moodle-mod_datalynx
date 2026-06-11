@@ -34,7 +34,6 @@ Feature: Test datalynx _status internal field
     And I set the field "name" to "DraftFilter"
     And I set the field "searchandor0" to "AND"
     And I set the field "searchfield0" to "status"
-    And I press "Reload"
     And I set the field "f_0_status" to "1"
     And I press "Save changes"
     Then I should see "DraftFilter"

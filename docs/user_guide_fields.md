@@ -127,7 +127,7 @@ Datalynx can be extended with additional building blocks:
 | Area | What it is | Typical user-facing result |
 |---|---|---|
 | **Field formats** | Named display configurations for fields (for example, author name style, truncation length, date format) | Consistent, reusable rendering across views without repeating settings |
-| **Field behaviors** | Rules attached to fields (for example, making fields required in specific situations) | Smarter forms with guided completion |
+| **Field behaviors** | Rules attached to fields (for example, making fields required, or showing/editing a field only when other fields hold certain values via **availability conditions**) | Smarter forms with guided completion and progressive, branching questions |
 | **Field layouts** | Reusable presentation structures for fields | Cleaner, consistent entry design |
 | **Tools** | Extra actions such as creating entries in bulk or downloading files | Faster administration workflows |
 | **Template patterns** | Tags and pattern snippets placed in templates | Dynamic output based on each entry |

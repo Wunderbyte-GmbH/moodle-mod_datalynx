@@ -66,4 +66,22 @@ class field extends datalynxfield_no_content {
     public function get_internalname() {
         return $this->field->internalname;
     }
+
+    /**
+     * The submit button is an action, not searchable content.
+     *
+     * @return bool always false
+     */
+    public function supports_search() {
+        return false;
+    }
+
+    /**
+     * The submit button is an action, not sortable content.
+     *
+     * @return bool always false
+     */
+    public function supports_sort() {
+        return false;
+    }
 }

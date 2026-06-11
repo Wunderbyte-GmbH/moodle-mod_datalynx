@@ -35,7 +35,6 @@ Feature: Filter approved and not approved entries from multiple students
     And I set the field "name" to "notapprovedfilter"
     And I set the field "searchandor0" to "AND"
     And I set the field "searchfield0" to "approve"
-    And I press "Reload"
     Then I should see "Not approved"
     And I set the field "f_0_approve" to "0"
     And I press "Save changes"
