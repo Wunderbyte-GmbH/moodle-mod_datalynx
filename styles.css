@@ -109,6 +109,50 @@
     line-height: 1.2;
 }
 
+/* Status edit widget rendered as an on/off switch (Draft = off, Final submission = on). */
+input.datalynxfield_status-switch {
+    appearance: none;
+    -webkit-appearance: none;
+    flex-shrink: 0;
+    position: relative;
+    display: inline-block;
+    width: 2.5rem;
+    height: 1.5rem;
+    margin: 0;
+    border: 0;
+    border-radius: 999px;
+    background-color: #6c757d;
+    transition: background-color 0.2s ease-in-out;
+    cursor: pointer;
+    vertical-align: middle;
+}
+
+input.datalynxfield_status-switch::after {
+    content: "";
+    position: absolute;
+    top: 0.125rem;
+    left: 0.125rem;
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 50%;
+    background-color: #fff;
+    box-shadow: 0 1px 2px rgb(0 0 0 / 20%);
+    transition: transform 0.2s ease-in-out;
+}
+
+input.datalynxfield_status-switch:checked {
+    background-color: #2e7d32;
+}
+
+input.datalynxfield_status-switch:checked::after {
+    transform: translateX(1rem);
+}
+
+input.datalynxfield_status-switch:focus-visible {
+    outline: 2px solid #0f6cbf;
+    outline-offset: 2px;
+}
+
 #page-mod-datalynx-view .tabtree {
     margin-bottom: 1em;
 }

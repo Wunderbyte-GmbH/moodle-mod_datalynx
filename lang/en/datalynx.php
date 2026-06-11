@@ -792,6 +792,7 @@ $string['statisticsfor'] = 'Statistics for \'{$a}\'';
 $string['status'] = 'Status';
 $string['statusdraft'] = 'Draft';
 $string['statusfinalsubmission'] = 'Final submission';
+$string['statusmarkfinal'] = 'Mark as final submission';
 $string['statusnotcreated'] = 'Not set';
 $string['statusrequired'] = 'Status must be set!';
 $string['statussubmission'] = 'Submission';

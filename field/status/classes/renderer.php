@@ -79,21 +79,26 @@ class renderer extends datalynxfield_renderer {
         $fieldid = $field->id();
         $entryid = $entry->id;
         $status = isset($entry->status) ? $entry->status : field::STATUS_NOT_SET;
-        $required = !empty($options['required']);
+        // Note: the ##*status## (required) variant no longer needs a "nonzero" rule because the switch's
+        // off value is Draft (1), which is always a valid, non-empty status.
 
         $fieldname = "field_{$fieldid}_{$entryid}";
-        $menu = $this->menu_status();
-        $mform->addElement('select', $fieldname, '', $menu);
-        $mform->setDefault($fieldname, $status);
-        if ($required) {
-            $mform->addRule(
-                $fieldname,
-                get_string('statusrequired', 'datalynx'),
-                'nonzero',
-                null,
-                'client'
-            );
-        }
+        // Render as an on/off switch (Draft = off, Final submission = on), styled like ##approve##.
+        // The advcheckbox keeps the real status constants as its off/on values, so the submitted value
+        // is still a valid status and the value parsing in datalynx_entries stays unchanged.
+        $caption = get_string('statusmarkfinal', 'datalynx');
+        $mform->addElement(
+            'advcheckbox',
+            $fieldname,
+            '',
+            $caption,
+            ['class' => 'datalynxfield_status-switch'],
+            [field::STATUS_DRAFT, field::STATUS_FINAL_SUBMISSION]
+        );
+        $mform->setDefault(
+            $fieldname,
+            ((int) $status === field::STATUS_FINAL_SUBMISSION) ? field::STATUS_FINAL_SUBMISSION : field::STATUS_DRAFT
+        );
     }
 
     /**
