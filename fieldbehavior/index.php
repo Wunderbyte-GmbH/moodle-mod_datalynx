@@ -39,6 +39,18 @@ require_capability('mod/datalynx:managetemplates', $dlx->context);
 
 // Add amd JavaScript.
 $PAGE->requires->js_call_amd('mod_datalynx/behavior', 'init', []);
+// Open the add/edit behavior editor in an AJAX modal.
+$PAGE->requires->js_call_amd('mod_datalynx/behaviorform', 'init', []);
+
+// Data attributes that let the AMD module open the behavior editor modal for a given behavior.
+$behavioreditattributes = static function (int $behaviorid) use ($dlx): array {
+    return [
+        'data-action' => 'datalynx-editbehavior',
+        'data-d' => $dlx->id(),
+        'data-cmid' => $dlx->cm->id,
+        'data-behavior-id' => $behaviorid,
+    ];
+};
 
 $dlx->set_page('behavior/index', ['urlparams' => $urlparams]);
 
@@ -57,7 +69,7 @@ echo html_writer::start_tag('div', ['class' => 'fieldadd mdl-align']);
 echo html_writer::link(new moodle_url(
     '/mod/datalynx/fieldbehavior/behavior_edit.php',
     ['d' => $dlx->id(), 'sesskey' => sesskey(), 'id' => 0]
-), get_string('behavioradd', 'datalynx'));
+), get_string('behavioradd', 'datalynx'), $behavioreditattributes(0));
 echo html_writer::end_tag('div');
 echo html_writer::empty_tag('br');
 
@@ -134,14 +146,17 @@ $behaviors = $DB->get_records('datalynx_behaviors', ['dataid' => $dlx->id()]);
 
 // Create table entries from behaviors.
 foreach ($behaviors as $behaviorid => $behavior) {
+    $editlinkattributes = $behavioreditattributes($behaviorid);
     $fieldname = html_writer::link(
         new moodle_url($editbaseurl, $linkparams + ['id' => $behaviorid]),
-        $behavior->name
+        $behavior->name,
+        $editlinkattributes
     );
     $fielddescription = shorten_text($behavior->description, 30);
     $fieldedit = html_writer::link(
         new moodle_url($editbaseurl, $linkparams + ['id' => $behaviorid]),
-        $OUTPUT->pix_icon('t/edit', get_string('edit'))
+        $OUTPUT->pix_icon('t/edit', get_string('edit')),
+        $editlinkattributes
     );
     $fieldduplicate = html_writer::link(
         new moodle_url(

@@ -70,6 +70,23 @@ Typical controls include:
 - **Dynamic Context checks**: Define dynamic visibility/editability rules bypassing capabilities:
   - **Dynamic Check: Author**: Limits visibility or editability of a field strictly to the creator/owner of the entry.
   - **Dynamic Check: Mentor**: Restricts visibility or editability of a field strictly to the mentors assigned to the entry's group or team.
+- **Availability conditions**: Show and allow editing of a field only when the value of one or more *other* fields in the same entry matches conditions you define (see below).
+
+### Availability conditions
+
+Availability conditions make a field appear (and become editable) only when other fields in the same entry hold the values you specify. This is what lets you build **progressive, branching entry forms** — for example, ask follow-up questions only after an earlier answer warrants them.
+
+How it works:
+
+- In the **Availability conditions** section of a field behavior, first choose the match mode: **When all conditions are met** or **When any condition is met**.
+- Add up to **five** condition rows. Each row compares a *source field* against a value:
+  **source field** + **is / not** + **operator** + **value**. The operators and value input are the same ones used by the search filters, so a condition like *Diet contains "veg"* behaves exactly as it would in a filter.
+- Source fields are limited to these field types: **Text**, **Radio button**, **Select**, **Team member select**, **Time**, and **Duration**.
+- Conditions are evaluated when the entry is **displayed or edited**, against the **saved** value of the source field. Because the check uses the saved value, a value entered on an *earlier* view can decide whether a field shows on a *later* view in a multi-view edit flow.
+- Attach the behavior to a field in a template with the usual `[[FieldName|behaviorname]]` pattern. Leaving the conditions empty applies no conditions (the field's visibility/editability rules still apply as normal).
+
+> **Example**  
+> Create a **Radio button** field `Gender` (`Male`/`Female`) on the first view. On a later view, add a behavior `b_femaleonly` with the condition `Gender` *is* `=` `Female`, then place the target field as `[[FemaleOnlyField|b_femaleonly]]`. The field only appears when the author selected *Female* earlier.
 
 ### Workflow
 
@@ -77,7 +94,8 @@ Typical controls include:
 2. Click **Add** or edit an existing behavior.
 3. Set visibility and editability rules using capability checkboxes and dynamic context checks.
 4. Configure required behavior where needed.
-5. Save and test with role-based accounts.
+5. (Optional) Add **availability conditions** to gate the field on other fields' values.
+6. Save and test with role-based accounts.
 
 > **Warning**  
 > Overly strict behavior rules can prevent legitimate submissions. Test with realistic user journeys.

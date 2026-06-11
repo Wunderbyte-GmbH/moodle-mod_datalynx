@@ -146,23 +146,20 @@ class renderer extends datalynxfield_renderer {
         $fieldid = $this->field->id();
         $fieldname = "f_{$i}_$fieldid";
 
+        // The exists/missing selector is the sole control, so it is used in every filter form.
+        $options = [
+                -1 => get_string('choose'),
+                0 => get_string('fileexist', 'datalynx'),
+                1 => get_string('filemissing', 'datalynx'),
+        ];
         $arr = [];
+        $arr[] = $mform->createElement('select', $fieldname, '', $options);
+        $mform->setType($fieldname, PARAM_INT);
+        $mform->setDefault($fieldname, $value === '' ? -1 : $value);
+        // The selector replaces the generic not/operator inputs; disable them where they exist.
+        $mform->disabledIf("searchnot$i", $fieldname, 'neq', 2);
+        $mform->disabledIf("searchoperator$i", $fieldname, 'neq', 2);
 
-        if ($mform->_formName == 'mod_datalynx_form_datalynx_customfilter_frontend_form') {
-            $options = [
-                    -1  => get_string('choose'),
-                    1 => get_string('filemissing', 'datalynx'),
-                    0 => get_string('fileexist', 'datalynx'),
-            ];
-            $arr[] = $mform->createElement('select', $fieldname, '', $options);
-            $mform->setType($fieldname, PARAM_INT);
-            $mform->setDefault($fieldname, $value);
-        } else {
-            $arr[] = &$mform->createElement('text', $fieldname, null, ['size' => '32']);
-            $mform->setType($fieldname, PARAM_NOTAGS);
-            $mform->setDefault($fieldname, $value ? 1 : 0);
-            $mform->disabledIf($fieldname, "searchoperator$i", 'eq', '');
-        }
         return [$arr, null];
     }
 

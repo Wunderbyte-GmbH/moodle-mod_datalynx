@@ -326,19 +326,46 @@ class field extends datalynxfield_base {
     }
 
     /**
+     * Parses the submitted "has a file / has not a file" selector for this field.
+     *
+     * The selector value (0 = has a file, 1 = has not a file) may legitimately be 0, so it is read
+     * with isset() rather than the base !empty() check. The "choose" sentinel (-1) and an empty
+     * value mean "no filter".
+     *
+     * @param object $formdata The submitted form data.
+     * @param int    $i        The search field index.
+     * @return mixed The parsed selector value, or false when no filter is set.
+     */
+    public function parse_search($formdata, $i) {
+        $fieldid = $this->field->id;
+        $key = "f_{$i}_$fieldid";
+        if (!isset($formdata->$key)) {
+            return false;
+        }
+        $value = $formdata->$key;
+        if ($value === '' || (int) $value === -1) {
+            return false;
+        }
+        return $value;
+    }
+
+    /**
      *
      * {@inheritDoc}
      * @see datalynxfield_base::get_search_sql()
+     *
+     * The exists/missing selector is authoritative: value 0 means "has a file" (content column
+     * equals 1), value 1 means "has not a file" (entries without a file). The incoming not/operator
+     * are ignored because the selector alone drives the comparison.
      *
      * @param array $search Search parameters array with [not, operator, value].
      * @return array SQL fragments array.
      */
     public function get_search_sql(array $search): array {
-        // We keep the not and compare with exactly 1 in the content column.
-        [$not, $operator, $value] = $search;
-        $value = '1';
-        $operator = '=';
-        return parent::get_search_sql([$not, $operator, $value]);
+        [, , $value] = $search;
+        // Value 1 = "has not a file" -> negate the "content equals 1" match; 0 = "has a file".
+        $not = ((int) $value === 1) ? 'NOT' : '';
+        return parent::get_search_sql([$not, '=', '1']);
     }
 
     /**

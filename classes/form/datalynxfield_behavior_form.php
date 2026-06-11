@@ -23,34 +23,28 @@
  */
 
 namespace mod_datalynx\form;
-use coding_exception;
-use dml_exception;
-use html_writer;
 use mod_datalynx;
-use mod_datalynx\local\field\datalynxfield_behavior;
 use moodleform;
-use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . '/formslib.php');
 
 /**
- * Class datalynx_field_behavior_form
- * This class is responsible for managin the form for the field behaviors
+ * Legacy full-page field-behavior form.
+ *
+ * The form body and data transforms live in {@see behavior_form_elements} so the AJAX
+ * {@see datalynxfield_behavior_dynamic_form} shares them. This class remains as the no-JS fallback
+ * reached from fieldbehavior/behavior_edit.php.
  */
 class datalynxfield_behavior_form extends moodleform {
+    use behavior_form_elements;
+
     /**
      *
      * @var mod_datalynx\datalynx
      */
     private $dlx;
-
-    /** @var int Maximum number of availability condition rows offered in the form. */
-    private const MAXCONDITIONS = 5;
-
-    /** @var array Stored conditions (from set_data) used to seed the dynamic condition rows. */
-    private array $storedconditions = ['match' => 'all', 'rules' => []];
 
     /**
      * datalynx_field_behavior_form constructor.
@@ -63,440 +57,49 @@ class datalynxfield_behavior_form extends moodleform {
     }
 
     /**
-     * Define the form elements for the behavior form.
+     * Returns the datalynx instance this form operates on.
      *
-     * @throws coding_exception
+     * @return \mod_datalynx\datalynx
+     */
+    protected function get_dlx() {
+        return $this->dlx;
+    }
+
+    /**
+     * Define the form elements for the behavior form.
      */
     protected function definition() {
-        $mform = &$this->_form;
-
-        $new = !required_param('id', PARAM_INT);
-
-        $mform->addElement('hidden', 'id', 0);
-        $mform->setType('id', PARAM_INT);
-        $mform->addElement('hidden', 'd', $this->dlx->id());
-        $mform->setType('d', PARAM_INT);
-
-        $mform->addElement('header', 'general', get_string('general', 'form'));
-
-        $mform->addElement('text', 'name', get_string('name'), ['size' => '32']);
-        $mform->setType('name', PARAM_TEXT);
-        $mform->addRule('name', null, 'required', null, 'client');
-        $mform->addRule(
-            'name',
-            "Behavior name may not contain the pipe symbol \" | \"!",
-            'regex',
-            '/^[^\|]+$/',
-            'client'
-        );
-
-        $mform->addElement('text', 'description', get_string('description'), ['size' => '64']);
-        $mform->setType('description', PARAM_TEXT);
-
-        // VISIBILITY OPTIONS.
-
-        $mform->addElement('header', 'visibilityoptions', get_string('visibility', 'datalynx'));
-        $mform->setExpanded('visibilityoptions');
-
-        $mform->addElement(
-            'static',
-            'visibletopermission_header',
-            '',
-            html_writer::tag('strong', get_string('visibleto', 'datalynx'))
-        );
-        $mform->addHelpButton('visibletopermission_header', 'visibleto', 'datalynx');
-
-        $this->add_permission_checkbox(
-            $mform,
-            'visibletopermission_1',
-            get_string('visible1', 'datalynx'),
-            'mod/datalynx:viewprivilegemanager',
-            1
-        );
-        $this->add_permission_checkbox(
-            $mform,
-            'visibletopermission_2',
-            get_string('visible2', 'datalynx'),
-            'mod/datalynx:viewprivilegeteacher',
-            2
-        );
-        $this->add_permission_checkbox(
-            $mform,
-            'visibletopermission_4',
-            get_string('visible4', 'datalynx'),
-            'mod/datalynx:viewprivilegestudent',
-            4
-        );
-        $this->add_permission_checkbox(
-            $mform,
-            'visibletopermission_8',
-            get_string('visible8', 'datalynx'),
-            'mod/datalynx:viewprivilegeguest',
-            8
-        );
-        $this->add_permission_checkbox(
-            $mform,
-            'visibletopermission_16',
-            get_string('author', 'datalynx'),
-            '',
-            16,
-            false,
-            get_string('dynamiccheckauthor_desc', 'datalynx')
-        );
-        $this->add_permission_checkbox(
-            $mform,
-            'visibletopermission_32',
-            get_string('mentor', 'datalynx'),
-            '',
-            32,
-            false,
-            get_string('dynamiccheckmentor_desc', 'datalynx')
-        );
-
-        // Interface for single user, this overrules other visibility options.
-        $allusers = $this->get_allusers();
-        $options = ["multiple" => true];
-        $mform->addElement(
-            'autocomplete',
-            'visibletouser',
-            get_string('otheruser', 'datalynx'),
-            $allusers,
-            $options
-        );
-        $mform->setType('visibletouser', PARAM_INT);
-
-        // Interface for teammemberselect fields.
-        $options = ["multiple" => true];
-        $teammemberselect = $this->get_teammemberselect_fields();
-        $mform->addElement(
-            'autocomplete',
-            'visibletoteammember',
-            get_string('teammemberselect', 'datalynx'),
-            $teammemberselect,
-            $options
-        );
-        $mform->setType('visibletoteammember', PARAM_RAW);
-
-        // EDITING OPTIONS.
-        $mform->addElement('header', 'editing', get_string('editing', 'datalynx'));
-        $mform->setExpanded('editing');
-
-        $mform->addElement('advcheckbox', 'editable', get_string('editable', 'datalynx'));
-        if ($new) {
-            $mform->setDefault('editable', true);
-        }
-
-        $mform->addElement(
-            'static',
-            'editableby_header',
-            '',
-            html_writer::tag('strong', get_string('editableby', 'datalynx'))
-        );
-        $mform->addHelpButton('editableby_header', 'editableby', 'datalynx');
-
-        $this->add_permission_checkbox(
-            $mform,
-            'editableby_1',
-            get_string('visible1', 'datalynx'),
-            'mod/datalynx:editprivilegemanager',
-            1
-        );
-        $this->add_permission_checkbox(
-            $mform,
-            'editableby_2',
-            get_string('visible2', 'datalynx'),
-            'mod/datalynx:editprivilegeteacher',
-            2
-        );
-        $this->add_permission_checkbox(
-            $mform,
-            'editableby_4',
-            get_string('visible4', 'datalynx'),
-            'mod/datalynx:editprivilegestudent',
-            4
-        );
-        $this->add_permission_checkbox(
-            $mform,
-            'editableby_8',
-            get_string('visible8', 'datalynx'),
-            'mod/datalynx:editprivilegeguest',
-            8
-        );
-        $this->add_permission_checkbox(
-            $mform,
-            'editableby_16',
-            get_string('author', 'datalynx'),
-            '',
-            16,
-            false,
-            get_string('dynamiccheckauthor_desc', 'datalynx')
-        );
-        $this->add_permission_checkbox(
-            $mform,
-            'editableby_32',
-            get_string('mentor', 'datalynx'),
-            '',
-            32,
-            false,
-            get_string('dynamiccheckmentor_desc', 'datalynx')
-        );
-
-        $permissions = [1, 2, 4, 8, 16, 32];
-        foreach ($permissions as $perm) {
-            $mform->disabledIf("editableby_{$perm}", 'editable', 'notchecked');
-        }
-
-        $mform->addElement('advcheckbox', 'required', get_string('required', 'datalynx'));
-        if ($new) {
-            $mform->setDefault('required', false);
-        }
-        $mform->disabledIf('required', 'editable', 'notchecked');
-
-        // AVAILABILITY CONDITIONS.
-        // The individual condition rows (operator + value widgets, which depend on the chosen source
-        // field) are built in definition_after_data() so they can reuse each field's own search widget.
-        $mform->addElement('header', 'conditionsheader', get_string('conditions', 'datalynx'));
-        $mform->addHelpButton('conditionsheader', 'conditions', 'datalynx');
-
-        $mform->addElement('select', 'conditionmatch', get_string('conditionmatch', 'datalynx'), [
-                'all' => get_string('conditionmatchall', 'datalynx'),
-                'any' => get_string('conditionmatchany', 'datalynx'),
-        ]);
-        $mform->setDefault('conditionmatch', 'all');
-
-        $mform->registerNoSubmitButton('reloadconditions');
-
-        // Action buttons are added at the end of definition_after_data() so the dynamic condition
-        // rows appear above them.
+        $this->behavior_definition(!required_param('id', PARAM_INT));
     }
 
     /**
      * Build the dynamic availability-condition rows and the action buttons.
-     *
-     * Each row reuses the source field's own search machinery: the operator list comes from
-     * {@see datalynxfield_base::get_supported_search_operators()} and the value input from the field
-     * renderer's {@see datalynxfield_renderer::render_search_mode()}. Because those widgets depend on
-     * the field selected in the same form, they are rendered here (after data) rather than in
-     * definition(). This method is finalised exactly once per request by the forms API.
      */
     public function definition_after_data() {
         parent::definition_after_data();
-        $mform = &$this->_form;
-
-        $sourcefields = $this->get_condition_source_fields();
-        $isnotoptions = ['' => get_string('is', 'datalynx'), 'NOT' => get_string('not', 'datalynx')];
-        $rules = $this->storedconditions['rules'] ?? [];
-        $issubmitted = $mform->isSubmitted();
-
-        for ($i = 0; $i < self::MAXCONDITIONS; $i++) {
-            $storedrule = $rules[$i] ?? null;
-
-            // Determine the chosen source field: submitted value wins, otherwise the stored rule.
-            $submitted = $mform->getSubmitValue("condfield$i");
-            if ($submitted !== null && $submitted !== '') {
-                $fieldid = (int) $submitted;
-            } else {
-                $fieldid = $storedrule ? (int) $storedrule['sourcefieldid'] : 0;
-            }
-            $field = $fieldid ? $this->dlx->get_field_from_id($fieldid) : false;
-
-            $rowelements = [];
-            $rowelements[] = $mform->createElement('select', "condfield$i", '', $sourcefields);
-            $rowelements[] = $mform->createElement('select', "condnot$i", '', $isnotoptions);
-
-            $value = '';
-            if ($field && in_array($field->type, datalynxfield_behavior::CONDITION_SOURCE_TYPES, true)) {
-                $rowelements[] = $mform->createElement(
-                    'select',
-                    "searchoperator$i",
-                    '',
-                    $field->get_supported_search_operators()
-                );
-                if (!$issubmitted && $storedrule && isset($storedrule['value'])) {
-                    $value = is_array($storedrule['value']) ? json_encode($storedrule['value']) : (string) $storedrule['value'];
-                }
-                [$valueelements] = $field->renderer()->render_search_mode($mform, $i, $value);
-                $rowelements = array_merge($rowelements, $valueelements);
-            }
-
-            $label = get_string('conditionrowlabel', 'datalynx', $i + 1);
-            $mform->addGroup($rowelements, "condrow$i", $label, ' ', false);
-            $mform->setType("condfield$i", PARAM_INT);
-
-            // Seed defaults from the stored rule on initial (non-submitted) display.
-            if (!$issubmitted) {
-                $mform->setDefault("condfield$i", $fieldid);
-                if ($storedrule) {
-                    $mform->setDefault("condnot$i", $storedrule['not'] ?? '');
-                    if ($field) {
-                        $mform->setDefault("searchoperator$i", $storedrule['operator'] ?? '');
-                    }
-                }
-            }
-        }
-
-        $mform->addElement('submit', 'reloadconditions', get_string('conditionreload', 'datalynx'));
-
-        $this->add_action_buttons();
+        $this->behavior_definition_after_data(true);
     }
 
     /**
-     * Get the source-field options for condition rows, limited to supported source field types.
-     *
-     * @return array fieldid => field name (with a leading "choose" entry keyed 0).
-     */
-    protected function get_condition_source_fields(): array {
-        $options = [0 => get_string('choosedots')];
-        foreach ($this->dlx->get_fields() as $fieldid => $field) {
-            if (in_array($field->type, datalynxfield_behavior::CONDITION_SOURCE_TYPES, true)) {
-                $options[$fieldid] = $field->field->name;
-            }
-        }
-        return $options;
-    }
-
-    /**
-     * Get all teammemberselect fields in datalynx.
-     *
-     * @return array fieldid => fieldname
-     */
-    public function get_teammemberselect_fields(): array {
-        $allfields = $this->dlx->get_fields();
-        $fields = [];
-        if (!empty($allfields)) {
-            foreach ($allfields as $fieldid => $field) {
-                if ($field->type === 'teammemberselect') {
-                    $fields[$fieldid] = $field->field->name;
-                }
-            }
-        }
-        return $fields;
-    }
-
-    /**
-     * Get all users in moodle instance for autocomplete list.
-     * TODO: Really all users or only those with access to this datalynx instance?
-     *
-     * @return array with userid -> firstname lastname.
-     * @throws coding_exception
-     */
-    public function get_allusers() {
-        global $DB;
-        $allusers = [];
-        $tempusers = $DB->get_records('user', [], '', 'id, firstname, lastname');
-
-        foreach ($tempusers as $userdata) {
-            // Remove empties to make list more usable.
-            if ($userdata->lastname == '') {
-                continue;
-            }
-            $allusers[$userdata->id] = "$userdata->firstname $userdata->lastname";
-        }
-        return $allusers;
-    }
-
-    /**
-     * Get data from the form, ensuring required fields are set.
+     * Get data from the form, collapsing permission checkboxes and condition rows.
      *
      * @return object
      */
     public function get_data() {
         $data = parent::get_data();
         if ($data) {
-            $permissions = [1, 2, 4, 8, 16, 32];
-
-            $visibletopermission = [];
-            foreach ($permissions as $perm) {
-                if (!empty($data->{"visibletopermission_{$perm}"})) {
-                    $visibletopermission[] = $perm;
-                }
-                unset($data->{"visibletopermission_{$perm}"});
-            }
-            $data->visibletopermission = $visibletopermission;
-
-            $editableby = [];
-            foreach ($permissions as $perm) {
-                if (!empty($data->{"editableby_{$perm}"})) {
-                    $editableby[] = $perm;
-                }
-                unset($data->{"editableby_{$perm}"});
-            }
-            $data->editableby = $editableby;
-
-            // When editable is unchecked, disabledIf hides the UI widget but the checkbox inputs
-            // still submit previously-selected values. Force empty when unchecked.
-            if (empty($data->editable)) {
-                $data->editableby = [];
-                $data->editable = false;
-            }
-            if (!isset($data->required)) {
-                $data->required = false;
-            }
-
-            // Collapse the dynamic condition rows into a single conditions structure.
-            $rules = [];
-            for ($i = 0; $i < self::MAXCONDITIONS; $i++) {
-                $fieldid = (int) ($data->{"condfield$i"} ?? 0);
-                if (!$fieldid) {
-                    continue;
-                }
-                $field = $this->dlx->get_field_from_id($fieldid);
-                if (!$field || !in_array($field->type, datalynxfield_behavior::CONDITION_SOURCE_TYPES, true)) {
-                    continue;
-                }
-                $operator = isset($data->{"searchoperator$i"}) ? $data->{"searchoperator$i"} : '';
-                $not = !empty($data->{"condnot$i"}) ? 'NOT' : '';
-                $value = $field->parse_search($data, $i);
-                // Skip rows whose operator needs a value but none was provided.
-                if ($field->get_argument_count($operator) > 0 && ($value === false || $value === '' || $value === null)) {
-                    continue;
-                }
-                if ($value === false) {
-                    $value = '';
-                }
-                $rules[] = ['sourcefieldid' => $fieldid, 'not' => $not, 'operator' => $operator, 'value' => $value];
-            }
-            $data->conditions = ['match' => $data->conditionmatch ?? 'all', 'rules' => $rules];
+            $data = $this->transform_behavior_data($data);
         }
         return $data;
     }
 
     /**
-     * Set form data, ensuring required fields have defaults.
+     * Set form data, expanding permission arrays into checkboxes and stashing conditions.
      *
-     * @param array|stdClass $data
+     * @param array|\stdClass $data
      */
     public function set_data($data) {
-        if (!isset($data->visibletopermission)) {
-            $data->visibletopermission = [];
-        }
-        if (!isset($data->editableby)) {
-            $data->editableby = [];
-        }
-
-        $permissions = [1, 2, 4, 8, 16, 32];
-        foreach ($permissions as $perm) {
-            $data->{"visibletopermission_{$perm}"} = in_array($perm, $data->visibletopermission) ? $perm : 0;
-            $data->{"editableby_{$perm}"} = in_array($perm, $data->editableby) ? $perm : 0;
-        }
-
-        if (empty($data->editableby)) {
-            $data->editable = false;
-        } else {
-            $data->editable = true;
-        }
-        if (!isset($data->required)) {
-            $data->required = false;
-        }
-
-        // Stash conditions so definition_after_data() can seed the dynamic rows, and preselect the match mode.
-        if (isset($data->conditions) && is_array($data->conditions)) {
-            $this->storedconditions = $data->conditions + ['match' => 'all', 'rules' => []];
-        } else {
-            $this->storedconditions = ['match' => 'all', 'rules' => []];
-        }
-        $data->conditionmatch = $this->storedconditions['match'] ?? 'all';
-
+        $this->prepare_behavior_data($data);
         parent::set_data($data);
     }
 
@@ -506,117 +109,8 @@ class datalynxfield_behavior_form extends moodleform {
      * @param array $data
      * @param array $files
      * @return array
-     * @throws coding_exception
-     * @throws dml_exception
      */
     public function validation($data, $files) {
-        global $DB;
-        $errors = [];
-        if (!$data['name']) {
-            $errors['name'] = "You must supply a value here.";
-        }
-        if (strpos($data['name'], '|') !== false) {
-            $errors['name'] = "Behavior name may not contain the pipe symbol \" | \".";
-        }
-        if ($data['id'] == 0) {
-            // To prevent duplicate renderer names when creating a new renderer.
-            if (
-                    $DB->record_exists(
-                        'datalynx_behaviors',
-                        ['name' => $data['name'], 'dataid' => $data['d']]
-                    )
-            ) {
-                $errors['name'] = get_string('duplicatename', 'datalynx');
-            }
-        } else {
-            // To prevent duplicate renderer names when updating existing renderers.
-            $sql = "SELECT 'x'
-                    FROM {datalynx_behaviors} r
-                    WHERE r.name = ? AND r.dataid = ? AND r.id <> ?";
-            $params = [$data['name'], $data['d'], $data['id']];
-            if ($DB->record_exists_sql($sql, $params)) {
-                $errors['name'] = get_string('duplicatename', 'datalynx');
-            }
-        }
-        return $errors;
-    }
-
-    /**
-     * Get the names of the roles that have a capability allowed in the current context.
-     *
-     * @param string $capability
-     * @return array List of localized role names.
-     */
-    protected function get_allowed_role_names($capability) {
-        $context = $this->dlx->context;
-        $allroles = role_get_names($context, ROLENAME_ALIAS, true);
-        $roleswithcap = get_roles_with_capability($capability, CAP_ALLOW, $context);
-        $matchingrolenames = [];
-        foreach ($roleswithcap as $role) {
-            if (isset($allroles[$role->id])) {
-                $matchingrolenames[] = $allroles[$role->id];
-            }
-        }
-        return $matchingrolenames;
-    }
-
-    /**
-     * Add a permission checkbox to the form with dynamic feedback (roles or description).
-     *
-     * @param \MoodleQuickForm $mform
-     * @param string $elementname
-     * @param string $label
-     * @param string $capability
-     * @param int $value
-     * @param bool $iscapability
-     * @param string $desc
-     */
-    protected function add_permission_checkbox(
-        $mform,
-        $elementname,
-        $label,
-        $capability,
-        $value,
-        $iscapability = true,
-        $desc = ''
-    ) {
-        if ($iscapability) {
-            $allowedroles = $this->get_allowed_role_names($capability);
-
-            $html = '<div class="d-inline-block align-middle ml-2">';
-            $html .= '<div><small class="text-muted">' .
-                    get_string('visiblecapability', 'datalynx', $capability) . '</small></div>';
-
-            if (empty($allowedroles)) {
-                $warningtext = get_string('visiblenoroleswarning', 'datalynx');
-                $warningicon = '<i class="fa fa-exclamation-triangle"></i> ';
-                $warninghtml = '<span class="badge badge-warning bg-warning text-dark">' .
-                        $warningicon . $warningtext . '</span>';
-                $html .= '<div class="mt-1">' . $warninghtml . '</div>';
-            } else {
-                $badges = [];
-                foreach ($allowedroles as $rolename) {
-                    $badges[] = html_writer::span($rolename, 'badge badge-secondary bg-secondary text-white mr-1');
-                }
-                $allowedlabel = get_string('visibleallowedroles', 'datalynx');
-                $html .= '<div class="mt-1"><small><strong>' . $allowedlabel . ' </strong>' .
-                        implode(' ', $badges) . '</small></div>';
-            }
-            $html .= '</div>';
-        } else {
-            $html = '<div class="d-inline-block align-middle ml-2">';
-            $html .= '<div><small class="text-muted"><strong>' .
-                    get_string('dynamiccheck', 'datalynx') . '</strong> ' . $desc . '</small></div>';
-            $html .= '</div>';
-        }
-
-        $mform->addElement(
-            'advcheckbox',
-            $elementname,
-            $label,
-            $html,
-            ['group' => 1],
-            [0, $value]
-        );
+        return $this->validate_behavior($data);
     }
 }

@@ -285,34 +285,9 @@ class datalynx_filter_manager {
                             if ($formdata = $filterform->get_data()) {
                                 // Get clean filter from formdata.
                                 $filter = $this->get_filter_from_form($filter, $formdata, true);
-
-                                if ($filter->id) {
-                                    $DB->update_record('datalynx_filters', $filter);
-                                    $processedfids[] = $filter->id;
-                                    $strnotify = 'filtersupdated';
-
-                                    $other = ['dataid' => $this->dlx->id()];
-                                    $event = \mod_datalynx\event\field_updated::create(
-                                        ['context' => $this->dlx->context,
-                                                    'objectid' => $filter->id,
-                                                    'other' => $other]
-                                    );
-                                    $event->trigger();
-                                } else {
-                                    $filter->id = $DB->insert_record('datalynx_filters', $filter, true);
-                                    $processedfids[] = $filter->id;
-                                    $strnotify = 'filtersadded';
-
-                                    $other = ['dataid' => $this->dlx->id()];
-                                    $event = \mod_datalynx\event\field_created::create(
-                                        ['context' => $this->dlx->context,
-                                                    'objectid' => $filter->id, 'other' => $other,
-                                            ]
-                                    );
-                                    $event->trigger();
-                                }
-                                // Update cached filters.
-                                $this->filters[$filter->id] = $filter;
+                                $strnotify = $filter->id ? 'filtersupdated' : 'filtersadded';
+                                $filter = $this->save_filter($filter);
+                                $processedfids[] = $filter->id;
                             } else {
                                 // Form validation failed so return to form.
                                 $this->display_filter_form($filterform, $filter);
@@ -445,6 +420,40 @@ class datalynx_filter_manager {
         $this->dlx->print_footer();
 
         exit();
+    }
+
+    /**
+     * Persists a (finalised) filter to the database, fires the matching event and updates the cache.
+     *
+     * Shared by the legacy full-page form flow ({@see self::process_filters()}) and the AJAX
+     * dynamic form ({@see \mod_datalynx\form\datalynx_filter_dynamic_form::process_dynamic_submission()})
+     * so that both write byte-identical records.
+     *
+     * @param datalynx_filter|\stdClass $filter A filter object whose customsort/customsearch are already finalised.
+     * @return datalynx_filter|\stdClass The saved filter (with its id populated for new filters).
+     */
+    public function save_filter($filter) {
+        global $DB;
+
+        if ($filter->id) {
+            $DB->update_record('datalynx_filters', $filter);
+            $eventclass = '\mod_datalynx\event\field_updated';
+        } else {
+            $filter->id = $DB->insert_record('datalynx_filters', $filter, true);
+            $eventclass = '\mod_datalynx\event\field_created';
+        }
+
+        $event = $eventclass::create([
+            'context' => $this->dlx->context,
+            'objectid' => $filter->id,
+            'other' => ['dataid' => $this->dlx->id()],
+        ]);
+        $event->trigger();
+
+        // Update cached filters.
+        $this->filters[$filter->id] = $filter;
+
+        return $filter;
     }
 
     /**
@@ -581,7 +590,7 @@ class datalynx_filter_manager {
      * @param \stdClass $formdata
      * @return string Serialised sort options, or empty string.
      */
-    protected function get_sort_options_from_form($formdata) {
+    public function get_sort_options_from_form($formdata) {
         $sortfields = [];
         $i = 0;
         while (isset($formdata->{"sortfield$i"})) {
@@ -604,7 +613,7 @@ class datalynx_filter_manager {
      * @param bool $finalize Whether to finalise search values.
      * @return string Serialised search options.
      */
-    protected function get_search_options_from_form($formdata, $finalize = false) {
+    public function get_search_options_from_form($formdata, $finalize = false) {
         if ($fields = $this->dlx->get_fields()) {
             $searchfields = [];
             foreach (array_keys((array) $formdata) as $var) {
@@ -757,12 +766,14 @@ class datalynx_filter_manager {
         $table->attributes['align'] = 'center';
 
         foreach ($this->filters as $filterid => $filter) {
+            $editlinkattributes = $this->filter_edit_link_attributes($filterid);
             $filtername = html_writer::link(
                 new moodle_url(
                     $filterbaseurl,
                     $linkparams + ['fedit' => $filterid, 'fid' => $filterid]
                 ),
-                $filter->name
+                $filter->name,
+                $editlinkattributes
             );
             $filterdescription = shorten_text($filter->description, 30);
             $filteredit = html_writer::link(
@@ -770,7 +781,8 @@ class datalynx_filter_manager {
                     $filterbaseurl,
                     $linkparams + ['fedit' => $filterid, 'fid' => $filterid]
                 ),
-                $OUTPUT->pix_icon('t/edit', $stredit)
+                $OUTPUT->pix_icon('t/edit', $stredit),
+                $editlinkattributes
             );
             $filterduplicate = html_writer::link(
                 new moodle_url($filterbaseurl, $linkparams + ['duplicate' => $filterid]),
@@ -912,6 +924,11 @@ class datalynx_filter_manager {
      * Renders the "Add filter" link and outputs it.
      */
     public function print_add_filter() {
+        global $PAGE;
+
+        // Enhance the add/edit links to open the filter editor in an AJAX modal.
+        $PAGE->requires->js_call_amd('mod_datalynx/filterform', 'init');
+
         echo html_writer::empty_tag('br');
         echo html_writer::start_tag('div', ['class' => 'fieldadd mdl-align']);
         echo html_writer::link(
@@ -919,10 +936,26 @@ class datalynx_filter_manager {
                 '/mod/datalynx/filter/index.php',
                 ['d' => $this->dlx->id(), 'sesskey' => sesskey(), 'new' => 1]
             ),
-            get_string('filteradd', 'datalynx')
+            get_string('filteradd', 'datalynx'),
+            $this->filter_edit_link_attributes(0)
         );
         echo html_writer::end_tag('div');
         echo html_writer::empty_tag('br');
+    }
+
+    /**
+     * Data attributes that let the AMD module open the filter editor modal for a given filter.
+     *
+     * @param int $filterid 0 for a new filter.
+     * @return array
+     */
+    protected function filter_edit_link_attributes(int $filterid): array {
+        return [
+            'data-action' => 'datalynx-editfilter',
+            'data-d' => $this->dlx->id(),
+            'data-cmid' => $this->dlx->cm->id,
+            'data-fid' => $filterid,
+        ];
     }
 
     // ADVANCED FILTER.

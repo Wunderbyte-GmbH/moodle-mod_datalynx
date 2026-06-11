@@ -624,6 +624,32 @@ abstract class datalynxfield_base {
     }
 
     /**
+     * Checks whether this field may be used as a search/filter criterion.
+     *
+     * Data-bearing fields are searchable by default. Pure action/display fields that carry no
+     * content - such as the submit and cancel button fields - override this to return false so
+     * they are excluded from the filter search field selectors.
+     *
+     * @return bool true if the field can be filtered/searched, false otherwise
+     */
+    public function supports_search() {
+        return true;
+    }
+
+    /**
+     * Checks whether entries may be sorted by this field.
+     *
+     * Data-bearing fields are sortable by default. Pure action/display fields that carry no
+     * content - such as the submit and cancel button fields - override this to return false so
+     * they are excluded from the filter sort field selectors.
+     *
+     * @return bool true if entries can be ordered by this field, false otherwise
+     */
+    public function supports_sort() {
+        return true;
+    }
+
+    /**
      * To be overriden by classes, that extend the field base class
      * This returns all the column names of the columns used to save content of one specific field
      * in the table "datalynx_contents".

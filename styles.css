@@ -364,3 +364,13 @@ form.mform div.entry div.datalynx-field-wrapper {
 .datalynx-field-value .form-autocomplete-suggestions {
     z-index: 1050;
 }
+
+/* The filter editor modal auto-reloads on field select, so hide the redundant manual reload button. */
+.modal [name="addsearchsettings"] {
+    display: none;
+}
+
+/* The behavior editor modal auto-reloads on condition-field select; hide its manual reload button. */
+.modal [name="reloadconditions"] {
+    display: none;
+}
