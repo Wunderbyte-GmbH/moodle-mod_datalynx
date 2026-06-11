@@ -1371,6 +1371,7 @@ class datalynx_entries {
      * @param object $entry
      * @param array $data
      * @param boolean $updatetime
+     * @param boolean $allowfinalfieldedit
      * @return boolean|integer <boolean, number>
      */
     public function update_entry($entry, $data = null, $updatetime = true, $allowfinalfieldedit = false) {
