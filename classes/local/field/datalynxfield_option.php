@@ -188,6 +188,11 @@ abstract class datalynxfield_option extends datalynxfield_base {
      */
     public function parse_search($formdata, $i) {
         $fieldname = "f_{$i}_{$this->field->id}";
+        // Prefer the $formdata object (AJAX / dynamic-form context) over $_POST.
+        if (isset($formdata->$fieldname)) {
+            $value = $formdata->$fieldname;
+            return is_array($value) ? $value : (string) $value;
+        }
         return optional_param_array($fieldname, false, PARAM_NOTAGS);
     }
 
