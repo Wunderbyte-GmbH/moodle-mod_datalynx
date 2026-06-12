@@ -75,6 +75,7 @@ class renderer extends datalynxfield_renderer {
      * @param array $options unused
      */
     public function display_edit(&$mform, $entry, array $options = []) {
+        global $PAGE;
         $field = $this->field;
         $fieldid = $field->id();
         $entryid = $entry->id;
@@ -86,19 +87,31 @@ class renderer extends datalynxfield_renderer {
         // Render as an on/off switch (Draft = off, Final submission = on), styled like ##approve##.
         // The advcheckbox keeps the real status constants as its off/on values, so the submitted value
         // is still a valid status and the value parsing in datalynx_entries stays unchanged.
-        $caption = get_string('statusmarkfinal', 'datalynx');
+        $labelon  = get_string('statuslabelon',  'datalynx');
+        $labeloff = get_string('statuslabeloff', 'datalynx');
+        $ison = ((int) $status === field::STATUS_FINAL_SUBMISSION);
+        $caption = $ison ? $labelon : $labeloff;
         $mform->addElement(
             'advcheckbox',
             $fieldname,
             '',
             $caption,
-            ['class' => 'datalynxfield_status-switch'],
+            [
+                'class'            => 'datalynxfield_status-switch mr-2',
+                'data-label-on'    => $labelon,
+                'data-label-off'   => $labeloff,
+                'data-status-toggle' => '1',
+            ],
             [field::STATUS_DRAFT, field::STATUS_FINAL_SUBMISSION]
         );
         $mform->setDefault(
             $fieldname,
-            ((int) $status === field::STATUS_FINAL_SUBMISSION) ? field::STATUS_FINAL_SUBMISSION : field::STATUS_DRAFT
+            $ison ? field::STATUS_FINAL_SUBMISSION : field::STATUS_DRAFT
         );
+        // Description shown below the toggle.
+        $desc = get_string('statustoggledesc', 'datalynx');
+        $mform->addElement('static', $fieldname . '_desc', '', '<small class="text-muted">' . $desc . '</small>');
+        $PAGE->requires->js_call_amd('mod_datalynx/status_toggle', 'init');
     }
 
     /**
