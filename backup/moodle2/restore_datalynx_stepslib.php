@@ -392,6 +392,26 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
      *
      * @param array $data
      */
+    /**
+     * Decode a rule param that may be stored as JSON (new format) or PHP-serialized (old backups).
+     * Always returns an array; always re-encodes to JSON before saving.
+     *
+     * @param string|null $value
+     * @return array
+     */
+    private static function decode_rule_param(?string $value): array {
+        if (empty($value)) {
+            return [];
+        }
+        $decoded = json_decode($value, true);
+        if (is_array($decoded)) {
+            return $decoded;
+        }
+        // Fallback for backups created before the JSON migration.
+        $unserialized = @unserialize($value);
+        return is_array($unserialized) ? $unserialized : [];
+    }
+
     protected function process_datalynx_rule($data) {
         global $DB;
 
@@ -400,32 +420,44 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
 
         $data->dataid = $this->get_new_parentid('datalynx');
 
+        // Normalise param1 (trigger events) to JSON — handles old serialized backups.
+        if (!empty($data->param1)) {
+            $data->param1 = json_encode(self::decode_rule_param($data->param1));
+        }
+
+        // Normalise param2 (ftpsyncfiles SFTP settings) to JSON — handles old serialized backups.
+        if (!empty($data->param2) && $data->type == 'ftpsyncfiles') {
+            $data->param2 = json_encode(self::decode_rule_param($data->param2));
+        }
+
         // Update teammemberselect ids in datalynx_rules event notifications.
         if ($data->param3 && $data->type == 'eventnotification') {
-            $unserialized = unserialize($data->param3);
-            if (!empty($unserialized['teams'])) {
-                foreach ($unserialized['teams'] as $key => $teamid) {
-                    $newreferencefieldid = $this->get_mappingid('datalynx_field', $teamid);
-                    $unserialized['teams'][$key] = $newreferencefieldid;
+            $decoded = self::decode_rule_param($data->param3);
+            if (!empty($decoded['teams'])) {
+                foreach ($decoded['teams'] as $key => $teamid) {
+                    $decoded['teams'][$key] = $this->get_mappingid('datalynx_field', $teamid);
                 }
-                $data->param3 = serialize($unserialized);
             }
+            $data->param3 = json_encode($decoded);
         }
 
         // Update the link to the views sent in the event notification.
         if ($data->param4 && $data->type == 'eventnotification') {
-            $views = unserialize($data->param4);
-            if (!empty($views)) {
-                foreach ($views as $key => $viewid) {
-                    $views[$key] = $this->get_mappingid('datalynx_view', $viewid);
-                }
+            $views = self::decode_rule_param($data->param4);
+            foreach ($views as $key => $viewid) {
+                $views[$key] = $this->get_mappingid('datalynx_view', $viewid);
             }
-            $data->param4 = serialize($views);
+            $data->param4 = json_encode($views);
         }
 
         // Update the link to the checkbox fields used for conditionally triggering the event.
         if ($data->param5 && $data->type == 'eventnotification') {
             $data->param5 = $this->get_mappingid('datalynx_field', $data->param5);
+        }
+
+        // Update the email-template view reference (param8 holds a datalynx view id).
+        if (!empty($data->param8) && $data->type == 'eventnotification') {
+            $data->param8 = $this->get_mappingid('datalynx_view', $data->param8);
         }
 
         // Update the text comment reference to be sent with the notification.
