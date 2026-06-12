@@ -412,6 +412,11 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
         return is_array($unserialized) ? $unserialized : [];
     }
 
+    /**
+     * Process a datalynx_rule element from backup data.
+     *
+     * @param array $data Backup element data.
+     */
     protected function process_datalynx_rule($data) {
         global $DB;
 

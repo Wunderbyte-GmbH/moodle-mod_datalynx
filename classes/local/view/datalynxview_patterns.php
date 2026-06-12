@@ -267,12 +267,20 @@ class datalynxview_patterns {
                     // Replace pipes in urlquery with &.
                     $urlquery = str_replace('|', '&', $urlquery);
                     $urlquery = $this->resolve_nested_entry_tags($urlquery, $entry, $options ?? []);
-                    $linkparams = [];
+                    // Build a clean link to the target view. Only carry the identifying
+                    // parameters; the current page's filter/search/paging state must NOT
+                    // leak into the link. Any filter or extra parameters are supplied
+                    // explicitly through the tag's URL query when desired.
+                    $baseurl = $view->get_baseurl();
+                    $linkparams = ['d' => $baseurl->get_param('d'), 'view' => $baseurl->get_param('view')];
+                    if ($baseurl->get_param('currentgroup') !== null) {
+                        $linkparams['currentgroup'] = $baseurl->get_param('currentgroup');
+                    }
                     // If it is a link with session (viewsesslink).
                     if ($sesslink === 0) {
                         $linkparams['sesskey'] = sesskey();
                     }
-                    $viewurl = new moodle_url($view->get_baseurl(), $linkparams);
+                    $viewurl = new moodle_url($baseurl->out_omit_querystring(), $linkparams);
                     if ($sesslink === 0) {
                         if (!((strpos($urlquery, 'new=1') === false || $this->user_can_add_new_entry()))) {
                             return '';

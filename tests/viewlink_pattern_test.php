@@ -345,6 +345,9 @@ final class viewlink_pattern_test extends advanced_testcase {
         $this->assertStringContainsString('d=' . $dlx->id(), $replacements[$tag]);
         $this->assertStringContainsString('view=' . $targetobj->id(), $replacements[$tag]);
         $this->assertStringContainsString('foo=1&amp;bar=2', $replacements[$tag]);
+        // The target view's own filter/search state must not be carried into the link.
+        $this->assertStringNotContainsString('filter=', $replacements[$tag]);
+        $this->assertStringNotContainsString('usearch=', $replacements[$tag]);
         $this->assertStringContainsString('class="btn btn-primary"', $replacements[$tag]);
         $this->assertStringContainsString('>Read more<', $replacements[$tag]);
     }
@@ -370,6 +373,9 @@ final class viewlink_pattern_test extends advanced_testcase {
         $this->assertStringContainsString('new=1', $replacements[$tag]);
         $this->assertStringContainsString('sesskey=', $replacements[$tag]);
         $this->assertStringNotContainsString('sourceview=', $replacements[$tag]);
+        // The target view's own filter/search state must not be carried into the link.
+        $this->assertStringNotContainsString('filter=', $replacements[$tag]);
+        $this->assertStringNotContainsString('usearch=', $replacements[$tag]);
         $this->assertStringContainsString('class="btn btn-secondary"', $replacements[$tag]);
         $this->assertStringContainsString('>Add entry<', $replacements[$tag]);
     }
@@ -396,8 +402,73 @@ final class viewlink_pattern_test extends advanced_testcase {
         $this->assertStringContainsString('editentries=42', $replacements[$tag]);
         $this->assertStringContainsString('sesskey=', $replacements[$tag]);
         $this->assertStringNotContainsString('sourceview=', $replacements[$tag]);
+        // The target view's own filter/search state must not be carried into the link.
+        $this->assertStringNotContainsString('filter=', $replacements[$tag]);
+        $this->assertStringNotContainsString('usearch=', $replacements[$tag]);
         $this->assertStringContainsString('class="btn btn-secondary"', $replacements[$tag]);
         $this->assertStringContainsString('>Edit entry<', $replacements[$tag]);
+    }
+
+    /**
+     * Test the real per-entry rendering path: when a ##viewsesslink:...## tag with a nested
+     * ##entryid## sits inside an entry template, the entry must reach the view-tag replacement
+     * so that ##entryid## resolves for that specific entry, and the link must NOT inherit the
+     * target view's current filter/search/paging state.
+     *
+     * This guards against two regressions:
+     *  - get_entry_tag_replacements() previously passed entry=null to the view-tag replacement,
+     *    leaving ##entryid## unresolved inside per-entry links.
+     *  - the link was built from the full target-view base URL, leaking its filter/usearch params.
+     *
+     * @covers ::get_regexp_replacements
+     * @covers \mod_datalynx\local\view\base::get_entry_tag_replacements
+     */
+    public function test_per_entry_viewsesslink_resolves_entryid_and_drops_filter_state(): void {
+        [$dlx, $targetobj, $templateobj] = $this->create_test_views(
+            '##viewsesslink:myview;Edit entry;editentries=##entryid##;btn btn-secondary##'
+        );
+
+        // Simulate the target view carrying the current page's filter and custom search
+        // state in its base URL (as happens on a real page request). These must not leak
+        // into the generated link.
+        $cachedtarget = $dlx->get_views()[$targetobj->id()];
+        $cachedtarget->get_baseurl()->param('filter', 266);
+        $cachedtarget->get_baseurl()->param('usearch', 'userid:AND:,ME,');
+
+        $tag = '##viewsesslink:myview;Edit entry;editentries=##entryid##;btn btn-secondary##';
+
+        // Build an entry shaped like one loaded by the entries query (the internal entry/
+        // group/author fields are always present and read several of these properties).
+        global $USER;
+        $entry = (object) array_merge((array) $USER, [
+            'id' => 42,
+            'userid' => $USER->id,
+            'status' => 0,
+            'approved' => 1,
+            'groupid' => 0,
+            'groupname' => null,
+            'grouppic' => 0,
+        ]);
+
+        // Exercise the actual per-entry rendering method (protected) that feeds the entry
+        // into the view-tag replacement.
+        $method = new \ReflectionMethod($templateobj, 'get_entry_tag_replacements');
+        $method->setAccessible(true);
+        $definitions = $method->invoke($templateobj, $entry, []);
+
+        $this->assertArrayHasKey($tag, $definitions);
+        $link = $definitions[$tag][1];
+
+        // Nested ##entryid## must be resolved for this specific entry.
+        $this->assertStringContainsString('editentries=42', $link);
+        $this->assertStringNotContainsString('##entryid##', $link);
+        // The identifying parameters and the session key are present.
+        $this->assertStringContainsString('d=' . $dlx->id(), $link);
+        $this->assertStringContainsString('view=' . $targetobj->id(), $link);
+        $this->assertStringContainsString('sesskey=', $link);
+        // The target view's current filter/search state must NOT leak into the link.
+        $this->assertStringNotContainsString('filter=266', $link);
+        $this->assertStringNotContainsString('usearch=', $link);
     }
 
     /**

@@ -124,10 +124,50 @@ Patterns are placeholders that Datalynx replaces with live content.
 | Pattern | Result |
 |---|---|
 | `##entryid##` | Shows current entry ID |
+| `##entryidzerofill##` | Shows the entry ID padded with leading zeros (for example `0042`) |
 | `##edit##` | Shows edit action (if permitted) |
 | `##delete##` | Shows delete action (if permitted) |
+| `##duplicate##` | Shows duplicate-entry action (if permitted) |
 | `##approve##` | Shows approval action (if permitted) |
+| `##export##` | Shows export action for the single entry |
 | `##select##` | Shows selection checkbox for bulk actions |
+| `##anchor##` | Inserts an HTML anchor for the entry (link target) |
+| `##more##` | Shows a "more"/detail link to the entry's single-entry view |
+| `##coursevisible##` | Shows whether the course is visible to students |
+| `##comments##` | Shows the comments area for the entry |
+| `##comments:add##` | Shows the add-comment control |
+| `##comments:count##` | Shows the number of comments |
+| `##comments:inline##` | Shows comments inline |
+
+### Author and group patterns
+
+These resolve against the entry's author (the user who created it) and its group.
+
+| Pattern | Result |
+|---|---|
+| `##author##` | Shows the author's full name |
+| `##author:firstname##` | Shows the author's first name (other user fields such as `lastname`, `email`, `username`, `idnumber`, `institution`, `department` work the same way) |
+| `##author:picture##` | Shows the author's profile picture |
+| `##author:picturelarge##` | Shows the author's large profile picture |
+| `##author:formatname##` | Shows author info rendered with a named **Field Format** |
+| `##group:name##` | Shows the entry's group name |
+| `##group:id##` | Shows the entry's group ID |
+| `##group:picture##` | Shows the group picture |
+| `##group:picturelarge##` | Shows the large group picture |
+| `##group:edit##` | Shows the group edit control (if permitted) |
+
+### Rating patterns
+
+Available when ratings are enabled for the activity.
+
+| Pattern | Result |
+|---|---|
+| `##ratings:rate##` | Shows the rating input control |
+| `##ratings:view##` / `##ratings:viewinline##` | Shows the rating breakdown |
+| `##ratings:avg##` / `##ratings:avgstar##` / `##ratings:avgbar##` | Shows the average rating (number, stars, or bar) |
+| `##ratings:count##` | Shows the number of ratings |
+| `##ratings:sum##` / `##ratings:min##` / `##ratings:max##` | Shows the sum / minimum / maximum rating |
+| `##ratings:formatname##` | Shows rating output rendered with a named **Field Format** |
 
 ### View navigation and filter patterns
 
@@ -137,11 +177,71 @@ Patterns are placeholders that Datalynx replaces with live content.
 | `##filtersmenu##` | Filter menu |
 | `##quicksearch##` | Quick search box |
 | `##quickperpage##` | Per-page selector |
+| `##advancedfilter##` | Advanced (custom) filter form |
+| `##customfilter:NAME##` | A specific saved custom filter, by name |
 | `##pagingbar##` | Pagination bar |
+| `##numentriestotal##` | Total number of entries matching the filter |
+| `##numentriesdisplayed##` | Number of entries shown on the current page |
+| `##addnewentry##` / `##addnewentries##` | "Add new entry" link(s) (if permitted) |
 | `##entries##` | Main entries container |
 
 > **Important Note on Tag Placement**  
 > View-level navigation and filter patterns (like `##viewsmenu##`, `##filtersmenu##`, `##quicksearch##`, `##quickperpage##`, `##pagingbar##`, and `##entries##`) are designed for use **only in the View template**. To prevent configuration errors, these patterns are explicitly excluded from the Entry template editor's general tag selection menu.
+
+### View link patterns (`##viewlink##`, `##viewsesslink##`, `##viewurl##`)
+
+These patterns build links and URLs to **other views** of the same Datalynx activity. They are the recommended way to wire navigation buttons (for example "Edit", "Review", "Add new entry") into entry cards and view templates.
+
+| Pattern | Result |
+|---|---|
+| `##viewurl##` | URL of the **current** view |
+| `##viewurl:VIEWNAME##` | URL of the named view (no link markup, just the URL) |
+| `##viewcontent:VIEWNAME##` | Renders the content of the named view inline |
+| `##viewlink:VIEWNAME;LINKTEXT;URLQUERY;CSSCLASS##` | A clickable link to the named view |
+| `##viewsesslink:VIEWNAME;LINKTEXT;URLQUERY;CSSCLASS##` | Like `##viewlink##`, but also adds the **session key** (`sesskey`) |
+
+**When to use `##viewsesslink##` vs `##viewlink##`**
+
+Use `##viewsesslink##` whenever the link triggers an **action** that changes data — creating an entry (`new=1`) or editing one (`editentries=...`). These actions require a valid session key, which `##viewsesslink##` adds automatically. Use plain `##viewlink##` for read-only navigation.
+
+**The four parts (separated by `;`)**
+
+1. **VIEWNAME** — the exact name of the target view.
+2. **LINKTEXT** — the visible link text. It may contain HTML (for example a Font Awesome icon: `<i class="fa fa-pencil"></i> Edit`).
+3. **URLQUERY** — extra URL parameters (see below). Leave empty if not needed.
+4. **CSSCLASS** — CSS classes applied to the link (for example `btn btn-primary btn-sm`).
+
+**URL query parameters**
+
+Separate several parameters with a **pipe character (`|`)**. The query may contain entry tags such as `##entryid##`, which are resolved for the current entry. Common parameters:
+
+- `new=1` — open the target view in "create new entry" mode.
+- `editentries=##entryid##` — open the target view editing the current entry.
+- `filter=FILTERID` — apply a specific filter on the target view. This is the **numeric filter id** (not the filter name), for example `filter=12`. Use `filter=-1` for the user's own filter.
+
+Examples:
+
+```text
+new=1
+filter=12|editentries=##entryid##
+```
+
+> **Important Note**  
+> The link is built to the target view using only its identifying parameters. The **current** page's filter, search, and paging state is **not** carried over. If you want the target view to apply a particular filter, add it explicitly in the URL query (for example `filter=12`).
+
+> **Tip — finding the filter id**  
+> Open the filter in the activity's **Filters** management area; the numeric id appears in the page URL (the `filter` / `fid` parameter). That number is what you put after `filter=`.
+
+**Full examples**
+
+```text
+##viewsesslink:Schritt 1 – Antragstyp und Sektion;<i class="fa fa-pencil me-2"></i>Bearbeiten;editentries=##entryid##;btn btn-outline-primary btn-sm##
+##viewsesslink:Schritt 1 – Antragstyp und Sektion;<i class="fa fa-plus me-2"></i>Neuen Antrag stellen;new=1;btn btn-primary btn-lg##
+##viewlink:Overview;Back to overview;;btn btn-link##
+```
+
+> **Tip**  
+> In the TinyMCE editor you can insert and configure these tags through the tag dialog instead of typing them by hand. The dialog's **URL query** field accepts the same `|`-separated syntax shown above.
 
 ### Bulk operation patterns
 
@@ -150,8 +250,13 @@ Patterns are placeholders that Datalynx replaces with live content.
 | `##multiedit##` | Bulk edit action |
 | `##multidelete##` | Bulk delete action |
 | `##multiapprove##` | Bulk approve action |
+| `##multiduplicate##` | Bulk duplicate action |
 | `##multiexport##` | Bulk export action |
+| `##multiimport##` | Bulk import action |
 | `##selectallnone##` | Select all/none control |
+
+> **Tip**  
+> Each bulk action also has an icon-only variant — append `:icon` (for example `##multiedit:icon##`, `##multidelete:icon##`, `##multiapprove:icon##`, `##multiduplicate:icon##`, `##multiexport:icon##`) to render a compact icon button instead of a text button.
 
 ### Notification/email patterns
 

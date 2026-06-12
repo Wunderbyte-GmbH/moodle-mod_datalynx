@@ -1879,8 +1879,10 @@ abstract class base {
         }
         $fielddefinitions = $definitions;
 
-        // Enables view tag replacement within the entry template.
-        if ($patterns = $this->patternclass()->get_replacements($this->tags['view'] ?? [], null, $options)) {
+        // Enables view tag replacement within the entry template. The entry is passed so that
+        // nested entry field tags (e.g. ##entryid## inside ##viewsesslink:...;editentries=##entryid##;...##)
+        // are resolved for this specific entry.
+        if ($patterns = $this->patternclass()->get_replacements($this->tags['view'] ?? [], $entry, $options)) {
             $viewdefinitions = [];
             foreach ($patterns as $tag => $pattern) {
                 if (
