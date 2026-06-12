@@ -113,9 +113,16 @@ class field extends datalynxfield_option_single {
      * @return mixed
      */
     public function parse_search($formdata, $i) {
-        $operator = optional_param("searchoperator$i", '', PARAM_ALPHANUMEXT);
+        // Read operator from $formdata first (AJAX / dynamic-form context), fall back to $_POST.
+        $operatorkey = "searchoperator$i";
+        $operator = isset($formdata->$operatorkey)
+            ? clean_param($formdata->$operatorkey, PARAM_ALPHANUMEXT)
+            : optional_param($operatorkey, '', PARAM_ALPHANUMEXT);
         if ($operator === 'MY_PROFILE') {
-            $shortname = optional_param("f_{$i}_{$this->field->id}_profile", '', PARAM_ALPHANUMEXT);
+            $profilekey = "f_{$i}_{$this->field->id}_profile";
+            $shortname = isset($formdata->$profilekey)
+                ? clean_param($formdata->$profilekey, PARAM_ALPHANUMEXT)
+                : optional_param($profilekey, '', PARAM_ALPHANUMEXT);
             return $shortname !== '' ? $shortname : false;
         }
         return parent::parse_search($formdata, $i);
