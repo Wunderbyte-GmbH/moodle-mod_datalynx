@@ -246,7 +246,7 @@ class rule extends base {
             }
 
             // Include defined field contents in the message.
-            $messagedfields = json_decode($this->rule->param7);
+            $messagedfields = !empty($this->rule->param7) ? json_decode($this->rule->param7) : null;
             $messagedata->messagecontent = '';
             if (!empty($messagedfields)) {
                 foreach ($messagedfields as $fieldid) {
@@ -488,7 +488,7 @@ class rule extends base {
         $params = array_merge($params, ['dataid' => $this->dlx->id()]);
         $contents = $DB->get_fieldset_sql($sql, $params);
         foreach ($contents as $content) {
-            $ids = array_merge($ids, json_decode($content, true));
+            $ids = array_merge($ids, json_decode($content, true) ?? []);
         }
         return array_unique($ids);
     }
