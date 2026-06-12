@@ -886,6 +886,7 @@ $string['viewpagingfield'] = 'Seitennavigation';
 $string['viewpatternclass'] = 'CSS-Klasse';
 $string['viewpatternlinktext'] = 'Linktext';
 $string['viewpatternurlquery'] = 'URL-Parameter';
+$string['viewpatternurlquery_help'] = 'Zusätzliche URL-Parameter, die an den Link angehängt werden. Trennen Sie mehrere Parameter mit einem senkrechten Strich (|). Sie können Eintragstags wie ##entryid## verwenden, die für den aktuellen Eintrag aufgelöst werden. Der Parameter filter erwartet die numerische Filter-ID (zum Beispiel filter=12). Beispiele: filter=12|editentries=##entryid## oder new=1.';
 $string['viewperpage'] = 'Pro Seite';
 $string['viewrepeatedfields'] = 'Das Feld {$a} darf nicht mehrmals verwendet werden.';
 $string['viewresettodefault'] = 'Standardeinstellungen wiederherstellen';

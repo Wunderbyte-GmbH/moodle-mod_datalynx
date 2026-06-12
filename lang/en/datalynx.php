@@ -918,6 +918,7 @@ $string['viewpagingfield'] = 'Paging field';
 $string['viewpatternclass'] = 'CSS class';
 $string['viewpatternlinktext'] = 'Link text';
 $string['viewpatternurlquery'] = 'URL query';
+$string['viewpatternurlquery_help'] = 'Extra URL parameters added to the link. Separate several parameters with a pipe character (|). You may use entry tags such as ##entryid##, which are resolved for the current entry. The filter parameter takes the numeric filter id (for example filter=12). Examples: filter=12|editentries=##entryid## or new=1.';
 $string['viewperpage'] = 'Per page';
 $string['viewrepeatedfields'] = 'You can not use the field {$a} more than once.';
 $string['viewresettodefault'] = 'Reset to default';

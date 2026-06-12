@@ -9,6 +9,7 @@
     * labels.view
     * labels.linktext
     * labels.urlquery
+    * labels.urlqueryhelp
     * labels.cssclass
     * labels.delete
     * options[] { value, name, selected }
@@ -29,6 +30,7 @@
             "view": "View",
             "linktext": "Link text",
             "urlquery": "URL query",
+            "urlqueryhelp": "Separate parameters with | e.g. filter=12|editentries=##entryid## or new=1",
             "cssclass": "CSS class",
             "delete": "Delete tag"
         },
@@ -61,6 +63,7 @@
     <div class="form-group">
         <label for="{{fieldids.urlquery}}">{{labels.urlquery}}</label>
         <input type="text" class="form-control" id="{{fieldids.urlquery}}" name="{{fieldids.urlquery}}" value="{{values.urlquery}}" data-region="tag-urlquery-input">
+        {{#labels.urlqueryhelp}}<small class="form-text text-muted" data-region="tag-urlquery-help">{{{labels.urlqueryhelp}}}</small>{{/labels.urlqueryhelp}}
     </div>
     <div class="form-group">
         <label for="{{fieldids.cssclass}}">{{labels.cssclass}}</label>

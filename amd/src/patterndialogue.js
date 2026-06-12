@@ -603,14 +603,15 @@ class PatternDialogue {
         const isFieldTag = button.classList.contains('datalynx-field-tag');
         const isViewTag = button.classList.contains('datalynx-view-tag');
 
-        const [behaviorLabel, rendererLabel, deleteLabel, viewLabel, linkTextLabel, urlQueryLabel, classLabel,
-            currentViewLabel] = await Promise.all([
+        const [behaviorLabel, rendererLabel, deleteLabel, viewLabel, linkTextLabel, urlQueryLabel, urlQueryHelp,
+            classLabel, currentViewLabel] = await Promise.all([
             Str.get_string('behavior', 'datalynx'),
             Str.get_string('renderer', 'datalynx'),
             Str.get_string('deletetag', 'datalynx'),
             Str.get_string('view', 'datalynx'),
             Str.get_string('viewpatternlinktext', 'datalynx'),
             Str.get_string('viewpatternurlquery', 'datalynx'),
+            Str.get_string('viewpatternurlquery_help', 'datalynx'),
             Str.get_string('viewpatternclass', 'datalynx'),
             Str.get_string('targetviewthis', 'datalynx'),
         ]);
@@ -727,6 +728,7 @@ class PatternDialogue {
                         view: viewLabel,
                         linktext: linkTextLabel,
                         urlquery: urlQueryLabel,
+                        urlqueryhelp: urlQueryHelp,
                         cssclass: classLabel,
                         'delete': deleteLabel,
                     },
