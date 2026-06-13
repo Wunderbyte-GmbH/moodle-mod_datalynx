@@ -174,10 +174,21 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
 
         // In case we restore a fieldgroup we need to update mapping of param1.
         if ($data->type == 'fieldgroup') {
-            $oldsubfields = json_decode($data->param1);
+            $oldsubfields = json_decode($data->param1, true) ?: [];
             $newsubfields = [];
             foreach ($oldsubfields as $oldsubfield) {
-                $newsubfields[] = $this->get_mappingid('datalynx_field', $oldsubfield);
+                // Support both legacy bare-integer format and new "fieldid:format|behavior|layout" format.
+                $entry     = (string) $oldsubfield;
+                $colonpos  = strpos($entry, ':');
+                if ($colonpos !== false) {
+                    $oldfieldid = (int) substr($entry, 0, $colonpos);
+                    $modifiers  = substr($entry, $colonpos); // Includes the leading ':' separator.
+                } else {
+                    $oldfieldid = (int) $entry;
+                    $modifiers  = '';
+                }
+                $newfieldid   = $this->get_mappingid('datalynx_field', $oldfieldid);
+                $newsubfields[] = $newfieldid . $modifiers;
             }
             $data->param1 = json_encode($newsubfields);
         }

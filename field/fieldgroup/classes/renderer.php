@@ -25,7 +25,10 @@
 namespace datalynxfield_fieldgroup;
 
 use html_writer;
+use mod_datalynx\local\field\datalynxfield_behavior;
+use mod_datalynx\local\field\datalynxfield_layout;
 use mod_datalynx\local\field\datalynxfield_renderer;
+use mod_datalynx\local\field_format\manager;
 use MoodleQuickForm;
 use stdClass;
 
@@ -75,22 +78,26 @@ class renderer extends datalynxfield_renderer {
 
         for ($line = 0; $line < $maxlines; $line++) {
             foreach ($fieldgroupfields as $key => $subfield) {
-                $parts = explode(':', $key);
+                $parts = explode(':', $key, 2);
                 $subfieldid = (int)$parts[0];
-                $formatname = $parts[1] ?? '';
+                $modifiers = explode('|', $parts[1] ?? '', 3);
+                $formatname   = $modifiers[0] ?? '';
+                $behaviorname = $modifiers[1] ?? '';
+                $layoutname   = $modifiers[2] ?? '';
 
                 $lastlinewithcontent = $this->renderer_split_content($entry, $subfieldid, $line, $lastlinewithcontent);
                 $subfielddefinition['name'] = $subfield->field->name;
 
+                // Build a tag identical to view-template syntax so replacements() handles
+                // format, behavior visibility, and layout template wrapping in one shot.
+                $subfieldname = $subfield->field->name;
+                $inner = $formatname ? "{$subfieldname}:{$formatname}" : $subfieldname;
+                $tag  = "[[{$inner}|{$behaviorname}|{$layoutname}]]";
                 $suboptions = $options;
-                if ($formatname) {
-                    $format = \mod_datalynx\local\field_format\manager::get_format_by_name($this->field->dlx->id(), $formatname);
-                    if ($format) {
-                        $suboptions['field_format'] = $format;
-                    }
-                }
+                $suboptions['edit'] = false;
+                $tagresults = $subfield->renderer()->replacements([$tag], $entry, $suboptions);
+                $subfielddefinition['content'] = ($tagresults[$tag][0] === 'html') ? $tagresults[$tag][1] : '';
 
-                $subfielddefinition['content'] = $subfield->renderer()->render_display_mode($entry, $suboptions);
                 $subfieldnames[] = $subfield->field->name;
                 $linedispl['subfield'][] = $subfielddefinition; // Build this multidimensional array for mustache context.
             }
@@ -171,9 +178,65 @@ class renderer extends datalynxfield_renderer {
             $mform->addElement('html', '<div class="row mb-4 lines" data-line="' . $thisline . '">');
             $counter = 0;
             foreach ($fieldgroupfields as $key => $subfield) {
-                $parts = explode(':', $key);
+                $parts = explode(':', $key, 2);
                 $subfieldid = (int)$parts[0];
-                $formatname = $parts[1] ?? '';
+                $modifiers = explode('|', $parts[1] ?? '', 3);
+                $formatname   = $modifiers[0] ?? '';
+                $behaviorname = $modifiers[1] ?? '';
+                $layoutname   = $modifiers[2] ?? '';
+
+                // Keep contentid in _id for later.
+                $resetcontentid = isset($entry->{"c{$subfieldid}_id"}) ? $entry->{"c{$subfieldid}_id"} : false;
+
+                $lastlinewithcontent = $this->renderer_split_content($entry, $subfieldid, $line, $lastlinewithcontent);
+
+                // Resolve format, behavior, and layout into $suboptions.
+                $suboptions = $options;
+                $dlxid = $this->field->dlx->id();
+
+                if ($formatname) {
+                    $fmt = manager::get_format_by_name($dlxid, $formatname);
+                    if ($fmt) {
+                        $suboptions['field_format'] = $fmt;
+                    }
+                }
+
+                // Behavior controls visibility, editability, and required.
+                $behavior = $behaviorname
+                    ? datalynxfield_behavior::from_name($behaviorname, $dlxid)
+                    : datalynxfield_behavior::get_default_behavior($this->field->dlx);
+                if ($behavior) {
+                    $conditionsmet = $behavior->passes_conditions($entry);
+                    $suboptions['visible']  = $behavior->is_visible_to_user($entry) && $conditionsmet;
+                    $suboptions['editable'] = $behavior->is_editable_by_user(null, true) && $conditionsmet;
+                    if ($behavior->is_required() && $conditionsmet) {
+                        $suboptions['required'] = true;
+                    }
+                }
+
+                // Skip invisible subfields entirely.
+                if (isset($suboptions['visible']) && !$suboptions['visible']) {
+                    $entry->{"c{$subfieldid}_id"} = $resetcontentid ?: null;
+                    continue;
+                }
+
+                // Layout provides edit template and not-editable template.
+                $layout = $layoutname
+                    ? datalynxfield_layout::get_renderer_by_name($layoutname, $dlxid)
+                    : datalynxfield_layout::get_default_renderer($this->field->dlx);
+                if ($layout) {
+                    $edittemplate = $layout->get_edit_template();
+                    if ($edittemplate !== datalynxfield_layout::EDIT_MODE_TEMPLATE_NONE) {
+                        $suboptions['template'] = $edittemplate;
+                    }
+                    // When not-editable mode is "show as display", provide the rendered value.
+                    if (
+                        !($suboptions['editable'] ?? true)
+                            && $layout->get_not_editable_template() === datalynxfield_layout::NOT_EDITABLE_SHOW_AS_DISPLAY_MODE
+                    ) {
+                        $suboptions['value'] = $subfield->renderer()->render_display_mode($entry, $suboptions);
+                    }
+                }
 
                 if ($counter % 3 == 0) {
                     $mform->addElement('html', '<div class="w-100 p-10"></div>');
@@ -181,26 +244,13 @@ class renderer extends datalynxfield_renderer {
                 $counter++;
                 $mform->addElement('html', '<div class="col">');
 
-                // Keep contentid in _id for later.
-                $resetcontentid = isset($entry->{"c{$subfieldid}_id"}) ? $entry->{"c{$subfieldid}_id"} : false;
-
-                $lastlinewithcontent = $this->renderer_split_content($entry, $subfieldid, $line, $lastlinewithcontent);
-
                 // Add a static label.
                 $tempentryid = $entry->id;
                 // Dirty hack to render elements with a unique id.
                 $entry->id = $entry->id . "_{$fieldname}_" . $line; // Add iterator to each line of fieldgroup.
                 $mform->addElement('static', $entry->id . '_' . $subfieldid, $subfield->field->name . ': ');
 
-                $suboptions = $options;
-                if ($formatname) {
-                    $format = \mod_datalynx\local\field_format\manager::get_format_by_name($this->field->dlx->id(), $formatname);
-                    if ($format) {
-                        $suboptions['field_format'] = $format;
-                    }
-                }
-
-                // Entry has an tmp id for rendering the subfields.
+                // Entry has a tmp id for rendering the subfields.
                 $subfield->renderer()->prerender_edit_mode($mform, $entry, $suboptions);
 
                 // Restore relevant parts of entry to prior state.

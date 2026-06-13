@@ -25,6 +25,7 @@
 
 namespace datalynxfield_fieldgroup;
 
+use html_writer;
 use mod_datalynx\form\datalynxfield_form;
 use stdClass;
 
@@ -38,33 +39,66 @@ class form extends datalynxfield_form {
      * @see datalynxfield_form::field_definition()
      */
     public function field_definition() {
+        global $PAGE;
         $mform = &$this->_form;
 
-        // Fieldgroupfieldids are stored in param1.
-        $fields = $this->dlx->get_fields(null, false, true);
-        $fieldformats = \mod_datalynx\local\field_format\manager::get_formats_for_instance($this->dlx->id());
-        $fieldnames = [];
-        foreach ($fields as $fieldid => $field) {
-            if ($field->for_use_in_fieldgroup()) {
-                $fieldnames[$fieldid] = $field->name();
-                foreach ($fieldformats as $format) {
-                    if ($format->get_fieldtype() === $field->type) {
-                        $formatname = $format->get_name();
-                        $fieldnames["{$fieldid}:{$formatname}"] = $field->name() . ':' . $formatname;
-                    }
-                }
+        // Hidden input: JavaScript keeps this in sync as a JSON array of
+        // "fieldid:formatname|behaviorname|layoutname" strings.
+        $mform->addElement('hidden', 'param1', '[]');
+        $mform->setType('param1', PARAM_RAW);
+
+        // Build a fieldid → name map for JS to resolve IDs to labels when rendering rows.
+        // JS reads the current entries from the hidden param1 input at page-load time so
+        // it correctly handles both initial load and re-render after a validation error.
+        $fieldmap = [];
+        foreach ($this->dlx->get_fields(null, false, true) as $fid => $fobj) {
+            if ($fobj->for_use_in_fieldgroup()) {
+                $fieldmap[(int)$fid] = $fobj->name();
             }
         }
-        asort($fieldnames);
-        $options = ['multiple' => true];
-        $mform->addElement(
-            'autocomplete',
-            'param1',
-            get_string('fieldgroupfields', 'datalynx'),
-            $fieldnames,
-            $options
+
+        // Subfield list table (rows rendered by JS on load and on add/edit/remove).
+        $tableheaders = html_writer::tag(
+            'tr',
+            html_writer::tag('th', get_string('subfieldfield', 'datalynx')) .
+            html_writer::tag('th', get_string('subfieldformat', 'datalynx')) .
+            html_writer::tag('th', get_string('subfieldbehavior', 'datalynx')) .
+            html_writer::tag('th', get_string('subfieldlayout', 'datalynx')) .
+            html_writer::tag('th', get_string('subfieldactions', 'datalynx'))
         );
-        $mform->addHelpButton('param1', 'fieldgroupfields', 'datalynx');
+        $table = html_writer::tag('thead', $tableheaders) .
+                 html_writer::tag('tbody', '', ['id' => 'fieldgroup-subfields-body']);
+        $mform->addElement('html', html_writer::tag(
+            'table',
+            $table,
+            ['class' => 'table table-sm generaltable mb-2', 'id' => 'fieldgroup-subfields-table']
+        ));
+
+        // Add subfield button — type=button so it does not submit the enclosing form.
+        $mform->addElement('html', html_writer::tag(
+            'button',
+            get_string('subfieldaddbutton', 'datalynx'),
+            [
+                'type'        => 'button',
+                'class'       => 'btn btn-secondary mb-3',
+                'data-action' => 'fieldgroup-addsubfield',
+                'data-d'      => $this->dlx->id(),
+                'data-cmid'   => $this->dlx->cm->id,
+            ]
+        ));
+
+        // Initialise the AMD module. The JS reads the hidden param1 input to render rows,
+        // so the table is always in sync with the submitted (or initial) JSON.
+        $PAGE->requires->js_call_amd(
+            'mod_datalynx/fieldgroup_subfield_settings',
+            'init',
+            [[
+                'd'         => $this->dlx->id(),
+                'cmid'      => $this->dlx->cm->id,
+                'formClass' => 'datalynxfield_fieldgroup\\form\\subfield_dynamic_form',
+                'fieldmap'  => $fieldmap,
+            ]]
+        );
 
         // Number of times the field group can be filled out.
         $mform->addElement('text', 'param2', get_string('nummax', 'datalynx'));
@@ -98,51 +132,44 @@ class form extends datalynxfield_form {
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 
-        // Check if any fieldnames are set.
-        if (!isset($data['param1']) || isset($data['param1']) && empty($data['param1'])) {
+        // Decode JSON from the hidden param1 input to validate the list of entries.
+        $entries = json_decode($data['param1'] ?? '[]', true) ?: [];
+        if (empty($entries)) {
             $errors['param1'] = get_string('onefieldrequired', 'datalynx');
             return $errors;
         }
 
-        // Check if all fieldnames are actually found and only fieldtypes are entered that have been tested.
         $fields = $this->dlx->get_fields(null, false, true);
-        foreach ($data['param1'] as $val) {
-            $parts = explode(':', $val);
+        foreach ($entries as $val) {
+            $parts   = explode(':', $val, 2);
             $fieldid = (int)$parts[0];
             if (!(array_key_exists($fieldid, $fields) && $fields[$fieldid]->for_use_in_fieldgroup())) {
-                $errors['param1'] = get_string('unsupportedfield', 'datalynx', $fields[$fieldid]->type);
+                $fieldtype = $fields[$fieldid]->type ?? '?';
+                $errors['param1'] = get_string('unsupportedfield', 'datalynx', $fieldtype);
             }
         }
         return $errors;
     }
 
     /**
-     * This function is overriden to decode param1 field from JSON notation into an array
+     * Ensure param1 is a JSON string before handing it to the hidden input element.
      *
      * @param array|stdClass $data new contents of the form
      */
     public function set_data($data) {
-        $elements = [];
-        if (!empty($data->param1)) {
-            $elements = json_decode($data->param1, true);
-        }
-        $data->param1 = [];
-        foreach ($elements as $element) {
-            $data->param1[] = $element;
+        if (is_array($data->param1 ?? null)) {
+            // Normalize: old entries may be bare integers (legacy format); convert all to strings.
+            $data->param1 = json_encode(array_map('strval', array_values($data->param1)));
+        } else if (!empty($data->param1)) {
+            // Normalize JSON from DB: old format stores bare integers [1604,1605];
+            // new format expects strings ["1604","1604:fmt|beh|lay"]. Convert if needed.
+            $decoded = json_decode($data->param1, true);
+            if (is_array($decoded)) {
+                $data->param1 = json_encode(array_map('strval', array_values($decoded)));
+            }
+        } else {
+            $data->param1 = '[]';
         }
         parent::set_data($data);
-    }
-
-    /**
-     * This function is overriden to encode param1 field into JSON notation
-     *
-     * @param boolean $slashed TODO: add description!
-     * @return array submitted, validated and processed form contents
-     */
-    public function get_data($slashed = true) {
-        if ($data = parent::get_data($slashed)) {
-            $data->param1 = json_encode($data->param1);
-        }
-        return $data;
     }
 }
