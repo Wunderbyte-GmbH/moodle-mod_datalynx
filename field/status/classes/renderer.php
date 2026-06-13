@@ -75,7 +75,7 @@ class renderer extends datalynxfield_renderer {
      * @param array $options unused
      */
     public function display_edit(&$mform, $entry, array $options = []) {
-        global $PAGE;
+        global $PAGE; // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
         $field = $this->field;
         $fieldid = $field->id();
         $entryid = $entry->id;
@@ -87,7 +87,7 @@ class renderer extends datalynxfield_renderer {
         // Render as an on/off switch (Draft = off, Final submission = on), styled like ##approve##.
         // The advcheckbox keeps the real status constants as its off/on values, so the submitted value
         // is still a valid status and the value parsing in datalynx_entries stays unchanged.
-        $labelon  = get_string('statuslabelon',  'datalynx');
+        $labelon  = get_string('statuslabelon', 'datalynx');
         $labeloff = get_string('statuslabeloff', 'datalynx');
         $ison = ((int) $status === field::STATUS_FINAL_SUBMISSION);
         $caption = $ison ? $labelon : $labeloff;
@@ -111,7 +111,7 @@ class renderer extends datalynxfield_renderer {
         // Description shown below the toggle.
         $desc = get_string('statustoggledesc', 'datalynx');
         $mform->addElement('static', $fieldname . '_desc', '', '<small class="text-muted">' . $desc . '</small>');
-        $PAGE->requires->js_call_amd('mod_datalynx/status_toggle', 'init');
+        $PAGE->requires->js_call_amd('mod_datalynx/status_toggle', 'init'); // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
     }
 
     /**
