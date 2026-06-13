@@ -262,5 +262,10 @@ final class totals_format_test extends advanced_testcase {
         // Without the format: no totals row, output is just the lines.
         $plain = $renderer->render_display_mode($entry, ['edit' => false]);
         $this->assertStringNotContainsString('datalynx-fieldgroup-totals', $plain);
+
+        // Subfield values are shown without the field-name label prefix (e.g. "10", not "price: 10").
+        $this->assertStringContainsString('>10<', $plain);
+        $this->assertStringNotContainsString('price:', $plain);
+        $this->assertStringNotContainsString('qty:', $plain);
     }
 }
