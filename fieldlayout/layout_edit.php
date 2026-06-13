@@ -24,6 +24,7 @@
 use mod_datalynx\datalynx;
 use mod_datalynx\form\datalynxfield_layout_form;
 use mod_datalynx\local\field\datalynxfield_layout;
+use mod_datalynx\local\layout_presets;
 
 require_once('../../../config.php');
 
@@ -80,6 +81,14 @@ switch ($urlparams->action) {
                 ['class' => 'mdl-align']
             );
         }
+
+        // Hand the preset catalogue to the editor JS as a JSON blob (avoids the js_call_amd argument
+        // size limit, mirroring the patterndialogue options pattern in view/view_edit.php).
+        echo html_writer::tag('script', json_encode(layout_presets::all()), [
+            'type' => 'application/json',
+            'id' => 'mod_datalynx-layouteditor-presets',
+        ]);
+        $PAGE->requires->js_call_amd('mod_datalynx/layouteditor', 'init');
 
         $mform->display();
         $dlx->print_footer();

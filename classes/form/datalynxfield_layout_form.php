@@ -50,6 +50,23 @@ class datalynxfield_layout_form extends moodleform {
     }
 
     /**
+     * Attributes for a template textarea. Larger by default (so the form is usable even with JS
+     * disabled) and tagged with a hook class + data attribute the layouteditor AMD module uses to
+     * attach the resizable editor, live preview and preset gallery.
+     *
+     * @param string $template One of notvisible|display|novalue|edit|noteditable.
+     * @return array
+     */
+    private static function template_attributes(string $template): array {
+        return [
+            'rows' => 14,
+            'class' => 'dlx-layout-textarea',
+            'data-dlx-template' => $template,
+            'spellcheck' => 'false',
+        ];
+    }
+
+    /**
      *
      * {@inheritDoc}
      * @see moodleform::definition()
@@ -92,7 +109,7 @@ class datalynxfield_layout_form extends moodleform {
         $group = [];
         $group[] = $mform->createElement('radio', 'notvisibleoptions', '', get_string('shownothing', 'datalynx'), '___0___');
         $group[] = $mform->createElement('radio', 'notvisibleoptions', '', get_string('custom', 'datalynx'), '___2___');
-        $group[] = $mform->createElement('textarea', 'notvisibletemplate', '', '');
+        $group[] = $mform->createElement('textarea', 'notvisibletemplate', '', self::template_attributes('notvisible'));
         $mform->disabledIf('notvisibletemplate', 'notvisibleoptions', 'eq', '___0___');
         $mform->addGroup(
             $group,
@@ -109,7 +126,7 @@ class datalynxfield_layout_form extends moodleform {
         $group = [];
         $group[] = $mform->createElement('radio', 'displayoptions', '', get_string('none'), '___4___');
         $group[] = $mform->createElement('radio', 'displayoptions', '', get_string('custom', 'datalynx'), '___2___');
-        $group[] = $mform->createElement('textarea', 'displaytemplate', '', '');
+        $group[] = $mform->createElement('textarea', 'displaytemplate', '', self::template_attributes('display'));
         $mform->setDefault('displaytemplate', '#value');
         $mform->disabledIf('displaytemplate', 'displayoptions', 'eq', '___4___');
         $mform->addGroup(
@@ -147,7 +164,7 @@ class datalynxfield_layout_form extends moodleform {
             get_string('custom', 'datalynx'),
             '___2___'
         );
-        $group[] = $mform->createElement('textarea', 'novaluetemplate', '', '');
+        $group[] = $mform->createElement('textarea', 'novaluetemplate', '', self::template_attributes('novalue'));
         $mform->disabledIf('novaluetemplate', 'novalueoptions', 'eq', '___0___');
         $mform->disabledIf('novaluetemplate', 'novalueoptions', 'eq', '___1___');
         $mform->addGroup($group, 'novaluetemplategroup', get_string('novalue', 'datalynx'), ['<br />'], false);
@@ -159,7 +176,7 @@ class datalynxfield_layout_form extends moodleform {
         $group[] = $mform->createElement('radio', 'editoptions', '', get_string('none'), '___4___');
         $group[] = $mform->createElement('radio', 'editoptions', '', get_string('asdisplay', 'datalynx'), '___1___');
         $group[] = $mform->createElement('radio', 'editoptions', '', get_string('custom', 'datalynx'), '___2___');
-        $group[] = $mform->createElement('textarea', 'edittemplate', '', '');
+        $group[] = $mform->createElement('textarea', 'edittemplate', '', self::template_attributes('edit'));
         $mform->setDefault('edittemplate', '#input');
         $mform->disabledIf('edittemplate', 'editoptions', 'eq', '___1___');
         $mform->disabledIf('edittemplate', 'editoptions', 'eq', '___4___');
@@ -174,7 +191,7 @@ class datalynxfield_layout_form extends moodleform {
         $group[] = $mform->createElement('radio', 'noteditableoptions', '', get_string('asdisplay', 'datalynx'), '___1___');
         $group[] = $mform->createElement('radio', 'noteditableoptions', '', get_string('disabled', 'datalynx'), '___3___');
         $group[] = $mform->createElement('radio', 'noteditableoptions', '', get_string('custom', 'datalynx'), '___2___');
-        $group[] = $mform->createElement('textarea', 'noteditabletemplate', '', '');
+        $group[] = $mform->createElement('textarea', 'noteditabletemplate', '', self::template_attributes('noteditable'));
         $mform->disabledIf('noteditabletemplate', 'noteditableoptions', 'eq', '___0___');
         $mform->disabledIf('noteditabletemplate', 'noteditableoptions', 'eq', '___1___');
         $mform->disabledIf('noteditabletemplate', 'noteditableoptions', 'eq', '___3___');
