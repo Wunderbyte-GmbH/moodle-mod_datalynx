@@ -53,8 +53,8 @@ $fields = $DB->get_fieldset_select(
     'dataid = :dataid',
     ['dataid' => $urlparams->d]
 );
-$options['renderers'] = [];
-$commonrenderers = $DB->get_records_select_menu(
+$options['layouts'] = [];
+$commonlayouts = $DB->get_records_select_menu(
     'datalynx_renderers',
     'dataid = :dataid',
     ['dataid' => $urlparams->d],
@@ -62,9 +62,9 @@ $commonrenderers = $DB->get_records_select_menu(
     'name AS value, name AS label'
 );
 foreach ($fields as $field) {
-    // TODO: MDL-66151 add field-specific renderers here.
-    $options['renderers'][$field] = $commonrenderers;
-    $options['renderers'][$field][''] = get_string('defaultrenderer', 'datalynx');
+    // TODO: MDL-66151 add field-specific layouts here.
+    $options['layouts'][$field] = $commonlayouts;
+    $options['layouts'][$field][''] = get_string('defaultlayout', 'datalynx');
 }
 $options['types'] = $DB->get_records_select_menu(
     'datalynx_fields',
