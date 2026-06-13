@@ -620,7 +620,11 @@ class PatternDialogue {
 
         if (isFieldTag) {
             const {field, behavior: currentBehavior, layout: currentLayout} = parseFieldTag(pattern);
-            const fieldType = (this.options.types || {})[field] || '';
+            // Field/behavior/layout option lists are keyed by plain field name, but a format tag like
+            // [[kost:summe]] yields field === "kost:summe". Strip the :format suffix for option lookups
+            // while keeping the full token for the saved pattern and label.
+            const baseField = field.split(':')[0];
+            const fieldType = (this.options.types || {})[baseField] || '';
             const tagtype = 'Field';
             const tagname = field;
             const titleStr = await Str.get_string('tagproperties', 'datalynx', {tagtype, tagname});
@@ -631,7 +635,7 @@ class PatternDialogue {
                     (val === currentBehavior ? ' selected="selected"' : '') + '>' +
                     label + '</option>'
                 ).join('');
-            const layoutsHtml = Object.entries((this.options.layouts || {})[field] || {})
+            const layoutsHtml = Object.entries((this.options.layouts || {})[baseField] || {})
                 .map(([val, label]) =>
                     '<option value="' + val + '"' +
                     (val === currentLayout ? ' selected="selected"' : '') + '>' +
