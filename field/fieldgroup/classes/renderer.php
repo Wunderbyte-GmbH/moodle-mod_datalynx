@@ -72,6 +72,11 @@ class renderer extends datalynxfield_renderer {
         // In case we don't have anything to show there should be an error.
         $linedispl = $completedispl = [];
 
+        // A field format on the fieldgroup tag (e.g. [[group:totals]]) enables a totals row.
+        $fieldformat = $options['field_format'] ?? null;
+        // Raw numeric per-line values collected per subfield id, used to build the totals row.
+        $columnvalues = [];
+
         // Show all lines with content, get rid of all after that.
         $lastlinewithcontent = -1;
         $subfieldnames = [];
@@ -86,6 +91,15 @@ class renderer extends datalynxfield_renderer {
                 $layoutname   = $modifiers[2] ?? '';
 
                 $lastlinewithcontent = $this->renderer_split_content($entry, $subfieldid, $line, $lastlinewithcontent);
+
+                // Harvest the raw per-line value of numeric subfields for the optional totals row.
+                if ($fieldformat && $subfield->type === 'number') {
+                    $rawvalue = $entry->{"c{$subfieldid}_content"} ?? null;
+                    if ($rawvalue !== null && $rawvalue !== '' && is_numeric($rawvalue)) {
+                        $columnvalues[$subfieldid][] = (float) $rawvalue;
+                    }
+                }
+
                 $subfielddefinition['name'] = $subfield->field->name;
 
                 // Build a tag identical to view-template syntax so replacements() handles
@@ -109,6 +123,24 @@ class renderer extends datalynxfield_renderer {
             $names[] = ['name' => $name];
         }
         $completedispl['header'] = $names;
+
+        // Build the optional totals row (one cell per subfield, in column order) when a
+        // fieldgroup field format is applied. Numeric subfields are aggregated; others stay blank.
+        if ($fieldformat) {
+            $totalcols = [];
+            foreach ($fieldgroupfields as $key => $subfield) {
+                $subfieldid = (int) explode(':', $key, 2)[0];
+                if ($subfield->type === 'number') {
+                    $values = $columnvalues[$subfieldid] ?? [];
+                    $decimals = $subfield->field->param1 ?? '';
+                    $value = $fieldformat->format_value($fieldformat->aggregate($values), $decimals);
+                } else {
+                    $value = '';
+                }
+                $totalcols[] = ['name' => $subfield->field->name, 'value' => $value];
+            }
+            $completedispl['totals'] = ['label' => $fieldformat->get_label(), 'col' => $totalcols];
+        }
 
         // We need this construct to make sure intermittent empty lines are shown.
         for ($line = $lastlinewithcontent + 1; $line <= $maxlines; $line++) {

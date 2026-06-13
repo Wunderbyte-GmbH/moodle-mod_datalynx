@@ -36,7 +36,11 @@
         ],
         "header":[
             {"name":"a"},{"name":"b"}
-        ]
+        ],
+        "totals":{
+            "label":"Total",
+            "col":[{"name":"a","value":"3"},{"name":"b","value":""}]
+        }
     }
 }}
 
@@ -55,4 +59,14 @@
         {{/subfield}}
     </tr>
     {{/line}}
+    {{#totals}}
+    <tr class="datalynx-fieldgroup-totals" style="font-weight: bold;">
+        <td style="padding: 5px;">{{label}}</td>
+    </tr>
+    <tr class="datalynx-fieldgroup-totals" style="font-weight: bold;">
+        {{#col}}
+        <td style="padding: 5px;">{{{value}}}</td>
+        {{/col}}
+    </tr>
+    {{/totals}}
 </table>

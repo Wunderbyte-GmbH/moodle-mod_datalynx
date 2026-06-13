@@ -28,6 +28,35 @@ class field_format_form extends \mod_datalynx\form\field_format_base_form {
      * Define the specific elements for the fieldgroup format.
      */
     protected function format_definition() {
-        // Default implementation has no extra elements.
+        $mform = &$this->_form;
+
+        // Which aggregation to apply across the fieldgroup's number subfields.
+        $mform->addElement(
+            'select',
+            'aggregation',
+            get_string('fieldformat_aggregation', 'datalynxfield_fieldgroup'),
+            \datalynxfield_fieldgroup\field_format::get_aggregation_options()
+        );
+        $mform->setDefault('aggregation', 'sum');
+        $mform->addHelpButton('aggregation', 'fieldformat_aggregation', 'datalynxfield_fieldgroup');
+
+        // Decimal places for the aggregated value (blank = use each subfield's own setting).
+        $mform->addElement(
+            'text',
+            'decimals',
+            get_string('fieldformat_decimals', 'datalynxfield_fieldgroup'),
+            ['size' => 3]
+        );
+        $mform->setType('decimals', PARAM_INT);
+        $mform->addHelpButton('decimals', 'fieldformat_decimals', 'datalynxfield_fieldgroup');
+
+        // Optional label shown next to the totals row (blank = default "Total").
+        $mform->addElement(
+            'text',
+            'label',
+            get_string('fieldformat_label', 'datalynxfield_fieldgroup')
+        );
+        $mform->setType('label', PARAM_TEXT);
+        $mform->addHelpButton('label', 'fieldformat_label', 'datalynxfield_fieldgroup');
     }
 }

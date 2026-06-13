@@ -210,6 +210,9 @@ final class field_formats_test extends advanced_testcase {
         $this->assertArrayHasKey('youtube', $types);
         $this->assertArrayHasKey('gradeitem', $types);
 
+        // The fieldgroup totals format carries options, so it is offered too.
+        $this->assertArrayHasKey('fieldgroup', $types);
+
         // Assert empty fields are not present.
         $this->assertArrayNotHasKey('approve', $types);
         $this->assertArrayNotHasKey('comment', $types);
@@ -217,7 +220,6 @@ final class field_formats_test extends advanced_testcase {
         $this->assertArrayNotHasKey('entry', $types);
         $this->assertArrayNotHasKey('entrygroup', $types);
         $this->assertArrayNotHasKey('entryteammemberprofilefield', $types);
-        $this->assertArrayNotHasKey('fieldgroup', $types);
         $this->assertArrayNotHasKey('identifier', $types);
         $this->assertArrayNotHasKey('status', $types);
         $this->assertArrayNotHasKey('tag', $types);
