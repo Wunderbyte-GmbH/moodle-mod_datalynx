@@ -23,7 +23,7 @@
  * `data-datalynx-field` attribute so that saving is trivial:
  *
  *   Action tags  →  data-datalynx-field="##entries##"
- *   Field tags   →  data-datalynx-field="[[fieldname|behavior|renderer]]"
+ *   Field tags   →  data-datalynx-field="[[fieldname|behavior|layout]]"
  *
  * `convertButtonsInHtml()` therefore just replaces every button with the
  * value of that one attribute — no further parsing needed.
@@ -66,7 +66,7 @@ function closestMatchingElement(target, selector) {
     return element && typeof element.closest === 'function' ? element.closest(selector) : null;
 }
 
-/** Regex that matches a full [[field|behavior|renderer]] tag (behavior and renderer optional). */
+/** Regex that matches a full [[field|behavior|layout]] tag (behavior and layout optional). */
 const FIELD_TAG_RE = /^\[\[([^|\]]+)(?:\|([^|\]]*))?(?:\|([^|\]]*))?\]\]$/;
 const VIEW_URL_TAG_RE = /^##viewurl(?::([^#]+))?##$/;
 const VIEW_LINK_TAG_RE = /^##(viewlink|viewsesslink):([^;#]+);([^;]*);([^;]*);([^#]*)##$/;
@@ -74,28 +74,28 @@ const VIEW_LINK_TAG_RE = /^##(viewlink|viewsesslink):([^;#]+);([^;]*);([^;]*);([
 /**
  * Parse a field tag pattern into its components.
  * @param {string} pattern  e.g. "[[Text|Behavior|Renderer]]"
- * @returns {{field:string, behavior:string, renderer:string}}
+ * @returns {{field:string, behavior:string, layout:string}}
  */
 function parseFieldTag(pattern) {
     const m = pattern.match(FIELD_TAG_RE);
     return {
         field:    m ? m[1] : '',
         behavior: m ? (m[2] || '') : '',
-        renderer: m ? (m[3] || '') : '',
+        layout:   m ? (m[3] || '') : '',
     };
 }
 
 /**
- * Build a [[field|behavior|renderer]] pattern string.
+ * Build a [[field|behavior|layout]] pattern string.
  * Omits trailing empty segments.
  * @param {string} field
  * @param {string} behavior
- * @param {string} renderer
+ * @param {string} layout
  * @returns {string}
  */
-function buildFieldTagPattern(field, behavior, renderer) {
-    if (renderer) {
-        return '[[' + field + '|' + behavior + '|' + renderer + ']]';
+function buildFieldTagPattern(field, behavior, layout) {
+    if (layout) {
+        return '[[' + field + '|' + behavior + '|' + layout + ']]';
     }
     if (behavior) {
         return '[[' + field + '|' + behavior + ']]';
@@ -329,13 +329,13 @@ class PatternDialogue {
         });
 
         html = html.replace(/(<[^>]+>)|\[\[([^|\]]+)(?:\|([^|\]]*))?(?:\|([^|\]]*))?\]\]/g,
-            (match, htmlTag, field, behavior, renderer) => {
+            (match, htmlTag, field, behavior, layout) => {
                 if (htmlTag) {
                     return match;
                 }
                 behavior = behavior || '';
-                renderer = renderer || '';
-                return this.buildFieldTagButtonHtml(match, field, behavior, renderer, editorId);
+                layout = layout || '';
+                return this.buildFieldTagButtonHtml(match, field, behavior, layout, editorId);
             }
         );
 
@@ -379,20 +379,20 @@ class PatternDialogue {
 
     /**
      * Build the inner HTML for a field-tag button.
-     * Shows the field name plus Bootstrap-compatible behavior/renderer badges.
+     * Shows the field name plus Bootstrap-compatible behavior/layout badges.
      * @param {string} field
      * @param {string} behavior
-     * @param {string} renderer
+     * @param {string} layout
      * @returns {string}
      */
-    buildButtonLabel(field, behavior, renderer) {
+    buildButtonLabel(field, behavior, layout) {
         let html = escapeHtml(field);
         if (behavior) {
             html += ' <span class="badge badge-info bg-info" style="pointer-events:none">' + escapeHtml(behavior) + '</span>';
         }
-        if (renderer) {
+        if (layout) {
             html += ' <span class="badge badge-secondary bg-secondary" style="pointer-events:none">' +
-                escapeHtml(renderer) + '</span>';
+                escapeHtml(layout) + '</span>';
         }
         return html;
     }
@@ -409,12 +409,12 @@ class PatternDialogue {
             ' data-datalynx-field="' + escapeHtml(pattern) + '">' + escapeHtml(action) + '</button>';
     }
 
-    buildFieldTagButtonHtml(pattern, field, behavior, renderer, editorId = '') {
+    buildFieldTagButtonHtml(pattern, field, behavior, layout, editorId = '') {
         return '<button type="button" contenteditable="false"' +
             ' class="btn btn-sm btn-outline-secondary datalynx-field-tag"' +
             this.buildEditorIdAttribute(editorId) +
             ' data-datalynx-field="' + escapeHtml(pattern) + '">' +
-            this.buildButtonLabel(field, behavior, renderer) + '</button>';
+            this.buildButtonLabel(field, behavior, layout) + '</button>';
     }
 
     buildViewTagButtonLabel(type, viewname, linktext) {
@@ -454,10 +454,10 @@ class PatternDialogue {
             button.setAttribute('data-datalynx-editor-id', editor.id);
             // Refresh badge label from the stored pattern.
             if (button.classList.contains('datalynx-field-tag')) {
-                const {field, behavior, renderer} = parseFieldTag(
+                const {field, behavior, layout} = parseFieldTag(
                     button.getAttribute('data-datalynx-field') || ''
                 );
-                button.innerHTML = this.buildButtonLabel(field, behavior, renderer);
+                button.innerHTML = this.buildButtonLabel(field, behavior, layout);
             }
             if (button.classList.contains('datalynx-view-tag')) {
                 const {type, viewname, linktext} = parseViewTag(
@@ -603,10 +603,10 @@ class PatternDialogue {
         const isFieldTag = button.classList.contains('datalynx-field-tag');
         const isViewTag = button.classList.contains('datalynx-view-tag');
 
-        const [behaviorLabel, rendererLabel, deleteLabel, viewLabel, linkTextLabel, urlQueryLabel, urlQueryHelp,
+        const [behaviorLabel, layoutLabel, deleteLabel, viewLabel, linkTextLabel, urlQueryLabel, urlQueryHelp,
             classLabel, currentViewLabel] = await Promise.all([
             Str.get_string('behavior', 'datalynx'),
-            Str.get_string('renderer', 'datalynx'),
+            Str.get_string('layout', 'datalynx'),
             Str.get_string('deletetag', 'datalynx'),
             Str.get_string('view', 'datalynx'),
             Str.get_string('viewpatternlinktext', 'datalynx'),
@@ -619,7 +619,7 @@ class PatternDialogue {
         const pattern = button.getAttribute('data-datalynx-field') || '';
 
         if (isFieldTag) {
-            const {field, behavior: currentBehavior, renderer: currentRenderer} = parseFieldTag(pattern);
+            const {field, behavior: currentBehavior, layout: currentLayout} = parseFieldTag(pattern);
             const fieldType = (this.options.types || {})[field] || '';
             const tagtype = 'Field';
             const tagname = field;
@@ -631,10 +631,10 @@ class PatternDialogue {
                     (val === currentBehavior ? ' selected="selected"' : '') + '>' +
                     label + '</option>'
                 ).join('');
-            const renderersHtml = Object.entries((this.options.renderers || {})[field] || {})
+            const layoutsHtml = Object.entries((this.options.layouts || {})[field] || {})
                 .map(([val, label]) =>
                     '<option value="' + val + '"' +
-                    (val === currentRenderer ? ' selected="selected"' : '') + '>' +
+                    (val === currentLayout ? ' selected="selected"' : '') + '>' +
                     label + '</option>'
                 ).join('');
 
@@ -647,10 +647,10 @@ class PatternDialogue {
                 ' data-region="tag-behavior-select">' +
                 behaviorsHtml + '</select></div>' +
                 '<div class="form-group">' +
-                '<label for="dlx-renderer-select">' + rendererLabel + '</label>' +
-                '<select class="form-control custom-select" id="dlx-renderer-select" name="dlx-renderer-select"' +
-                ' data-region="tag-renderer-select">' +
-                renderersHtml + '</select></div>' +
+                '<label for="dlx-layout-select">' + layoutLabel + '</label>' +
+                '<select class="form-control custom-select" id="dlx-layout-select" name="dlx-layout-select"' +
+                ' data-region="tag-layout-select">' +
+                layoutsHtml + '</select></div>' +
                 '<div class="mt-2">' +
                 '<button type="button" class="btn btn-danger btn-sm" data-action="dlx-delete" data-region="delete-tag">' +
                 deleteLabel + '</button></div>';
@@ -667,16 +667,16 @@ class PatternDialogue {
                 e.preventDefault();
                 const modalBody = modal.getBody()[0];
                 const newBehavior = modalBody.querySelector('#dlx-behavior-select')?.value || '';
-                const newRenderer = modalBody.querySelector('#dlx-renderer-select')?.value || '';
-                const newPattern = buildFieldTagPattern(field, newBehavior, newRenderer);
+                const newLayout = modalBody.querySelector('#dlx-layout-select')?.value || '';
+                const newPattern = buildFieldTagPattern(field, newBehavior, newLayout);
 
                 if (owningEditor) {
                     owningEditor.dom.setAttrib(button, 'data-datalynx-field', newPattern);
-                    button.innerHTML = this.buildButtonLabel(field, newBehavior, newRenderer);
+                    button.innerHTML = this.buildButtonLabel(field, newBehavior, newLayout);
                     owningEditor.undoManager.add();
                 } else {
                     button.setAttribute('data-datalynx-field', newPattern);
-                    button.innerHTML = this.buildButtonLabel(field, newBehavior, newRenderer);
+                    button.innerHTML = this.buildButtonLabel(field, newBehavior, newLayout);
                 }
                 modal.hide();
             });
@@ -826,8 +826,8 @@ class PatternDialogue {
             } else if (config.supportsFieldTags && fieldTagMatch) {
                 const field = fieldTagMatch[1];
                 const behavior = fieldTagMatch[2] || '';
-                const renderer = fieldTagMatch[3] || '';
-                contentToInsert = this.buildFieldTagButtonHtml(selectedValue, field, behavior, renderer, editorId);
+                const layout = fieldTagMatch[3] || '';
+                contentToInsert = this.buildFieldTagButtonHtml(selectedValue, field, behavior, layout, editorId);
             } else {
                 contentToInsert = selectedValue;
             }

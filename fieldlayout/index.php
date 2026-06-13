@@ -57,7 +57,7 @@ echo html_writer::link(
         '/mod/datalynx/fieldlayout/layout_edit.php',
         ['d' => $dlx->id(), 'sesskey' => sesskey(), 'id' => 0]
     ),
-    get_string('rendereradd', 'datalynx')
+    get_string('layoutadd', 'datalynx')
 );
 echo html_writer::end_tag('div');
 echo html_writer::empty_tag('br');

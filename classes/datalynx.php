@@ -624,7 +624,7 @@ class datalynx {
                 $what = strpos($page, 'import') !== false ? get_string('import', 'datalynx') : $what;
                 $what = strpos($page, 'statistics') !== false ? get_string('statistics', 'datalynx') : $what;
                 $what = strpos($page, 'behavior') !== false ? get_string('behaviors', 'datalynx') : $what;
-                $what = strpos($page, 'renderer') !== false ? get_string('renderers', 'datalynx') : $what;
+                $what = strpos($page, 'renderer') !== false ? get_string('layouts', 'datalynx') : $what;
                 $pagename = "{$modulename}: {$what} ({$manage})";
                 $PAGE->set_title($pagename);
             }

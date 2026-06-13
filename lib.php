@@ -850,7 +850,7 @@ function datalynx_extend_settings_navigation(settings_navigation $settings, navi
                 new moodle_url('/mod/datalynx/fieldbehavior/index.php', ['id' => $page->cm->id])
             );
             $fields->add(
-                get_string('renderers', 'datalynx'),
+                get_string('layouts', 'datalynx'),
                 new moodle_url('/mod/datalynx/fieldlayout/index.php', ['id' => $page->cm->id])
             );
         }

@@ -70,13 +70,13 @@ switch ($urlparams->action) {
             $mform->set_data($data);
             echo html_writer::tag(
                 'h2',
-                get_string('editingrenderer', 'datalynx', $data->name),
+                get_string('editinglayout', 'datalynx', $data->name),
                 ['class' => 'mdl-align']
             );
         } else {
             echo html_writer::tag(
                 'h2',
-                get_string('newrenderer', 'datalynx'),
+                get_string('newlayout', 'datalynx'),
                 ['class' => 'mdl-align']
             );
         }
@@ -99,11 +99,11 @@ switch ($urlparams->action) {
             );
             echo html_writer::tag(
                 'h2',
-                get_string('duplicatingrenderer', 'datalynx', $data->get_name()),
+                get_string('duplicatinglayout', 'datalynx', $data->get_name()),
                 ['class' => 'mdl-align']
             );
             echo $OUTPUT->confirm(
-                get_string('confirmrendererduplicate', 'datalynx'),
+                get_string('confirmlayoutduplicate', 'datalynx'),
                 new moodle_url('renderer_edit.php', (array) $urlparams),
                 $returnurl
             );
@@ -124,11 +124,11 @@ switch ($urlparams->action) {
             );
             echo html_writer::tag(
                 'h2',
-                get_string('deletingrenderer', 'datalynx', $data->get_name()),
+                get_string('deletinglayout', 'datalynx', $data->get_name()),
                 ['class' => 'mdl-align']
             );
             echo $OUTPUT->confirm(
-                get_string('confirmrendererdelete', 'datalynx'),
+                get_string('confirmlayoutdelete', 'datalynx'),
                 new moodle_url('renderer_edit.php', (array) $urlparams),
                 $returnurl
             );
