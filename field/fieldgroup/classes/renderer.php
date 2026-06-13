@@ -422,6 +422,17 @@ class renderer extends datalynxfield_renderer {
         $patterns = [];
         $patterns["[[$fieldname]]"] = [true, $cat];
 
+        // Register one tag per defined fieldgroup field format, e.g. [[group:totals]].
+        // This makes the format tag selectable in the field tags picker and discoverable in
+        // templates (search() iterates these keys), so it is replaced instead of shown literally.
+        $formats = \mod_datalynx\local\field_format\manager::get_formats_for_instance(
+            $this->field->dlx()->id(),
+            'fieldgroup'
+        );
+        foreach ($formats as $format) {
+            $patterns["[[{$fieldname}:{$format->get_name()}]]"] = [true, $cat];
+        }
+
         return $patterns;
     }
 

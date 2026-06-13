@@ -427,6 +427,13 @@ class datalynxview_base_form extends moodleform {
         if (array_key_exists('Fieldgroups', $view->field_tags())) {
             $visiblefieldgroups = 0;
             foreach ($view->field_tags()['Fieldgroups']['Fieldgroups'] as $fieldgroup) {
+                // Skip field-format variants like [[group:totals]]: they are display-only tags,
+                // not editable fieldgroup instances, so they neither count towards the limit nor
+                // expand into subfields (and "group:totals" is not a resolvable field name).
+                if (strpos(substr($fieldgroup, 2, -2), ':') !== false) {
+                    continue;
+                }
+
                 // Stop if the fieldgroup is not used in this entryview.
                 if (strpos($entryview, $fieldgroup) === false) {
                     continue;

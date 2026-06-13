@@ -27,6 +27,7 @@ namespace datalynxfield_fieldgroup;
 use advanced_testcase;
 use mod_datalynx\datalynx;
 use mod_datalynx\local\field_format\manager;
+use ReflectionClass;
 use stdClass;
 
 /**
@@ -106,6 +107,101 @@ final class totals_format_test extends advanced_testcase {
             $this->make_format([])->get_label()
         );
         $this->assertSame('Gesamt', $this->make_format(['label' => 'Gesamt'])->get_label());
+    }
+
+    /**
+     * A defined fieldgroup format must be registered as a tag so it is both offered in the
+     * field tags picker (get_menu) and discovered in templates (search), not shown literally.
+     */
+    public function test_format_tag_is_registered_and_discoverable(): void {
+        global $DB;
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        $course = $this->getDataGenerator()->create_course();
+        $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
+        $dlx = new datalynx($instance->id);
+
+        $numid = (int) $DB->insert_record('datalynx_fields', (object) [
+            'dataid' => $dlx->id(), 'name' => 'price', 'type' => 'number', 'description' => '',
+        ]);
+        $fgid = (int) $DB->insert_record('datalynx_fields', (object) [
+            'dataid' => $dlx->id(), 'name' => 'group', 'type' => 'fieldgroup', 'description' => '',
+            'param1' => json_encode(["$numid"]), 'param2' => 3, 'param3' => 3, 'param4' => 0,
+        ]);
+        manager::save_format((object) [
+            'dataid' => $dlx->id(), 'name' => 'totals', 'fieldtype' => 'fieldgroup',
+            'settings' => json_encode(['aggregation' => 'sum']),
+        ]);
+
+        $renderer = $dlx->get_field_from_id($fgid, true)->renderer();
+
+        // The format tag is offered in the field tags picker menu.
+        $menutags = [];
+        foreach ($renderer->get_menu() as $cat) {
+            foreach ($cat as $subcat) {
+                $menutags = array_merge($menutags, array_keys($subcat));
+            }
+        }
+        $this->assertContains('[[group:totals]]', $menutags);
+        $this->assertContains('[[group]]', $menutags);
+
+        // The format tag is discovered when present in a template.
+        $found = $renderer->search('Before [[group:totals]] after');
+        $this->assertContains('[[group:totals]]', $found);
+    }
+
+    /**
+     * The view-edit form validation must not crash on a fieldgroup format tag (e.g. [[group:summe]]).
+     * These display-only tags appear in the Fieldgroups menu but are not editable fieldgroup
+     * instances, so they must be skipped by the "multiple fieldgroups" validation.
+     */
+    public function test_view_edit_validation_ignores_format_tag(): void {
+        global $DB;
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        $course = $this->getDataGenerator()->create_course();
+        $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
+        $dlx = new datalynx($instance->id);
+
+        $numid = (int) $DB->insert_record('datalynx_fields', (object) [
+            'dataid' => $dlx->id(), 'name' => 'price', 'type' => 'number', 'description' => '',
+        ]);
+        $DB->insert_record('datalynx_fields', (object) [
+            'dataid' => $dlx->id(), 'name' => 'kost', 'type' => 'fieldgroup', 'description' => '',
+            'param1' => json_encode(["$numid"]), 'param2' => 3, 'param3' => 3, 'param4' => 0,
+        ]);
+        manager::save_format((object) [
+            'dataid' => $dlx->id(), 'name' => 'summe', 'fieldtype' => 'fieldgroup',
+            'settings' => json_encode(['aggregation' => 'sum']),
+        ]);
+
+        $viewrecord = (object) [
+            'dataid' => $dlx->id(), 'type' => 'grid', 'name' => 'Grid', 'description' => '',
+            'visible' => 7, 'filter' => 0, 'perpage' => 0, 'groupby' => '', 'param5' => 0, 'param10' => 0,
+            'section' => '##entries##',
+            'param2' => '<div>[[kost:summe]]</div>',
+        ];
+        $viewrecord->id = (int) $DB->insert_record('datalynx_views', $viewrecord);
+        $view = $dlx->get_view('grid', $viewrecord);
+
+        // Reach validation() directly without building the whole moodleform.
+        $reflection = new ReflectionClass(\datalynxview_grid\form::class);
+        $form = $reflection->newInstanceWithoutConstructor();
+        foreach (['view' => $view, 'dlx' => $dlx] as $prop => $value) {
+            $p = $reflection->getProperty($prop);
+            $p->setAccessible(true);
+            $p->setValue($form, $value);
+        }
+
+        // Before the fix this threw "Attempt to read property fieldids on false".
+        $errors = $form->validation([
+            'name' => 'Grid',
+            'eparam2_editor' => ['text' => '<div>[[kost:summe]]</div>'],
+        ], []);
+        $this->assertIsArray($errors);
+        $this->assertArrayNotHasKey('eparam2_editor', $errors);
     }
 
     /**
