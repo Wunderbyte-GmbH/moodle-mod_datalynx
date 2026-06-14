@@ -140,5 +140,4 @@ class layout_presets {
             'templates' => $templates,
         ];
     }
-
 }

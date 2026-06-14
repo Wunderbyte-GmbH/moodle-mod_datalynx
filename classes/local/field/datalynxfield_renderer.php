@@ -157,7 +157,9 @@ abstract class datalynxfield_renderer {
                 if ($renderer->get_not_visible_template() === $renderer::NOT_VISIBLE_SHOW_NOTHING) {
                     $replacements[$tag] = ['html', ''];
                 } else {
-                    $replacements[$tag] = ['html', $renderer->get_not_visible_template()];
+                    // No value is shown when not visible, so strip the #value placeholder.
+                    $replacements[$tag] = ['html',
+                            $this->replace_renderer_template_tags($renderer->get_not_visible_template(), '')];
                 }
             } else {
                 // VISIBLE ===.
@@ -209,7 +211,9 @@ abstract class datalynxfield_renderer {
                                 $replacements[$tag] = ['html',
                                         $this->replace_renderer_template_tags($renderer->get_display_template(), '')];
                             } else {
-                                $replacements[$tag] = ['html', $renderer->get_no_value_template()];
+                                // No value here, so strip the #value placeholder from the custom template.
+                                $replacements[$tag] = ['html',
+                                        $this->replace_renderer_template_tags($renderer->get_no_value_template(), '')];
                             }
                         }
                     } else {

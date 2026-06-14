@@ -127,7 +127,8 @@ export const init = async() => {
                 case 'display':
                     return opt === CUSTOM ? subValue(raw, sampleValue) : esc(sampleValue);
                 case 'notvisible':
-                    return opt === CUSTOM ? raw : '';
+                    // No value is shown when not visible, so strip the #value placeholder.
+                    return opt === CUSTOM ? subValue(raw, '') : '';
                 case 'novalue':
                     if (opt === '___0___') {
                         return '';
@@ -135,7 +136,8 @@ export const init = async() => {
                     if (opt === '___1___') {
                         return subValue(effectiveDisplay(), '');
                     }
-                    return raw; // Custom: server emits it literally.
+                    // Custom: there is no value here, so strip the #value placeholder.
+                    return subValue(raw, '');
                 case 'edit':
                     if (opt === '___4___') {
                         return sampleInput(false);
@@ -302,27 +304,40 @@ export const init = async() => {
             updatePreview(base);
         });
 
-        // --- Top toolbar: sample-value control. ------------------------------------------------
+        // --- Sample-value control, reusing the form's own mform row markup. --------------------
 
         if (firstEditor) {
-            const topbar = document.createElement('div');
-            topbar.className = 'dlx-layout-topbar';
+            // Clone the structure of a standard moodleform text row (label column + felement column)
+            // so it inherits the form's styling instead of looking like a bolted-on widget.
+            const row = document.createElement('div');
+            row.id = 'fitem_dlx_layout_sample';
+            row.className = 'mb-3 row fitem';
+            row.innerHTML =
+                '<div class="col-md-3 col-form-label d-flex pb-0 pe-md-0">' +
+                    '<label class="d-inline word-break" for="dlx-layout-sample-input">' +
+                        esc(sSampleValue) +
+                    '</label>' +
+                    '<div class="form-label-addon d-flex align-items-center align-self-start"></div>' +
+                '</div>' +
+                '<div class="col-md-9 d-flex flex-wrap align-items-start felement" data-fieldtype="text">' +
+                    '<input type="text" class="form-control" id="dlx-layout-sample-input" size="64"' +
+                        ' value="' + esc(sampleValue) + '">' +
+                '</div>';
 
-            const sampleWrap = document.createElement('label');
-            sampleWrap.className = 'dlx-layout-sample';
-            sampleWrap.textContent = `${sSampleValue}: `;
-            const sampleInputEl = document.createElement('input');
-            sampleInputEl.type = 'text';
-            sampleInputEl.className = 'form-control form-control-sm';
-            sampleInputEl.value = sampleValue;
+            const sampleInputEl = row.querySelector('#dlx-layout-sample-input');
             sampleInputEl.addEventListener('input', () => {
                 sampleValue = sampleInputEl.value;
                 Object.keys(previews).forEach((base) => updatePreview(base));
             });
-            sampleWrap.append(sampleInputEl);
 
-            topbar.append(sampleWrap);
-            firstEditor.parentNode.insertBefore(topbar, firstEditor);
+            // Place the control right after the Description row so it reads as part of the form,
+            // rather than buried inside the first template's option fieldset.
+            const descRow = form.querySelector('#fitem_id_description');
+            if (descRow) {
+                descRow.after(row);
+            } else {
+                firstEditor.parentNode.insertBefore(row, firstEditor);
+            }
         }
     } catch (error) {
         Notification.exception(error);
