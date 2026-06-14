@@ -80,16 +80,12 @@ class layout_presets {
     /** @var string Edit snippet: labelled input block. */
     const INPUT_LABELLED = '<div class="mb-2"><label class="form-label fw-semibold">…</label>#input</div>';
 
-    /** @var string No-value snippet: a muted placeholder dash. */
-    const NOVALUE_DASH = '<span class="text-muted fst-italic">—</span>';
-
     /**
      * Return the full preset catalogue for the editor, with localized labels.
      *
      * @return array {
      *     families: array<int, array{key:string, label:string}>,
-     *     presets:  array<int, array{id,family,familylabel,label,scope,templates}>,
-     *     wholelooks: array<int, array{id,label,templates}>
+     *     presets:  array<int, array{id,family,familylabel,label,scope,templates}>
      * }
      */
     public static function all(): array {
@@ -122,25 +118,6 @@ class layout_presets {
                 self::preset('list_group', 'typographic', 'display', ['display' => self::LIST_GROUP]),
                 self::preset('heading', 'typographic', 'display', ['display' => self::HEADING]),
             ],
-            'wholelooks' => [
-                self::wholelook('look_card', [
-                    'display' => self::CARD_BASIC,
-                    'edit' => self::INPUT_GROUP_ICON,
-                    'novalue' => self::NOVALUE_DASH,
-                ]),
-                self::wholelook('look_badge', [
-                    'display' => self::BADGE_PRIMARY,
-                    'edit' => self::INPUT_HELP,
-                    // Radio-only outcome: when empty, show nothing.
-                    'novalue' => datalynxfield_layout::NO_VALUE_SHOW_NOTHING,
-                ]),
-                self::wholelook('look_quote', [
-                    'display' => self::BLOCKQUOTE,
-                    'edit' => self::INPUT_LABELLED,
-                    // Radio-only outcome: when empty, reuse the display template.
-                    'novalue' => datalynxfield_layout::NO_VALUE_SHOW_DISPLAY_MODE_TEMPLATE,
-                ]),
-            ],
         ];
     }
 
@@ -164,18 +141,4 @@ class layout_presets {
         ];
     }
 
-    /**
-     * Build a coordinated "whole look" record that fills several templates at once.
-     *
-     * @param string $id Unique id (also the lang string suffix preset_<id>).
-     * @param array $templates Map of template key (display|edit|novalue|...) => HTML snippet or signifier.
-     * @return array
-     */
-    private static function wholelook(string $id, array $templates): array {
-        return [
-            'id' => $id,
-            'label' => get_string('preset_' . $id, 'datalynx'),
-            'templates' => $templates,
-        ];
-    }
 }

@@ -545,35 +545,6 @@ class behat_mod_datalynx extends behat_base {
     }
 
     /**
-     * Directly selects options in a hidden select element by visible text, bypassing the
-     * form-autocomplete widget entirely to avoid timing / pending-key issues.
-     * Multiple values can be provided as a comma-separated string.
-     *
-     * @When I select :value in the datalynx fieldgroup fields selector
-     *
-     * @param string $value  Comma-separated option texts to select, e.g. "Field A, Field B"
-     * @throws coding_exception
-     */
-    public function i_select_in_fieldgroup_fields_selector($value) {
-        if (!$this->running_javascript()) {
-            throw new coding_exception('This step requires JavaScript.');
-        }
-        $values = array_map('trim', explode(',', $value));
-        $valuesjson = json_encode($values);
-        $this->getSession()->executeScript(
-            "(function(values) {" .
-            "  var sel = document.getElementById('id_param1');" .
-            "  if (!sel) { return; }" .
-            "  Array.from(sel.options).forEach(function(opt) {" .
-            "    if (values.indexOf(opt.text.trim()) !== -1) {" .
-            "      opt.selected = true;" .
-            "    }" .
-            "  });" .
-            "})($valuesjson);"
-        );
-    }
-
-    /**
      * Directly selects a user option in the nth datalynx teammemberselect field, bypassing
      * the form-autocomplete widget to avoid timing / pending-key issues on slow machines.
      *

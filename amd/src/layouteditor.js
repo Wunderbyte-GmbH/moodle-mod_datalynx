@@ -72,10 +72,9 @@ export const init = async() => {
 
         const catalogue = JSON.parse(presetsEl.textContent);
         const [
-            sChooseStyle, sApplyLook, sLivePreview, sSampleValue, sInsertValue, sInsertInput, sEmpty,
+            sChooseStyle, sLivePreview, sSampleValue, sInsertValue, sInsertInput, sEmpty,
         ] = await getStrings([
             {key: 'choosestyle', component: 'datalynx'},
-            {key: 'applywholelook', component: 'datalynx'},
             {key: 'livepreview', component: 'datalynx'},
             {key: 'samplevalue', component: 'datalynx'},
             {key: 'insertvaluetag', component: 'datalynx'},
@@ -254,21 +253,6 @@ export const init = async() => {
             });
         };
 
-        // Whole-look picker: applies several templates at once.
-        const openWholeLookGallery = () => {
-            let html = '<div class="dlx-layout-gallery">';
-            catalogue.wholelooks.forEach((look) => {
-                html += cardHtml(look.id, look.label, subValue(look.templates.display || '#value', sampleValue));
-            });
-            html += '</div>';
-            openGallery(sApplyLook, html, (id) => {
-                const look = catalogue.wholelooks.find((l) => l.id === id);
-                if (look) {
-                    Object.entries(look.templates).forEach(([base, value]) => applyToTemplate(base, value));
-                }
-            });
-        };
-
         // --- Build the UI around each template textarea. ---------------------------------------
 
         let firstEditor = null;
@@ -318,13 +302,11 @@ export const init = async() => {
             updatePreview(base);
         });
 
-        // --- Top toolbar: whole-look button + sample-value control. ----------------------------
+        // --- Top toolbar: sample-value control. ------------------------------------------------
 
         if (firstEditor) {
             const topbar = document.createElement('div');
             topbar.className = 'dlx-layout-topbar';
-            const lookBtn = button(sApplyLook, 'btn btn-primary dlx-layout-wholelook');
-            lookBtn.addEventListener('click', openWholeLookGallery);
 
             const sampleWrap = document.createElement('label');
             sampleWrap.className = 'dlx-layout-sample';
@@ -339,7 +321,7 @@ export const init = async() => {
             });
             sampleWrap.append(sampleInputEl);
 
-            topbar.append(lookBtn, sampleWrap);
+            topbar.append(sampleWrap);
             firstEditor.parentNode.insertBefore(topbar, firstEditor);
         }
     } catch (error) {

@@ -51,14 +51,16 @@ Feature: Create entry and add fieldgroups
   Scenario: Add a fieldgroup with teammemberselect to this instance
     When I follow "Fields"
     And I select "Fieldgroup" from the "type" singleselect
-    Then I should see "Fieldgroupfields"
+    Then I should see "Add subfield"
     When I set the following fields to these values:
       | Name           | Testfieldgroup1       |
       | Description    | This is a first test  |
       | param2         | 4                     |
       | param3         | 4                     |
 
-    And I select "Datalynx field Team member select" in the datalynx fieldgroup fields selector
+    And I press "Add subfield"
+    And I set the field "Field" to "Datalynx field Team member select"
+    And I click on "Save changes" "button" in the "Add subfield" "dialogue"
     And I press "Save changes"
     When I follow "Views"
     And I click on "Edit Gridview" "link"
@@ -91,15 +93,21 @@ Feature: Create entry and add fieldgroups
   Scenario: Add a new fieldgroup with text and number to this instance
     When I follow "Fields"
     And I select "Fieldgroup" from the "type" singleselect
-    Then I should see "Fieldgroupfields"
+    Then I should see "Add subfield"
     When I set the following fields to these values:
       | Name           | Testfieldgroup1       |
       | Description    | This is a first test  |
       | param2         | 4                     |
       | param3         | 4                     |
 
-    ## Use the autocomplete.
-    And I select "Datalynx field Text, Datalynx field Number" in the datalynx fieldgroup fields selector
+    ## Add subfields. Order matters: the entry below addresses inputs positionally,
+    ## expecting the Number subfield before the Text subfield in each line.
+    And I press "Add subfield"
+    And I set the field "Field" to "Datalynx field Number"
+    And I click on "Save changes" "button" in the "Add subfield" "dialogue"
+    And I press "Add subfield"
+    And I set the field "Field" to "Datalynx field Text"
+    And I click on "Save changes" "button" in the "Add subfield" "dialogue"
     And I press "Save changes"
     Then I should see "Testfieldgroup1"
     When I follow "Views"
@@ -127,7 +135,8 @@ Feature: Create entry and add fieldgroups
     And I press "Save changes"
     Then I should see "updated"
     And I press "Continue"
-    Then I should see "Datalynx field Number: 6"
+    ## Fieldgroup subfields are now displayed without the field-name label prefix.
+    Then I should see "Text 1 in the second line"
     ## Add a second entry
     When I follow "Add a new entry"
 
@@ -156,15 +165,15 @@ Feature: Create entry and add fieldgroups
     And I press "Save changes"
     Then I should see "updated"
     And I press "Continue"
-    Then I should see "Datalynx field Number: 30"
-    And I should see "Datalynx field Text: Text 3 in the fourth line"
+    Then I should see "30"
+    And I should see "Text 3 in the fourth line"
 
     ## Find the right edit button for the second entry and click it.
     And I click on the 2nd entry "Edit" link
 
     ## Change some values.
     When I set the field with xpath "(//input[@type='text'])[1]" to "33"
-    When I set the field with xpath "(//input[@type='text'])[2]" to "Second Text 2 in the first line"
+    When I set the field with xpath "(//input[@type='text'])[2]" to "Edited 2 first line"
     When I set the field with xpath "(//input[@type='text'])[3]" to ""
     When I set the field with xpath "(//input[@type='text'])[4]" to "Second Text 2 in the second line"
 
@@ -172,11 +181,11 @@ Feature: Create entry and add fieldgroups
     And I press "Save changes"
     Then I should see "updated"
     And I press "Continue"
-    And I should see "Datalynx field Text: Second Text 2 in the first line"
-    And I should not see "Datalynx field Text: Text 2 in the first line"
-    And I should see "Datalynx field Text: Text 2 in the third line"
+    And I should see "Edited 2 first line"
+    And I should not see "Text 2 in the first line"
+    And I should see "Text 2 in the third line"
     ## Check order of content as well.
-    And "Datalynx field Text: Second Text 2 in the first line" "text" should appear before "Datalynx field Text: Second Text 2 in the second line" "text"
+    And "Edited 2 first line" "text" should appear before "Second Text 2 in the second line" "text"
 
     ## Edit the first entry and remove a whole line.
     And I click on the 1st entry "Edit" link
@@ -195,6 +204,8 @@ Feature: Create entry and add fieldgroups
     And I press "Continue"
 
     ## Check if empty lines are kept.
-    And I should not see "Datalynx field Text: Text 1 in the first line"
-    And I should not see "Datalynx field Number: 3 "
+    ## The cleared first line of entry 1 (text "Text 1 in the first line", number 3) is gone.
+    ## Without the field-name prefix a bare number like "3" cannot be asserted unambiguously
+    ## (it is a substring of 33/30), so the removed line is verified via its unique text only.
+    And I should not see "Text 1 in the first line"
     ## TODO: Fix this to test if not needed lines are removed.

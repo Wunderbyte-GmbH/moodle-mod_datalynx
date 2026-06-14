@@ -64,7 +64,7 @@ Feature: Test TinyMCE tag buttons and dialogs in datalynx view editor
     Then I should see "Field tag properties"
     And "[data-region='datalynx-tag-field']" "css_element" should exist
     And "[data-region='tag-behavior-select']" "css_element" should exist
-    And "[data-region='tag-renderer-select']" "css_element" should exist
+    And "[data-region='tag-layout-select']" "css_element" should exist
 
   @javascript
   Scenario: Delete a field tag button via the properties dialog

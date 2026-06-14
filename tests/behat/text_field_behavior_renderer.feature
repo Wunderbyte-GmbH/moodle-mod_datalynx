@@ -39,13 +39,13 @@ Feature: Test text field behavior and renderer in datalynx
     And I set the field "Student" to "1"
     And I press "Save changes"
 
-    # Add renderer "Text Renderer" via Manage > Fields > Renderers
+    # Add layout "Text Renderer" via Manage > Fields > Layouts
     And I am on "Course 1" course homepage
     And I follow "Datalynx Test Instance"
     And I click on ".nav-item [title='Manage']" "css_element"
     And I follow "Fields"
-    And I follow "Renderers"
-    And I follow "Add renderer"
+    And I follow "Layouts"
+    And I follow "Add layout"
     And I set the field "Name" to "Text Renderer"
     # When not visible: Custom template
     And I click on "input[name='notvisibleoptions'][value='___2___']" "css_element"
@@ -105,13 +105,13 @@ Feature: Test text field behavior and renderer in datalynx
     And I follow "Views"
     And I click on "Edit Behavior Renderer View" "link"
     And I click on "Entry template" "link"
-    # Open the dialog for the Text field tag button to assign behavior and renderer
+    # Open the dialog for the Text field tag button to assign behavior and layout
     And I switch to the "id_eparam2_editor" TinyMCE editor iframe
     And I click on "Datalynx field Text" "button"
     And I switch to the main frame
-    # Select behavior and renderer in the dialog (selects have id/name dlx-behavior-select / dlx-renderer-select)
+    # Select behavior and layout in the dialog (selects have id/name dlx-behavior-select / dlx-layout-select)
     And I set the field "dlx-behavior-select" to "Text Behavior"
-    And I set the field "dlx-renderer-select" to "Text Renderer"
+    And I set the field "dlx-layout-select" to "Text Renderer"
     And I click on ".modal [data-action='save']" "css_element"
     And I press "Save changes"
     And I log out

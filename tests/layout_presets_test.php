@@ -41,7 +41,6 @@ final class layout_presets_test extends advanced_testcase {
 
         $this->assertArrayHasKey('families', $all);
         $this->assertArrayHasKey('presets', $all);
-        $this->assertArrayHasKey('wholelooks', $all);
 
         $familykeys = array_column($all['families'], 'key');
         $this->assertEqualsCanonicalizing(['cards', 'inline', 'edit', 'typographic'], $familykeys);
@@ -76,32 +75,6 @@ final class layout_presets_test extends advanced_testcase {
                 $this->assertStringContainsString('#value', $snippet, "preset {$context} needs #value");
             }
             $this->assertStringNotContainsString('#name', $snippet, "preset {$context} must not use #name");
-        }
-    }
-
-    /**
-     * Whole-look presets fill several templates; HTML snippets must carry the right token while
-     * radio-only outcomes are passed through as option signifiers.
-     */
-    public function test_wholelooks_are_well_formed(): void {
-        foreach (layout_presets::all()['wholelooks'] as $look) {
-            $context = $look['id'] ?? '(no id)';
-            $this->assertNotEmpty($look['label'], "wholelook {$context} label");
-            $this->assertNotEmpty($look['templates'], "wholelook {$context} templates");
-
-            foreach ($look['templates'] as $target => $value) {
-                if (preg_match('/^___\d+___$/', $value)) {
-                    continue; // Radio-only outcome (e.g. "show nothing").
-                }
-                // Only display (#value) and edit (#input) carry a mandatory token; empty/not-visible/
-                // not-editable templates are rendered literally, so they need no token.
-                if ($target === 'display') {
-                    $this->assertStringContainsString('#value', $value, "wholelook {$context} display needs #value");
-                } else if ($target === 'edit') {
-                    $this->assertStringContainsString('#input', $value, "wholelook {$context} edit needs #input");
-                }
-                $this->assertStringNotContainsString('#name', $value, "wholelook {$context} must not use #name");
-            }
         }
     }
 }

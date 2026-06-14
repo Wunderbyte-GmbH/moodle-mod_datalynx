@@ -33,14 +33,19 @@ Feature: Basic fieldgroup entry flow with repeated checkbox rows
   Scenario: Add and edit entries with a basic checkbox fieldgroup
     When I follow "Fields"
     And I select "Fieldgroup" from the "type" singleselect
-    Then I should see "Fieldgroupfields"
+    Then I should see "Add subfield"
     When I set the following fields to these values:
       | Name        | Fieldgroup |
       | Description | Basic fieldgroup test |
       | param2      | 3 |
       | param3      | 1 |
       | param4      | 1 |
-    And I select "Datalynx field Checkbox letters, Datalynx field Checkbox numbers" in the datalynx fieldgroup fields selector
+    And I press "Add subfield"
+    And I set the field "Field" to "Datalynx field Checkbox letters"
+    And I click on "Save changes" "button" in the "Add subfield" "dialogue"
+    And I press "Add subfield"
+    And I set the field "Field" to "Datalynx field Checkbox numbers"
+    And I click on "Save changes" "button" in the "Add subfield" "dialogue"
     And I press "Save changes"
     Then I should see "Fieldgroup"
     When I follow "Views"
