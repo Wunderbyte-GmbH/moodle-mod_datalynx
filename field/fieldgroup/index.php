@@ -103,24 +103,34 @@ foreach ($fieldgroups as $fieldgroupid => $fieldgroup) {
     $fieldgroupfields = $fieldgroup->param1; // What fields are in the group.
     $fieldrequired = $fieldgroup->param4; // We show how many lines are required in the overview.
 
-    // NOTE: We need fid NOT id here. These links are very inconsistent.
+    // Include the fieldgroup name in the icon alt text, title and aria-label so the actions are
+    // distinguishable for screen readers and addressable in Behat (e.g. I follow "Delete mygroup").
+    $editlabel = get_string('edit') . ' ' . $fieldgroup->name;
+    $duplicatelabel = get_string('duplicate') . ' ' . $fieldgroup->name;
+    $deletelabel = get_string('delete') . ' ' . $fieldgroup->name;
+
+    // NOTE: We need fid NOT id here. Editing is done via field_edit.php, while duplication and
+    // deletion are processed by field/index.php (via process_fields), which expects fid sequences.
     $fieldedit = html_writer::link(
         new moodle_url($editbaseurl, $linkparams + ['fid' => $fieldgroupid]),
-        $OUTPUT->pix_icon('t/edit', get_string('edit'))
+        $OUTPUT->pix_icon('t/edit', $editlabel),
+        ['title' => $editlabel, 'aria-label' => $editlabel]
     );
     $fieldduplicate = html_writer::link(
         new moodle_url(
-            $editbaseurl,
-            $linkparams + ['action' => 'duplicate', 'id' => $fieldgroupid]
+            $deletebaseurl,
+            $linkparams + ['duplicate' => $fieldgroupid]
         ),
-        $OUTPUT->pix_icon('t/copy', get_string('duplicate'))
+        $OUTPUT->pix_icon('t/copy', $duplicatelabel),
+        ['title' => $duplicatelabel, 'aria-label' => $duplicatelabel]
     );
     $fielddelete = html_writer::link(
         new moodle_url(
             $deletebaseurl,
             $linkparams + ['delete' => $fieldgroupid]
         ),
-        $OUTPUT->pix_icon('t/delete', get_string('delete'))
+        $OUTPUT->pix_icon('t/delete', $deletelabel),
+        ['title' => $deletelabel, 'aria-label' => $deletelabel]
     );
 
     $table->add_data([$fieldname, $fielddescription, $fieldgroupfields, $fieldrequired,

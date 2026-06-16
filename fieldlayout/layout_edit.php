@@ -58,7 +58,12 @@ switch ($urlparams->action) {
                 } else {
                     datalynxfield_layout::update_renderer($data);
                 }
-                redirect($returnurl);
+                redirect(
+                    $returnurl,
+                    get_string('layoutsaved', 'datalynx'),
+                    null,
+                    \core\output\notification::NOTIFY_SUCCESS
+                );
             }
         }
 
@@ -98,7 +103,12 @@ switch ($urlparams->action) {
     case "duplicate":
         if ($urlparams->confirmed) {
             datalynxfield_layout::duplicate_renderer($urlparams->id);
-            redirect($returnurl);
+            redirect(
+                $returnurl,
+                get_string('layoutduplicated', 'datalynx'),
+                null,
+                \core\output\notification::NOTIFY_SUCCESS
+            );
         } else {
             $data = datalynxfield_layout::get_renderer_by_id($urlparams->id);
             $urlparams->confirmed = true;
@@ -113,7 +123,7 @@ switch ($urlparams->action) {
             );
             echo $OUTPUT->confirm(
                 get_string('confirmlayoutduplicate', 'datalynx'),
-                new moodle_url('renderer_edit.php', (array) $urlparams),
+                new moodle_url('layout_edit.php', (array) $urlparams),
                 $returnurl
             );
             $dlx->print_footer();
@@ -123,7 +133,12 @@ switch ($urlparams->action) {
     case "delete":
         if ($urlparams->confirmed) {
             datalynxfield_layout::delete_renderer($urlparams->id);
-            redirect($returnurl);
+            redirect(
+                $returnurl,
+                get_string('layoutdeleted', 'datalynx'),
+                null,
+                \core\output\notification::NOTIFY_SUCCESS
+            );
         } else {
             $data = datalynxfield_layout::get_renderer_by_id($urlparams->id);
             $urlparams->confirmed = true;
@@ -138,7 +153,7 @@ switch ($urlparams->action) {
             );
             echo $OUTPUT->confirm(
                 get_string('confirmlayoutdelete', 'datalynx'),
-                new moodle_url('renderer_edit.php', (array) $urlparams),
+                new moodle_url('layout_edit.php', (array) $urlparams),
                 $returnurl
             );
             $dlx->print_footer();

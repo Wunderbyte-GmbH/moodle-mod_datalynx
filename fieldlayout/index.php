@@ -93,6 +93,12 @@ $table->setup();
 $renderers = $DB->get_records('datalynx_renderers', ['dataid' => $dlx->id()]);
 
 foreach ($renderers as $rendererid => $renderer) {
+    // Include the layout name in the icon alt text, title and aria-label so the actions are
+    // distinguishable for screen readers and addressable in Behat (e.g. I follow "Delete layoutname").
+    $editlabel = get_string('edit') . ' ' . $renderer->name;
+    $duplicatelabel = get_string('duplicate') . ' ' . $renderer->name;
+    $deletelabel = get_string('delete') . ' ' . $renderer->name;
+
     $fieldname = html_writer::link(
         new moodle_url($editbaseurl, $linkparams + ['id' => $rendererid]),
         $renderer->name
@@ -100,21 +106,24 @@ foreach ($renderers as $rendererid => $renderer) {
     $fielddescription = shorten_text($renderer->description, 30);
     $fieldedit = html_writer::link(
         new moodle_url($editbaseurl, $linkparams + ['id' => $rendererid]),
-        $OUTPUT->pix_icon('t/edit', get_string('edit'))
+        $OUTPUT->pix_icon('t/edit', $editlabel),
+        ['title' => $editlabel, 'aria-label' => $editlabel]
     );
     $fieldduplicate = html_writer::link(
         new moodle_url(
             $editbaseurl,
             $linkparams + ['action' => 'duplicate', 'id' => $rendererid]
         ),
-        $OUTPUT->pix_icon('t/copy', get_string('duplicate'))
+        $OUTPUT->pix_icon('t/copy', $duplicatelabel),
+        ['title' => $duplicatelabel, 'aria-label' => $duplicatelabel]
     );
     $fielddelete = html_writer::link(
         new moodle_url(
             $editbaseurl,
             $linkparams + ['action' => 'delete', 'id' => $rendererid]
         ),
-        $OUTPUT->pix_icon('t/delete', get_string('delete'))
+        $OUTPUT->pix_icon('t/delete', $deletelabel),
+        ['title' => $deletelabel, 'aria-label' => $deletelabel]
     );
 
     $table->add_data(

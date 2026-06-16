@@ -62,12 +62,17 @@ Feature: Test text field behavior and renderer in datalynx
     And I click on "input[name='noteditableoptions'][value='___3___']" "css_element"
     And I press "Save changes"
     Then I should see "Text Renderer"
-    And I follow "Duplicate" 
+    # The action icons carry the layout name in their title/aria-label, so they are addressable by
+    # name and tell screen readers which layout they act on.
+    And "Duplicate Text Renderer" "link" should exist
+    And "Delete Text Renderer" "link" should exist
+    And I follow "Duplicate Text Renderer"
     And I press "Continue"
+    Then I should see "Field layout duplicated"
     And I should see "Copy of Text Renderer"
     And I follow "Delete Copy of Text Renderer"
     And I press "Continue"
-    Then I should see "deleted"
+    Then I should see "Field layout deleted"
 
     # Create Grid view "Behavior Renderer View"
     And I add to "Datalynx Test Instance" datalynx the view of "Grid" type with:

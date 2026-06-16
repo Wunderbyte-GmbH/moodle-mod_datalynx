@@ -119,3 +119,38 @@ Feature: Basic fieldgroup entry flow with repeated checkbox rows
     And the field with xpath "//form[contains(@class,'mform')]//div[@data-field-type='fieldgroup']//div[contains(@class,'lines') and @data-line='2']//div[@data-field-name='Datalynx field Checkbox letters']//label[normalize-space()='B']/input[@type='checkbox']" matches value "1"
     And the field with xpath "//form[contains(@class,'mform')]//div[@data-field-type='fieldgroup']//div[contains(@class,'lines') and @data-line='2']//div[@data-field-name='Datalynx field Checkbox numbers']//label[normalize-space()='3']/input[@type='checkbox']" matches value "1"
     And "//form[contains(@class,'mform')]//div[@data-field-type='fieldgroup']//div[contains(@class,'lines') and @data-line='3']" "xpath_element" should not be visible
+
+  @javascript
+  Scenario: Duplicate and delete a fieldgroup using the named action icons
+    # Create a fieldgroup with a single subfield.
+    When I follow "Fields"
+    And I select "Fieldgroup" from the "type" singleselect
+    Then I should see "Add subfield"
+    When I set the following fields to these values:
+      | Name        | Mygroup |
+      | Description | Manage fieldgroup test |
+      | param2      | 2 |
+    And I press "Add subfield"
+    And I set the field "Field" to "Datalynx field Checkbox letters"
+    And I click on "Save changes" "button" in the "Add subfield" "dialogue"
+    And I press "Save changes"
+    Then I should see "Mygroup"
+
+    # Duplicate the fieldgroup via its named icon on the Fieldgroups tab (previously this link was
+    # broken and opened a blank new-field form instead of duplicating).
+    When I follow "Fieldgroups"
+    Then I should see "Mygroup"
+    And "Duplicate Mygroup" "link" should exist
+    When I follow "Duplicate Mygroup"
+    And I press "Continue"
+    Then I should see "Mygroup_1"
+
+    # Delete the duplicate via its named icon and confirm the deletion notification.
+    When I follow "Fieldgroups"
+    And "Delete Mygroup_1" "link" should exist
+    And I follow "Delete Mygroup_1"
+    And I press "Continue"
+    Then I should see "deleted"
+    And I follow "Fieldgroups"
+    Then I should see "Mygroup"
+    And I should not see "Mygroup_1"

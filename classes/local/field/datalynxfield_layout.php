@@ -360,6 +360,11 @@ class datalynxfield_layout {
         );
         // Update every instance that still has the string ||renderername in it.
         foreach ($connected as $view) {
+            // Views may legitimately have NULL patterns/param2 (e.g. a view with no field tags yet),
+            // so normalise to strings before passing them to strpos()/str_replace() (passing null is
+            // deprecated in PHP 8.1+).
+            $view->patterns = (string) $view->patterns;
+            $view->param2 = (string) $view->param2;
             // TODO: MDL-66151 Is one check enough or are these separate?
             if (
                     strpos($view->patterns, '|' . $rendererinfo->name) !== false ||
