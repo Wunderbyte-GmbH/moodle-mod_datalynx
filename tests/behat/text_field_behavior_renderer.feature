@@ -61,6 +61,13 @@ Feature: Test text field behavior and renderer in datalynx
     # When not editable: Display disabled elements
     And I click on "input[name='noteditableoptions'][value='___3___']" "css_element"
     And I press "Save changes"
+    Then I should see "Text Renderer"
+    And I follow "Duplicate" 
+    And I press "Continue"
+    And I should see "Copy of Text Renderer"
+    And I follow "Delete Copy of Text Renderer"
+    And I press "Continue"
+    Then I should see "deleted"
 
     # Create Grid view "Behavior Renderer View"
     And I add to "Datalynx Test Instance" datalynx the view of "Grid" type with:
