@@ -202,6 +202,10 @@ class renderer extends datalynxfield_renderer {
         } else if (!empty($params['content']) || $mode === 'content') {
             return $file->get_content();
         } else if (!empty($params['download']) || $mode === 'download') {
+            // A "download" field format must behave like the legacy [[field:download]] tag, i.e. link
+            // through download.php to force a download. display_link() keys off $params['download'],
+            // so make sure it is set when the format mode (rather than the legacy param) requested it.
+            $params['download'] = 1;
             return $this->display_link($file, $path, $altname, $params);
         }
 
@@ -287,12 +291,33 @@ class renderer extends datalynxfield_renderer {
 
     /**
      * Array of patterns this field supports
+     *
+     * Field formats (Manage > Fields > Field Formats) are the modern replacement for the legacy
+     * ##field:suffix## tags. When one or more "file" formats are defined for this instance we surface
+     * one tag per format ([[fieldname:formatname]]) in the field-tags menu and stop advertising the
+     * built-in suffix variants, mirroring the entryauthor field. The legacy suffixes keep working at
+     * render time (see datalynxfield_renderer::replacements() and self::display_file()); they are just
+     * no longer listed in the tag menu once custom formats exist.
      */
     protected function patterns(): array {
         $fieldname = $this->field->name();
 
         $patterns = parent::patterns();
+        // The plain field tag always outputs the file(s) with the default rendering.
         $patterns["[[$fieldname]]"] = [true];
+
+        $formats = \mod_datalynx\local\field_format\manager::get_formats_for_instance(
+            $this->field->dlx()->id(),
+            'file'
+        );
+        if ($formats) {
+            foreach ($formats as $format) {
+                $patterns["[[$fieldname:{$format->get_name()}]]"] = [true];
+            }
+            return $patterns;
+        }
+
+        // No custom file formats yet: fall back to the legacy suffix patterns.
         $patterns["[[$fieldname:url]]"] = [false];
         $patterns["[[$fieldname:alt]]"] = [true];
         $patterns["[[$fieldname:size]]"] = [false];
