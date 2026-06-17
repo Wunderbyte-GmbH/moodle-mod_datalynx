@@ -489,7 +489,59 @@ abstract class datalynxfield_renderer {
 
         $patterns = [];
         $patterns["[[$fieldname]]"] = [true];
+        $patterns += $this->format_patterns();
 
+        return $patterns;
+    }
+
+    /**
+     * Patterns generated from the user-created field formats for this field's type.
+     *
+     * Field formats (Manage > Fields > Field Formats) are the single, discoverable way to apply
+     * display modifiers to a field: each format defined for this datalynx instance and this field's
+     * type becomes a [[fieldname:formatname]] tag that is shown in the field-tags menu and recognised
+     * by {@see self::search()} for replacement. Renderers that build their own pattern list (e.g. the
+     * legacy ##field:suffix## internal fields) can call this to opt in. Renderers that still carry
+     * hardcoded legacy suffixes should call parent::patterns() (which already merges these) and then
+     * add their legacy keys as [false] so the suffixes keep rendering in old templates without being
+     * advertised in the menu.
+     *
+     * @return array pattern => array(visible in menu)
+     */
+    protected function format_patterns(): array {
+        $patterns = [];
+        $fieldname = $this->field->name();
+        $formats = \mod_datalynx\local\field_format\manager::get_formats_for_instance(
+            $this->field->dlx()->id(),
+            $this->field->type
+        );
+        foreach ($formats as $format) {
+            $patterns["[[{$fieldname}:{$format->get_name()}]]"] = [true];
+        }
+        return $patterns;
+    }
+
+    /**
+     * Add the field's hardcoded legacy [[fieldname:suffix]] modifiers to a pattern list as hidden
+     * ([false]) entries.
+     *
+     * The suffixes stay recognised by {@see self::search()} so existing templates keep rendering, but
+     * they are no longer advertised in the field-tags menu — field formats are the surfaced mechanism.
+     * A legacy suffix is only added when a user-created format of the same name has not already claimed
+     * the tag (so a format named e.g. "url" keeps its visible [true] entry instead of being hidden).
+     *
+     * @param array $patterns Existing pattern list (typically from parent::patterns()).
+     * @param array $suffixes Legacy suffix names, e.g. ['url', 'size', 'download'].
+     * @return array
+     */
+    protected function add_legacy_suffix_patterns(array $patterns, array $suffixes): array {
+        $fieldname = $this->field->name();
+        foreach ($suffixes as $suffix) {
+            $key = "[[{$fieldname}:{$suffix}]]";
+            if (!isset($patterns[$key])) {
+                $patterns[$key] = [false];
+            }
+        }
         return $patterns;
     }
 

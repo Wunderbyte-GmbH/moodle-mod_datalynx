@@ -403,31 +403,15 @@ class renderer extends datalynxfield_renderer {
      * Array of patterns this field supports
      */
     protected function patterns() {
-        $fieldname = $this->field->name();
-
+        // The parent::patterns() contributes [[fieldname]] plus a visible tag per user-created time format
+        // (e.g. a "date" format with a configured strftime string). The legacy date/time suffixes stay
+        // recognised for old templates but are hidden from the menu.
         $patterns = parent::patterns();
-        $patterns["[[$fieldname]]"] = [true];
-        // Date without time.
-        $patterns["[[$fieldname:date]]"] = [true];
-        // Date with time.
-        $patterns["[[$fieldname:timestamp]]"] = [true];
-        // Minute (M).
-        $patterns["[[$fieldname:minute]]"] = [false];
-        // Hour (H).
-        $patterns["[[$fieldname:hour]]"] = [false];
-        // Day (a).
-        $patterns["[[$fieldname:day]]"] = [false];
-        $patterns["[[$fieldname:d]]"] = [false];
-        // Week (V).
-        $patterns["[[$fieldname:week]]"] = [false];
-        // Month (b).
-        $patterns["[[$fieldname:month]]"] = [false];
-        $patterns["[[$fieldname:m]]"] = [false];
-        // Year (G).
-        $patterns["[[$fieldname:year]]"] = [false];
-        $patterns["[[$fieldname:Y]]"] = [false];
 
-        return $patterns;
+        return $this->add_legacy_suffix_patterns(
+            $patterns,
+            ['date', 'timestamp', 'minute', 'hour', 'day', 'd', 'week', 'month', 'm', 'year', 'Y']
+        );
     }
 
     /**

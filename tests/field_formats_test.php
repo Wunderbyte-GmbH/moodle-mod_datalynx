@@ -213,6 +213,10 @@ final class field_formats_test extends advanced_testcase {
         // The fieldgroup totals format carries options, so it is offered too.
         $this->assertArrayHasKey('fieldgroup', $types);
 
+        // Tag now exposes a "linked" option (replacing the legacy [[tag:nolink]] suffix), so it is
+        // offered as a format type too.
+        $this->assertArrayHasKey('tag', $types);
+
         // Assert empty fields are not present.
         $this->assertArrayNotHasKey('approve', $types);
         $this->assertArrayNotHasKey('comment', $types);
@@ -222,7 +226,6 @@ final class field_formats_test extends advanced_testcase {
         $this->assertArrayNotHasKey('entryteammemberprofilefield', $types);
         $this->assertArrayNotHasKey('identifier', $types);
         $this->assertArrayNotHasKey('status', $types);
-        $this->assertArrayNotHasKey('tag', $types);
     }
 
     /**
@@ -511,30 +514,28 @@ final class field_formats_test extends advanced_testcase {
 
     /**
      * The auto-creation scanner must not create format records for field types whose formats carry
-     * no settings (has_options() === false, e.g. tag); doing so would only shadow the legacy
-     * ##field:suffix## option (such as tag's :nolink) at render time without reproducing it.
+     * no settings (has_options() === false, e.g. entrygroup); doing so would only shadow the legacy
+     * ##field:suffix## option (such as ##group:id##) at render time without reproducing it.
      */
     public function test_auto_create_skips_optionless_field_types(): void {
         global $DB;
         $dlx = $this->create_test_datalynx();
 
-        // A tag field (has_options() === false) and a time field (has_options() === true).
-        $DB->insert_record('datalynx_fields', (object)[
-            'dataid' => $dlx->id(), 'name' => 'mytag', 'type' => 'tag', 'description' => '',
-        ]);
         $DB->insert_record('datalynx_fields', (object)[
             'dataid' => $dlx->id(), 'name' => 'mytime', 'type' => 'time', 'description' => '',
         ]);
 
+        // The ##group:id## resolves to the entrygroup field type (has_options() === false); the time
+        // suffix resolves to an option-bearing type.
         $DB->insert_record('datalynx_views', (object)[
             'dataid' => $dlx->id(), 'name' => 'View', 'type' => 'grid', 'description' => '',
-            'section' => 'Tag: [[mytag:nolink]] Time: ##mytime:datey##',
+            'section' => 'Group: ##group:id## Time: ##mytime:datey##',
         ]);
 
         \mod_datalynx\local\field_format\manager::auto_create_formats_from_templates($dlx->id());
 
-        // The option-less tag format must NOT be created, so the legacy $options['nolink'] path survives.
-        $this->assertNull(\mod_datalynx\local\field_format\manager::get_format_by_name($dlx->id(), 'nolink'));
+        // The option-less entrygroup format must NOT be created, so the legacy $options['id'] path survives.
+        $this->assertNull(\mod_datalynx\local\field_format\manager::get_format_by_name($dlx->id(), 'id'));
         // The option-bearing time format is still created as before.
         $this->assertNotNull(\mod_datalynx\local\field_format\manager::get_format_by_name($dlx->id(), 'datey'));
     }

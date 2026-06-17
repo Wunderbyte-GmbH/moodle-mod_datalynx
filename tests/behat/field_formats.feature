@@ -145,3 +145,41 @@ Feature: Manage and use Datalynx Field Formats
     And I wait until the page is ready
     Then I should see "Unsubscribe"
     And I should see "Student 1"
+
+  Scenario: A number field format applies its decimal places and is usable end to end
+    And I follow the datalynx "Manage" link
+    And I follow "Fields"
+    And I add to the "Datalynx Test Instance" datalynx the following fields:
+      | type   | name   | description |
+      | number | Amount |             |
+
+    # Create a number field format with two decimal places (previously selectable but never applied).
+    And I follow "Field Formats"
+    And I set the field "Add field format" to "Number"
+    And I wait until the page is ready
+    And I set the field "Name" to "twodp"
+    And I set the field "Decimal places" to "2"
+    And I press "Save changes"
+    Then I should see "twodp"
+
+    # Use the format in a grid view entry template.
+    And I follow the datalynx "Views" link
+    And I add to "Datalynx Test Instance" datalynx the view of "Grid" type with:
+      | name        | Gridview   |
+      | description | Behat grid |
+    And I follow "Set as default view"
+    And I follow "Set as edit view"
+    And I click on "Edit Gridview" "link"
+    And I click on "Entry template" "link"
+    And I set the "id_eparam2_editor" editor to "Amount: [[Datalynx field Amount:twodp]]"
+    And I press "Save changes"
+
+    # An entry whose stored value has more precision than the format allows.
+    And the "Datalynx Test Instance" datalynx has the following entries:
+      | user     | Amount  |
+      | teacher1 | 3.14159 |
+
+    And I am on "Course 1" course homepage
+    And I follow "Datalynx Test Instance"
+    Then I should see "Amount: 3.14"
+    And I should not see "3.14159"

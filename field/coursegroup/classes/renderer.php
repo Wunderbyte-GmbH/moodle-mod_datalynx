@@ -265,15 +265,13 @@ class renderer extends datalynxfield_renderer {
      * Array of patterns this field supports
      */
     protected function patterns() {
-        $fieldname = $this->field->name();
-
+        // The parent::patterns() contributes [[fieldname]] plus a visible tag per user-created coursegroup
+        // format. The legacy suffix modifiers stay recognised for old templates but hidden from menu.
         $patterns = parent::patterns();
-        $patterns["[[$fieldname]]"] = [true];
-        $patterns["[[$fieldname:course]]"] = [true];
-        $patterns["[[$fieldname:group]]"] = [true];
-        $patterns["[[$fieldname:courseid]]"] = [false];
-        $patterns["[[$fieldname:groupid]]"] = [false];
 
-        return $patterns;
+        return $this->add_legacy_suffix_patterns(
+            $patterns,
+            ['course', 'group', 'courseid', 'groupid']
+        );
     }
 }

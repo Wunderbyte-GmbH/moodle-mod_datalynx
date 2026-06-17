@@ -30,15 +30,22 @@ class field_format extends \mod_datalynx\local\field_format\base {
      * @param \MoodleQuickForm $mform
      */
     public function config_form(\MoodleQuickForm &$mform) {
-        // Default implementation does not add any extra elements.
+        $mform->addElement('selectyesno', 'linked', get_string('fieldformat_tag_linked', 'datalynxfield_tag'));
+        $mform->setDefault('linked', 1);
+        $mform->setType('linked', PARAM_INT);
     }
 
     /**
-     * Returns whether this field format supports custom configuration options.
+     * Map the legacy [[tag:nolink]] suffix to the linked=0 setting so formats auto-created during
+     * upgrade/restore reproduce the legacy "render tags without links" behaviour.
      *
-     * @return bool
+     * @param string $name
+     * @return array
      */
-    public function has_options(): bool {
-        return false;
+    public function get_default_settings_for_name(string $name): array {
+        if ($name === 'nolink') {
+            return ['linked' => 0];
+        }
+        return [];
     }
 }

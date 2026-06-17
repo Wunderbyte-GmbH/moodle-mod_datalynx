@@ -80,23 +80,29 @@ final class file_field_renderer_test extends advanced_testcase {
     }
 
     /**
-     * With no custom file formats, the legacy suffix patterns are still offered.
+     * Legacy suffix tags stay recognised (so old templates still render) but are hidden from the
+     * field-tags menu — they remain keys in patterns() with a [false] (not-in-menu) flag.
      */
-    public function test_patterns_without_format_keep_legacy_tags(): void {
+    public function test_legacy_suffixes_recognised_but_hidden(): void {
         [$dlx, $fieldid] = $this->create_file_field_instance();
 
         $patterns = $this->renderer_patterns($dlx, $fieldid);
 
+        // Plain tag is always present and visible.
         $this->assertArrayHasKey('[[Attachment]]', $patterns);
+        // Legacy suffixes are still recognised (present as keys)...
         $this->assertArrayHasKey('[[Attachment:alt]]', $patterns);
         $this->assertArrayHasKey('[[Attachment:download]]', $patterns);
+        // ...but hidden from the menu.
+        $this->assertFalse($patterns['[[Attachment:alt]]'][0]);
+        $this->assertFalse($patterns['[[Attachment:download]]'][0]);
     }
 
     /**
-     * Once a "file" field format exists it is surfaced as a tag and the legacy suffix tags are
-     * dropped from the menu (regression: custom file formats never appeared in the Field tags list).
+     * Once a "file" field format exists it is surfaced as a visible tag, while the legacy suffix tags
+     * stay present-but-hidden (regression: custom file formats never appeared in the Field tags list).
      */
-    public function test_patterns_with_format_surface_format_and_drop_legacy(): void {
+    public function test_patterns_with_format_surface_format_and_hide_legacy(): void {
         [$dlx, $fieldid] = $this->create_file_field_instance();
 
         manager::save_format((object) [
@@ -108,14 +114,14 @@ final class file_field_renderer_test extends advanced_testcase {
 
         $patterns = $this->renderer_patterns($dlx, $fieldid);
 
-        // The custom field format is now an available tag.
+        // The custom field format is now an available, visible tag.
         $this->assertArrayHasKey('[[Attachment:downloadlink]]', $patterns);
+        $this->assertTrue($patterns['[[Attachment:downloadlink]]'][0]);
         // The plain field tag is always available.
         $this->assertArrayHasKey('[[Attachment]]', $patterns);
-        // Legacy suffix tags are no longer advertised.
-        $this->assertArrayNotHasKey('[[Attachment:alt]]', $patterns);
-        $this->assertArrayNotHasKey('[[Attachment:download]]', $patterns);
-        $this->assertArrayNotHasKey('[[Attachment:url]]', $patterns);
+        // Legacy suffix tags remain recognised but hidden from the menu.
+        $this->assertArrayHasKey('[[Attachment:alt]]', $patterns);
+        $this->assertFalse($patterns['[[Attachment:alt]]'][0]);
     }
 
     /**

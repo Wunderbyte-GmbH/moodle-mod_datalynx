@@ -99,7 +99,12 @@ class renderer extends datalynxfield_renderer {
             return '';
         }
 
-        if (!empty($options['downloadcount'])) {
+        // Resolve the requested output mode from either a field format ([[file:myformat]]) or the
+        // legacy suffix flag ([[file:downloadcount]]).
+        $format = $options['field_format'] ?? null;
+        $mode = $format ? ($format->get_settings()['mode'] ?? '') : '';
+
+        if (!empty($options['downloadcount']) || $mode === 'downloadcount') {
             return $content2;
         }
 
@@ -290,42 +295,21 @@ class renderer extends datalynxfield_renderer {
     }
 
     /**
-     * Array of patterns this field supports
+     * Array of patterns this field supports.
      *
-     * Field formats (Manage > Fields > Field Formats) are the modern replacement for the legacy
-     * ##field:suffix## tags. When one or more "file" formats are defined for this instance we surface
-     * one tag per format ([[fieldname:formatname]]) in the field-tags menu and stop advertising the
-     * built-in suffix variants, mirroring the entryauthor field. The legacy suffixes keep working at
-     * render time (see datalynxfield_renderer::replacements() and self::display_file()); they are just
-     * no longer listed in the tag menu once custom formats exist.
+     * Field formats (Manage > Fields > Field Formats) are the surfaced way to apply display modifiers:
+     * parent::patterns() contributes [[fieldname]] plus a visible [[fieldname:formatname]] tag for each
+     * file format defined for this instance. The hardcoded legacy [[fieldname:suffix]] modifiers stay
+     * recognised at render time (see datalynxfield_renderer::replacements() and self::display_file())
+     * for backward compatibility but are hidden from the menu via add_legacy_suffix_patterns().
      */
     protected function patterns(): array {
-        $fieldname = $this->field->name();
-
         $patterns = parent::patterns();
-        // The plain field tag always outputs the file(s) with the default rendering.
-        $patterns["[[$fieldname]]"] = [true];
 
-        $formats = \mod_datalynx\local\field_format\manager::get_formats_for_instance(
-            $this->field->dlx()->id(),
-            'file'
+        return $this->add_legacy_suffix_patterns(
+            $patterns,
+            ['url', 'alt', 'size', 'content', 'download', 'downloadcount']
         );
-        if ($formats) {
-            foreach ($formats as $format) {
-                $patterns["[[$fieldname:{$format->get_name()}]]"] = [true];
-            }
-            return $patterns;
-        }
-
-        // No custom file formats yet: fall back to the legacy suffix patterns.
-        $patterns["[[$fieldname:url]]"] = [false];
-        $patterns["[[$fieldname:alt]]"] = [true];
-        $patterns["[[$fieldname:size]]"] = [false];
-        $patterns["[[$fieldname:content]]"] = [false];
-        $patterns["[[$fieldname:download]]"] = [false];
-        $patterns["[[$fieldname:downloadcount]]"] = [false];
-
-        return $patterns;
     }
 
     /**

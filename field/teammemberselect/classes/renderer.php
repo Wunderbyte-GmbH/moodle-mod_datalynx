@@ -282,13 +282,12 @@ class renderer extends datalynxfield_renderer {
      * @return array
      */
     protected function patterns() {
-        $fieldname = $this->field->name();
-
+        // The parent::patterns() contributes [[fieldname]] plus a visible tag per user-created
+        // teammemberselect format (e.g. a "subscribe" format). The legacy :subscribe suffix stays
+        // recognised for old templates but is hidden from the menu.
         $patterns = parent::patterns();
-        $patterns["[[$fieldname]]"] = [true];
-        $patterns["[[$fieldname:subscribe]]"] = [true];
 
-        return $patterns;
+        return $this->add_legacy_suffix_patterns($patterns, ['subscribe']);
     }
 
     /**

@@ -253,16 +253,15 @@ class renderer extends FileRenderer {
      * Array of patterns this field supports
      */
     public function patterns(): array {
-        $fieldname = $this->field->name();
-
+        // The parent::patterns() contributes [[fieldname]] plus a visible tag per user-created picture
+        // format. The legacy display-mode suffixes stay recognised for old templates but are hidden
+        // from the menu.
         $patterns = parent::patterns();
-        $patterns["[[{$fieldname}:linked]]"] = [true];
-        $patterns["[[{$fieldname}:tn]]"] = [false];
-        $patterns["[[{$fieldname}:thumb]]"] = [true];
-        $patterns["[[{$fieldname}:tn-linked]]"] = [false];
-        $patterns["[[{$fieldname}:lightbox]]"] = [true];
 
-        return $patterns;
+        return $this->add_legacy_suffix_patterns(
+            $patterns,
+            ['linked', 'tn', 'thumb', 'tn-linked', 'lightbox']
+        );
     }
 
     /**

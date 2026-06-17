@@ -101,9 +101,11 @@ class renderer extends datalynxfield_renderer {
             $menuoptions = $field->options_menu(false, true);
             $menuoptions[-999] = null; // Allow this option for empty values.
 
-            // If we see the pattern addnew open up option to add menuoptions.
+            // Open up the option to add new menu options when requested via either the legacy
+            // [[field:addnew]] suffix or a multiselect field format whose "addnew" setting is on.
             $fieldattr = [];
-            if (isset($options['addnew'])) {
+            $format = $options['field_format'] ?? null;
+            if (isset($options['addnew']) || ($format && $format->get_setting('addnew'))) {
                 $fieldattr['tags'] = true;
                 $paramtype = PARAM_NOTAGS;
             }
@@ -290,12 +292,11 @@ class renderer extends datalynxfield_renderer {
      * @return array pattern => array(visible in menu, category)
      */
     protected function patterns() {
-        $fieldname = $this->field->name();
-
+        // The parent::patterns() contributes [[fieldname]] plus a visible tag per user-created multiselect
+        // format. The legacy :addnew suffix stays recognised for old templates but is hidden from the
+        // menu (it is also exposed as an "addnew" format option).
         $patterns = parent::patterns();
-        $patterns["[[$fieldname]]"] = [true];
-        $patterns["[[$fieldname:addnew]]"] = [true];
 
-        return $patterns;
+        return $this->add_legacy_suffix_patterns($patterns, ['addnew']);
     }
 }

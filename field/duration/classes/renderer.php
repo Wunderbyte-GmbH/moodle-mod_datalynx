@@ -154,16 +154,14 @@ class renderer extends datalynxfield_renderer {
      * @return array Array of patterns.
      */
     protected function patterns() {
-        $fieldname = $this->field->name();
-
+        // The parent::patterns() contributes [[fieldname]] plus a visible tag per user-created duration
+        // format. The legacy suffix modifiers stay recognised for old templates but hidden from menu.
         $patterns = parent::patterns();
-        $patterns["[[$fieldname]]"] = [true];
-        $patterns["[[$fieldname:unit]]"] = [false];
-        $patterns["[[$fieldname:value]]"] = [false];
-        $patterns["[[$fieldname:seconds]]"] = [false];
-        $patterns["[[$fieldname:interval]]"] = [false];
 
-        return $patterns;
+        return $this->add_legacy_suffix_patterns(
+            $patterns,
+            ['unit', 'value', 'seconds', 'interval']
+        );
     }
 
     /**

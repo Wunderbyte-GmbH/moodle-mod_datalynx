@@ -36,6 +36,8 @@ class field_format extends \mod_datalynx\local\field_format\base {
             'size' => 'File size',
             'content' => 'File content',
             'download' => 'Download link',
+            'alt' => 'Alt text / display name',
+            'downloadcount' => 'Download count',
         ];
         $mform->addElement('select', 'mode', 'Output mode', $modes);
         $mform->setType('mode', PARAM_ALPHA);
@@ -49,7 +51,7 @@ class field_format extends \mod_datalynx\local\field_format\base {
      * @return array
      */
     public function get_default_settings_for_name(string $name): array {
-        if (in_array($name, ['url', 'size', 'content', 'download'], true)) {
+        if (in_array($name, ['url', 'size', 'content', 'download', 'alt', 'downloadcount'], true)) {
             return ['mode' => $name];
         }
         return [];

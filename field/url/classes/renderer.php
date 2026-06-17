@@ -162,16 +162,14 @@ class renderer extends datalynxfield_renderer {
      * Array of patterns this field supports
      */
     protected function patterns() {
-        $fieldname = $this->field->name();
-
+        // The parent::patterns() contributes [[fieldname]] plus a visible tag per user-created url format.
+        // The legacy suffix modifiers stay recognised for old templates but are hidden from the menu.
         $patterns = parent::patterns();
-        $patterns["[[$fieldname]]"] = [true];
-        $patterns["[[$fieldname:link]]"] = [true];
-        $patterns["[[$fieldname:image]]"] = [false];
-        $patterns["[[$fieldname:imageflex]]"] = [false];
-        $patterns["[[$fieldname:media]]"] = [false];
 
-        return $patterns;
+        return $this->add_legacy_suffix_patterns(
+            $patterns,
+            ['link', 'image', 'imageflex', 'media']
+        );
     }
 
     /**

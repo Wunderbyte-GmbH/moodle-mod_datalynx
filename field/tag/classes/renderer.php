@@ -94,7 +94,12 @@ class renderer extends datalynxfield_renderer {
             return implode("#", $exportstring);
         }
         $str = $OUTPUT->tag_list($items, null, 'datalynx-tags');
-        if (isset($options['nolink'])) {
+        // Render tags without links when requested via either the legacy [[tag:nolink]] suffix or a
+        // tag field format whose "linked" setting is off.
+        $format = $options['field_format'] ?? null;
+        $nolink = isset($options['nolink'])
+            || ($format && (string) $format->get_setting('linked', 1) === '0');
+        if ($nolink) {
             $str = preg_replace("/<b>.+<\/b>/i", '', $str);
             $str = preg_replace("/<a[^>]*(href=\"[^\"]+?\")([^>]*?)(\/?)>([^<]+)(<\/a>)/i", '<span$2>$4</span>', $str);
         }
@@ -106,12 +111,12 @@ class renderer extends datalynxfield_renderer {
      * Array of patterns this field supports
      */
     protected function patterns() {
-        $fieldname = $this->field->name();
+        // The parent::patterns() contributes [[fieldname]] plus a visible tag per user-created tag format.
+        // The legacy :nolink suffix stays recognised for old templates but is hidden from the menu
+        // (it is also exposed via the "linked" format option).
         $patterns = parent::patterns();
-        $patterns["[[$fieldname]]"] = [true];
-        // Tag without link.
-        $patterns["[[$fieldname:nolink]]"] = [true];
-        return $patterns;
+
+        return $this->add_legacy_suffix_patterns($patterns, ['nolink']);
     }
 
     /**

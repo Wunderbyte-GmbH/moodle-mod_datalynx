@@ -22,6 +22,7 @@
  * @copyright based on the work  by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+$string['fieldformat_multiselect_addnew'] = 'Allow adding new options in the entry form';
 $string['fieldformat_separator'] = 'Value separator';
 $string['fieldformat_separator_comma'] = 'Comma';
 $string['fieldformat_separator_commaspace'] = 'Comma (with space)';
