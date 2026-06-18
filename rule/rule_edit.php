@@ -83,10 +83,9 @@ if ($mform->is_cancelled()) {
 
             if ($data->submitbutton != get_string('savecontinue', 'datalynx')) {
                 redirect(new moodle_url('/mod/datalynx/rule/index.php', ['d' => $dlx->id()]));
+            } else {
+                redirect(new moodle_url('/mod/datalynx/rule/rule_edit.php', ['d' => $dlx->id(), 'rid' => $rule->get_id()]));
             }
-
-            // Continue to edit so refresh the form.
-            $mform = $rule->get_form();
         }
     }
 }
@@ -107,7 +106,9 @@ $formheading = $rule->get_id() ? get_string('ruleedit', 'datalynx', $rule->get_n
 echo html_writer::tag('h2', format_string($formheading), ['class' => 'mdl-align']);
 
 // Display form.
-$mform->set_data($rule->to_form());
+if (!$mform->is_submitted()) {
+    $mform->set_data($rule->to_form());
+}
 $mform->display();
 
 $dlx->print_footer();

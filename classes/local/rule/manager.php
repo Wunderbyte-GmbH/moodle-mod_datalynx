@@ -531,13 +531,24 @@ class manager {
                 continue;
             }
 
+            $editattributes = [
+                'data-action' => 'datalynx-editrule',
+                'data-d' => $dlx->id(),
+                'data-cmid' => $dlx->cm->id,
+                'data-rid' => $ruleid,
+                'data-type' => $rule->type,
+                'data-formclass' => "\\datalynxrule_{$rule->type}\\form\\rule_form",
+            ];
+
             $rulename = html_writer::link(
                 new moodle_url($editbaseurl, $linkparams + ['rid' => $ruleid]),
-                $rule->get_name()
+                $rule->get_name(),
+                $editattributes
             );
             $ruleedit = html_writer::link(
                 new moodle_url($editbaseurl, $linkparams + ['rid' => $ruleid]),
-                $OUTPUT->pix_icon('t/edit', $stredit)
+                $OUTPUT->pix_icon('t/edit', $stredit),
+                $editattributes
             );
             $ruleduplicate = html_writer::link(
                 new moodle_url($actionbaseurl, $linkparams + ['duplicate' => $ruleid]),
@@ -592,7 +603,7 @@ class manager {
 
         $popupurl = new moodle_url(
             '/mod/datalynx/rule/rule_edit.php',
-            ['d' => $this->dlx->id(), 'sesskey' => sesskey()]
+            ['d' => $this->dlx->id(), 'cmid' => $this->dlx->cm->id, 'sesskey' => sesskey()]
         );
         $ruleselect = new single_select($popupurl, 'type', $rulemenu, null, ['' => 'choosedots'], 'ruleform');
         $ruleselect->set_label(get_string('ruleadd', 'datalynx') . '&nbsp;');

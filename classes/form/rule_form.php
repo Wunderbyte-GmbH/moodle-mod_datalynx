@@ -18,7 +18,7 @@ namespace mod_datalynx\form;
 
 use coding_exception;
 use mod_datalynx\local\rule\manager;
-use moodleform;
+use core_form\dynamic_form;
 use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
@@ -32,7 +32,7 @@ require_once($CFG->libdir . '/formslib.php');
  * @copyright  2025 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class rule_form extends moodleform {
+class rule_form extends dynamic_form {
     /**
      * @var object
      */
@@ -44,30 +44,134 @@ class rule_form extends moodleform {
     protected $dlx = null;
 
     /**
-     * rule_form constructor.
+     * Lazily get datalynx instance.
      *
-     * @param mixed $rule
-     * @param mixed $action
-     * @param mixed $customdata
-     * @param string $method
-     * @param string $target
-     * @param mixed $attributes
-     * @param bool $editable
+     * @return \mod_datalynx\datalynx
      */
-    public function __construct(
-        $rule,
-        $action = null,
-        $customdata = null,
-        $method = 'post',
-        $target = '',
-        $attributes = null,
-        $editable = true
-    ) {
-        $this->rule = $rule;
-        $this->dlx = $this->rule->dlx;
-
-        parent::__construct($action, $customdata, $method, $target, $attributes, $editable);
+    protected function get_dlx(): \mod_datalynx\datalynx {
+        if ($this->dlx === null) {
+            if (isset($this->_customdata['rule'])) {
+                $this->dlx = $this->_customdata['rule']->dlx;
+            } else {
+                $d = 0;
+                $cmid = 0;
+                if (is_array($this->_ajaxformdata)) {
+                    $d = isset($this->_ajaxformdata['d']) ? (int)$this->_ajaxformdata['d'] : 0;
+                    $cmid = isset($this->_ajaxformdata['cmid']) ? (int)$this->_ajaxformdata['cmid'] : 0;
+                }
+                if (!$d) {
+                    $d = optional_param('d', 0, PARAM_INT);
+                }
+                if (!$cmid) {
+                    $cmid = optional_param('cmid', 0, PARAM_INT);
+                }
+                $this->dlx = new \mod_datalynx\datalynx($d, $cmid);
+            }
+        }
+        return $this->dlx;
     }
+
+    /**
+     * Lazily get rule instance.
+     *
+     * @return \mod_datalynx\local\rule\base
+     */
+    protected function get_rule() {
+        if ($this->rule === null) {
+            if (isset($this->_customdata['rule'])) {
+                $this->rule = $this->_customdata['rule'];
+            } else {
+                $rid = 0;
+                $type = '';
+                if (is_array($this->_ajaxformdata)) {
+                    $rid = isset($this->_ajaxformdata['rid']) ? (int)$this->_ajaxformdata['rid'] : 0;
+                    $type = isset($this->_ajaxformdata['type']) ? clean_param($this->_ajaxformdata['type'], PARAM_ALPHA) : '';
+                }
+                if (!$rid) {
+                    $rid = optional_param('rid', 0, PARAM_INT);
+                }
+                if (!$type) {
+                    $type = optional_param('type', '', PARAM_ALPHA);
+                }
+
+                $rm = $this->get_dlx()->get_rule_manager();
+                if ($rid) {
+                    $this->rule = $rm->get_rule_from_id($rid, true);
+                } else if ($type) {
+                    $this->rule = $rm->get_rule($type);
+                }
+            }
+        }
+        return $this->rule;
+    }
+
+    /**
+     * Context for the dynamic submission.
+     *
+     * @return \context
+     */
+    protected function get_context_for_dynamic_submission(): \context {
+        return $this->get_dlx()->context;
+    }
+
+    /**
+     * Check permissions for dynamic submission.
+     */
+    protected function check_access_for_dynamic_submission(): void {
+        require_capability('mod/datalynx:managetemplates', $this->get_context_for_dynamic_submission());
+    }
+
+    /**
+     * Set data for dynamic submission.
+     */
+    public function set_data_for_dynamic_submission(): void {
+        $rule = $this->get_rule();
+        $data = $rule->to_form();
+        $data->d = $this->get_dlx()->id();
+        $data->cmid = $this->get_dlx()->cm->id;
+        $data->rid = $rule->get_id();
+        $data->type = $rule->type;
+        $this->set_data($data);
+    }
+
+    /**
+     * Process dynamic submission (save/update the rule).
+     *
+     * @return array
+     */
+    public function process_dynamic_submission(): array {
+        $data = $this->get_data();
+        $rule = $this->get_rule();
+        $dlx = $this->get_dlx();
+        if (!$rule->get_id()) {
+            $ruleid = $rule->insert_rule($data);
+            $other = ['dataid' => $dlx->id()];
+            $event = \mod_datalynx\event\rule_created::create(
+                ['context' => $dlx->context, 'objectid' => $ruleid, 'other' => $other]
+            );
+            $event->trigger();
+        } else {
+            $data->id = $rule->get_id();
+            $rule->update_rule($data);
+            $ruleid = $rule->get_id();
+            $other = ['dataid' => $dlx->id()];
+            $event = \mod_datalynx\event\rule_updated::create(
+                ['context' => $dlx->context, 'objectid' => $ruleid, 'other' => $other]
+            );
+            $event->trigger();
+        }
+        return ['rid' => $ruleid, 'name' => $data->name];
+    }
+
+    /**
+     * Page URL for dynamic submission.
+     *
+     * @return \moodle_url
+     */
+    protected function get_page_url_for_dynamic_submission(): \moodle_url {
+        return new \moodle_url('/mod/datalynx/rule/index.php', ['d' => $this->get_dlx()->id()]);
+    }
+
 
     /**
      * Form definition
@@ -76,7 +180,19 @@ class rule_form extends moodleform {
      */
     public function definition() {
         global $CFG;
+        $this->rule = $this->get_rule();
+        $this->dlx = $this->get_dlx();
         $mform = &$this->_form;
+
+        // Hidden parameters.
+        $mform->addElement('hidden', 'd', $this->dlx->id());
+        $mform->setType('d', PARAM_INT);
+        $mform->addElement('hidden', 'cmid', $this->dlx->cm->id);
+        $mform->setType('cmid', PARAM_INT);
+        $mform->addElement('hidden', 'rid', $this->rule->get_id());
+        $mform->setType('rid', PARAM_INT);
+        $mform->addElement('hidden', 'type', $this->rule->type);
+        $mform->setType('type', PARAM_ALPHA);
 
         // Buttons.
         $this->add_action_buttons();
@@ -132,7 +248,7 @@ class rule_form extends moodleform {
             );
             $mform->registerNoSubmitButton('reloadconditions');
 
-            $submitted = $mform->getSubmitValue('param5');
+            $submitted = $this->optional_param('param5', null, PARAM_INT);
             if ($submitted !== null && $submitted !== '') {
                 $fieldid = (int)$submitted;
             } else {

@@ -291,7 +291,7 @@ abstract class base {
             '/mod/datalynx/rule/rule_edit.php',
             ['d' => $this->dlx->id(), 'rid' => $this->get_id(), 'type' => $this->type]
         );
-        return new $formclass($this, $actionurl);
+        return new $formclass($actionurl, ['rule' => $this]);
     }
 
     /**

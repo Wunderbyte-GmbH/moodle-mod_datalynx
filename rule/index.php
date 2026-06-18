@@ -57,6 +57,9 @@ require_capability('mod/datalynx:managetemplates', $dlx->context);
 
 $dlx->set_page('rule/index', ['modjs' => true, 'urlparams' => $urlparams]);
 
+// Add rules AMD forms JS.
+$PAGE->requires->js_call_amd('mod_datalynx/ruleform', 'init', []);
+
 // Activate navigation node.
 navigation_node::override_active_url(
     new moodle_url('/mod/datalynx/rule/index.php', ['id' => $dlx->cm->id])
