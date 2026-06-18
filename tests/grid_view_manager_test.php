@@ -122,6 +122,64 @@ final class grid_view_manager_test extends advanced_testcase {
     }
 
     /**
+     * A custom (non-empty) entry template must be honoured when rendering browse entries, and a
+     * subsequent edit of that template must be reflected in the rendered output.
+     *
+     * Regression test: previously a "tag only" entry template (one that contains nothing but field
+     * and action tags) was discarded in favour of a generic field loop that rendered *all* fields
+     * regardless of the template, so editing such a template appeared to have no effect.
+     *
+     * @covers ::get_browse_payload
+     * @covers ::requires_rendered_entry_html
+     */
+    public function test_custom_entry_template_is_honoured_and_reflects_edits(): void {
+        global $DB, $USER;
+
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        [$dlx, $view, , $entryid] = $this->create_grid_fixture();
+
+        // Add a second field (with content) so we can prove the template controls which fields render.
+        $second = (object) [
+            'dataid' => $dlx->id(),
+            'type' => 'text',
+            'name' => 'Subtitle',
+            'description' => '',
+            'param1' => '', 'param2' => '', 'param3' => '', 'param4' => '', 'param5' => '',
+            'param6' => '', 'param7' => '', 'param8' => '', 'param9' => '', 'param10' => '',
+        ];
+        $second->id = (int) $DB->insert_record('datalynx_fields', $second);
+        $DB->insert_record('datalynx_contents', (object) [
+            'fieldid' => $second->id,
+            'entryid' => $entryid,
+            'lineid' => 0,
+            'content' => 'Second value',
+        ]);
+
+        $manager = new grid_view_manager();
+
+        // A "tag only" entry template that references only the first field. Such a template contains
+        // nothing but a field tag, which is exactly the case that used to be discarded.
+        $DB->set_field('datalynx_views', 'param2', '[[Title]]', ['id' => $view->id]);
+        $payload = $manager->get_browse_payload($dlx->id(), $view->id);
+        $entryhtml = $payload['groups'][0]['entries'][0]['entryhtml'];
+
+        $this->assertNotSame('', $entryhtml, 'A non-empty entry template must be rendered as entryhtml.');
+        $this->assertStringContainsString('Hello Grid', $entryhtml);
+        // The Subtitle field is not part of the template, so its content must not appear.
+        $this->assertStringNotContainsString('Second value', $entryhtml);
+
+        // Edit the template to reference the other field; the rendered output must follow the edit.
+        $DB->set_field('datalynx_views', 'param2', '[[Subtitle]]', ['id' => $view->id]);
+        $payload = $manager->get_browse_payload($dlx->id(), $view->id);
+        $entryhtml = $payload['groups'][0]['entries'][0]['entryhtml'];
+
+        $this->assertStringContainsString('Second value', $entryhtml, 'Editing the entry template must be reflected on render.');
+        $this->assertStringNotContainsString('Hello Grid', $entryhtml, 'The stale template must not survive the edit.');
+    }
+
+    /**
      * Test wrapper settings payload output.
      *
      * @covers ::get_browse_payload

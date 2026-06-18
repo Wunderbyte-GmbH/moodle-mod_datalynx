@@ -207,25 +207,18 @@ class grid_view_manager {
     /**
      * Determine whether the configured entry template needs full rendered HTML.
      *
+     * Any non-empty entry template is rendered through the template itself so that the template
+     * fully controls the entry output (which field tags appear, in which order, and any surrounding
+     * markup or action tags). Only a genuinely empty template falls back to the generic structured
+     * field loop. Previously a "tag only" template (one stripped to whitespace once field and action
+     * tags were removed) was discarded in favour of that generic loop, which rendered every field
+     * regardless of the template, so edits to such a template had no visible effect.
+     *
      * @param \mod_datalynx\local\view\base $view
      * @return bool
      */
     protected function requires_rendered_entry_html(\mod_datalynx\local\view\base $view): bool {
-        $template = trim((string) ($view->view->eparam2 ?? ''));
-        if ($template === '') {
-            return false;
-        }
-
-        $simpletags = ['##edit##', '##delete##'];
-        foreach ($view->get__patterns('field') as $patterns) {
-            $simpletags = array_merge($simpletags, $patterns);
-        }
-
-        foreach (array_unique($simpletags) as $tag) {
-            $template = str_replace($tag, '', $template);
-        }
-
-        return trim($template) !== '';
+        return trim((string) ($view->view->eparam2 ?? '')) !== '';
     }
 
     /**
