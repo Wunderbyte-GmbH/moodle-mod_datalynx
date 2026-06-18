@@ -1,0 +1,18 @@
+{{!
+    @template mod_datalynx/report_view_user
+
+    Renders one user cell for the Report view table.
+
+    Context variables required for this template:
+    * fullname string The user's full name.
+    * email string The user's email address.
+    * hasemail bool Whether an email should be shown.
+
+    Example context (json):
+    {
+        "fullname": "Student 1",
+        "email": "s1@example.com",
+        "hasemail": true
+    }
+}}
+{{fullname}}{{#hasemail}}<br><small>{{email}}</small>{{/hasemail}}

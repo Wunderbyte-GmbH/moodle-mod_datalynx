@@ -1,7 +1,7 @@
 {{!
     @template mod_datalynx/report_view_browser
 
-    Structured Report browse rendering.
+    Structured Report browse rendering: date-scope controls, native charts and aggregation tables.
 
     Example context (json):
     {
@@ -14,21 +14,40 @@
         "monthlabel": "Month",
         "totallabel": "Total",
         "notyetansweredlabel": "Not yet answered",
-        "optioncolumns": [
+        "aggregationsumlabel": "Sum",
+        "hascharts": true,
+        "charts": [
             {
-                "label": "Option A"
+                "uniqid": "dlreport2optiondist",
+                "title": "Option distribution",
+                "chartdata": "null",
+                "withtable": true
             }
         ],
+        "scope": {
+            "fieldlabel": "Date field",
+            "modelabel": "Period",
+            "yearlabel": "Year",
+            "monthlabel": "Month",
+            "fromlabel": "From",
+            "tolabel": "To",
+            "field": "timecreated",
+            "mode": "all",
+            "showyear": false,
+            "showmonth": false,
+            "showrange": false,
+            "fields": [{"value": "timecreated", "label": "Created", "selected": true}],
+            "modes": [{"value": "all", "label": "All", "selected": true}],
+            "years": [{"value": "2026", "label": "2026", "selected": false}],
+            "months": [{"value": "1", "label": "January", "selected": false}]
+        },
+        "optioncolumns": [{"label": "Option A"}],
         "rows": [
             {
-                "userhtml": "<span>Student 1</span>",
+                "user": {"fullname": "Student 1", "email": "s1@example.com", "hasemail": true},
                 "month": "2026-05",
                 "totalentries": 2,
-                "optioncells": [
-                    {
-                        "count": 1
-                    }
-                ],
+                "optioncells": [{"count": 1}],
                 "notyetanswered": 1
             }
         ],
@@ -39,7 +58,62 @@
      data-datalynxid="{{datalynxid}}"
      data-viewid="{{viewid}}"
      data-viewtype="{{viewtype}}">
+    {{#scope}}
+        <form class="mod-datalynx-report-view-browser__controls form-inline mb-3 gap-2" data-region="report-controls"
+              onsubmit="return false;">
+            <div class="form-group mr-2">
+                <label class="mr-1" for="dlreport-scope-field-{{viewid}}">{{fieldlabel}}</label>
+                <select class="custom-select" id="dlreport-scope-field-{{viewid}}" data-report-control="field">
+                    {{#fields}}
+                        <option value="{{value}}" {{#selected}}selected{{/selected}}>{{label}}</option>
+                    {{/fields}}
+                </select>
+            </div>
+            <div class="form-group mr-2">
+                <label class="mr-1" for="dlreport-scope-mode-{{viewid}}">{{modelabel}}</label>
+                <select class="custom-select" id="dlreport-scope-mode-{{viewid}}" data-report-control="mode">
+                    {{#modes}}
+                        <option value="{{value}}" {{#selected}}selected{{/selected}}>{{label}}</option>
+                    {{/modes}}
+                </select>
+            </div>
+            <div class="form-group mr-2 {{^showyear}}d-none{{/showyear}}" data-region="scope-year">
+                <label class="mr-1" for="dlreport-scope-year-{{viewid}}">{{yearlabel}}</label>
+                <select class="custom-select" id="dlreport-scope-year-{{viewid}}" data-report-control="year">
+                    {{#years}}
+                        <option value="{{value}}" {{#selected}}selected{{/selected}}>{{label}}</option>
+                    {{/years}}
+                </select>
+            </div>
+            <div class="form-group mr-2 {{^showmonth}}d-none{{/showmonth}}" data-region="scope-month">
+                <label class="mr-1" for="dlreport-scope-month-{{viewid}}">{{monthlabel}}</label>
+                <select class="custom-select" id="dlreport-scope-month-{{viewid}}" data-report-control="month">
+                    {{#months}}
+                        <option value="{{value}}" {{#selected}}selected{{/selected}}>{{label}}</option>
+                    {{/months}}
+                </select>
+            </div>
+            <div class="form-group mr-2 {{^showrange}}d-none{{/showrange}}" data-region="scope-range">
+                <label class="mr-1" for="dlreport-scope-from-{{viewid}}">{{fromlabel}}</label>
+                <input type="date" class="form-control mr-2" id="dlreport-scope-from-{{viewid}}"
+                       data-report-control="fromdate" value="{{fromdate}}">
+                <label class="mr-1" for="dlreport-scope-to-{{viewid}}">{{tolabel}}</label>
+                <input type="date" class="form-control" id="dlreport-scope-to-{{viewid}}"
+                       data-report-control="todate" value="{{todate}}">
+            </div>
+        </form>
+    {{/scope}}
     {{#hasdata}}
+        {{#hascharts}}
+            <div class="mod-datalynx-report-view-browser__charts row mb-4">
+                {{#charts}}
+                    <div class="col-12 col-lg-6 mb-3">
+                        <h4 class="h5">{{title}}</h4>
+                        {{> core/chart}}
+                    </div>
+                {{/charts}}
+            </div>
+        {{/hascharts}}
         {{#ismonthly}}
             {{#monthlysections}}
                 <section class="mod-datalynx-report-view-browser__section mb-4">
@@ -59,7 +133,7 @@
                             <tbody>
                                 {{#rows}}
                                     <tr>
-                                        <td>{{{userhtml}}}</td>
+                                        <td>{{#user}}{{> mod_datalynx/report_view_user}}{{/user}}</td>
                                         <td>{{totalentries}}</td>
                                         {{#optioncells}}
                                             <td>{{count}}</td>
@@ -129,7 +203,7 @@
                     <tbody>
                         {{#rows}}
                             <tr>
-                                <td>{{{userhtml}}}</td>
+                                <td>{{#user}}{{> mod_datalynx/report_view_user}}{{/user}}</td>
                                 <td>{{month}}</td>
                                 <td>{{totalentries}}</td>
                                 {{#optioncells}}

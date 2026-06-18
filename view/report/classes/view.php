@@ -25,9 +25,6 @@
 
 namespace datalynxview_report;
 
-use html_table;
-use html_table_cell;
-use html_table_row;
 use html_writer;
 use mod_datalynx\local\datalynx_entries;
 use mod_datalynx\local\view\base;
@@ -56,6 +53,9 @@ class view extends base {
 
     /** @var ?string Cached rendered report browser HTML. */
     protected ?string $reporthtml = null;
+
+    /** @var ?array Active temporal scope: field, mode, year, month, fromdate, todate, from, to. */
+    protected ?array $reportscope = null;
 
     /**
      * Constructor for datalynxview_report.
@@ -143,6 +143,11 @@ class view extends base {
                 'mod_datalynx_get_report_view_data',
                 'mod_datalynx/report_view_browser'
             );
+            $this->initialise_report_controls(
+                'report-view-browser',
+                'mod_datalynx_get_report_view_data',
+                'mod_datalynx/report_view_browser'
+            );
         }
 
         if ($tohtml) {
@@ -165,6 +170,30 @@ class view extends base {
     }
 
     /**
+     * Register the AMD bootstrap for the date-scope controls.
+     *
+     * The controls re-fetch and re-render the browser region when changed.
+     *
+     * @param string $region
+     * @param string $methodname
+     * @param string $template
+     * @return void
+     */
+    protected function initialise_report_controls(string $region, string $methodname, string $template): void {
+        global $PAGE;
+
+        $PAGE->requires->js_call_amd('mod_datalynx/report_controls', 'init', [
+            $this->get_view_browser_selector($region),
+            [
+                'methodname' => $methodname,
+                'template' => $template,
+                'args' => $this->get_view_browser_arguments(),
+                'errormessage' => get_string('ajaxviewloaderror', 'datalynx'),
+            ],
+        ]);
+    }
+
+    /**
      * Build the structured report payload.
      *
      * @return array
@@ -179,7 +208,7 @@ class view extends base {
         $payload = [
             'datalynxid' => $this->dlx->id(),
             'viewid' => (int) $this->id(),
-            'viewname' => format_string($this->name()),
+            'viewname' => $this->name(),
             'viewtype' => $this->type(),
             'ismonthly' => $this->view->param2 === 'month',
             'hasdata' => false,
@@ -200,6 +229,9 @@ class view extends base {
                 'optioncells' => [],
                 'notyetanswered' => 0,
             ],
+            'hascharts' => false,
+            'charts' => [],
+            'scope' => $this->get_report_scope_payload(),
             'emptycontent' => $this->display_no_entries(),
         ];
 
@@ -267,6 +299,17 @@ class view extends base {
             $payload['hasdata'] = $payload['hasrows'];
         }
 
+        if ($payload['hasdata']) {
+            $payload['charts'] = $this->build_report_charts(
+                $optionlabels,
+                $entryrecords,
+                $userentryids,
+                $users,
+                $optioncountsbyentry
+            );
+            $payload['hascharts'] = !empty($payload['charts']);
+        }
+
         $this->reportpayload = $payload;
         return $this->reportpayload;
     }
@@ -283,10 +326,10 @@ class view extends base {
             return $this->reporthtml;
         }
 
-        $renderable = new report_view_browser_renderable($this->get_report_payload());
+        $exporter = new report_view_browser_renderable($this->get_report_payload(), $this->dlx->context);
         $this->reporthtml = $OUTPUT->render_from_template(
             'mod_datalynx/report_view_browser',
-            $renderable->export_for_template($OUTPUT)
+            $exporter->export($OUTPUT)
         );
 
         return $this->reporthtml;
@@ -319,7 +362,7 @@ class view extends base {
             $monthlysummary = $this->build_user_monthly_summary($entryids, $entryrecords, $optionlabels, $optioncountsbyentry);
             foreach ($monthlysummary as $month => $summary) {
                 $rows[] = [
-                    'userhtml' => $this->format_report_user($users[$userid]),
+                    'user' => $this->export_report_user($users[$userid]),
                     'month' => $month,
                     'totalentries' => $summary['totalentries'],
                     'optioncells' => $this->normalise_option_counts($summary['matchingcontents'], $optionlabels),
@@ -371,7 +414,7 @@ class view extends base {
 
                 $notyetanswered = $this->calculate_notyetanswered($summary['totalentries'], $summary['matchingcontents']);
                 $sectionsbymonth[$month]['rows'][] = [
-                    'userhtml' => $this->format_report_user($users[$userid]),
+                    'user' => $this->export_report_user($users[$userid]),
                     'totalentries' => $summary['totalentries'],
                     'optioncells' => $this->normalise_option_counts($summary['matchingcontents'], $optionlabels),
                     'notyetanswered' => $notyetanswered,
@@ -501,17 +544,17 @@ class view extends base {
     }
 
     /**
-     * Format one user cell for the report table.
+     * Build the structured user column for the report table.
      *
      * @param stdClass $user
-     * @return string
+     * @return array
      */
-    protected function format_report_user(stdClass $user): string {
-        $name = fullname($user);
-        if (!empty($user->email)) {
-            return $name . '<br><small>' . s($user->email) . '</small>';
-        }
-        return $name;
+    protected function export_report_user(stdClass $user): array {
+        return [
+            'fullname' => fullname($user),
+            'email' => !empty($user->email) ? $user->email : '',
+            'hasemail' => !empty($user->email),
+        ];
     }
 
     /**
@@ -528,12 +571,25 @@ class view extends base {
         }
 
         [$insql, $params] = $DB->get_in_or_equal($entryids, SQL_PARAMS_NAMED);
+        $where = "id $insql";
+
+        $scope = $this->get_report_scope();
+        // The scope field is whitelisted in set_report_scope(), never interpolated from raw input.
+        if (!empty($scope['from'])) {
+            $where .= " AND {$scope['field']} >= :tfrom";
+            $params['tfrom'] = (int) $scope['from'];
+        }
+        if (!empty($scope['to'])) {
+            $where .= " AND {$scope['field']} <= :tto";
+            $params['tto'] = (int) $scope['to'];
+        }
+
         return $DB->get_records_select(
             'datalynx_entries',
-            "id $insql",
+            $where,
             $params,
             'timecreated ASC, id ASC',
-            'id,userid,timecreated'
+            'id,userid,timecreated,timemodified'
         );
     }
 
@@ -635,6 +691,324 @@ class view extends base {
         }
 
         return array_map('intval', array_keys($exportentries));
+    }
+
+    /**
+     * Build the native charts (pie + bar) for the report from the aggregated data.
+     *
+     * @param array $optionlabels Option id => label for the counted field.
+     * @param stdClass[] $entryrecords Entry records keyed by entry id.
+     * @param array $userentryids User/group id => entry ids.
+     * @param stdClass[] $users User records keyed by id.
+     * @param array $optioncountsbyentry Entry id => [label => count].
+     * @return array One descriptor per chart: uniqid, title, chartdata, withtable.
+     */
+    protected function build_report_charts(
+        array $optionlabels,
+        array $entryrecords,
+        array $userentryids,
+        array $users,
+        array $optioncountsbyentry
+    ): array {
+        $charts = [];
+        $labels = array_values(array_map('format_string', $optionlabels));
+
+        // Option distribution (pie): total hits per option across all entries.
+        $optiontotals = array_fill_keys(array_values($optionlabels), 0);
+        foreach ($optioncountsbyentry as $counts) {
+            foreach ($counts as $label => $count) {
+                $optiontotals[$label] = ($optiontotals[$label] ?? 0) + $count;
+            }
+        }
+        if (array_sum($optiontotals) > 0) {
+            $pie = new \core\chart_pie();
+            $pie->set_labels($labels);
+            $pie->add_series(new \core\chart_series(
+                get_string('optiondistribution', 'datalynxview_report'),
+                array_values($optiontotals)
+            ));
+            $charts[] = $this->wrap_chart('optiondist', get_string('optiondistribution', 'datalynxview_report'), $pie);
+        }
+
+        // Entries over time (bar): entry counts per month.
+        $bymonth = [];
+        foreach ($entryrecords as $entry) {
+            $month = userdate((int) $entry->timecreated, '%Y-%m');
+            $bymonth[$month] = ($bymonth[$month] ?? 0) + 1;
+        }
+        if (!empty($bymonth)) {
+            ksort($bymonth);
+            $timebar = new \core\chart_bar();
+            $timebar->set_labels(array_keys($bymonth));
+            $timebar->add_series(new \core\chart_series(
+                get_string('entriesovertime', 'datalynxview_report'),
+                array_values($bymonth)
+            ));
+            $charts[] = $this->wrap_chart('overtime', get_string('entriesovertime', 'datalynxview_report'), $timebar);
+        }
+
+        // Per-user / per-group totals (bar): entry count per user or grouping value.
+        $usertotals = [];
+        foreach ($userentryids as $userid => $entryids) {
+            if (empty($users[$userid])) {
+                continue;
+            }
+            $count = 0;
+            foreach ($entryids as $entryid) {
+                if (!empty($entryrecords[$entryid])) {
+                    $count++;
+                }
+            }
+            if ($count > 0) {
+                $usertotals[fullname($users[$userid])] = $count;
+            }
+        }
+        if (!empty($usertotals)) {
+            arsort($usertotals);
+            $userbar = new \core\chart_bar();
+            $userbar->set_labels(array_keys($usertotals));
+            $userbar->add_series(new \core\chart_series(
+                get_string('usertotals', 'datalynxview_report'),
+                array_values($usertotals)
+            ));
+            $charts[] = $this->wrap_chart('usertotals', get_string('usertotals', 'datalynxview_report'), $userbar);
+        }
+
+        return $charts;
+    }
+
+    /**
+     * Wrap a chart instance into a template descriptor with a deterministic id.
+     *
+     * @param string $key Stable chart key (combined with the view id).
+     * @param string $title Chart heading.
+     * @param \core\chart_base $chart The chart instance.
+     * @return array
+     */
+    protected function wrap_chart(string $key, string $title, \core\chart_base $chart): array {
+        return [
+            'uniqid' => 'dlreport' . (int) $this->id() . $key,
+            'title' => $title,
+            'chartdata' => json_encode($chart),
+            'withtable' => true,
+        ];
+    }
+
+    /**
+     * Set the active temporal scope from a raw selection and compute its bounds.
+     *
+     * @param array $scope Keys: field, mode, year, month, fromdate, todate.
+     * @return void
+     */
+    public function set_report_scope(array $scope): void {
+        $field = (($scope['field'] ?? '') === 'timemodified') ? 'timemodified' : 'timecreated';
+        $mode = $scope['mode'] ?? 'all';
+        if (!in_array($mode, ['all', 'year', 'month', 'range'], true)) {
+            $mode = 'all';
+        }
+        $year = (int) ($scope['year'] ?? 0);
+        $month = (int) ($scope['month'] ?? 0);
+        $fromdate = (string) ($scope['fromdate'] ?? '');
+        $todate = (string) ($scope['todate'] ?? '');
+
+        [$from, $to] = $this->compute_scope_bounds($mode, $year, $month, $fromdate, $todate);
+
+        $this->reportscope = [
+            'field' => $field,
+            'mode' => $mode,
+            'year' => $year,
+            'month' => $month,
+            'fromdate' => $fromdate,
+            'todate' => $todate,
+            'from' => $from,
+            'to' => $to,
+        ];
+        // Invalidate cached payload/markup so the new scope takes effect.
+        $this->reportpayload = null;
+        $this->reporthtml = null;
+    }
+
+    /**
+     * Get the active temporal scope, defaulting to an unbounded created-time scope.
+     *
+     * @return array
+     */
+    protected function get_report_scope(): array {
+        return $this->reportscope ?? [
+            'field' => 'timecreated',
+            'mode' => 'all',
+            'year' => 0,
+            'month' => 0,
+            'fromdate' => '',
+            'todate' => '',
+            'from' => 0,
+            'to' => 0,
+        ];
+    }
+
+    /**
+     * Compute the [from, to] timestamp bounds for a scope selection.
+     *
+     * @param string $mode all|year|month|range
+     * @param int $year
+     * @param int $month
+     * @param string $fromdate YYYY-MM-DD
+     * @param string $todate YYYY-MM-DD
+     * @return array{0:int,1:int} From and to timestamps (0 means unbounded).
+     */
+    protected function compute_scope_bounds(string $mode, int $year, int $month, string $fromdate, string $todate): array {
+        switch ($mode) {
+            case 'year':
+                if ($year <= 0) {
+                    return [0, 0];
+                }
+                return [
+                    make_timestamp($year, 1, 1, 0, 0, 0),
+                    make_timestamp($year, 12, 31, 23, 59, 59),
+                ];
+            case 'month':
+                if ($year <= 0 || $month < 1 || $month > 12) {
+                    return [0, 0];
+                }
+                $lastday = (int) date('t', make_timestamp($year, $month, 1, 12, 0, 0));
+                return [
+                    make_timestamp($year, $month, 1, 0, 0, 0),
+                    make_timestamp($year, $month, $lastday, 23, 59, 59),
+                ];
+            case 'range':
+                $from = $this->parse_scope_date($fromdate, false);
+                $to = $this->parse_scope_date($todate, true);
+                return [$from, $to];
+            default:
+                return [0, 0];
+        }
+    }
+
+    /**
+     * Parse a YYYY-MM-DD scope date into a day-start or day-end timestamp.
+     *
+     * @param string $date
+     * @param bool $endofday Whether to return the end-of-day second.
+     * @return int Timestamp, or 0 when the date is empty/invalid.
+     */
+    protected function parse_scope_date(string $date, bool $endofday): int {
+        if (!preg_match('/^(\d{4})-(\d{1,2})-(\d{1,2})$/', trim($date), $m)) {
+            return 0;
+        }
+        $year = (int) $m[1];
+        $month = (int) $m[2];
+        $day = (int) $m[3];
+        if ($month < 1 || $month > 12 || $day < 1 || $day > 31) {
+            return 0;
+        }
+        return $endofday
+            ? make_timestamp($year, $month, $day, 23, 59, 59)
+            : make_timestamp($year, $month, $day, 0, 0, 0);
+    }
+
+    /**
+     * Build the date-scoping control payload (labels, current selection, options).
+     *
+     * @return array
+     */
+    protected function get_report_scope_payload(): array {
+        $scope = $this->get_report_scope();
+
+        $createdlabel = get_string('timecreated', 'datalynxview_report');
+        $modifiedlabel = get_string('timemodified', 'datalynxview_report');
+        $fields = [
+            $this->scope_option('timecreated', $createdlabel, $scope['field'] === 'timecreated'),
+            $this->scope_option('timemodified', $modifiedlabel, $scope['field'] === 'timemodified'),
+        ];
+
+        $modes = [];
+        foreach (['all', 'year', 'month', 'range'] as $modekey) {
+            $modes[] = $this->scope_option(
+                $modekey,
+                get_string('scopemode_' . $modekey, 'datalynxview_report'),
+                $scope['mode'] === $modekey
+            );
+        }
+
+        $years = [];
+        foreach ($this->get_report_available_years($scope['field']) as $year) {
+            $years[] = $this->scope_option((string) $year, (string) $year, $scope['year'] === $year);
+        }
+
+        $months = [];
+        for ($m = 1; $m <= 12; $m++) {
+            $label = userdate(make_timestamp(2000, $m, 1, 12, 0, 0), '%B');
+            $months[] = $this->scope_option((string) $m, $label, $scope['month'] === $m);
+        }
+
+        return [
+            'fieldlabel' => get_string('scopefield', 'datalynxview_report'),
+            'modelabel' => get_string('scopemode', 'datalynxview_report'),
+            'yearlabel' => get_string('year'),
+            'monthlabel' => get_string('month'),
+            'fromlabel' => get_string('scopefrom', 'datalynxview_report'),
+            'tolabel' => get_string('scopeto', 'datalynxview_report'),
+            'field' => $scope['field'],
+            'mode' => $scope['mode'],
+            'from' => $scope['from'],
+            'to' => $scope['to'],
+            'fromdate' => $scope['fromdate'],
+            'todate' => $scope['todate'],
+            'showyear' => in_array($scope['mode'], ['year', 'month'], true),
+            'showmonth' => $scope['mode'] === 'month',
+            'showrange' => $scope['mode'] === 'range',
+            'fields' => $fields,
+            'modes' => $modes,
+            'years' => $years,
+            'months' => $months,
+        ];
+    }
+
+    /**
+     * Build one select-option descriptor for the scope controls.
+     *
+     * @param string $value
+     * @param string $label
+     * @param bool $selected
+     * @return array
+     */
+    protected function scope_option(string $value, string $label, bool $selected): array {
+        return ['value' => $value, 'label' => $label, 'selected' => $selected];
+    }
+
+    /**
+     * Get the list of years covered by the filtered entries for the given time field.
+     *
+     * @param string $field timecreated|timemodified
+     * @return int[] Years in descending order.
+     */
+    protected function get_report_available_years(string $field): array {
+        global $DB;
+
+        $field = $field === 'timemodified' ? 'timemodified' : 'timecreated';
+        $entryids = $this->get_report_entryids();
+        if (empty($entryids)) {
+            return [(int) userdate(time(), '%Y')];
+        }
+
+        [$insql, $params] = $DB->get_in_or_equal($entryids, SQL_PARAMS_NAMED);
+        $bounds = $DB->get_record_select(
+            'datalynx_entries',
+            "id $insql AND $field > 0",
+            $params,
+            "MIN($field) AS mintime, MAX($field) AS maxtime"
+        );
+
+        $currentyear = (int) userdate(time(), '%Y');
+        if (empty($bounds) || empty($bounds->maxtime)) {
+            return [$currentyear];
+        }
+
+        $minyear = (int) userdate((int) $bounds->mintime, '%Y');
+        $maxyear = max($currentyear, (int) userdate((int) $bounds->maxtime, '%Y'));
+
+        $years = range($maxyear, $minyear);
+        return array_map('intval', $years);
     }
 
     /**

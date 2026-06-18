@@ -48,10 +48,16 @@ class report_view_manager {
             throw new coding_exception('Report browse payload manager only supports Report views.');
         }
 
+        $timescope = $filteroptions['timescope'] ?? null;
+        unset($filteroptions['timescope']);
+
         /** @var \datalynxview_report\view $view */
         $view = $dlx->get_view($viewrecord->type, $viewrecord, false);
         if (!empty($filteroptions)) {
             $view->set_filter($filteroptions, $view->is_forcing_filter());
+        }
+        if (!empty($timescope)) {
+            $view->set_report_scope($timescope);
         }
 
         return $view->get_report_payload();

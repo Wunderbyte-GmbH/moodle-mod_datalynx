@@ -141,10 +141,54 @@ final class get_report_view_data_test extends advanced_testcase {
         $this->assertSame('report', $result['viewtype']);
         $this->assertTrue($result['hasdata']);
         $this->assertCount(2, $result['rows']);
-        $this->assertStringContainsString(fullname($student1), $result['rows'][0]['userhtml']);
-        $this->assertStringContainsString(fullname($student2), $result['rows'][1]['userhtml']);
+        $this->assertSame(fullname($student1), $result['rows'][0]['user']['fullname']);
+        $this->assertSame(fullname($student2), $result['rows'][1]['user']['fullname']);
         $this->assertSame('2026-04', $result['rows'][0]['month']);
         $this->assertSame(1, $result['rows'][0]['optioncells'][0]['count']);
         $this->assertSame(1, $result['rows'][1]['optioncells'][1]['count']);
+
+        // New blocks: charts and date scope are part of the cleaned structure.
+        $this->assertTrue($result['hascharts']);
+        $this->assertNotEmpty($result['charts']);
+        $this->assertArrayHasKey('chartdata', $result['charts'][0]);
+        $this->assertSame('timecreated', $result['scope']['field']);
+        $this->assertSame('all', $result['scope']['mode']);
+    }
+
+    /**
+     * A year scope passed through the web service should bound the result set.
+     *
+     * @covers ::execute
+     */
+    public function test_execute_applies_time_scope(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        [$dlx, $view] = $this->create_report_fixture();
+
+        // Scope to a year with no entries: the payload should report no data.
+        $result = get_report_view_data::execute(
+            $dlx->id(),
+            $view->id,
+            0,
+            0,
+            0,
+            '',
+            '',
+            '',
+            '',
+            0,
+            '',
+            '',
+            '',
+            'timecreated',
+            'year',
+            2025
+        );
+        $result = external_api::clean_returnvalue(get_report_view_data::execute_returns(), $result);
+
+        $this->assertFalse($result['hasdata']);
+        $this->assertSame([], $result['rows']);
+        $this->assertSame('year', $result['scope']['mode']);
     }
 }

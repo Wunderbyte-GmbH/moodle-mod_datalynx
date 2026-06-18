@@ -24,5 +24,5 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'datalynxview_report';
-$plugin->version = 2024083100;
+$plugin->version = 2026061800;
 $plugin->requires = 2022112800;

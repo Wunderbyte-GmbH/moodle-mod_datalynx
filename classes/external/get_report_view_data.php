@@ -19,7 +19,6 @@ namespace mod_datalynx\external;
 use context_module;
 use external_api;
 use external_function_parameters;
-use external_multiple_structure;
 use external_single_structure;
 use external_value;
 use mod_datalynx\local\view\manager\report_view_manager;
@@ -57,6 +56,12 @@ class get_report_view_data extends external_api {
             'customsort' => new external_value(PARAM_RAW, 'Optional serialized custom sort options', VALUE_DEFAULT, ''),
             'customsearch' => new external_value(PARAM_RAW, 'Optional serialized custom search options', VALUE_DEFAULT, ''),
             'search' => new external_value(PARAM_RAW, 'Optional search string', VALUE_DEFAULT, ''),
+            'timescopefield' => new external_value(PARAM_ALPHA, 'Time field (timecreated|timemodified)', VALUE_DEFAULT, ''),
+            'timescopemode' => new external_value(PARAM_ALPHA, 'Date scope mode (all|year|month|range)', VALUE_DEFAULT, 'all'),
+            'timescopeyear' => new external_value(PARAM_INT, 'Selected year for year/month scope', VALUE_DEFAULT, 0),
+            'timescopemonth' => new external_value(PARAM_INT, 'Selected month (1-12) for month scope', VALUE_DEFAULT, 0),
+            'timescopefrom' => new external_value(PARAM_RAW, 'Range start date (YYYY-MM-DD)', VALUE_DEFAULT, ''),
+            'timescopeto' => new external_value(PARAM_RAW, 'Range end date (YYYY-MM-DD)', VALUE_DEFAULT, ''),
         ]);
     }
 
@@ -76,6 +81,12 @@ class get_report_view_data extends external_api {
      * @param string $customsort
      * @param string $customsearch
      * @param string $search
+     * @param string $timescopefield
+     * @param string $timescopemode
+     * @param int $timescopeyear
+     * @param int $timescopemonth
+     * @param string $timescopefrom
+     * @param string $timescopeto
      * @return array
      */
     public static function execute(
@@ -91,7 +102,13 @@ class get_report_view_data extends external_api {
         int $selection = 0,
         string $customsort = '',
         string $customsearch = '',
-        string $search = ''
+        string $search = '',
+        string $timescopefield = '',
+        string $timescopemode = 'all',
+        int $timescopeyear = 0,
+        int $timescopemonth = 0,
+        string $timescopefrom = '',
+        string $timescopeto = ''
     ): array {
         global $OUTPUT;
 
@@ -109,6 +126,12 @@ class get_report_view_data extends external_api {
             'customsort' => $customsort,
             'customsearch' => $customsearch,
             'search' => $search,
+            'timescopefield' => $timescopefield,
+            'timescopemode' => $timescopemode,
+            'timescopeyear' => $timescopeyear,
+            'timescopemonth' => $timescopemonth,
+            'timescopefrom' => $timescopefrom,
+            'timescopeto' => $timescopeto,
         ]);
 
         $cm = get_coursemodule_from_instance('datalynx', $params['d'], 0, false, MUST_EXIST);
@@ -148,75 +171,31 @@ class get_report_view_data extends external_api {
         if ($params['search'] !== '') {
             $filteroptions['search'] = $params['search'];
         }
+        $filteroptions['timescope'] = [
+            'field' => $params['timescopefield'],
+            'mode' => $params['timescopemode'],
+            'year' => $params['timescopeyear'],
+            'month' => $params['timescopemonth'],
+            'fromdate' => $params['timescopefrom'],
+            'todate' => $params['timescopeto'],
+        ];
 
         $manager = new report_view_manager();
         $payload = $manager->get_browse_payload($params['d'], $params['view'], $filteroptions);
-        $renderable = new report_view_browser($payload);
+        $exporter = new report_view_browser($payload, $context);
 
-        return $renderable->export_for_template($OUTPUT);
+        return (array) $exporter->export($OUTPUT);
     }
 
     /**
      * Define return structure.
      *
+     * The structure is derived from the exporter so the template context and the
+     * web service contract share a single definition.
+     *
      * @return external_single_structure
      */
     public static function execute_returns(): external_single_structure {
-        $optioncell = new external_single_structure([
-            'count' => new external_value(PARAM_INT, 'Count for one option'),
-        ]);
-        $datarow = new external_single_structure([
-            'userhtml' => new external_value(PARAM_RAW, 'Rendered user column HTML'),
-            'month' => new external_value(PARAM_RAW, 'Month key', VALUE_DEFAULT, ''),
-            'totalentries' => new external_value(PARAM_INT, 'Total entries for the row'),
-            'optioncells' => new external_multiple_structure($optioncell),
-            'notyetanswered' => new external_value(PARAM_INT, 'Entries without one of the counted options'),
-        ]);
-
-        return new external_single_structure([
-            'datalynxid' => new external_value(PARAM_INT, 'Datalynx instance ID'),
-            'viewid' => new external_value(PARAM_INT, 'View ID'),
-            'viewname' => new external_value(PARAM_TEXT, 'View name'),
-            'viewtype' => new external_value(PARAM_ALPHA, 'View type'),
-            'ismonthly' => new external_value(PARAM_BOOL, 'Whether the report is grouped into month sections'),
-            'hasdata' => new external_value(PARAM_BOOL, 'Whether the report has data'),
-            'hasrows' => new external_value(PARAM_BOOL, 'Whether the flat rows section has data'),
-            'hasmonthlysections' => new external_value(PARAM_BOOL, 'Whether the monthly sections have data'),
-            'hasoverall' => new external_value(PARAM_BOOL, 'Whether the overall summary has data'),
-            'userlabel' => new external_value(PARAM_TEXT, 'User column heading'),
-            'monthlabel' => new external_value(PARAM_TEXT, 'Month column heading'),
-            'totallabel' => new external_value(PARAM_TEXT, 'Total column heading'),
-            'notyetansweredlabel' => new external_value(PARAM_TEXT, 'Not yet answered heading'),
-            'aggregationsumlabel' => new external_value(PARAM_TEXT, 'Overall aggregation heading'),
-            'optioncolumns' => new external_multiple_structure(
-                new external_single_structure([
-                    'label' => new external_value(PARAM_TEXT, 'Option column label'),
-                ])
-            ),
-            'rows' => new external_multiple_structure($datarow),
-            'monthlysections' => new external_multiple_structure(
-                new external_single_structure([
-                    'heading' => new external_value(PARAM_TEXT, 'Section heading'),
-                    'rows' => new external_multiple_structure(
-                        new external_single_structure([
-                            'userhtml' => new external_value(PARAM_RAW, 'Rendered user column HTML'),
-                            'totalentries' => new external_value(PARAM_INT, 'Total entries for the row'),
-                            'optioncells' => new external_multiple_structure($optioncell),
-                            'notyetanswered' => new external_value(PARAM_INT, 'Entries without one of the counted options'),
-                        ])
-                    ),
-                    'totalentries' => new external_value(PARAM_INT, 'Total entries for the section'),
-                    'optioncells' => new external_multiple_structure($optioncell),
-                    'notyetanswered' => new external_value(PARAM_INT, 'Section not yet answered total'),
-                ])
-            ),
-            'overall' => new external_single_structure([
-                'heading' => new external_value(PARAM_TEXT, 'Overall summary heading'),
-                'totalentries' => new external_value(PARAM_INT, 'Overall total entries'),
-                'optioncells' => new external_multiple_structure($optioncell),
-                'notyetanswered' => new external_value(PARAM_INT, 'Overall not yet answered total'),
-            ]),
-            'emptycontent' => new external_value(PARAM_RAW, 'Fallback content when no report data is available'),
-        ]);
+        return report_view_browser::get_read_structure();
     }
 }
