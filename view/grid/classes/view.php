@@ -65,7 +65,7 @@ class view extends base {
         $this->view->esection = $this->get_default_esection_html(
             'grid',
             '##addnewentry##',
-            'mod-datalynx-grid-entries row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4'
+            'mod-datalynx-grid-entries'
         );
 
         // Set content fields in responsive grid.
@@ -96,6 +96,20 @@ class view extends base {
      * @return string
      */
     public function display(array $options = []): string {
+        // Strip Bootstrap row utilities stored in legacy esection HTML.
+        // Row-cols-* on the outer wrapper constrained the inner grid container
+        // to 50 % width, breaking the column layout for existing stored views.
+        if (!empty($this->view->esection)) {
+            $this->view->esection = preg_replace_callback(
+                '/(class=")(mod-datalynx-grid-entries[^"]*)(")/',
+                static function (array $m): string {
+                    $cls = preg_replace('/\s+(?:row(?:-cols-(?:\d+|[a-z]+-\d+))?|g-\d+)\b/', '', $m[2]);
+                    return $m[1] . trim($cls) . $m[3];
+                },
+                $this->view->esection
+            );
+        }
+
         $tohtml = $options['tohtml'] ?? false;
         $inlinefieldview = !empty($options['fieldview']);
         $browsemode = !$inlinefieldview && !$this->returntoentriesform && !$this->user_is_editing() &&
