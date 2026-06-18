@@ -121,28 +121,64 @@ class rule_form extends moodleform {
             false
         );
 
-        // If we have selected entry updated, add a new UI when the instance includes a checkbox.
-        $checkboxes = $this->dlx->get_fields_by_type('checkbox', true);
-        $radiobuttons = $this->dlx->get_fields_by_type('radiobutton', true);
-        $choices = $radiobuttons + $checkboxes;
-        if (!empty($choices)) {
-            $choices = ['0' => get_string('noselection', 'datalynx')] + $choices;
+        $choices = ['0' => get_string('noselection', 'datalynx')] + $this->dlx->get_fields(['entry'], true);
+        if (count($choices) > 1) {
             $mform->addElement(
                 'select',
                 'param5',
                 get_string('triggerspecificevent', 'datalynxrule_eventnotification'),
-                $choices
+                $choices,
+                ['onchange' => 'window.skipClientValidation = true; this.form.elements["reloadconditions"].click();']
             );
-            $attributes = ['size' => '5'];
-            $mform->addElement(
-                'text',
-                'param10',
-                get_string('condition', 'datalynxrule_eventnotification'),
-                $attributes
-            );
-            $mform->setType('param10', PARAM_TEXT);
-            $mform->addHelpButton('param10', 'condition', 'datalynxrule_eventnotification');
-            $mform->disabledIf('param10', 'param5', 'eq', 0);
+            $mform->registerNoSubmitButton('reloadconditions');
+
+            $submitted = $mform->getSubmitValue('param5');
+            if ($submitted !== null && $submitted !== '') {
+                $fieldid = (int)$submitted;
+            } else {
+                $fieldid = !empty($this->rule->rule->param5) ? (int)$this->rule->rule->param5 : 0;
+            }
+
+            if ($fieldid) {
+                $field = $this->dlx->get_field_from_id($fieldid);
+                if ($field) {
+                    $value = !empty($this->rule->rule->param10) ? $this->rule->rule->param10 : '';
+                    if ($value !== '') {
+                        $decoded = json_decode($value, true);
+                        if ($decoded === null) {
+                            if ($field instanceof \mod_datalynx\local\field\datalynxfield_option_multiple) {
+                                $value = json_encode(explode(',', $value));
+                            }
+                        }
+                    }
+
+                    // Set up a hidden searchoperator0 so validation / disabledIf doesn't disable fields.
+                    $operators = $field->get_supported_search_operators();
+                    $defaultoperator = '';
+                    foreach (array_keys($operators) as $op) {
+                        if ($op !== '') {
+                            $defaultoperator = $op;
+                            break;
+                        }
+                    }
+                    $mform->addElement('hidden', 'searchoperator0', $defaultoperator);
+                    $mform->setType('searchoperator0', PARAM_RAW);
+
+                    [$elems, $separators] = $field->renderer()->render_search_mode($mform, 0, $value);
+                    $label = get_string('condition', 'datalynxrule_eventnotification');
+                    $sep = $separators ? array_merge([' ', ' ', ' '], $separators) : ' ';
+                    $mform->addGroup($elems, 'conditiongrp', $label, $sep, false);
+                }
+            } else {
+                $mform->addElement(
+                    'text',
+                    'param10',
+                    get_string('condition', 'datalynxrule_eventnotification'),
+                    ['disabled' => 'disabled']
+                );
+                $mform->setType('param10', PARAM_TEXT);
+            }
+            $mform->addElement('submit', 'reloadconditions', get_string('reload'), ['class' => 'd-none']);
         }
         $this->rule_definition();
         // Buttons.
@@ -159,6 +195,24 @@ class rule_form extends moodleform {
             $selectedevents = json_decode($data->param1, true) ?? [];
             foreach ($selectedevents as $eventname) {
                 $data->$eventname = true;
+            }
+        }
+        if (!empty($data->param5)) {
+            $fieldid = (int)$data->param5;
+            $field = $this->dlx->get_field_from_id($fieldid);
+            if ($field) {
+                $value = !empty($data->param10) ? $data->param10 : '';
+                if ($value !== '') {
+                    $decoded = json_decode($value, true);
+                    if (is_array($decoded)) {
+                        $value = $decoded;
+                    } else {
+                        if ($field instanceof \mod_datalynx\local\field\datalynxfield_option_multiple) {
+                            $value = explode(',', $value);
+                        }
+                    }
+                }
+                $data->{"f_0_{$fieldid}"} = $value;
             }
         }
         parent::set_data($data);
@@ -181,6 +235,25 @@ class rule_form extends moodleform {
                 }
             }
             $data->param1 = json_encode($selectedevents);
+
+            if (!empty($data->param5)) {
+                $fieldid = (int)$data->param5;
+                $field = $this->dlx->get_field_from_id($fieldid);
+                if ($field) {
+                    $val = $field->parse_search($data, 0);
+                    if ($val === false) {
+                        $data->param10 = '';
+                    } else if (is_array($val)) {
+                        $data->param10 = json_encode($val);
+                    } else {
+                        $data->param10 = (string)$val;
+                    }
+                } else {
+                    $data->param10 = '';
+                }
+            } else {
+                $data->param10 = '';
+            }
         }
         return $data;
     }

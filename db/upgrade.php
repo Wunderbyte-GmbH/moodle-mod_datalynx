@@ -1348,6 +1348,31 @@ function xmldb_datalynx_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2026061103, 'datalynx');
     }
 
+    if ($oldversion < 2026061900) {
+        // Migrate datalynx_rules eventnotification param10 condition values to JSON if they are multiple option fields.
+        $sql = "SELECT r.id, r.param5, r.param10
+                  FROM {datalynx_rules} r
+                 WHERE r.type = 'eventnotification'
+                   AND r.param5 IS NOT NULL
+                   AND r.param5 <> '0'
+                   AND r.param10 IS NOT NULL
+                   AND r.param10 <> ''";
+        if ($rules = $DB->get_records_sql($sql)) {
+            foreach ($rules as $rule) {
+                $field = $DB->get_record('datalynx_fields', ['id' => (int)$rule->param5], 'id, type');
+                if ($field && in_array($field->type, ['checkbox', 'multiselect', 'tag'])) {
+                    $value = $rule->param10;
+                    if (json_decode($value) === null) {
+                        $newvalue = json_encode(explode(',', $value));
+                        $DB->set_field('datalynx_rules', 'param10', $newvalue, ['id' => $rule->id]);
+                    }
+                }
+            }
+        }
+
+        upgrade_mod_savepoint(true, 2026061900, 'datalynx');
+    }
+
     return true;
 }
 

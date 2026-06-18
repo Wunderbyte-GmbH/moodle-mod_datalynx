@@ -146,7 +146,7 @@ class rule extends base {
             }
         }
 
-        // Check if we only trigger on specific checkbox.
+        // Check if we only trigger on a specific field condition.
         if ($this->rule->param5) {
             // If so, test for conditions and stop sending if not met.
             $entryid = $event->get_data()['objectid'];
@@ -156,15 +156,22 @@ class rule extends base {
             if (!$content) {
                 return false;
             }
-            // For now only checkbox and radiobutton are supported.
+
             $field = $this->dlx()->get_field_from_id($fieldid);
-            if ($field->type === 'radiobutton') {
+            if ($field instanceof \mod_datalynx\local\field\datalynxfield_option_multiple) {
+                $compare = explode('#,#', trim($content->content, '#'));
+                $value = $this->rule->param10;
+                $decoded = json_decode($value, true);
+                if (is_array($decoded)) {
+                    $condition = $decoded;
+                } else {
+                    $condition = explode(',', $value);
+                }
+                sort($compare);
+                sort($condition);
+            } else {
                 $compare = $content->content;
                 $condition = $this->rule->param10;
-            }
-            if ($field->type === 'checkbox') {
-                $compare = explode('#,#', trim($content->content, '#'));
-                $condition = explode(',', $this->rule->param10);
             }
             if (isset($compare) && isset($condition) && ($compare !== $condition)) {
                 return false;

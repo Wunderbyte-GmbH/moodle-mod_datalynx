@@ -409,5 +409,28 @@ class restore_datalynx_activity_task extends restore_activity_task {
             ]);
             \core\task\manager::queue_adhoc_task($task);
         }
+
+        // Migrate restored rule conditions to JSON if needed.
+        global $DB;
+        $sql = "SELECT r.id, r.param5, r.param10
+                  FROM {datalynx_rules} r
+                 WHERE r.dataid = :dataid
+                   AND r.type = 'eventnotification'
+                   AND r.param5 IS NOT NULL
+                   AND r.param5 <> '0'
+                   AND r.param10 IS NOT NULL
+                   AND r.param10 <> ''";
+        if ($rules = $DB->get_records_sql($sql, ['dataid' => $this->get_activityid()])) {
+            foreach ($rules as $rule) {
+                $field = $DB->get_record('datalynx_fields', ['id' => (int)$rule->param5], 'id, type');
+                if ($field && in_array($field->type, ['checkbox', 'multiselect', 'tag'])) {
+                    $value = $rule->param10;
+                    if (json_decode($value) === null) {
+                        $newvalue = json_encode(explode(',', $value));
+                        $DB->set_field('datalynx_rules', 'param10', $newvalue, ['id' => $rule->id]);
+                    }
+                }
+            }
+        }
     }
 }

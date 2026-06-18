@@ -280,6 +280,7 @@ trait filter_form_elements {
      */
     public function customfilter_search_definition($fields, $fieldoptions) {
         $mform = &$this->_form;
+        $mform->customfilter = true;
 
         // Drop fields that cannot be searched (e.g. the submit/cancel button fields).
         $fieldoptions = $this->keep_searchable_fieldoptions($fieldoptions);
