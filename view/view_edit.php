@@ -73,6 +73,24 @@ $options['types'] = $DB->get_records_select_menu(
     'name ASC',
     'name, type'
 );
+$options['formats'] = [];
+foreach ($fields as $field) {
+    $fieldtype = $options['types'][$field] ?? '';
+    // Empty value means "no format".
+    $formats = ['' => get_string('defaultformat', 'datalynx')];
+    if ($fieldtype !== '') {
+        foreach (
+            \mod_datalynx\local\field_format\manager::get_formats_for_instance(
+                $urlparams->d,
+                $fieldtype
+            ) as $format
+        ) {
+            $name = $format->get_name();
+            $formats[$name] = $name;
+        }
+    }
+    $options['formats'][$field] = $formats;
+}
 $options['datalynxid'] = $urlparams->d;
 $options['views'] = [];
 $options['referenceeditors'] = ['id_esection_editor', 'id_eparam2_editor'];

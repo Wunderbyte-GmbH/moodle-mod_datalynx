@@ -603,10 +603,11 @@ class PatternDialogue {
         const isFieldTag = button.classList.contains('datalynx-field-tag');
         const isViewTag = button.classList.contains('datalynx-view-tag');
 
-        const [behaviorLabel, layoutLabel, deleteLabel, viewLabel, linkTextLabel, urlQueryLabel, urlQueryHelp,
-            classLabel, currentViewLabel] = await Promise.all([
+        const [behaviorLabel, layoutLabel, formatLabel, deleteLabel, viewLabel, linkTextLabel, urlQueryLabel,
+            urlQueryHelp, classLabel, currentViewLabel] = await Promise.all([
             Str.get_string('behavior', 'datalynx'),
             Str.get_string('layout', 'datalynx'),
+            Str.get_string('fieldformat', 'datalynx'),
             Str.get_string('deletetag', 'datalynx'),
             Str.get_string('view', 'datalynx'),
             Str.get_string('viewpatternlinktext', 'datalynx'),
@@ -624,6 +625,7 @@ class PatternDialogue {
             // [[kost:summe]] yields field === "kost:summe". Strip the :format suffix for option lookups
             // while keeping the full token for the saved pattern and label.
             const baseField = field.split(':')[0];
+            const currentFormat = field.includes(':') ? field.split(':')[1] : '';
             const fieldType = (this.options.types || {})[baseField] || '';
             const tagtype = 'Field';
             const tagname = field;
@@ -641,20 +643,31 @@ class PatternDialogue {
                     (val === currentLayout ? ' selected="selected"' : '') + '>' +
                     label + '</option>'
                 ).join('');
+            const formatsHtml = Object.entries((this.options.formats || {})[baseField] || {})
+                .map(([val, label]) =>
+                    '<option value="' + val + '"' +
+                    (val === currentFormat ? ' selected="selected"' : '') + '>' +
+                    label + '</option>'
+                ).join('');
 
             const fieldInfo = field + (fieldType ? ' <small class="text-muted">(' + fieldType + ')</small>' : '');
             const bodyHtml =
                 '<p><strong data-region="datalynx-tag-field">' + fieldInfo + '</strong></p>' +
                 '<div class="form-group">' +
-                '<label for="dlx-behavior-select">' + behaviorLabel + '</label>' +
+                '<label class="d-block mb-1" for="dlx-behavior-select">' + behaviorLabel + '</label>' +
                 '<select class="form-control custom-select" id="dlx-behavior-select" name="dlx-behavior-select"' +
                 ' data-region="tag-behavior-select">' +
                 behaviorsHtml + '</select></div>' +
                 '<div class="form-group">' +
-                '<label for="dlx-layout-select">' + layoutLabel + '</label>' +
+                '<label class="d-block mb-1" for="dlx-layout-select">' + layoutLabel + '</label>' +
                 '<select class="form-control custom-select" id="dlx-layout-select" name="dlx-layout-select"' +
                 ' data-region="tag-layout-select">' +
                 layoutsHtml + '</select></div>' +
+                '<div class="form-group">' +
+                '<label class="d-block mb-1" for="dlx-format-select">' + formatLabel + '</label>' +
+                '<select class="form-control custom-select" id="dlx-format-select" name="dlx-format-select"' +
+                ' data-region="tag-format-select">' +
+                formatsHtml + '</select></div>' +
                 '<div class="mt-2">' +
                 '<button type="button" class="btn btn-danger btn-sm" data-action="dlx-delete" data-region="delete-tag">' +
                 deleteLabel + '</button></div>';
@@ -672,15 +685,18 @@ class PatternDialogue {
                 const modalBody = modal.getBody()[0];
                 const newBehavior = modalBody.querySelector('#dlx-behavior-select')?.value || '';
                 const newLayout = modalBody.querySelector('#dlx-layout-select')?.value || '';
-                const newPattern = buildFieldTagPattern(field, newBehavior, newLayout);
+                const newFormat = modalBody.querySelector('#dlx-format-select')?.value || '';
+                // The format is encoded as a ":suffix" on the field name (e.g. "kost:summe").
+                const newField = baseField + (newFormat ? ':' + newFormat : '');
+                const newPattern = buildFieldTagPattern(newField, newBehavior, newLayout);
 
                 if (owningEditor) {
                     owningEditor.dom.setAttrib(button, 'data-datalynx-field', newPattern);
-                    button.innerHTML = this.buildButtonLabel(field, newBehavior, newLayout);
+                    button.innerHTML = this.buildButtonLabel(newField, newBehavior, newLayout);
                     owningEditor.undoManager.add();
                 } else {
                     button.setAttribute('data-datalynx-field', newPattern);
-                    button.innerHTML = this.buildButtonLabel(field, newBehavior, newLayout);
+                    button.innerHTML = this.buildButtonLabel(newField, newBehavior, newLayout);
                 }
                 modal.hide();
             });
