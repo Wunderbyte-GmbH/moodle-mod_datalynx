@@ -176,8 +176,8 @@ class renderer extends datalynxfield_renderer {
             $mform->setDefault($fieldname, $decoded);
         }
 
-        $customfilter = !empty($mform->customfilter);
-        if (!$customfilter) {
+        $showprofilecompare = !empty($mform->showprofilecompare);
+        if ($showprofilecompare) {
             $mform->disabledIf($fieldname, "searchoperator{$i}", 'neq', 'ANY_OF');
 
             // Profile field selector, used by the MY_PROFILE operator.
