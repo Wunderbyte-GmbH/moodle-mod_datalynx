@@ -353,21 +353,33 @@ class behat_mod_datalynx extends behat_base {
             $fieldmap[$normalizefieldname($field->name())] = $field;
         }
 
+        // Columns handled directly on the entry record rather than as field content.
+        $entrycolumns = ['user', 'timecreated', 'timemodified', 'approved', 'status'];
+
         foreach ($entriesdata->getHash() as $entrydata) {
             $user = $DB->get_record('user', ['username' => $entrydata['user']], '*', MUST_EXIST);
             $timestamp = \core\di::get(\core\clock::class)->time();
+            // Allow hardcoded timestamps/flags so date-range and status tests are deterministic.
+            $timecreated = isset($entrydata['timecreated']) && $entrydata['timecreated'] !== ''
+                ? (int) $entrydata['timecreated'] : $timestamp;
+            $timemodified = isset($entrydata['timemodified']) && $entrydata['timemodified'] !== ''
+                ? (int) $entrydata['timemodified'] : $timecreated;
+            $approved = isset($entrydata['approved']) && $entrydata['approved'] !== ''
+                ? (int) $entrydata['approved'] : 1;
+            $status = isset($entrydata['status']) && $entrydata['status'] !== ''
+                ? (int) $entrydata['status'] : 0;
             $entryid = (int) $DB->insert_record('datalynx_entries', (object) [
                 'dataid' => $dlx->id(),
                 'userid' => $user->id,
                 'groupid' => 0,
-                'approved' => 1,
-                'status' => 0,
-                'timecreated' => $timestamp,
-                'timemodified' => $timestamp,
+                'approved' => $approved,
+                'status' => $status,
+                'timecreated' => $timecreated,
+                'timemodified' => $timemodified,
             ]);
 
             foreach ($entrydata as $fieldname => $value) {
-                if ($fieldname === 'user' || $value === '') {
+                if (in_array($fieldname, $entrycolumns, true) || $value === '') {
                     continue;
                 }
                 $normalizedname = $normalizefieldname($fieldname);
@@ -392,6 +404,100 @@ class behat_mod_datalynx extends behat_base {
                     'content' => $content,
                 ]);
             }
+        }
+    }
+
+    /**
+     * Creates or updates a custom filter for the given activity directly in the database.
+     *
+     * The data table is a key/value list. Recognised flag keys (set to 1 to enable):
+     * visible, fulltextsearch, timecreated, timecreatedsortable, timemodified, timemodifiedsortable,
+     * authorsearch, approve, status. Two list keys take comma-separated user field names:
+     * "searchfields" (added to the field list so they can be searched) and "sortfields" (also marked
+     * sortable). If a custom filter with the same name already exists it is updated, so view templates
+     * referencing it by name keep working.
+     *
+     * @Given /^the "(?P<activityname_string>(?:[^"]|\\")*)" datalynx has the customfilter "(?P<name_string>(?:[^"]|\\")*)" with:$/
+     *
+     * @param string $activityname
+     * @param string $name
+     * @param TableNode $data
+     */
+    public function the_datalynx_has_the_customfilter_with($activityname, $name, TableNode $data) {
+        global $DB;
+
+        $record = $DB->get_record('datalynx', ['name' => $activityname], '*', MUST_EXIST);
+        $dlx = new \mod_datalynx\datalynx($record->id);
+
+        $normalizefieldname = static function (string $fieldname): string {
+            return preg_replace('/^Datalynx field\s+/u', '', trim($fieldname));
+        };
+        $fieldsbyname = [];
+        foreach ($dlx->get_fields() as $field) {
+            $fieldsbyname[$normalizefieldname($field->name())] = $field;
+        }
+
+        $settings = $data->getRowsHash();
+
+        $customfilter = (object) [
+            'dataid' => $dlx->id(),
+            'name' => $name,
+            'description' => '',
+            'visible' => 1,
+            'fulltextsearch' => 0,
+            'timecreated' => 0,
+            'timecreatedsortable' => 0,
+            'timemodified' => 0,
+            'timemodifiedsortable' => 0,
+            'authorsearch' => 0,
+            'approve' => 0,
+            'status' => 0,
+            'fieldlist' => null,
+        ];
+
+        $flags = ['visible', 'fulltextsearch', 'timecreated', 'timecreatedsortable', 'timemodified',
+                'timemodifiedsortable', 'authorsearch', 'approve', 'status'];
+        foreach ($flags as $flag) {
+            if (isset($settings[$flag]) && $settings[$flag] !== '') {
+                $customfilter->{$flag} = (int) $settings[$flag];
+            }
+        }
+
+        $resolvefields = static function (string $csv) use ($fieldsbyname, $normalizefieldname): array {
+            $resolved = [];
+            foreach (array_filter(array_map('trim', explode(',', $csv))) as $fieldname) {
+                $key = $normalizefieldname($fieldname);
+                if (isset($fieldsbyname[$key])) {
+                    $resolved[] = $fieldsbyname[$key];
+                }
+            }
+            return $resolved;
+        };
+
+        $fieldlist = [];
+        if (!empty($settings['searchfields'])) {
+            foreach ($resolvefields($settings['searchfields']) as $field) {
+                $fieldlist[$field->field->id] = ['name' => $field->field->name, 'sortable' => 0];
+            }
+        }
+        if (!empty($settings['sortfields'])) {
+            foreach ($resolvefields($settings['sortfields']) as $field) {
+                if (!isset($fieldlist[$field->field->id])) {
+                    $fieldlist[$field->field->id] = ['name' => $field->field->name, 'sortable' => 1];
+                } else {
+                    $fieldlist[$field->field->id]['sortable'] = 1;
+                }
+            }
+        }
+        if ($fieldlist) {
+            $customfilter->fieldlist = json_encode($fieldlist);
+        }
+
+        if ($existing = $DB->get_record('datalynx_customfilters', ['dataid' => $dlx->id(), 'name' => $name])) {
+            $customfilter->id = $existing->id;
+            $DB->update_record('datalynx_customfilters', $customfilter);
+        } else {
+            $DB->insert_record('datalynx_customfilters', $customfilter);
         }
     }
 

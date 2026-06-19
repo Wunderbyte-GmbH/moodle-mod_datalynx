@@ -523,7 +523,8 @@ class datalynx_filter_manager {
                         if (count($formfieldarray) == 4 && $formfieldarray[3] == 'from') {
                             if ($formdata->{$key} > 0) {
                                 $valuearr = [];
-                                $valuearr[] = $key;
+                                // The "from" timestamp is the first BETWEEN bound (not the field name).
+                                $valuearr[] = $formdata->{$key};
                                 $tokeyactive = str_replace('_from', '_to', $key);
                                 if (isset($formdata->{$tokeyactive}) && $formdata->{$tokeyactive} > $formdata->{$key}) {
                                     $valuearr[] = $formdata->{$tokeyactive};
@@ -536,8 +537,10 @@ class datalynx_filter_manager {
                         }
                         break;
                     case ("status"):
-                        if ((int) $value > 0) {
-                            $searchfields['status']['AND'][] = ['', '=', $value];
+                        // Empty value means "no selection" => no filter; a real status (incl. -1 => not created,
+                        // which get_search_sql clamps to 0) is applied.
+                        if ($value !== '' && $value !== null) {
+                            $searchfields['status']['AND'][] = ['', '=', (int) $value];
                         }
                         break;
                     default:
@@ -580,6 +583,13 @@ class datalynx_filter_manager {
         }
         if ($searchfields) {
             $filter->customsearch = serialize($searchfields);
+        }
+
+        // Persist the chosen sort field/direction. The customfilter is not stored in user preferences,
+        // so without this the sort would be lost as soon as the request finishes.
+        if (!empty($formdata->customfiltersortfield)) {
+            $sortdirection = empty($formdata->customfiltersortdirection) ? 0 : 1;
+            $filter->customsort = serialize([$formdata->customfiltersortfield => $sortdirection]);
         }
 
         return $filter;

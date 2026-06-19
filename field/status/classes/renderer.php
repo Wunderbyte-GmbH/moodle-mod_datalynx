@@ -169,7 +169,8 @@ class renderer extends datalynxfield_renderer {
         $fieldid = $this->field->id();
         $fieldname = "f_{$i}_$fieldid";
 
-        $statusmenu = [-1 => get_string('statusnotcreated', 'datalynx'),
+        $statusmenu = ['' => get_string('choosedots'),
+                -1 => get_string('statusnotcreated', 'datalynx'),
                 field::STATUS_DRAFT => get_string('statusdraft', 'datalynx'),
                 field::STATUS_FINAL_SUBMISSION => get_string(
                     'statusfinalsubmission',
@@ -177,7 +178,7 @@ class renderer extends datalynxfield_renderer {
                 )];
 
         $select = &$mform->createElement('select', $fieldname, null, $statusmenu, '');
-        $select->setValue($value);
+        $select->setValue(($value === '' || $value === null) ? '' : $value);
 
         $mform->disabledIf($fieldname, "searchoperator$i", 'eq', '');
         return [[$select,
