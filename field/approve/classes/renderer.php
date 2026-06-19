@@ -83,10 +83,11 @@ class renderer extends datalynxfield_renderer {
         $field = $this->field;
         $fieldid = $field->id();
 
-        $options = [0 => ucfirst(get_string('approvednot', 'datalynx')),
+        $options = [-1 => get_string('choosedots'),
+                0 => ucfirst(get_string('approvednot', 'datalynx')),
                 1 => ucfirst(get_string('approved', 'datalynx'))];
         $select = &$mform->createElement('select', "f_{$i}_$fieldid", null, $options);
-        $select->setSelected($value);
+        $select->setSelected(($value === '' || $value === null) ? -1 : $value);
         // Disable the 'not' and 'operator' fields.
         $mform->disabledIf("searchnot$i", "f_{$i}_$fieldid", 'neq', 2);
         $mform->disabledIf("searchoperator$i", "f_{$i}_$fieldid", 'neq', 2);

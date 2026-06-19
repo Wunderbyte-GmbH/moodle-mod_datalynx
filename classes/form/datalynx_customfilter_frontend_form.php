@@ -167,7 +167,26 @@ class datalynx_customfilter_frontend_form extends datalynx_filter_base_form {
      * @return \stdClass The template context data.
      */
     public function export_for_template() {
+        global $OUTPUT;
+
         $quickform = $this->_form;
+
+        // Render a single element through Moodle's per-element renderer instead of raw toHtml().
+        // Using ingroup = true selects the *-inline templates (field only, no fitem/label wrapper)
+        // and still calls the element's export_for_template(), so complex elements such as
+        // date_time_selector run form_init_date_js() and autocompletes load their enhancement JS.
+        // The grid template renders our own styled label, so the element's own label is suppressed.
+        $renderfield = function ($element) use ($OUTPUT) {
+            $origlabel = $element->getLabel();
+            $element->setLabel('');
+            $html = $OUTPUT->mform_element($element, false, false, '', true);
+            $element->setLabel($origlabel);
+            if ($html === false || $html === null) {
+                // Fallback for elements without a Moodle template.
+                $html = $element->toHtml();
+            }
+            return $html;
+        };
 
         // Ensure all elements and group sub-elements have their standard Moodle IDs set for Behat & accessibility.
         foreach ($quickform->_elements as $element) {
@@ -186,7 +205,10 @@ class datalynx_customfilter_frontend_form extends datalynx_filter_base_form {
         }
 
         $data = new \stdClass();
-        $data->action = $quickform->getAttribute('action');
+        // The action attribute is stored as a moodle_url object; out(false) yields a raw URL so the
+        // mustache {{action}} placeholder escapes it exactly once (avoids double-encoded &amp;amp;).
+        $action = $quickform->getAttribute('action');
+        $data->action = ($action instanceof \moodle_url) ? $action->out(false) : $action;
         $data->method = $quickform->getAttribute('method');
         $data->formid = $quickform->getAttribute('id');
         $data->filtername = get_string('search');
@@ -213,42 +235,22 @@ class datalynx_customfilter_frontend_form extends datalynx_filter_base_form {
             } else if ($name === 'search') {
                 $fulltextsearch = [
                     'label' => $element->getLabel() ?: get_string('search', 'datalynx'),
-                    'html' => $element->toHtml(),
+                    'html' => $renderfield($element),
                 ];
             } else if ($name === 'authorsearch') {
                 $authorsearch = [
                     'label' => $element->getLabel(),
-                    'html' => $element->toHtml(),
+                    'html' => $renderfield($element),
                 ];
             } else if (strpos($name, 'customsearcharr') === 0) {
-                $html = '';
-                if ($element instanceof \HTML_QuickForm_group) {
-                    foreach ($element->getElements() as $subelem) {
-                        $subhtml = $subelem->toHtml();
-                        $sublabel = $subelem->getLabel();
-                        if (($subelem->getType() === 'advcheckbox' || $subelem->getType() === 'checkbox') && $sublabel) {
-                            $subid = $subelem->getAttribute('id') ?: ('id_' . $subelem->getName());
-                            $labelclass = 'form-check-label font-weight-normal align-middle cursor-pointer';
-                            $subhtml = '<div class="form-check d-inline-block align-middle ml-2 ms-2">' .
-                                       $subhtml .
-                                       ' <label class="' . $labelclass . '" for="' . $subid . '">' .
-                                       $sublabel .
-                                       '</label>' .
-                                       '</div>';
-                        }
-                        $html .= $subhtml . ' ';
-                    }
-                } else {
-                    $html = $element->toHtml();
-                }
                 $searchfields[] = [
                     'label' => $element->getLabel(),
-                    'html' => $html,
+                    'html' => $renderfield($element),
                 ];
             } else if ($name === 'customfiltersort_grp') {
                 $sortby = [
                     'label' => $element->getLabel(),
-                    'html' => $element->toHtml(),
+                    'html' => $renderfield($element),
                 ];
             } else if ($name === 'buttonar') {
                 if ($element instanceof \HTML_QuickForm_group) {

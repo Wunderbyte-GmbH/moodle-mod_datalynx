@@ -513,8 +513,9 @@ class datalynx_filter_manager {
                 $fieldname = $formfieldarray[2];
                 switch ($fieldname) {
                     case ("approve"):
-                        if ((int) $value > 0) {
-                            $searchfields['approve']['AND'][] = ['', '=', $value];
+                        // Value -1 (or empty) means "no selection" => no filter; 0 and 1 are real states.
+                        if ((int) $value === 0 || (int) $value === 1) {
+                            $searchfields['approve']['AND'][] = ['', '=', (int) $value];
                         }
                         break;
                     case ("timecreated"):
