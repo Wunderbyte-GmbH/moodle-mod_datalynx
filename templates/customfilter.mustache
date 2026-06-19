@@ -1,0 +1,135 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_datalynx/customfilter
+
+    Displays a responsive, modern and collapsible Bootstrap 4/5 compatible custom filter.
+
+    Example context (json):
+    {
+        "action": "/mod/datalynx/view.php",
+        "method": "post",
+        "formid": "datalynx-customfilter-form",
+        "filtername": "Search Entries",
+        "isexpanded": true,
+        "hiddenfields": "<input type='hidden' name='sesskey' value='123456'>",
+        "fulltextsearch": {
+            "label": "Search",
+            "html": "<input type='text' name='search'>"
+        },
+        "authorsearch": {
+            "label": "Author",
+            "html": "<select name='authorsearch'></select>"
+        },
+        "searchfields": [
+            {
+                "label": "Firstname",
+                "html": "<input type='text' name='f_0_123'>"
+            }
+        ],
+        "sortby": {
+            "label": "Sort by",
+            "html": "<select name='sortfield'></select><select name='sortdir'></select>"
+        },
+        "buttons": [
+            {
+                "html": "<input type='submit' value='Search'>"
+            }
+        ]
+    }
+}}
+<div class="datalynx-customfilter container-fluid px-0 mb-4">
+    <div class="card border shadow-sm bg-white rounded">
+        <!-- Collapse Toggle Header (using link tag for Behat/accessibility compatibility) -->
+        <a class="card-header bg-light d-flex justify-content-between align-items-center py-3 text-decoration-none text-dark"
+           href="#datalynx-customfilter-collapse"
+           data-toggle="collapse"
+           data-bs-toggle="collapse"
+           data-target="#datalynx-customfilter-collapse"
+           data-bs-target="#datalynx-customfilter-collapse"
+           aria-expanded="{{#isexpanded}}true{{/isexpanded}}{{^isexpanded}}false{{/isexpanded}}"
+           aria-controls="datalynx-customfilter-collapse"
+           style="cursor: pointer;">
+            <h5 class="mb-0 text-dark d-flex align-items-center font-weight-bold">
+                <i class="fa fa-filter mr-2 me-2 text-primary"></i>
+                <span>{{filtername}}</span>
+            </h5>
+            <span class="collapse-icon text-muted">
+                <i class="fa fa-chevron-down"></i>
+            </span>
+        </a>
+
+        <!-- Collapsible Form Body (collapsed by default unless active/submitted) -->
+        <div id="datalynx-customfilter-collapse" class="collapse {{#isexpanded}}show{{/isexpanded}}">
+            <form action="{{action}}" method="{{method}}" id="{{formid}}" class="card-body p-3 p-md-4">
+                <!-- Hidden inputs -->
+                {{{hiddenfields}}}
+
+                <div class="row">
+                    <!-- Fulltext search input -->
+                    {{#fulltextsearch}}
+                        <div class="col-12 col-md-6 col-lg-4 mb-3">
+                            <label class="col-form-label form-label font-weight-bold text-muted mb-1">{{label}}</label>
+                            <div class="datalynx-filter-input">
+                                {{{html}}}
+                            </div>
+                        </div>
+                    {{/fulltextsearch}}
+
+                    <!-- Author search autocomplete -->
+                    {{#authorsearch}}
+                        <div class="col-12 col-md-6 col-lg-4 mb-3">
+                            <label class="col-form-label form-label font-weight-bold text-muted mb-1">{{label}}</label>
+                            <div class="datalynx-filter-input">
+                                {{{html}}}
+                            </div>
+                        </div>
+                    {{/authorsearch}}
+
+                    <!-- Dynamic field search parameters -->
+                    {{#searchfields}}
+                        <div class="col-12 col-md-6 col-lg-4 mb-3">
+                            <label class="col-form-label form-label font-weight-bold text-muted mb-1">{{label}}</label>
+                            <div class="datalynx-filter-input">
+                                {{{html}}}
+                            </div>
+                        </div>
+                    {{/searchfields}}
+
+                    <!-- Sorting parameters -->
+                    {{#sortby}}
+                        <div class="col-12 col-md-6 col-lg-4 mb-3">
+                            <label class="col-form-label form-label font-weight-bold text-muted mb-1">{{label}}</label>
+                            <div class="datalynx-filter-input d-flex align-items-center flex-wrap gap-1">
+                                {{{html}}}
+                            </div>
+                        </div>
+                    {{/sortby}}
+                </div>
+
+                <!-- Form Action Buttons -->
+                <div class="d-flex flex-wrap align-items-center justify-content-end gap-2 mt-3 pt-3 border-top">
+                    {{#buttons}}
+                        <div class="mr-1 me-1 mb-1">
+                            {{{html}}}
+                        </div>
+                    {{/buttons}}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1344,7 +1344,7 @@ class datalynxview_patterns {
      * @return string
      */
     protected function print_custom_filter($tag, $return = false) {
-        global $DB;
+        global $DB, $OUTPUT;
 
         $view = $this->view;
         $filter = $view->get_filter();
@@ -1355,12 +1355,13 @@ class datalynxview_patterns {
         $fm = $dlx->get_filter_manager();
         $filterform = $fm->get_customfilter_frontend_form($filter, $view, $customfilter);
 
+        $templateform = $filterform->export_for_template();
+        $html = $OUTPUT->render_from_template('mod_datalynx/customfilter', $templateform);
+
         if ($return) {
-            return html_writer::tag('div', $filterform->html(), ['class' => 'mdl-left']);
+            return $html;
         } else {
-            html_writer::start_tag('div', ['class' => 'mdl-left']);
-            $filterform->display();
-            html_writer::end_tag('div');
+            echo $html;
         }
     }
 }

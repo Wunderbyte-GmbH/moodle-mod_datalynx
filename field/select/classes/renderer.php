@@ -176,7 +176,7 @@ class renderer extends datalynxfield_renderer {
             $mform->setDefault($fieldname, $decoded);
         }
 
-        $showprofilecompare = !empty($mform->showprofilecompare);
+        $showprofilecompare = !empty($mform->showprofilecompare) || !empty($mform->getAttribute('showprofilecompare'));
         if ($showprofilecompare) {
             $mform->disabledIf($fieldname, "searchoperator{$i}", 'neq', 'ANY_OF');
 

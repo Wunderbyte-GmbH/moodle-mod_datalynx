@@ -109,7 +109,7 @@ trait filter_form_elements {
         $showlabel = false
     ) {
         $mform = &$this->_form;
-        $mform->showprofilecompare = true;
+        $mform->updateAttributes(['showprofilecompare' => true]);
         $dlx = $this->dlx;
 
         // Drop fields that cannot be searched (e.g. the submit/cancel button fields).

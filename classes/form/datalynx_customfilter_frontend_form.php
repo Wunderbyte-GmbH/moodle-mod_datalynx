@@ -160,4 +160,117 @@ class datalynx_customfilter_frontend_form extends datalynx_filter_base_form {
 
         $mform->addGroup($buttonarray, 'buttonar', '', [' '], false);
     }
+
+    /**
+     * Export form elements for rendering in a Mustache template.
+     *
+     * @return \stdClass The template context data.
+     */
+    public function export_for_template() {
+        $quickform = $this->_form;
+
+        // Ensure all elements and group sub-elements have their standard Moodle IDs set for Behat & accessibility.
+        foreach ($quickform->_elements as $element) {
+            $name = $element->getName();
+            if ($name && !$element->getAttribute('id')) {
+                $element->updateAttributes(['id' => 'id_' . $name]);
+            }
+            if ($element instanceof \HTML_QuickForm_group) {
+                foreach ($element->getElements() as $subelem) {
+                    $subname = $subelem->getName();
+                    if ($subname && !$subelem->getAttribute('id')) {
+                        $subelem->updateAttributes(['id' => 'id_' . $subname]);
+                    }
+                }
+            }
+        }
+
+        $data = new \stdClass();
+        $data->action = $quickform->getAttribute('action');
+        $data->method = $quickform->getAttribute('method');
+        $data->formid = $quickform->getAttribute('id');
+        $data->filtername = get_string('search');
+        $data->isexpanded = $this->is_submitted() || optional_param('cfilter', 0, PARAM_INT) || optional_param('filter', 0, PARAM_INT);
+
+        $hiddenfields = '';
+        if (isset($quickform->_pageparams)) {
+            $hiddenfields .= $quickform->_pageparams;
+        }
+        $fulltextsearch = null;
+        $authorsearch = null;
+        $searchfields = [];
+        $sortby = null;
+        $buttons = [];
+
+        foreach ($quickform->_elements as $element) {
+            $name = $element->getName();
+            $type = $element->getType();
+
+            if ($type === 'hidden') {
+                $hiddenfields .= $element->toHtml();
+            } else if ($name === 'search') {
+                $fulltextsearch = [
+                    'label' => $element->getLabel() ?: get_string('search', 'datalynx'),
+                    'html' => $element->toHtml()
+                ];
+            } else if ($name === 'authorsearch') {
+                $authorsearch = [
+                    'label' => $element->getLabel(),
+                    'html' => $element->toHtml()
+                ];
+            } else if (strpos($name, 'customsearcharr') === 0) {
+                $html = '';
+                if ($element instanceof \HTML_QuickForm_group) {
+                    foreach ($element->getElements() as $subelem) {
+                        $subhtml = $subelem->toHtml();
+                        $sublabel = $subelem->getLabel();
+                        if (($subelem->getType() === 'advcheckbox' || $subelem->getType() === 'checkbox') && $sublabel) {
+                            $subid = $subelem->getAttribute('id') ?: ('id_' . $subelem->getName());
+                            $subhtml = '<div class="form-check d-inline-block align-middle ml-2 ms-2">' .
+                                       $subhtml .
+                                       ' <label class="form-check-label font-weight-normal align-middle cursor-pointer" for="' . $subid . '">' .
+                                       $sublabel .
+                                       '</label>' .
+                                       '</div>';
+                        }
+                        $html .= $subhtml . ' ';
+                    }
+                } else {
+                    $html = $element->toHtml();
+                }
+                $searchfields[] = [
+                    'label' => $element->getLabel(),
+                    'html' => $html
+                ];
+            } else if ($name === 'customfiltersort_grp') {
+                $sortby = [
+                    'label' => $element->getLabel(),
+                    'html' => $element->toHtml()
+                ];
+            } else if ($name === 'buttonar') {
+                if ($element instanceof \HTML_QuickForm_group) {
+                    foreach ($element->getElements() as $subelem) {
+                        $buttons[] = [
+                            'html' => $subelem->toHtml()
+                        ];
+                    }
+                } else {
+                    $buttons[] = [
+                        'html' => $element->toHtml()
+                    ];
+                }
+            } else if ($name === 'sesskey' || $name === '_qf__' . $this->_formname) {
+                $hiddenfields .= $element->toHtml();
+            }
+        }
+
+        $data->hiddenfields = $hiddenfields;
+        $data->fulltextsearch = $fulltextsearch;
+        $data->authorsearch = $authorsearch;
+        $data->searchfields = $searchfields;
+        $data->sortby = $sortby;
+        $data->buttons = $buttons;
+
+        return $data;
+    }
 }
