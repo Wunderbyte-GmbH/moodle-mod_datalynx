@@ -120,6 +120,7 @@ if ($fields) {
     $editbaseurl = '/mod/datalynx/field/field_edit.php';
     $actionbaseurl = '/mod/datalynx/field/index.php';
     $linkparams = ['d' => $dlx->id(), 'sesskey' => sesskey()];
+    $views = $dlx->get_views();
 
     $stredit = get_string('edit');
     $strduplicate = get_string('duplicate');
@@ -153,7 +154,7 @@ if ($fields) {
 
     // Table headers.
     $headers = ['name' => get_string('name'), 'type' => get_string('type', 'datalynx'),
-            'description' => get_string('description'), 'edit' => $stredit,
+            'usedinviews' => get_string('usedinviews', 'datalynx'), 'edit' => $stredit,
             'convert' => get_string('convert', 'datalynx'), 'duplicate' => $multiduplicate,
             'delete' => $multidelete, 'selectallnone' => $selectallnone,
     ];
@@ -165,7 +166,7 @@ if ($fields) {
 
     // Column sorting.
     $table->sortable(true);
-    $table->no_sorting('description');
+    $table->no_sorting('usedinviews');
     $table->no_sorting('edit');
     $table->no_sorting('duplicate');
     $table->no_sorting('delete');
@@ -205,7 +206,32 @@ if ($fields) {
         $fieldselector = html_writer::checkbox("fieldselector", $fieldid, false);
 
         $fieldtype = $field->image() . '&nbsp;' . $field->typename();
-        $fielddescription = shorten_text($field->field->description, 30);
+
+        $usedinviews = [];
+        foreach ($views as $viewid => $view) {
+            $fieldpatterns = $view->get__patterns('field');
+            if (!empty($fieldpatterns[$fieldid])) {
+                $internalview = $view->is_internal_view();
+                if ($internalview) {
+                    $viewname = format_string($view->name());
+                } else {
+                    $viewname = html_writer::link(
+                        new moodle_url('/mod/datalynx/view.php', ['d' => $dlx->id(), 'view' => $viewid]),
+                        $view->name()
+                    );
+                }
+                $viewediturl = new moodle_url(
+                    '/mod/datalynx/view/view_edit.php',
+                    ['d' => $dlx->id(), 'sesskey' => sesskey(), 'vedit' => $viewid]
+                );
+                $editicon = html_writer::link(
+                    $viewediturl,
+                    $OUTPUT->pix_icon('t/edit', get_string('edit'))
+                );
+                $usedinviews[] = $viewname . ' ' . $editicon;
+            }
+        }
+        $usedinviewshtml = implode(', ', $usedinviews);
 
         // Convert textarea to editor field.
         if ($field->type == "textarea") {
@@ -219,7 +245,7 @@ if ($fields) {
         }
 
         $table->add_data(
-            [$fieldname, $fieldtype, $fielddescription, $fieldedit, $convert, $fieldduplicate, $fielddelete, $fieldselector,
+            [$fieldname, $fieldtype, $usedinviewshtml, $fieldedit, $convert, $fieldduplicate, $fielddelete, $fieldselector,
             ]
         );
     }

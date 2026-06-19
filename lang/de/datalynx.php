@@ -885,6 +885,7 @@ $string['uploadfile'] = 'Importdatei';
 $string['uploadtext'] = 'Importtext';
 $string['urlclass'] = 'CSS Klassen';
 $string['urltarget'] = '\'target\' Attribut';
+$string['usedinviews'] = 'In Ansichten verwendet';
 $string['usercanaddself'] = 'Benutzer/in kann sich selbst hinzufügen';
 $string['usercanaddself_help'] = 'Check this option to allow the user who owns the entry to add themselves to the team in this field.';
 $string['userfields'] = 'Benutzer-definierte Felder';

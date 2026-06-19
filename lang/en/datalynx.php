@@ -916,6 +916,7 @@ $string['uploadfile'] = 'File to import';
 $string['uploadtext'] = 'Text to import';
 $string['urlclass'] = 'CSS classes';
 $string['urltarget'] = '\'target\' attribute';
+$string['usedinviews'] = 'Used in views';
 $string['usercanaddself'] = 'User can add him/herself';
 $string['usercanaddself_help'] = 'Check this option to allow the user who owns the entry to add themselves to the team in this field.';
 $string['userfields'] = 'User defined fields';
