@@ -27,8 +27,6 @@ namespace mod_datalynx;
 use advanced_testcase;
 use stdClass;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Tests for rule conditions.
  *
@@ -94,7 +92,7 @@ final class rule_conditions_test extends advanced_testcase {
     /**
      * Test rule condition evaluation on checkbox fields (multiple options).
      */
-    public function test_checkbox_rule_conditions() {
+    public function test_checkbox_rule_conditions(): void {
         global $DB;
 
         $checkboxfieldid = $this->make_field('checkbox', 'Colors', "Red\nGreen\nBlue");
@@ -108,7 +106,7 @@ final class rule_conditions_test extends advanced_testcase {
             'enabled' => 1,
             'param1' => json_encode(['entry_created']),
             'param5' => $checkboxfieldid,
-            'param10' => json_encode(['1', '3']), // Red and Blue
+            'param10' => json_encode(['1', '3']), // Red and Blue.
         ];
         $ruleid = $DB->insert_record('datalynx_rules', $rule);
         $ruleobj = $this->dlx->get_rule_manager()->get_rule_from_id($ruleid);
@@ -118,9 +116,9 @@ final class rule_conditions_test extends advanced_testcase {
         $event1 = \mod_datalynx\event\entry_created::create([
             'context' => $this->dlx->context,
             'objectid' => $entryid1,
-            'other' => ['dataid' => $this->dlx->id()]
+            'other' => ['dataid' => $this->dlx->id()],
         ]);
-        // trigger() should return true (it tries to execute/notify because conditions are met).
+        // The trigger() method should return true (it tries to execute/notify because conditions are met).
         $this->assertTrue($ruleobj->trigger($event1));
 
         // Non-matching entry.
@@ -128,16 +126,16 @@ final class rule_conditions_test extends advanced_testcase {
         $event2 = \mod_datalynx\event\entry_created::create([
             'context' => $this->dlx->context,
             'objectid' => $entryid2,
-            'other' => ['dataid' => $this->dlx->id()]
+            'other' => ['dataid' => $this->dlx->id()],
         ]);
-        // trigger() should return false (conditions not met).
+        // The trigger() method should return false (conditions not met).
         $this->assertFalse($ruleobj->trigger($event2));
     }
 
     /**
      * Test rule condition evaluation on radiobutton/select fields (single value).
      */
-    public function test_single_value_rule_conditions() {
+    public function test_single_value_rule_conditions(): void {
         global $DB;
 
         $radiofieldid = $this->make_field('radiobutton', 'Size', "Small\nMedium\nLarge");
@@ -150,7 +148,7 @@ final class rule_conditions_test extends advanced_testcase {
             'enabled' => 1,
             'param1' => json_encode(['entry_created']),
             'param5' => $radiofieldid,
-            'param10' => '2', // Medium (key '2')
+            'param10' => '2', // Medium option (key 2).
         ];
         $ruleid = $DB->insert_record('datalynx_rules', $rule);
         $ruleobj = $this->dlx->get_rule_manager()->get_rule_from_id($ruleid);
@@ -160,7 +158,7 @@ final class rule_conditions_test extends advanced_testcase {
         $event1 = \mod_datalynx\event\entry_created::create([
             'context' => $this->dlx->context,
             'objectid' => $entryid1,
-            'other' => ['dataid' => $this->dlx->id()]
+            'other' => ['dataid' => $this->dlx->id()],
         ]);
         $this->assertTrue($ruleobj->trigger($event1));
 
@@ -169,7 +167,7 @@ final class rule_conditions_test extends advanced_testcase {
         $event2 = \mod_datalynx\event\entry_created::create([
             'context' => $this->dlx->context,
             'objectid' => $entryid2,
-            'other' => ['dataid' => $this->dlx->id()]
+            'other' => ['dataid' => $this->dlx->id()],
         ]);
         $this->assertFalse($ruleobj->trigger($event2));
     }

@@ -190,7 +190,9 @@ class datalynx_customfilter_frontend_form extends datalynx_filter_base_form {
         $data->method = $quickform->getAttribute('method');
         $data->formid = $quickform->getAttribute('id');
         $data->filtername = get_string('search');
-        $data->isexpanded = $this->is_submitted() || optional_param('cfilter', 0, PARAM_INT) || optional_param('filter', 0, PARAM_INT);
+        $data->isexpanded = $this->is_submitted() ||
+            optional_param('cfilter', 0, PARAM_INT) ||
+            optional_param('filter', 0, PARAM_INT);
 
         $hiddenfields = '';
         if (isset($quickform->_pageparams)) {
@@ -211,12 +213,12 @@ class datalynx_customfilter_frontend_form extends datalynx_filter_base_form {
             } else if ($name === 'search') {
                 $fulltextsearch = [
                     'label' => $element->getLabel() ?: get_string('search', 'datalynx'),
-                    'html' => $element->toHtml()
+                    'html' => $element->toHtml(),
                 ];
             } else if ($name === 'authorsearch') {
                 $authorsearch = [
                     'label' => $element->getLabel(),
-                    'html' => $element->toHtml()
+                    'html' => $element->toHtml(),
                 ];
             } else if (strpos($name, 'customsearcharr') === 0) {
                 $html = '';
@@ -226,9 +228,10 @@ class datalynx_customfilter_frontend_form extends datalynx_filter_base_form {
                         $sublabel = $subelem->getLabel();
                         if (($subelem->getType() === 'advcheckbox' || $subelem->getType() === 'checkbox') && $sublabel) {
                             $subid = $subelem->getAttribute('id') ?: ('id_' . $subelem->getName());
+                            $labelclass = 'form-check-label font-weight-normal align-middle cursor-pointer';
                             $subhtml = '<div class="form-check d-inline-block align-middle ml-2 ms-2">' .
                                        $subhtml .
-                                       ' <label class="form-check-label font-weight-normal align-middle cursor-pointer" for="' . $subid . '">' .
+                                       ' <label class="' . $labelclass . '" for="' . $subid . '">' .
                                        $sublabel .
                                        '</label>' .
                                        '</div>';
@@ -240,23 +243,23 @@ class datalynx_customfilter_frontend_form extends datalynx_filter_base_form {
                 }
                 $searchfields[] = [
                     'label' => $element->getLabel(),
-                    'html' => $html
+                    'html' => $html,
                 ];
             } else if ($name === 'customfiltersort_grp') {
                 $sortby = [
                     'label' => $element->getLabel(),
-                    'html' => $element->toHtml()
+                    'html' => $element->toHtml(),
                 ];
             } else if ($name === 'buttonar') {
                 if ($element instanceof \HTML_QuickForm_group) {
                     foreach ($element->getElements() as $subelem) {
                         $buttons[] = [
-                            'html' => $subelem->toHtml()
+                            'html' => $subelem->toHtml(),
                         ];
                     }
                 } else {
                     $buttons[] = [
-                        'html' => $element->toHtml()
+                        'html' => $element->toHtml(),
                     ];
                 }
             } else if ($name === 'sesskey' || $name === '_qf__' . $this->_formname) {
