@@ -149,7 +149,7 @@ Feature: Basic fieldgroup entry flow with repeated checkbox rows
     When I follow "Fieldgroups"
     And "Delete Mygroup_1" "link" should exist
     And I follow "Delete Mygroup_1"
-    And I press "Continue"
+    And I click on "Yes" "button" in the "Delete field" "dialogue"
     Then I should see "deleted"
     And I follow "Fieldgroups"
     Then I should see "Mygroup"

@@ -53,6 +53,47 @@ abstract class base {
      */
     const ADD_NEW_ENTRY = -1;
 
+    /** @var string Open delimiter for field tags. */
+    const FIELD_TAG_OPEN = '[[';
+
+    /** @var string Close delimiter for field tags. */
+    const FIELD_TAG_CLOSE = ']]';
+
+    /** @var string Regex pattern matching a generic field tag: [[field|behavior|renderer]]. */
+    const FIELD_TAG_REGEX = '/\[\[([^\|\]]+)(?:\|([^\|\]]*))?(?:\|([^\|\]]*))?\]\]/';
+
+    /** @var string Regex pattern matching all datalynx tag delimiters: [[...]] (not followed by @), ##...##, and %%...%%. */
+    const ALL_TAGS_REGEX = '/(?:(\[\[[^\]]+\]\])(?!@)|(##[^#]+##)|(%%[^%]+%%))/';
+
+    /** @var string Regex pattern matching viewlink / viewsesslink tags: ##viewlink:viewname;linktext;urlquery;class##. */
+    const VIEW_LINK_REGEX = '/##(viewlink|viewsesslink):([^;#]+);([^;]*);([^;]*);([^#]*)##/';
+
+    /**
+     * Get specific regex matching a field tag by name.
+     *
+     * @param string $fieldname
+     * @param bool $escaped
+     * @return string
+     */
+    public static function get_specific_field_tag_regex(string $fieldname, bool $escaped = true): string {
+        $name = $escaped ? preg_quote($fieldname, '/') : $fieldname;
+        return "/\[\[" . $name . "(?:\|(?:[^\]]+))?\]\](?:@)?/";
+    }
+
+    /**
+     * Get pattern variations for view search/replace.
+     *
+     * @param string $fieldname
+     * @return string[]
+     */
+    public static function get_field_tag_patterns(string $fieldname): array {
+        return [
+            self::FIELD_TAG_OPEN . $fieldname . self::FIELD_TAG_CLOSE,
+            self::FIELD_TAG_OPEN . $fieldname . '#id' . self::FIELD_TAG_CLOSE,
+        ];
+    }
+
+
     /**
      *
      * @var string view type Subclasses must override the type with their name
@@ -671,11 +712,11 @@ abstract class base {
      * @return void
      */
     public function replace_field_in_view($searchfieldname, $newfieldname) {
-        $patterns = ['[[' . $searchfieldname . ']]', '[[' . $searchfieldname . '#id]]'];
+        $patterns = self::get_field_tag_patterns($searchfieldname);
         if (!$newfieldname) {
             $replacements = '';
         } else {
-            $replacements = ['[[' . $newfieldname . ']]', '[[' . $newfieldname . '#id]]'];
+            $replacements = self::get_field_tag_patterns($newfieldname);
         }
 
         foreach ($this->editors as $editor) {
@@ -1097,7 +1138,7 @@ abstract class base {
         // Regex to mask all known tag patterns. Patterns followed by @ are not masked.
         // The ##[^#]+## clause already covers ##viewlink:...## and ##viewsesslink:...## tags.
         preg_match_all(
-            '/(?:(\[\[[^\]]+\]\])(?!@)|(##[^#]+##)|(%%[^%]+%%))/',
+            self::ALL_TAGS_REGEX,
             $text,
             $matches,
             PREG_PATTERN_ORDER
@@ -1706,7 +1747,7 @@ abstract class base {
     public function get_editable_after_final_fieldids(): array {
         $allowed = [];
         $fieldtags = $this->tags['field'] ?? [];
-        $pattern = '/\[\[([^\|\]]+)(?:\|([^\|\]]*))?(?:\|([^\|\]]*))?\]\]/';
+        $pattern = self::FIELD_TAG_REGEX;
         foreach ($fieldtags as $fieldid => $patterns) {
             if (!is_numeric($fieldid)) {
                 continue; // Internal fields (status, …) are never excepted from the lock.

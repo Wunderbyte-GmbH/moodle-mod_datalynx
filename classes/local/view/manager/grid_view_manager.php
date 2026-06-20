@@ -22,6 +22,7 @@ use datalynxfield_fieldgroup\field as fieldgroup_field;
 use mod_datalynx\datalynx;
 use mod_datalynx\local\datalynx_entries;
 use stdClass;
+use mod_datalynx\local\view\base;
 
 /**
  * Builds the structured browse payload for the Grid view pilot.
@@ -171,7 +172,9 @@ class grid_view_manager {
             }
 
             $name = format_string($field->field->name);
-            $tag = '[[' . $field->field->name . ']]';
+            $tag = base::FIELD_TAG_OPEN .
+                $field->field->name .
+                base::FIELD_TAG_CLOSE;
 
             $definitions = $field->get_definitions([$tag], $entry, ['edit' => false, 'manage' => false]);
             $values[] = [

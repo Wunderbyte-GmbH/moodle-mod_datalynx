@@ -23,6 +23,7 @@ use datalynxfield_entryauthor\field as entryauthor_field;
 use mod_datalynx\datalynx;
 use mod_datalynx\local\datalynx_entries;
 use stdClass;
+use mod_datalynx\local\view\base;
 
 /**
  * Builds the structured browse payload for the Tabular view.
@@ -214,7 +215,7 @@ class tabular_view_manager {
                     continue;
                 }
 
-                $tag = '[[' . $field->field->name . ']]';
+                $tag = base::FIELD_TAG_OPEN . $field->field->name . base::FIELD_TAG_CLOSE;
 
                 $cells[] = [
                     'valuehtml' => $this->resolve_definition_html(

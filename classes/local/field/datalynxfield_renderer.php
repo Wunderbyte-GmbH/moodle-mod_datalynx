@@ -63,9 +63,9 @@ abstract class datalynxfield_renderer {
     public function search($text) {
         $found = [];
 
-        $matches = [];
-        $fieldname = preg_quote($this->field->name(), '/');
-        if (preg_match_all("/\[\[$fieldname(?:\|(?:[^\]]+))?\]\](?:@)?/", $text, $matches)) {
+        $fieldname = $this->field->name();
+        $regex = \mod_datalynx\local\view\base::get_specific_field_tag_regex($fieldname);
+        if (preg_match_all($regex, $text, $matches)) {
             $found = array_merge($found, $matches[0]);
         }
 
@@ -80,14 +80,13 @@ abstract class datalynxfield_renderer {
                     $found[] = $pattern;
                 }
             } else {
-                $strippedpattern = preg_quote(str_replace(['[[', ']]'], ['', ''], $pattern), '/');
-                if (
-                    preg_match_all(
-                        "/\[\[$strippedpattern(?:\|(?:[^\]]+))?\]\](?:@)?/",
-                        $text,
-                        $matches
-                    )
-                ) {
+                $strippedpattern = str_replace(
+                    [\mod_datalynx\local\view\base::FIELD_TAG_OPEN, \mod_datalynx\local\view\base::FIELD_TAG_CLOSE],
+                    ['', ''],
+                    $pattern
+                );
+                $regex = \mod_datalynx\local\view\base::get_specific_field_tag_regex($strippedpattern);
+                if (preg_match_all($regex, $text, $matches)) {
                     $found = array_merge($found, $matches[0]);
                 }
             }

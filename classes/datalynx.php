@@ -1259,6 +1259,52 @@ class datalynx {
     }
 
     /**
+     * Find fieldgroups using fields
+     *
+     * @param array $fields
+     * @return array
+     */
+    private function find_fieldgroups_using_fields($fields) {
+        $fieldgroups = $this->get_fields_by_type('fieldgroup');
+        $usedfieldgroups = [];
+        $fieldids = array_keys($fields);
+        foreach ($fieldgroups as $fieldgroup) {
+            if (!empty($fieldgroup->fieldids)) {
+                if (array_intersect($fieldids, $fieldgroup->fieldids)) {
+                    $usedfieldgroups[] = $fieldgroup;
+                }
+            }
+        }
+        return $usedfieldgroups;
+    }
+
+    /**
+     * Find customfilters using fields
+     *
+     * @param array $fields
+     * @return array
+     */
+    private function find_customfilters_using_fields($fields) {
+        global $DB;
+        $customfilters = $DB->get_records('datalynx_customfilters', ['dataid' => $this->id()]);
+        $usedcustomfilters = [];
+        $fieldids = array_keys($fields);
+        foreach ($customfilters as $customfilter) {
+            if (empty($customfilter->fieldlist)) {
+                continue;
+            }
+            $fieldlist = json_decode($customfilter->fieldlist, true);
+            if (is_array($fieldlist)) {
+                $usedfieldids = array_keys($fieldlist);
+                if (array_intersect($fieldids, $usedfieldids)) {
+                    $usedcustomfilters[] = $customfilter;
+                }
+            }
+        }
+        return $usedcustomfilters;
+    }
+
+    /**
      * Checks if string contains html tags
      *
      * @param string $string
@@ -1302,12 +1348,16 @@ class datalynx {
             $this->notifications['bad'][] = get_string("fieldnoneforaction", 'datalynx');
             return false;
         } else {
-            if (!$confirmed) {
-                // Print header.
-                $this->print_header(['tab' => 'fields']);
+            if ($action === 'delete') {
+                $fieldgroups = $this->find_fieldgroups_using_fields($fields);
+                $filters = $this->find_filters_using_fields($fields);
+                $customfilters = $this->find_customfilters_using_fields($fields);
 
-                $msg = get_string("fieldsconfirm$action", 'datalynx', count($fields));
-                if ($action === 'delete') {
+                if ($fieldgroups || $filters || $customfilters) {
+                    if (defined('PHPUNIT_TEST') && PHPUNIT_TEST) {
+                        throw new \coding_exception('deleteblocked');
+                    }
+                    $this->print_header(['tab' => 'fields']);
                     $fieldlist = array_reduce(
                         $fields,
                         function ($list, $field) {
@@ -1316,35 +1366,127 @@ class datalynx {
                         ''
                     );
                     $fieldlist = "<ul>$fieldlist</ul>";
-                    $filters = $this->find_filters_using_fields($fields);
-                    $filterlist = array_reduce(
-                        $filters,
-                        function ($list, $filter) {
-                            return $list . "<li>{$filter->name}</li>";
-                        },
-                        ''
-                    );
-                    $filterlist = "<ul>$filterlist</ul>";
+
+                    if ($fieldgroups) {
+                        $fieldgrouplist = array_reduce(
+                            $fieldgroups,
+                            function ($list, $fieldgroup) {
+                                return $list . "<li>{$fieldgroup->field->name}</li>";
+                            },
+                            ''
+                        );
+                        $fieldgrouplist = "<ul>$fieldgrouplist</ul>";
+                        echo "<div class=\"alert alert-warning\">" .
+                                get_string(
+                                    'deletefieldgroupwarning',
+                                    'datalynx',
+                                    ['fieldlist' => $fieldlist, 'fieldgrouplist' => $fieldgrouplist]
+                                ) . "</div>";
+                    }
+
                     if ($filters) {
+                        $filterlist = array_reduce(
+                            $filters,
+                            function ($list, $filter) {
+                                return $list . "<li>{$filter->name}</li>";
+                            },
+                            ''
+                        );
+                        $filterlist = "<ul>$filterlist</ul>";
                         echo "<div class=\"alert alert-warning\">" .
                                 get_string(
                                     'deletefieldfilterwarning',
                                     'datalynx',
-                                    ['fieldlist' => $fieldlist, 'filterlist' => $filterlist,
-                                    ]
+                                    ['fieldlist' => $fieldlist, 'filterlist' => $filterlist]
                                 ) . "</div>";
-                        echo $OUTPUT->continue_button(
-                            new moodle_url(
-                                '/mod/datalynx/field/index.php',
-                                ['d' => $this->id()]
-                            )
-                        );
-
-                        echo $OUTPUT->footer();
-                        exit();
                     }
+
+                    if ($customfilters) {
+                        $customfilterlist = array_reduce(
+                            $customfilters,
+                            function ($list, $customfilter) {
+                                return $list . "<li>{$customfilter->name}</li>";
+                            },
+                            ''
+                        );
+                        $customfilterlist = "<ul>$customfilterlist</ul>";
+                        echo "<div class=\"alert alert-warning\">" .
+                                get_string(
+                                    'deletefieldcustomfilterwarning',
+                                    'datalynx',
+                                    ['fieldlist' => $fieldlist, 'customfilterlist' => $customfilterlist]
+                                ) . "</div>";
+                    }
+
+                    echo $OUTPUT->continue_button(
+                        new moodle_url(
+                            '/mod/datalynx/field/index.php',
+                            ['d' => $this->id()]
+                        )
+                    );
+                    echo $OUTPUT->footer();
+                    exit();
+                }
+            }
+
+            if (!$confirmed) {
+                if ($action === 'delete') {
+                    if (defined('PHPUNIT_TEST') && PHPUNIT_TEST) {
+                        throw new \coding_exception('deleteconfirm');
+                    }
+                    global $PAGE;
+                    $this->print_header(['tab' => 'fields']);
+                    $usedviews = [];
+                    $views = $this->get_views();
+                    foreach ($fields as $field) {
+                        foreach ($views as $view) {
+                            $fieldpatterns = $view->get__patterns('field');
+                            if (!empty($fieldpatterns[$field->field->id])) {
+                                $usedviews[$view->id()] = format_string($view->name());
+                            }
+                        }
+                    }
+
+                    $title = get_string('deletefieldconfirmtitle', 'datalynx');
+                    if (count($fields) > 1) {
+                        if ($usedviews) {
+                            $viewnames = implode(', ', $usedviews);
+                            $message = get_string('deletefieldconfirmmsg_multiple_usedin', 'datalynx', $viewnames);
+                        } else {
+                            $message = get_string('deletefieldconfirmmsg_multiple', 'datalynx');
+                        }
+                    } else {
+                        if ($usedviews) {
+                            $viewnames = implode(', ', $usedviews);
+                            $message = get_string('deletefieldconfirmmsg_usedin', 'datalynx', $viewnames);
+                        } else {
+                            $message = get_string('deletefieldconfirmmsg', 'datalynx');
+                        }
+                    }
+
+                    $confirmurl = new moodle_url(
+                        '/mod/datalynx/field/index.php',
+                        ['d' => $this->id(),
+                                        $action => implode(',', array_keys($fields)),
+                                        'sesskey' => sesskey(), 'confirmed' => 1]
+                    );
+                    $cancelurl = new moodle_url('/mod/datalynx/field/index.php', ['d' => $this->id()]);
+
+                    $PAGE->requires->js_call_amd('mod_datalynx/delete_field_confirm', 'init', [
+                        $title,
+                        $message,
+                        $confirmurl->out(false),
+                        $cancelurl->out(false),
+                    ]);
+
+                    echo $OUTPUT->footer();
+                    exit();
                 }
 
+                // Print header.
+                $this->print_header(['tab' => 'fields']);
+
+                $msg = get_string("fieldsconfirm$action", 'datalynx', count($fields));
                 echo $OUTPUT->confirm(
                     $msg,
                     new moodle_url(

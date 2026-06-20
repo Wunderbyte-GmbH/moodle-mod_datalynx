@@ -66,6 +66,9 @@ function closestMatchingElement(target, selector) {
     return element && typeof element.closest === 'function' ? element.closest(selector) : null;
 }
 
+const FIELD_TAG_OPEN = '[[';
+const FIELD_TAG_CLOSE = ']]';
+
 /** Regex that matches a full [[field|behavior|layout]] tag (behavior and layout optional). */
 const FIELD_TAG_RE = /^\[\[([^|\]]+)(?:\|([^|\]]*))?(?:\|([^|\]]*))?\]\]$/;
 const VIEW_URL_TAG_RE = /^##viewurl(?::([^#]+))?##$/;
@@ -95,12 +98,12 @@ function parseFieldTag(pattern) {
  */
 function buildFieldTagPattern(field, behavior, layout) {
     if (layout) {
-        return '[[' + field + '|' + behavior + '|' + layout + ']]';
+        return FIELD_TAG_OPEN + field + '|' + behavior + '|' + layout + FIELD_TAG_CLOSE;
     }
     if (behavior) {
-        return '[[' + field + '|' + behavior + ']]';
+        return FIELD_TAG_OPEN + field + '|' + behavior + FIELD_TAG_CLOSE;
     }
-    return '[[' + field + ']]';
+    return FIELD_TAG_OPEN + field + FIELD_TAG_CLOSE;
 }
 
 /**
