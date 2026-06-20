@@ -316,6 +316,25 @@ form.mform div.entry div.datalynx-field-wrapper {
     display: block; /* inline-flex */
 }
 
+/* When a field uses a custom edit template with #input, suppress Moodle's
+   Bootstrap grid wrapper (col-md-3 label + col-md-9 input columns).
+   display:contents removes the layout box but preserves DOM parentage so
+   descendant selectors (.has-danger .form-control) and JS error enhancers
+   still work correctly. */
+.datalynx-no-fitem-wrapper .fitem {
+    display: contents;
+}
+.datalynx-no-fitem-wrapper .col-md-3.col-form-label {
+    display: none;
+}
+.datalynx-no-fitem-wrapper .felement {
+    flex: 0 0 100%;
+    max-width: 100%;
+    padding-left: 0;
+    padding-right: 0;
+    display: block;
+}
+
 /* Modern Datalynx View default templates styling */
 .datalynx-view-container {
     width: 100%;

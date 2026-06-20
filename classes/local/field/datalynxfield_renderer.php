@@ -318,15 +318,19 @@ abstract class datalynxfield_renderer {
         array $options
     ) {
         if ($options['editable']) {
-            if (isset($options['template']) && strpos($options['template'], '#input') !== false) {
+            $hascustomtemplate = isset($options['template'])
+                && strpos($options['template'], '#input') !== false;
+            if ($hascustomtemplate) {
                 $splittemplate = explode('#input', $options['template']);
                 $options['prefix'] = $splittemplate[0];
                 $options['suffix'] = $splittemplate[1];
             }
 
+            $wrapperclass = 'datalynx-field-wrapper'
+                . ($hascustomtemplate ? ' datalynx-no-fitem-wrapper' : '');
             $mform->addElement(
                 'html',
-                '<div class="datalynx-field-wrapper" data-field-type="' . $this->field->type .
+                '<div class="' . $wrapperclass . '" data-field-type="' . $this->field->type .
                 '" data-field-name="' . $this->field->field->name . '">'
             );
             if (isset($options['prefix'])) {

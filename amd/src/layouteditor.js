@@ -140,7 +140,16 @@ export const init = async() => {
                     return subValue(raw, '');
                 case 'edit':
                     if (opt === '___4___') {
-                        return sampleInput(false);
+                        // Mirror the actual Moodle fitem wrapper so users can see
+                        // the difference between "none" (default grid) and "custom".
+                        return '<div class="mb-3 row fitem femptylabel">' +
+                            '<div class="col-md-3 col-form-label d-flex pb-0 pe-md-0">' +
+                            '<div class="form-label-addon d-flex align-items-center align-self-start">' +
+                            '</div></div>' +
+                            '<div class="col-md-9 d-flex flex-wrap align-items-start felement">' +
+                            sampleInput(false) +
+                            '<div class="form-control-feedback invalid-feedback"></div>' +
+                            '</div></div>';
                     }
                     if (opt === '___1___') {
                         return subValue(effectiveDisplay(), sampleValue);
