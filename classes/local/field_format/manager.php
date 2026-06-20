@@ -108,10 +108,16 @@ class manager {
         if (empty($record->id)) {
             return $DB->insert_record('datalynx_field_formats', $record);
         } else {
+            $oldname = $DB->get_field('datalynx_field_formats', 'name', ['id' => $record->id]);
+            if ($oldname !== $record->name) {
+                $dlx = new \mod_datalynx\datalynx($record->dataid);
+                $dlx->replace_format_in_views($oldname, $record->name);
+            }
             $DB->update_record('datalynx_field_formats', $record);
             return $record->id;
         }
     }
+
 
     /**
      * Delete a field format after verifying it is not referenced in any view templates.

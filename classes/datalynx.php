@@ -2058,6 +2058,52 @@ class datalynx {
     }
 
     /**
+     * Rename or remove field format tags/names in views when a format is renamed or deleted.
+     *
+     * @param string $oldname The old format name.
+     * @param string $newname The new format name (empty string if deleted).
+     */
+    public function replace_format_in_views(string $oldname, string $newname): void {
+        $views = $this->get_views();
+        if (!empty($views)) {
+            foreach ($views as $view) {
+                $view->replace_format_in_view($oldname, $newname);
+            }
+        }
+    }
+
+    /**
+     * Rename or remove behavior tags/names in views when a behavior is renamed or deleted.
+     *
+     * @param string $oldname The old behavior name.
+     * @param string $newname The new behavior name (empty string if deleted).
+     */
+    public function replace_behavior_in_views(string $oldname, string $newname): void {
+        $views = $this->get_views();
+        if (!empty($views)) {
+            foreach ($views as $view) {
+                $view->replace_behavior_in_view($oldname, $newname);
+            }
+        }
+    }
+
+    /**
+     * Rename or remove layout/renderer tags/names in views when a layout is renamed or deleted.
+     *
+     * @param string $oldname The old layout name.
+     * @param string $newname The new layout name (empty string if deleted).
+     */
+    public function replace_layout_in_views(string $oldname, string $newname): void {
+        $views = $this->get_views();
+        if (!empty($views)) {
+            foreach ($views as $view) {
+                $view->replace_layout_in_view($oldname, $newname);
+            }
+        }
+    }
+
+
+    /**
      * Rename or remove field tags/names in custom filters when a field is renamed or deleted.
      *
      * @param string $oldfieldname The old field name.

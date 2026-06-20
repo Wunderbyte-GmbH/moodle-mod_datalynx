@@ -734,6 +734,36 @@ abstract class base {
     }
 
     /**
+     * A unified replacement helper to apply regex-based search-and-replace callbacks
+     * on all view template text columns and editors.
+     *
+     * @param callable $replacer Callback that takes a string and returns the modified string.
+     * @return void
+     */
+    public function replace_pattern_in_view(callable $replacer): void {
+        $textcolumns = [
+            'description', 'section',
+            'param1', 'param2', 'param3', 'param4', 'param5',
+            'param6', 'param7', 'param8', 'param9', 'param10',
+            'patterns',
+        ];
+
+        foreach ($textcolumns as $col) {
+            if (!empty($this->view->$col)) {
+                $this->view->$col = $replacer((string) $this->view->$col);
+            }
+        }
+
+        foreach ($this->editors as $editor) {
+            if (isset($this->view->{"e$editor"})) {
+                $this->view->{"e$editor"} = $replacer((string) $this->view->{"e$editor"});
+            }
+        }
+
+        $this->update($this->view);
+    }
+
+    /**
      * Subclass may need to override
      *
      * @param string $searchfieldname Field name to search for.
@@ -741,26 +771,133 @@ abstract class base {
      * @return void
      */
     public function replace_field_in_view($searchfieldname, $newfieldname) {
-        $textcolumns = [
-            'description', 'section',
-            'param1', 'param2', 'param3', 'param4', 'param5',
-            'param6', 'param7', 'param8', 'param9', 'param10',
-        ];
-
-        foreach ($textcolumns as $col) {
-            if (!empty($this->view->$col)) {
-                $this->view->$col = self::replace_field_tag($this->view->$col, $searchfieldname, $newfieldname);
-            }
-        }
-
-        foreach ($this->editors as $editor) {
-            if (isset($this->view->{"e$editor"})) {
-                $this->view->{"e$editor"} = self::replace_field_tag($this->view->{"e$editor"}, $searchfieldname, $newfieldname);
-            }
-        }
-
-        $this->update($this->view);
+        $this->replace_pattern_in_view(function ($text) use ($searchfieldname, $newfieldname) {
+            return self::replace_field_tag($text, $searchfieldname, $newfieldname);
+        });
     }
+
+    /**
+     * Replace a field format name in the view templates.
+     *
+     * @param string $searchformatname The format name to search for.
+     * @param string $newformatname The new format name.
+     * @return void
+     */
+    public function replace_format_in_view(string $searchformatname, string $newformatname): void {
+        $this->replace_pattern_in_view(function ($text) use ($searchformatname, $newformatname) {
+            return self::replace_format_tag($text, $searchformatname, $newformatname);
+        });
+    }
+
+    /**
+     * Replace a behavior name in the view templates.
+     *
+     * @param string $searchbehaviorname The behavior name to search for.
+     * @param string $newbehaviorname The new behavior name.
+     * @return void
+     */
+    public function replace_behavior_in_view(string $searchbehaviorname, string $newbehaviorname): void {
+        $this->replace_pattern_in_view(function ($text) use ($searchbehaviorname, $newbehaviorname) {
+            return self::replace_behavior_tag($text, $searchbehaviorname, $newbehaviorname);
+        });
+    }
+
+    /**
+     * Replace a layout/renderer name in the view templates.
+     *
+     * @param string $searchlayoutname The layout name to search for.
+     * @param string $newlayoutname The new layout name.
+     * @return void
+     */
+    public function replace_layout_in_view(string $searchlayoutname, string $newlayoutname): void {
+        $this->replace_pattern_in_view(function ($text) use ($searchlayoutname, $newlayoutname) {
+            return self::replace_layout_tag($text, $searchlayoutname, $newlayoutname);
+        });
+    }
+
+
+    /**
+     * Replace a format tag in view templates.
+     *
+     * @param string $text The text/template to search in.
+     * @param string $oldname The old format name.
+     * @param string $newname The new format name (empty string if deleting).
+     * @return string The updated text.
+     */
+    public static function replace_format_tag(string $text, string $oldname, string $newname): string {
+        if ($oldname === '') {
+            return $text;
+        }
+
+        $escapedoldname = preg_quote($oldname, '/');
+
+        if ($newname === '') {
+            $pattern1 = '/:' . $escapedoldname . '(?=[|\]])/i';
+            $pattern2 = '/:' . $escapedoldname . '(?=##)/i';
+            $text = (string) preg_replace($pattern1, '', $text);
+            return (string) preg_replace($pattern2, '', $text);
+        } else {
+            $pattern1 = '/\[\[[^:|\]]+:\K' . $escapedoldname . '(?=[|\]])/i';
+            $pattern2 = '/##[^:#]+:\K' . $escapedoldname . '(?=##)/i';
+            $text = (string) preg_replace($pattern1, $newname, $text);
+            return (string) preg_replace($pattern2, $newname, $text);
+        }
+    }
+
+    /**
+     * Replace a behavior tag in view templates.
+     *
+     * @param string $text The text/template to search in.
+     * @param string $oldname The old behavior name.
+     * @param string $newname The new behavior name (empty string if deleting).
+     * @return string The updated text.
+     */
+    public static function replace_behavior_tag(string $text, string $oldname, string $newname): string {
+        if ($oldname === '') {
+            return $text;
+        }
+
+        $escapedoldname = preg_quote($oldname, '/');
+
+        if ($newname === '') {
+            $pattern2 = '/\|' . $escapedoldname . '(?=\])/i';
+            $pattern1 = '/\[\[[^|\]]+\|\K' . $escapedoldname . '(?=\||\])/i';
+            $text = (string) preg_replace($pattern2, '', $text);
+            return (string) preg_replace($pattern1, '', $text);
+        } else {
+            $pattern = '/\[\[[^|\]]+\|\K' . $escapedoldname . '(?=[|\]])/i';
+            return (string) preg_replace($pattern, $newname, $text);
+        }
+    }
+
+
+    /**
+     * Replace a layout tag in view templates.
+     *
+     * @param string $text The text/template to search in.
+     * @param string $oldname The old layout name.
+     * @param string $newname The new layout name (empty string if deleting).
+     * @return string The updated text.
+     */
+    public static function replace_layout_tag(string $text, string $oldname, string $newname): string {
+        if ($oldname === '') {
+            return $text;
+        }
+
+        $escapedoldname = preg_quote($oldname, '/');
+
+        if ($newname === '') {
+            $pattern1 = '/\[\[[^|\]]+\|[^|\]]+\K\|' . $escapedoldname . '(?=\])/i';
+            $pattern2 = '/\[\[[^|\]]+\K\|\|' . $escapedoldname . '(?=\])/i';
+            $text = (string) preg_replace($pattern1, '', $text);
+            return (string) preg_replace($pattern2, '', $text);
+        } else {
+            $pattern = '/\[\[[^|\]]+\|[^|\]]*\|\K' . $escapedoldname . '(?=\])/i';
+            return (string) preg_replace($pattern, $newname, $text);
+        }
+    }
+
+
 
 
     /**

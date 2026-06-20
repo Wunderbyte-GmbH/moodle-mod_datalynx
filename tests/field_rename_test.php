@@ -34,6 +34,9 @@ use stdClass;
  * @covers     \mod_datalynx\local\view\base
  * @covers     \mod_datalynx\local\field\datalynxfield_base
  * @covers     \datalynx
+ * @covers     \datalynxfield_behavior
+ * @covers     \datalynxfield_layout
+ * @covers     \mod_datalynx\local\field_format\manager
  */
 final class field_rename_test extends advanced_testcase {
     /**
@@ -220,5 +223,184 @@ final class field_rename_test extends advanced_testcase {
         // Verify the custom filter entry was removed.
         $updatedfilter = $DB->get_record('datalynx_customfilters', ['id' => $filterid]);
         $this->assertNull($updatedfilter->fieldlist);
+    }
+
+    /**
+     * Test the regex replacement logic for format, behavior, and layout tags.
+     */
+    public function test_replace_additional_tags_regex(): void {
+        // 1. Format tags renaming.
+        $text = '[[field:oldformat]] and [[field:oldformat|behavior]] and ##field:oldformat##';
+        $expected = '[[field:newformat]] and [[field:newformat|behavior]] and ##field:newformat##';
+        $this->assertEquals($expected, \mod_datalynx\local\view\base::replace_format_tag($text, 'oldformat', 'newformat'));
+
+        // 2. Format tags deletion.
+        $text = '[[field:oldformat]] and [[field:oldformat|behavior]] and ##field:oldformat##';
+        $expected = '[[field]] and [[field|behavior]] and ##field##';
+        $this->assertEquals($expected, \mod_datalynx\local\view\base::replace_format_tag($text, 'oldformat', ''));
+
+        // 3. Behavior tags renaming.
+        $text = '[[field|oldbehavior]] and [[field:format|oldbehavior]] and [[field|oldbehavior|layout]]';
+        $expected = '[[field|newbehavior]] and [[field:format|newbehavior]] and [[field|newbehavior|layout]]';
+        $this->assertEquals($expected, \mod_datalynx\local\view\base::replace_behavior_tag($text, 'oldbehavior', 'newbehavior'));
+
+        // 4. Behavior tags deletion.
+        $text = '[[field|oldbehavior]] and [[field|oldbehavior|layout]]';
+        $expected = '[[field]] and [[field||layout]]';
+        $this->assertEquals($expected, \mod_datalynx\local\view\base::replace_behavior_tag($text, 'oldbehavior', ''));
+
+        // 5. Layout tags renaming.
+        $text = '[[field|behavior|oldlayout]] and [[field||oldlayout]]';
+        $expected = '[[field|behavior|newlayout]] and [[field||newlayout]]';
+        $this->assertEquals($expected, \mod_datalynx\local\view\base::replace_layout_tag($text, 'oldlayout', 'newlayout'));
+
+        // 6. Layout tags deletion.
+        $text = '[[field|behavior|oldlayout]] and [[field||oldlayout]]';
+        $expected = '[[field|behavior]] and [[field]]';
+        $this->assertEquals($expected, \mod_datalynx\local\view\base::replace_layout_tag($text, 'oldlayout', ''));
+    }
+
+    /**
+     * Test that updating/deleting behaviors propagates to views.
+     */
+    public function test_behavior_renaming_updates_views(): void {
+        global $DB;
+
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        $course = $this->getDataGenerator()->create_course();
+        $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
+        $dlx = new datalynx($instance->id);
+
+        // Insert a behavior.
+        $behaviorid = $DB->insert_record('datalynx_behaviors', (object) [
+            'dataid' => $dlx->id(),
+            'name' => 'oldbehavior',
+            'visibleto' => serialize(['permissions' => [], 'users' => [], 'teammember' => []]),
+            'editableby' => serialize([]),
+            'required' => serialize([]),
+            'description' => '',
+        ]);
+
+        // Setup a view with behavior tags.
+        $viewid = $DB->insert_record('datalynx_views', (object) [
+            'dataid' => $dlx->id(),
+            'type' => 'tabular',
+            'name' => 'My View',
+            'description' => 'Desc [[field|oldbehavior]]',
+            'section' => 'Section [[field|oldbehavior|layout]]',
+        ]);
+
+        // Rename behavior.
+        $formdata = \mod_datalynx\local\field\datalynxfield_behavior::get_behavior($behaviorid);
+        $formdata->name = 'newbehavior';
+        \mod_datalynx\local\field\datalynxfield_behavior::update_behavior($formdata);
+
+        // Verify renaming.
+        $updatedview = $DB->get_record('datalynx_views', ['id' => $viewid]);
+        $this->assertEquals('Desc [[field|newbehavior]]', $updatedview->description);
+        $this->assertEquals('Section [[field|newbehavior|layout]]', $updatedview->section);
+
+        // Delete behavior.
+        \mod_datalynx\local\field\datalynxfield_behavior::delete_behavior($behaviorid);
+
+        // Verify deletion.
+        $deletedview = $DB->get_record('datalynx_views', ['id' => $viewid]);
+        $this->assertEquals('Desc [[field]]', $deletedview->description);
+        $this->assertEquals('Section [[field||layout]]', $deletedview->section);
+    }
+
+    /**
+     * Test that updating/deleting layouts propagates to views.
+     */
+    public function test_layout_renaming_updates_views(): void {
+        global $DB;
+
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        $course = $this->getDataGenerator()->create_course();
+        $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
+        $dlx = new datalynx($instance->id);
+
+        // Insert a renderer (layout).
+        $rendererid = $DB->insert_record('datalynx_renderers', (object) [
+            'dataid' => $dlx->id(),
+            'type' => 'text',
+            'name' => 'oldlayout',
+        ]);
+
+        // Setup a view with layout tags.
+        $viewid = $DB->insert_record('datalynx_views', (object) [
+            'dataid' => $dlx->id(),
+            'type' => 'tabular',
+            'name' => 'My View',
+            'description' => 'Desc [[field|behavior|oldlayout]]',
+            'section' => 'Section [[field||oldlayout]]',
+        ]);
+
+        // Rename layout.
+        $formdata = \mod_datalynx\local\field\datalynxfield_layout::get_renderer($rendererid);
+        $formdata->name = 'newlayout';
+        $formdata->d = $dlx->id();
+        \mod_datalynx\local\field\datalynxfield_layout::update_renderer($formdata);
+
+        // Verify renaming.
+        $updatedview = $DB->get_record('datalynx_views', ['id' => $viewid]);
+        $this->assertEquals('Desc [[field|behavior|newlayout]]', $updatedview->description);
+        $this->assertEquals('Section [[field||newlayout]]', $updatedview->section);
+
+        // Delete layout.
+        \mod_datalynx\local\field\datalynxfield_layout::delete_renderer($rendererid);
+
+        // Verify deletion.
+        $deletedview = $DB->get_record('datalynx_views', ['id' => $viewid]);
+        $this->assertEquals('Desc [[field|behavior]]', $deletedview->description);
+        $this->assertEquals('Section [[field]]', $deletedview->section);
+    }
+
+    /**
+     * Test that updating a format propagates to views.
+     */
+    public function test_format_renaming_updates_views(): void {
+        global $DB;
+
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        $course = $this->getDataGenerator()->create_course();
+        $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
+        $dlx = new datalynx($instance->id);
+
+        // Insert a format.
+        $formatid = $DB->insert_record('datalynx_field_formats', (object) [
+            'dataid' => $dlx->id(),
+            'name' => 'oldformat',
+            'fieldtype' => 'text',
+        ]);
+
+        // Setup a view with format tags.
+        $viewid = $DB->insert_record('datalynx_views', (object) [
+            'dataid' => $dlx->id(),
+            'type' => 'tabular',
+            'name' => 'My View',
+            'description' => 'Desc [[field:oldformat]]',
+            'section' => 'Section [[field:oldformat|behavior]]',
+        ]);
+
+        // Rename format.
+        $record = (object) [
+            'id' => $formatid,
+            'dataid' => $dlx->id(),
+            'name' => 'newformat',
+            'fieldtype' => 'text',
+        ];
+        \mod_datalynx\local\field_format\manager::save_format($record);
+
+        // Verify renaming.
+        $updatedview = $DB->get_record('datalynx_views', ['id' => $viewid]);
+        $this->assertEquals('Desc [[field:newformat]]', $updatedview->description);
+        $this->assertEquals('Section [[field:newformat|behavior]]', $updatedview->section);
     }
 }

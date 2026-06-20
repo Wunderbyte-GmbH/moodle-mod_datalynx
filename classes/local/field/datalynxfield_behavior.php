@@ -437,7 +437,8 @@ class datalynxfield_behavior {
     public static function update_behavior($formdata) {
         global $DB;
         $record = self::form_to_db($formdata);
-        if ($DB->get_field('datalynx_renderers', 'name', ['id' => $record->id]) != $record->name) {
+        $oldname = $DB->get_field('datalynx_behaviors', 'name', ['id' => $record->id]);
+        if ($oldname !== $record->name) {
             self::update_behavior_pattern($record->id, $record->name);
         }
         $DB->update_record('datalynx_behaviors', $record);
@@ -484,40 +485,18 @@ class datalynxfield_behavior {
      */
     public static function update_behavior_pattern($behaviorid, $behaviorname = '') {
         global $DB;
-        // Read dataid from DB and find patterns and param2 from all connected views.
         $behaviorinfo = $DB->get_record(
             'datalynx_behaviors',
             ['id' => $behaviorid],
             'dataid, name',
             IGNORE_MISSING
         );
-        $connected = $DB->get_records(
-            'datalynx_views',
-            ['dataid' => $behaviorinfo->dataid],
-            null,
-            'id, patterns, param2'
-        );
-        // Update every instance that still has the string ||behaviorname in it.
-        foreach ($connected as $view) {
-            // Check if view patterns or param2 contain the behavior name.
-            if (
-                    strpos($view->patterns, '|' . $behaviorinfo->name) !== false ||
-                    strpos($view->param2, '|' . $behaviorinfo->name) !== false
-            ) {
-                if (strpos($view->param2, '|' . $behaviorinfo->name . '|')) {
-                    $view->patterns = str_replace('|' . $behaviorinfo->name . '|', '|' . $behaviorname . '|', $view->patterns);
-                    $view->param2 = str_replace('|' . $behaviorinfo->name . '|', '|' . $behaviorname . '|', $view->param2);
-                } else {
-                    if (!empty($behaviorname)) {
-                        $behaviorname = '|' . $behaviorname;
-                    }
-                    $view->patterns = str_replace('|' . $behaviorinfo->name, $behaviorname, $view->patterns);
-                    $view->param2 = str_replace('|' . $behaviorinfo->name, $behaviorname, $view->param2);
-                }
-            }
-            $DB->update_record('datalynx_views', $view, true);
+        if ($behaviorinfo) {
+            $dlx = new datalynx($behaviorinfo->dataid);
+            $dlx->replace_behavior_in_views($behaviorinfo->name, $behaviorname);
         }
     }
+
 
     /**
      * Toggle a permission-based property and persist it.

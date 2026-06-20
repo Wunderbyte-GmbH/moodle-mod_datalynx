@@ -336,51 +336,25 @@ class datalynxfield_layout {
     /**
      * Delete renderer when $renderername is empty otherwise update view patterns.
      *
-     * @param integer $rendererid
-     * @param string $renderername
-     * @return bool success status of deletion
+     * @param int $rendererid The renderer database ID.
+     * @param string $renderername The new renderer name (empty if deleting).
+     * @return void
      */
     public static function update_render_pattern($rendererid, $renderername = '') {
         global $DB;
-        if (!empty($renderername)) {
-            $renderername = '|' . $renderername;
-        }
-        // Read dataid from DB and find patterns and param2 from all connected views.
         $rendererinfo = $DB->get_record(
             'datalynx_renderers',
             ['id' => $rendererid],
             'dataid, name',
             IGNORE_MISSING
         );
-        $connected = $DB->get_records(
-            'datalynx_views',
-            ['dataid' => $rendererinfo->dataid],
-            null,
-            'id, patterns, param2'
-        );
-        // Update every instance that still has the string ||renderername in it.
-        foreach ($connected as $view) {
-            // Views may legitimately have NULL patterns/param2 (e.g. a view with no field tags yet),
-            // so normalise to strings before passing them to strpos()/str_replace() (passing null is
-            // deprecated in PHP 8.1+).
-            $view->patterns = (string) $view->patterns;
-            $view->param2 = (string) $view->param2;
-            // TODO: MDL-66151 Is one check enough or are these separate?
-            if (
-                    strpos($view->patterns, '|' . $rendererinfo->name) !== false ||
-                    strpos($view->param2, '|' . $rendererinfo->name) !== false
-            ) {
-                if (strpos($view->param2, '||' . $rendererinfo->name) !== false) {
-                    $view->patterns = str_replace('||' . $rendererinfo->name, $renderername, $view->patterns);
-                    $view->param2 = str_replace('||' . $rendererinfo->name, $renderername, $view->param2);
-                } else {
-                    $view->patterns = str_replace('|' . $rendererinfo->name, $renderername, $view->patterns);
-                    $view->param2 = str_replace('|' . $rendererinfo->name, $renderername, $view->param2);
-                }
-                $DB->update_record('datalynx_views', $view, true);
-            }
+        if ($rendererinfo) {
+            $dlx = new datalynx($rendererinfo->dataid);
+            $dlx->replace_layout_in_views($rendererinfo->name, $renderername);
         }
     }
+
+
 
     /**
      * Process renderer pattern
