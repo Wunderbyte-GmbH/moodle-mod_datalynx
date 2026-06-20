@@ -705,6 +705,35 @@ abstract class base {
     }
 
     /**
+     * Replace occurrences of a field tag in a given text/template.
+     *
+     * @param string $text The text/template to search in.
+     * @param string $oldname The old field name.
+     * @param string $newname The new field name (empty string if deleting).
+     * @return string The updated text.
+     */
+    public static function replace_field_tag(string $text, string $oldname, string $newname): string {
+        if ($oldname === '') {
+            return $text;
+        }
+
+        $escapedoldname = preg_quote($oldname, '/');
+
+        if ($newname === '') {
+            // Field deletion: match the entire tag (e.g. [[fieldname]], [[fieldname:format]],
+            // [[fieldname|behavior]], etc.) and remove it.
+            $pattern = '/\[\[' . $escapedoldname . '(?:[:|#\]][^\]]*)?\]\](?:@)?/i';
+            return (string) preg_replace($pattern, '', $text);
+        } else {
+            // Field renaming: replace only the field name prefix inside the tag.
+            // Match [[oldname if it's followed by :, |, #, or ]].
+            $pattern = '/\[\[' . $escapedoldname . '(?=[:|#\]])/i';
+            $replacement = '[[' . $newname;
+            return (string) preg_replace($pattern, $replacement, $text);
+        }
+    }
+
+    /**
      * Subclass may need to override
      *
      * @param string $searchfieldname Field name to search for.
@@ -712,22 +741,27 @@ abstract class base {
      * @return void
      */
     public function replace_field_in_view($searchfieldname, $newfieldname) {
-        $patterns = self::get_field_tag_patterns($searchfieldname);
-        if (!$newfieldname) {
-            $replacements = '';
-        } else {
-            $replacements = self::get_field_tag_patterns($newfieldname);
+        $textcolumns = [
+            'description', 'section',
+            'param1', 'param2', 'param3', 'param4', 'param5',
+            'param6', 'param7', 'param8', 'param9', 'param10',
+        ];
+
+        foreach ($textcolumns as $col) {
+            if (!empty($this->view->$col)) {
+                $this->view->$col = self::replace_field_tag($this->view->$col, $searchfieldname, $newfieldname);
+            }
         }
 
         foreach ($this->editors as $editor) {
-            $this->view->{"e$editor"} = str_ireplace(
-                $patterns,
-                $replacements,
-                $this->view->{"e$editor"}
-            );
+            if (isset($this->view->{"e$editor"})) {
+                $this->view->{"e$editor"} = self::replace_field_tag($this->view->{"e$editor"}, $searchfieldname, $newfieldname);
+            }
         }
+
         $this->update($this->view);
     }
+
 
     /**
      * Returns the name/type of the view

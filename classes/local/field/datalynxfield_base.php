@@ -158,14 +158,22 @@ abstract class datalynxfield_base {
      */
     public function update_field($fromform = null) {
         global $DB, $OUTPUT;
+        $oldname = $this->field->name;
         if (!empty($fromform)) {
             $this->set_field($fromform);
         }
+        $newname = $this->field->name;
 
         if (!$DB->update_record('datalynx_fields', $this->field)) {
             echo $OUTPUT->notification('updating of field failed!');
             return false;
         }
+
+        if ($oldname !== '' && $oldname !== $newname) {
+            $this->dlx->replace_field_in_views($oldname, $newname);
+            $this->dlx->replace_field_in_filters($oldname, $newname);
+        }
+
         return true;
     }
 

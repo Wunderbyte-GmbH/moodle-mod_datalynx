@@ -1576,6 +1576,7 @@ class datalynx {
                             $processedfids[] = $field->field->id;
                             // Update views.
                             $this->replace_field_in_views($field->field->name, '');
+                            $this->replace_field_in_filters($field->field->name, '');
 
                             $other = ['dataid' => $this->id()];
                             $event = event\field_deleted::create(
@@ -2052,6 +2053,47 @@ class datalynx {
         if (!empty($views)) {
             foreach ($views as $view) {
                 $view->replace_field_in_view($searchfieldname, $newfieldname);
+            }
+        }
+    }
+
+    /**
+     * Rename or remove field tags/names in custom filters when a field is renamed or deleted.
+     *
+     * @param string $oldfieldname The old field name.
+     * @param string $newfieldname The new field name (empty string if deleted).
+     */
+    public function replace_field_in_filters(string $oldfieldname, string $newfieldname): void {
+        global $DB;
+        $customfilters = $DB->get_records('datalynx_customfilters', ['dataid' => $this->id()]);
+        if (!empty($customfilters)) {
+            foreach ($customfilters as $customfilter) {
+                if (empty($customfilter->fieldlist)) {
+                    continue;
+                }
+                $fieldlist = json_decode($customfilter->fieldlist, true);
+                if (!is_array($fieldlist)) {
+                    continue;
+                }
+                $changed = false;
+                foreach ($fieldlist as $fieldid => &$listfield) {
+                    if (isset($listfield['name']) && $listfield['name'] === $oldfieldname) {
+                        if ($newfieldname === '') {
+                            unset($fieldlist[$fieldid]);
+                        } else {
+                            $listfield['name'] = $newfieldname;
+                        }
+                        $changed = true;
+                    }
+                }
+                if ($changed) {
+                    if (empty($fieldlist)) {
+                        $customfilter->fieldlist = null;
+                    } else {
+                        $customfilter->fieldlist = json_encode($fieldlist);
+                    }
+                    $DB->update_record('datalynx_customfilters', $customfilter);
+                }
             }
         }
     }

@@ -1091,5 +1091,30 @@ class behat_mod_datalynx extends behat_base {
         $record->singleedit = (int) $view->id;
         $DB->update_record('datalynx', $record);
     }
+    /**
+     * Asserts that a TinyMCE editor content contains a specific string.
+     *
+     * @Then the :editorid editor should contain :expectedvalue
+     *
+     * @param string $editorid  The textarea ID backing the TinyMCE editor, e.g. "id_eparam2_editor"
+     * @param string $expectedvalue  Expected content in the editor
+     * @throws coding_exception
+     * @throws \Exception
+     */
+    public function the_editor_should_contain($editorid, $expectedvalue) {
+        if (!$this->running_javascript()) {
+            throw new coding_exception('Reading editor content requires javascript.');
+        }
+        $safeid = addslashes($editorid);
+        $content = $this->getSession()->evaluateScript(
+            "(function() { " .
+            "  var ed = window.tinyMCE ? window.tinyMCE.get('{$safeid}') : null; " .
+            "  return ed ? ed.getContent() : ''; " .
+            "})()"
+        );
+        if (strpos($content, $expectedvalue) === false) {
+            throw new \Exception("Expected editor content to contain '{$expectedvalue}', but got: '{$content}'");
+        }
+    }
     // phpcs:enable moodle.Files.LineLength
 }

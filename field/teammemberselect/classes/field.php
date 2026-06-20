@@ -333,24 +333,7 @@ class field extends datalynxfield_base {
         return true;
     }
 
-    /**
-     * Update a field in the database
-     *
-     * @param ?stdClass $fromform Form data to update from.
-     * @return bool True on success.
-     */
-    public function update_field($fromform = null) {
-        global $DB, $OUTPUT;
-        if (!empty($fromform)) {
-            $this->set_field($fromform);
-        }
 
-        if (!$DB->update_record('datalynx_fields', $this->field)) {
-            echo $OUTPUT->notification('updating of field failed!');
-            return false;
-        }
-        return true;
-    }
 
     /**
      * Get options menu for selection.
