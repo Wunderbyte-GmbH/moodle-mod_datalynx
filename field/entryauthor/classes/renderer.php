@@ -188,8 +188,10 @@ class renderer extends datalynxfield_renderer {
         foreach ($users as $userid => $user) {
             $usermenu[$userid] = $user->lastname . ' ' . $user->firstname . ' (' . $user->email . ')';
         }
+        $mform->addElement('html', '<div class="datalynx-no-fitem-wrapper">');
         $mform->addElement('select', $fieldname, null, $usermenu);
         $mform->setDefault($fieldname, $selected);
+        $mform->addElement('html', '</div>');
     }
 
     /**

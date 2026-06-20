@@ -335,6 +335,23 @@ form.mform div.entry div.datalynx-field-wrapper {
     display: block;
 }
 
+/* ##submit## and ##cancel## are always placed in custom view HTML, so their
+   fitem wrapper should be invisible. Moodle propagates the element class to
+   the outer fitem div, giving us a reliable hook. Both felement and fitem
+   use display:contents because buttons have no validation feedback to show. */
+.fitem.datalynx-custom-submit,
+.fitem.datalynx-custom-cancel {
+    display: contents;
+}
+.fitem.datalynx-custom-submit .col-md-3.col-form-label,
+.fitem.datalynx-custom-cancel .col-md-3.col-form-label {
+    display: none;
+}
+.fitem.datalynx-custom-submit .felement,
+.fitem.datalynx-custom-cancel .felement {
+    display: contents;
+}
+
 /* Modern Datalynx View default templates styling */
 .datalynx-view-container {
     width: 100%;

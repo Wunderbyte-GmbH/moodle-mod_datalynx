@@ -84,6 +84,7 @@ class renderer extends datalynxfield_renderer {
         // off value is Draft (1), which is always a valid, non-empty status.
 
         $fieldname = "field_{$fieldid}_{$entryid}";
+        $mform->addElement('html', '<div class="datalynx-no-fitem-wrapper">');
         // Render as an on/off switch (Draft = off, Final submission = on), styled like ##approve##.
         // The advcheckbox keeps the real status constants as its off/on values, so the submitted value
         // is still a valid status and the value parsing in datalynx_entries stays unchanged.
@@ -112,6 +113,7 @@ class renderer extends datalynxfield_renderer {
         $desc = get_string('statustoggledesc', 'datalynx');
         $mform->addElement('static', $fieldname . '_desc', '', '<small class="text-muted">' . $desc . '</small>');
         $PAGE->requires->js_call_amd('mod_datalynx/status_toggle', 'init'); // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
+        $mform->addElement('html', '</div>');
     }
 
     /**

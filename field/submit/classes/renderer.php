@@ -108,7 +108,7 @@ class renderer extends datalynxfield_renderer {
                 $label = $settings['buttontext'];
             }
             if (!empty($settings['cssclasses'])) {
-                $class = $settings['cssclasses'];
+                $class = trim($settings['cssclasses']) . ' datalynx-custom-submit';
             }
             if (!empty($settings['showarrow'])) {
                 $label .= ' →';
@@ -122,8 +122,7 @@ class renderer extends datalynxfield_renderer {
                     $label = substr($option, 5);
                     $label = str_replace('_', ' ', $label);
                 } else if (strpos($option, 'class=') === 0) {
-                    $class = substr($option, 6);
-                    $class = str_replace('_', ' ', $class);
+                    $class = trim(str_replace('_', ' ', substr($option, 6))) . ' datalynx-custom-submit';
                 }
             }
         }

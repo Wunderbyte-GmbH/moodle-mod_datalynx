@@ -142,8 +142,10 @@ class renderer extends datalynxfield_renderer {
             }
         }
 
+        $mform->addElement('html', '<div class="datalynx-no-fitem-wrapper">');
         $mform->addElement('select', $fieldname, null, $groupsmenu);
         $mform->setDefault($fieldname, $selected);
+        $mform->addElement('html', '</div>');
     }
 
     /**

@@ -103,6 +103,7 @@ class renderer extends datalynxfield_renderer {
         }
 
         $fieldname = "field_{$fieldid}_{$entryid}";
+        $mform->addElement('html', '<div class="datalynx-no-fitem-wrapper">');
         // Group course.
         $courses = get_courses("all", "c.sortorder ASC", "c.id,c.fullname");
         $coursemenu = [0 => get_string('choosedots')];
@@ -158,6 +159,7 @@ class renderer extends datalynxfield_renderer {
             $mform->setType("{$fieldname}_groupid", PARAM_TEXT);
             $mform->setDefault("{$fieldname}_groupid", $groupid);
         }
+        $mform->addElement('html', '</div>');
     }
     // phpcs:enable moodle.PHP.ForbiddenGlobalUse.BadGlobal
 

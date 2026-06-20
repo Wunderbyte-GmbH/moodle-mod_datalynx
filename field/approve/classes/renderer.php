@@ -115,8 +115,10 @@ class renderer extends datalynxfield_renderer {
         }
 
         $fieldname = "field_{$fieldid}_{$entryid}";
+        $mform->addElement('html', '<div class="datalynx-no-fitem-wrapper">');
         $mform->addElement('advcheckbox', $fieldname, null, null, null, [0, 1]);
         $mform->setDefault($fieldname, $checked);
+        $mform->addElement('html', '</div>');
     }
 
     /**
