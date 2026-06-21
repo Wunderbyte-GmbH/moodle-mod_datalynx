@@ -139,7 +139,19 @@ class renderer extends datalynxfield_renderer {
                 }
                 $totalcols[] = ['name' => $subfield->field->name, 'value' => $value];
             }
-            $completedispl['totals'] = ['label' => $fieldformat->get_label(), 'col' => $totalcols];
+            // Place the totals label into the first blank (non-numeric) cell so it sits on the
+            // same row as the aggregated sum instead of on a separate full-width line above it.
+            $label = $fieldformat->get_label();
+            $labelplaced = false;
+            foreach ($totalcols as &$totalcol) {
+                if ($totalcol['value'] === '') {
+                    $totalcol['value'] = s($label);
+                    $labelplaced = true;
+                    break;
+                }
+            }
+            unset($totalcol);
+            $completedispl['totals'] = ['label' => $label, 'labelplaced' => $labelplaced, 'col' => $totalcols];
         }
 
         // We need this construct to make sure intermittent empty lines are shown.

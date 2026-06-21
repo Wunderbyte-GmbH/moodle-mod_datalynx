@@ -60,9 +60,11 @@
     </tr>
     {{/line}}
     {{#totals}}
+    {{^labelplaced}}
     <tr class="datalynx-fieldgroup-totals" style="font-weight: bold;">
         <td style="padding: 5px;">{{label}}</td>
     </tr>
+    {{/labelplaced}}
     <tr class="datalynx-fieldgroup-totals" style="font-weight: bold;">
         {{#col}}
         <td style="padding: 5px;">{{{value}}}</td>

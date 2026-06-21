@@ -52,9 +52,11 @@
 </div>
 {{/line}}
 {{#totals}}
+{{^labelplaced}}
 <div class="row font-weight-bold datalynx-fieldgroup-totals">
     <div class="col-12">{{label}}</div>
 </div>
+{{/labelplaced}}
 <div class="row font-weight-bold datalynx-fieldgroup-totals">
     {{#col}}
         <div class="col" data-field-name="{{name}}">{{{value}}}</div>
