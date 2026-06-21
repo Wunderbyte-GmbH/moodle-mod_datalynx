@@ -429,11 +429,11 @@ final class viewlink_pattern_test extends advanced_testcase {
         );
 
         // Simulate the target view carrying the current page's filter and custom search
-        // state in its base URL (as happens on a real page request). These must not leak
-        // into the generated link.
+        // state in its navigation URL (as happens on a real page request). These must not
+        // leak into the generated link — viewsesslinks use the clean baseurl.
         $cachedtarget = $dlx->get_views()[$targetobj->id()];
-        $cachedtarget->get_baseurl()->param('filter', 266);
-        $cachedtarget->get_baseurl()->param('usearch', 'userid:AND:,ME,');
+        $cachedtarget->get_navigationurl()->param('filter', 266);
+        $cachedtarget->get_navigationurl()->param('usearch', 'userid:AND:,ME,');
 
         $tag = '##viewsesslink:myview;Edit entry;editentries=##entryid##;btn btn-secondary##';
 

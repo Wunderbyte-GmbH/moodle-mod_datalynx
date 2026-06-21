@@ -187,7 +187,7 @@ class tabular_view_manager {
         $rows = [];
 
         foreach ($entryrecords as $entry) {
-            $entry->baseurl = $view->get_baseurl();
+            $entry->baseurl = $view->get_navigationurl();
             $manageable = $view->get_dlx()->user_can_manage_entry($entry);
             $cells = [];
 

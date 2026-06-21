@@ -126,7 +126,7 @@ class csv_view_manager {
         $rows = [];
 
         foreach ($entryrecords as $entry) {
-            $entry->baseurl = $view->get_baseurl();
+            $entry->baseurl = $view->get_navigationurl();
             $cells = [];
 
             foreach ($columns as $column) {

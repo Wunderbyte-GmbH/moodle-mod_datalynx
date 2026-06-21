@@ -979,7 +979,7 @@ class datalynx_filter_manager {
      * @return datalynx_advanced_filter_form
      */
     public function get_advanced_filter_form($filter, $view) {
-        $formurl = new moodle_url($view->get_baseurl(), ['filter' => self::USER_FILTER_SET, 'afilter' => 1]);
+        $formurl = new moodle_url($view->get_navigationurl(), ['filter' => self::USER_FILTER_SET, 'afilter' => 1]);
         $mform = new datalynx_advanced_filter_form($this->dlx, $filter, $formurl, ['view' => $view]);
         return $mform;
     }
@@ -996,7 +996,7 @@ class datalynx_filter_manager {
      */
     public function get_customfilter_frontend_form($filter, \mod_datalynx\local\view\base $view, $customfilter = false) {
         $cfilter = isset($customfilter->id) ? $customfilter->id : "1";
-        $formurl = new moodle_url($view->get_baseurl(), ['filter' => self::USER_FILTER_SET, 'cfilter' => $cfilter]);
+        $formurl = new moodle_url($view->get_navigationurl(), ['filter' => self::USER_FILTER_SET, 'cfilter' => $cfilter]);
         $mform = new datalynx_customfilter_frontend_form(
             $this->dlx,
             $filter,

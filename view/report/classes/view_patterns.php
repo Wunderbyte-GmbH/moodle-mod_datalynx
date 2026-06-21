@@ -43,7 +43,7 @@ class view_patterns extends datalynxview_patterns {
         $replacements = parent::get_replacements($tags, $entry, $options);
 
         $view = $this->view;
-        $baseurl = new \moodle_url($view->get_baseurl());
+        $baseurl = new \moodle_url($view->get_navigationurl());
         $baseurl->param('sesskey', sesskey());
 
         foreach ($tags as $tag) {

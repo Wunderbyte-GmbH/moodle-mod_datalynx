@@ -191,7 +191,7 @@ class datalynxview_patterns {
         $paging = array_keys($this->paging_patterns()); // Paging tags.
 
         $options['filter'] = $view->get_filter();
-        $options['baseurl'] = new moodle_url($view->get_baseurl(), ['sesskey' => sesskey()]);
+        $options['baseurl'] = new moodle_url($view->get_navigationurl(), ['sesskey' => sesskey()]);
 
         $replacements = [];
         foreach ($tags as $tag) {
@@ -486,7 +486,7 @@ class datalynxview_patterns {
 
         $view = $this->view;
         $dlx = $view->get_dlx();
-        $baseurl = new moodle_url($view->get_baseurl());
+        $baseurl = new moodle_url($view->get_navigationurl());
         $baseurl->param('sesskey', sesskey());
         // When user is editing then do not render these tags.
         if ($view->user_is_editing()) {
@@ -696,7 +696,7 @@ class datalynxview_patterns {
 
         $view = $this->view;
         $filter = $view->get_filter();
-        $baseurl = $view->get_baseurl();
+        $baseurl = $view->get_navigationurl();
 
         $pagingbar = null;
 

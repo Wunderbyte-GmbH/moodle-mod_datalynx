@@ -136,7 +136,7 @@ class grid_view_manager {
 
         foreach ($entryrecords as $entry) {
             $manageable = $view->get_dlx()->user_can_manage_entry($entry);
-            $entry->baseurl = $view->get_baseurl();
+            $entry->baseurl = $view->get_navigationurl();
             $entries[] = [
                 'id' => (int) $entry->id,
                 'entryhtml' => $useentryhtml ? $view->render_entry_html($entry, ['edit' => false, 'manage' => $manageable]) : '',

@@ -122,9 +122,7 @@ Feature: Create entry and add fieldgroups
 
     ## Add some entries for testing.
     When I follow "Add a new entry"
-    Then I should see "Datalynx field Text"
-    ## Names do not work bc. iterator.
-
+    ## Subfield names are not shown in the fieldgroup edit form (labels were removed intentionally).
     When I set the field with xpath "(//input[@type='text'])[1]" to "3"
     When I set the field with xpath "(//input[@type='text'])[2]" to "Text 1 in the first line"
     When I set the field with xpath "(//input[@type='text'])[3]" to "6"

@@ -158,11 +158,12 @@ final class csv_view_customfilter_test extends advanced_testcase {
      * When a custom filter search is active the base URL must carry a usearch parameter
      * so that derived links (e.g. Export All / Export Page) preserve the filter.
      *
-     * This test will FAIL before the fix in base.php and PASS after.
+     * This test verifies that the navigation URL (used for export links) carries usearch
+     * while the base URL remains clean (no filter/search params).
      *
-     * @covers ::get_baseurl
+     * @covers ::get_navigationurl
      */
-    public function test_baseurl_contains_usearch_when_custom_filter_active(): void {
+    public function test_navigationurl_contains_usearch_when_custom_filter_active(): void {
         $this->resetAfterTest();
         $this->setAdminUser();
 
@@ -171,12 +172,21 @@ final class csv_view_customfilter_test extends advanced_testcase {
         $searchfields = [$fieldid => ['AND' => [['', 'ANY_OF', ['2']]]]];
 
         $view = new csv_view($dlx, $viewrecord->id, ['customsearch' => $searchfields]);
-        $url = $view->get_baseurl()->out(false);
 
+        // The navigationurl is what export links are built from; it must carry usearch.
+        $navurl = $view->get_navigationurl()->out(false);
         $this->assertStringContainsString(
             'usearch=',
-            $url,
-            'Export links are built from baseurl; without usearch the custom filter is silently ignored on export.'
+            $navurl,
+            'Export links are built from navigationurl; without usearch the custom filter is silently ignored on export.'
+        );
+
+        // The baseurl must stay clean — no filter/search state.
+        $baseurl = $view->get_baseurl()->out(false);
+        $this->assertStringNotContainsString(
+            'usearch=',
+            $baseurl,
+            'baseurl must not contain usearch — it is the minimal context URL used for clean redirects.'
         );
     }
 }

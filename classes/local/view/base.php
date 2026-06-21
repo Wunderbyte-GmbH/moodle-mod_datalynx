@@ -159,6 +159,14 @@ abstract class base {
     protected moodle_url $baseurl;
 
     /**
+     * Navigation URL for the current view — baseurl plus active filter/search/paging state.
+     * Used for paging bars, search forms, and within-view action links.
+     *
+     * @var moodle_url
+     */
+    protected moodle_url $navigationurl;
+
+    /**
      * Notifications grouped by type.
      *
      * @var array
@@ -287,41 +295,41 @@ abstract class base {
         $this->set__editors();
         $this->set__patterns();
 
-        // Base url params.
-        $baseurlparams = [];
-        $baseurlparams['d'] = $this->dlx->id();
-        $baseurlparams['view'] = $this->id();
-
+        // Minimal context URL — only params that identify the view, no filter/search/paging state.
+        $baseurlparams = ['d' => $this->dlx->id(), 'view' => $this->id()];
         if ($this->dlx->currentgroup) {
             $baseurlparams['currentgroup'] = $this->dlx->currentgroup;
         }
+        $this->baseurl = new moodle_url("/mod/datalynx/{$this->dlx->pagefile_for_urls()}.php", $baseurlparams);
+
+        $this->set_filter($filteroptions, $this->is_forcing_filter()); // If filter is forced ignore URL parameters.
+
+        // Navigation URL — baseurl plus active browsing state (filter, search, paging).
+        // Used by paging bars, search forms, and within-view action links so that browsing
+        // context is preserved. Cross-view redirects use the clean $this->baseurl instead.
+        $this->navigationurl = new moodle_url($this->baseurl);
         $usersearch = optional_param('usersearch', '', PARAM_TEXT);
         $uperpage = optional_param('uperpage', '', PARAM_INT);
         if (!empty($usersearch)) {
-            $baseurlparams['usersearch'] = $usersearch;
+            $this->navigationurl->param('usersearch', $usersearch);
         }
         if (!empty($uperpage)) {
-            $baseurlparams['uperpage'] = $uperpage;
+            $this->navigationurl->param('uperpage', $uperpage);
         }
-
-        $this->baseurl = new moodle_url("/mod/datalynx/{$this->dlx->pagefile_for_urls()}.php", $baseurlparams);
-        $this->set_filter($filteroptions, $this->is_forcing_filter()); // If filter is forced ignore URL parameters.
-        $this->baseurl->param('filter', $this->filter->id);
+        $this->navigationurl->param('filter', $this->filter->id);
         if ($this->filter->page) {
-            $this->baseurl->param('page', $this->filter->page);
+            $this->navigationurl->param('page', $this->filter->page);
         }
-        // Propagate active custom-filter search and filter ID into the base URL so
-        // that all derived links (e.g. CSV export, pagination) carry the full filter state.
         $cfilter = optional_param('cfilter', 0, PARAM_INT);
         if ($cfilter) {
-            $this->baseurl->param('cfilter', $cfilter);
+            $this->navigationurl->param('cfilter', $cfilter);
         }
         if (!empty($this->filter->customsearch)) {
             $searchfields = unserialize($this->filter->customsearch);
             $usearch = datalynx_filter_manager::get_search_url_query($searchfields);
             if ($usearch !== null) {
                 // Decode get_search_url_query urlencoded string because it is encoded again with ->param().
-                $this->baseurl->param('usearch', urldecode($usearch));
+                $this->navigationurl->param('usearch', urldecode($usearch));
             }
         }
         $this->set_groupby_per_page();
@@ -2075,7 +2083,7 @@ abstract class base {
      */
     protected function get_entry_tag_replacements($entry, $options) {
         $fields = $this->dlx->get_fields();
-        $entry->baseurl = $this->baseurl;
+        $entry->baseurl = $this->navigationurl;
         if (empty($options['viewid'])) {
             $options['viewid'] = $this->id();
         }
@@ -2301,12 +2309,23 @@ abstract class base {
     }
 
     /**
-     * Return base URL for this view.
+     * Return base URL for this view (minimal: d, view, currentgroup only).
+     * Use for cross-view redirects, cancel buttons, and view-switcher links.
      *
      * @return moodle_url
      */
     public function get_baseurl(): moodle_url {
         return $this->baseurl;
+    }
+
+    /**
+     * Return the navigation URL for this view — baseurl plus active filter/search/paging state.
+     * Use for paging bars, search forms, and within-view action links.
+     *
+     * @return moodle_url
+     */
+    public function get_navigationurl(): moodle_url {
+        return $this->navigationurl;
     }
 
     /**
