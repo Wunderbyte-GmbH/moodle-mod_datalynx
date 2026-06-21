@@ -301,6 +301,7 @@ abstract class base {
             $baseurlparams['currentgroup'] = $this->dlx->currentgroup;
         }
         $this->baseurl = new moodle_url("/mod/datalynx/{$this->dlx->pagefile_for_urls()}.php", $baseurlparams);
+        $this->navigationurl = new moodle_url($this->baseurl);
 
         $this->set_filter($filteroptions, $this->is_forcing_filter()); // If filter is forced ignore URL parameters.
 
@@ -2325,6 +2326,10 @@ abstract class base {
      * @return moodle_url
      */
     public function get_navigationurl(): moodle_url {
+        if (!isset($this->navigationurl)) {
+            $baseurl = isset($this->baseurl) ? $this->baseurl : new moodle_url('/');
+            return new moodle_url($baseurl);
+        }
         return $this->navigationurl;
     }
 

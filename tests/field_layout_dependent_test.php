@@ -28,7 +28,6 @@ use mod_datalynx\local\field\datalynxfield_layout;
  * @covers \mod_datalynx\local\field\datalynxfield_renderer::replacements
  */
 final class field_layout_dependent_test extends advanced_testcase {
-
     /**
      * Test rendering when the "not editable" option is set to dependent layout (___5___).
      */
@@ -93,7 +92,7 @@ final class field_layout_dependent_test extends advanced_testcase {
         $renderer = $field->renderer();
 
         // Create an entry where the field has no content.
-        $entry_empty = (object) [
+        $entryempty = (object) [
             'id' => (int) $DB->insert_record('datalynx_entries', (object) [
                 'dataid' => $dlx->id(),
                 'userid' => $USER->id,
@@ -106,7 +105,7 @@ final class field_layout_dependent_test extends advanced_testcase {
         ];
 
         // Create an entry where the field has content.
-        $entry_with_val = (object) [
+        $entrywithval = (object) [
             'id' => (int) $DB->insert_record('datalynx_entries', (object) [
                 'dataid' => $dlx->id(),
                 'userid' => $USER->id,
@@ -119,33 +118,33 @@ final class field_layout_dependent_test extends advanced_testcase {
         ];
         $DB->insert_record('datalynx_contents', (object) [
             'fieldid' => $fieldrecord->id,
-            'entryid' => $entry_with_val->id,
+            'entryid' => $entrywithval->id,
             'lineid' => 0,
             'content' => 'Hello World',
         ]);
         // Also populate entry content property.
-        $entry_with_val->{"c{$fieldrecord->id}_content"} = 'Hello World';
+        $entrywithval->{"c{$fieldrecord->id}_content"} = 'Hello World';
 
-        // Tag format: [[Fieldname|Behaviorname|Renderername]]
+        // The tag format is Fieldname|Behaviorname|Renderername inside double brackets.
         $tag = '[[MyField|MyBehavior|MyLayout]]';
 
         // 1. Empty entry should render empty string.
-        $replacements_empty = $renderer->replacements([$tag], $entry_empty, ['edit' => true]);
-        $this->assertArrayHasKey($tag, $replacements_empty);
-        $this->assertEquals(['html', ''], $replacements_empty[$tag]);
+        $replacementsempty = $renderer->replacements([$tag], $entryempty, ['edit' => true]);
+        $this->assertArrayHasKey($tag, $replacementsempty);
+        $this->assertEquals(['html', ''], $replacementsempty[$tag]);
 
         // 2. Entry with value should render display template (Display: Hello World).
-        $replacements_val = $renderer->replacements([$tag], $entry_with_val, ['edit' => true]);
-        $this->assertArrayHasKey($tag, $replacements_val);
-        $replacement_spec = $replacements_val[$tag];
-        
-        $this->assertEquals('', $replacement_spec[0]);
-        $callback = $replacement_spec[1][0];
-        $args = $replacement_spec[1][1];
-        
+        $replacementsval = $renderer->replacements([$tag], $entrywithval, ['edit' => true]);
+        $this->assertArrayHasKey($tag, $replacementsval);
+        $replacementspec = $replacementsval[$tag];
+
+        $this->assertEquals('', $replacementspec[0]);
+        $callback = $replacementspec[1][0];
+        $args = $replacementspec[1][1];
+
         $this->assertEquals('prerender_edit_mode', $callback[1]);
-        $rendered_options = $args[1];
-        $this->assertEquals('Hello World', $rendered_options['value']);
-        $this->assertEquals('Display: #value', $rendered_options['template']);
+        $renderedoptions = $args[1];
+        $this->assertEquals('Hello World', $renderedoptions['value']);
+        $this->assertEquals('Display: #value', $renderedoptions['template']);
     }
 }
