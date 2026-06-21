@@ -555,19 +555,30 @@ form.mform div.entry div.datalynx-field-wrapper {
 }
 
 /* Radio button & Checkbox fields vertical list layout overrides */
-.datalynx-radio-group-vertical .form-check-inline,
-.datalynx-checkbox-group-vertical .form-check-inline {
+.mform .datalynx-radio-group-vertical .form-check-inline,
+.mform .datalynx-checkbox-group-vertical .form-check-inline {
+    display: inline-flex;
+    align-items: center;
+    padding-left: 0;
     width: 100%;
     margin-right: 0;
     margin-bottom: 0.5rem;
 }
 
-.datalynx-radio-group-vertical .form-check-inline:last-child,
-.datalynx-checkbox-group-vertical .form-check-inline:last-child {
+.mform .datalynx-radio-group-vertical .form-check-inline:last-child,
+.mform .datalynx-checkbox-group-vertical .form-check-inline:last-child {
     margin-bottom: 0;
 }
 
-.datalynx-radio-group-vertical br,
-.datalynx-checkbox-group-vertical br {
+.mform .datalynx-radio-group-vertical br,
+.mform .datalynx-checkbox-group-vertical br {
     display: none;
+}
+
+.mform .datalynx-radio-group-vertical .form-check-input,
+.mform .datalynx-checkbox-group-vertical .form-check-input {
+    position: static;
+    margin-top: 0;
+    margin-left: 0;
+    margin-right: 0.5rem;
 }
