@@ -631,6 +631,7 @@ $string['not'] = 'NOT';
 $string['notallowedtoeditentry'] = 'It\'s not allowed to edit this entry.';
 $string['notapproved'] = 'Entry is not approved yet.';
 $string['noteditable'] = 'When not editable';
+$string['noteditabledependent'] = 'Use display template if content is present, otherwise display nothing';
 $string['notemplate'] = 'No template';
 $string['notificationenable'] = 'Enable notifications for';
 $string['notifyteam'] = 'Notification rule';

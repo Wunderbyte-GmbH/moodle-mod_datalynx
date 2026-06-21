@@ -184,6 +184,17 @@ abstract class datalynxfield_renderer {
                             $currentoptions['template'] = $renderer->get_display_template();
                             $currentoptions['value'] = $this->render_display_mode($entry, $currentoptions);
                             $replacements[$tag] = ['', [[$this, 'prerender_edit_mode'], [$entry, $currentoptions]]];
+                        } else if (
+                            $noteditabletemplate === $renderer::NOT_EDITABLE_SHOW_DEPENDENT
+                        ) {
+                            $displayvalue = $this->render_display_mode($entry, $currentoptions);
+                            if ($displayvalue === '') {
+                                $replacements[$tag] = ['html', ''];
+                            } else {
+                                $currentoptions['template'] = $renderer->get_display_template();
+                                $currentoptions['value'] = $displayvalue;
+                                $replacements[$tag] = ['', [[$this, 'prerender_edit_mode'], [$entry, $currentoptions]]];
+                            }
                         } else {
                             $replacements[$tag] = ['html', $noteditabletemplate];
                         }

@@ -190,11 +190,13 @@ class datalynxfield_layout_form extends moodleform {
         $group[] = $mform->createElement('radio', 'noteditableoptions', '', get_string('shownothing', 'datalynx'), '___0___');
         $group[] = $mform->createElement('radio', 'noteditableoptions', '', get_string('asdisplay', 'datalynx'), '___1___');
         $group[] = $mform->createElement('radio', 'noteditableoptions', '', get_string('disabled', 'datalynx'), '___3___');
+        $group[] = $mform->createElement('radio', 'noteditableoptions', '', get_string('noteditabledependent', 'datalynx'), '___5___');
         $group[] = $mform->createElement('radio', 'noteditableoptions', '', get_string('custom', 'datalynx'), '___2___');
         $group[] = $mform->createElement('textarea', 'noteditabletemplate', '', self::template_attributes('noteditable'));
         $mform->disabledIf('noteditabletemplate', 'noteditableoptions', 'eq', '___0___');
         $mform->disabledIf('noteditabletemplate', 'noteditableoptions', 'eq', '___1___');
         $mform->disabledIf('noteditabletemplate', 'noteditableoptions', 'eq', '___3___');
+        $mform->disabledIf('noteditabletemplate', 'noteditableoptions', 'eq', '___5___');
         $mform->addGroup($group, 'noteditablegroup', get_string('noteditable', 'datalynx'), ['<br />'], false);
         $mform->setType('noteditabletemplate', PARAM_RAW);
         $mform->setDefault('noteditableoptions', '___1___');
@@ -241,7 +243,7 @@ class datalynxfield_layout_form extends moodleform {
         foreach ($formfields as $formfield) {
             $template = $formfield . 'template';
             $option = $formfield . 'options';
-            $signifiers = ['___0___', '___1___', '___2___', '___3___', '___4___'];
+            $signifiers = ['___0___', '___1___', '___2___', '___3___', '___4___', '___5___'];
             if (in_array($data->$template, $signifiers)) {
                 // If we see a signifier we set options and delete template.
                 $data->$option = $data->$template;

@@ -82,6 +82,9 @@ class datalynxfield_layout {
     /** @var string Not editable show disabled */
     const NOT_EDITABLE_SHOW_DISABLED = '___3___';
 
+    /** @var string Not editable show as display if value, otherwise nothing */
+    const NOT_EDITABLE_SHOW_DEPENDENT = '___5___';
+
     /** @var string Not editable show custom */
     const NOT_EDITABLE_SHOW_CUSTOM = '___2___';
 

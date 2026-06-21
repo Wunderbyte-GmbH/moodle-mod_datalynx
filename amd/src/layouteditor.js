@@ -165,6 +165,9 @@ export const init = async() => {
                     if (opt === '___3___') {
                         return sampleInput(true);
                     }
+                    if (opt === '___5___') {
+                        return sampleValue !== '' ? subValue(effectiveDisplay(), sampleValue) : '';
+                    }
                     return raw; // Custom.
                 default:
                     return '';

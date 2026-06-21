@@ -604,6 +604,7 @@ $string['not'] = 'NICHT';
 $string['notallowedtoeditentry'] = 'Es ist nicht erlaubt, diesen Eintrag zu ändern.';
 $string['notapproved'] = 'Eintrag wurde noch nicht freigeschaltet.';
 $string['noteditable'] = 'Wenn nicht editierbar';
+$string['noteditabledependent'] = 'Verwende Anzeige-Vorlage wenn Inhalt vorhanden, ansonsten nichts anzeigen';
 $string['notificationenable'] = 'Benachrichtigungen einschalten für';
 $string['notifyteam'] = 'Benachrichtigungsregeln';
 $string['notifyteam_help'] = 'Wählen Sie eine Benachrichtigungsregel aus, die Select notification rule to be applied to all team members selected in this field.';
