@@ -1939,6 +1939,25 @@ class datalynx {
     }
 
     /**
+     * Get all views of the datalynx instance, regardless of user capabilities or browsable status.
+     *
+     * @param string $sort SQL ORDER BY clause.
+     * @return \mod_datalynx\local\view\base[] Array of view objects.
+     */
+    public function get_all_view_objects(string $sort = ''): array {
+        global $DB;
+        $views = $DB->get_records('datalynx_views', ['dataid' => $this->id()], $sort);
+        if (empty($views)) {
+            return [];
+        }
+        $viewobjs = [];
+        foreach ($views as $viewid => $view) {
+            $viewobjs[$viewid] = $this->get_view($view->type, $view);
+        }
+        return $viewobjs;
+    }
+
+    /**
      * Set default view
      *
      * @param int $viewid
@@ -2049,7 +2068,7 @@ class datalynx {
      * @param string $newfieldname
      */
     public function replace_field_in_views(string $searchfieldname, string $newfieldname): void {
-        $views  = $this->get_views();
+        $views  = $this->get_all_view_objects();
         if (!empty($views)) {
             foreach ($views as $view) {
                 $view->replace_field_in_view($searchfieldname, $newfieldname);
@@ -2064,7 +2083,7 @@ class datalynx {
      * @param string $newname The new format name (empty string if deleted).
      */
     public function replace_format_in_views(string $oldname, string $newname): void {
-        $views = $this->get_views();
+        $views = $this->get_all_view_objects();
         if (!empty($views)) {
             foreach ($views as $view) {
                 $view->replace_format_in_view($oldname, $newname);
@@ -2079,7 +2098,7 @@ class datalynx {
      * @param string $newname The new behavior name (empty string if deleted).
      */
     public function replace_behavior_in_views(string $oldname, string $newname): void {
-        $views = $this->get_views();
+        $views = $this->get_all_view_objects();
         if (!empty($views)) {
             foreach ($views as $view) {
                 $view->replace_behavior_in_view($oldname, $newname);
@@ -2094,7 +2113,7 @@ class datalynx {
      * @param string $newname The new layout name (empty string if deleted).
      */
     public function replace_layout_in_views(string $oldname, string $newname): void {
-        $views = $this->get_views();
+        $views = $this->get_all_view_objects();
         if (!empty($views)) {
             foreach ($views as $view) {
                 $view->replace_layout_in_view($oldname, $newname);

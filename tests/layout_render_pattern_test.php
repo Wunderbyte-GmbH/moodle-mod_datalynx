@@ -112,4 +112,37 @@ final class layout_render_pattern_test extends advanced_testcase {
         $this->assertStringNotContainsString('||My layout', $view->patterns);
         $this->assertStringNotContainsString('||My layout', $view->param2);
     }
+
+    /**
+     * Renaming a layout updates its pattern reference (||name) in connected views.
+     */
+    public function test_rename_renderer_rewrites_connected_view_patterns(): void {
+        global $DB;
+        $this->resetAfterTest();
+
+        $course = $this->getDataGenerator()->create_course();
+        $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
+        $dlx = new datalynx($instance->id);
+
+        $rendererid = $this->create_renderer($dlx->id(), 'My layout');
+
+        // A view referencing the renderer via the ||name layout tag syntax.
+        $viewid = (int) $DB->insert_record('datalynx_views', (object) [
+            'dataid' => $dlx->id(),
+            'type' => 'grid',
+            'name' => 'Using view',
+            'description' => '',
+            'visible' => 7,
+            'patterns' => '[[Title||My layout]]',
+            'param2' => '##entries## [[Title||My layout]]',
+        ]);
+
+        datalynxfield_layout::update_render_pattern($rendererid, 'My new layout');
+
+        $view = $DB->get_record('datalynx_views', ['id' => $viewid]);
+        $this->assertStringContainsString('||My new layout', $view->patterns);
+        $this->assertStringContainsString('||My new layout', $view->param2);
+        $this->assertStringNotContainsString('||My layout', $view->patterns);
+        $this->assertStringNotContainsString('||My layout', $view->param2);
+    }
 }

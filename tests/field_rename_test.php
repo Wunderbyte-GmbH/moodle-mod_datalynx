@@ -403,4 +403,86 @@ final class field_rename_test extends advanced_testcase {
         $this->assertEquals('Desc [[field:newformat]]', $updatedview->description);
         $this->assertEquals('Section [[field:newformat|behavior]]', $updatedview->section);
     }
+
+    /**
+     * Test that behavior renaming and deletion propagate to views without active admin session.
+     */
+    public function test_behavior_renaming_without_admin_user(): void {
+        global $DB;
+        $this->resetAfterTest();
+
+        $course = $this->getDataGenerator()->create_course();
+        $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
+        $dlx = new datalynx($instance->id);
+
+        $behaviorid = $DB->insert_record('datalynx_behaviors', (object) [
+            'dataid' => $dlx->id(),
+            'name' => 'oldbehavior',
+            'visibleto' => serialize(['permissions' => [], 'users' => [], 'teammember' => []]),
+            'editableby' => serialize([]),
+            'required' => serialize([]),
+            'description' => '',
+        ]);
+
+        $viewid = $DB->insert_record('datalynx_views', (object) [
+            'dataid' => $dlx->id(),
+            'type' => 'tabular',
+            'name' => 'My View',
+            'description' => 'Desc [[field|oldbehavior]]',
+            'section' => 'Section [[field|oldbehavior|layout]]',
+        ]);
+
+        // Rename behavior.
+        $formdata = \mod_datalynx\local\field\datalynxfield_behavior::get_behavior($behaviorid);
+        $formdata->name = 'newbehavior';
+        \mod_datalynx\local\field\datalynxfield_behavior::update_behavior($formdata);
+
+        $updatedview = $DB->get_record('datalynx_views', ['id' => $viewid]);
+        $this->assertEquals('Desc [[field|newbehavior]]', $updatedview->description);
+        $this->assertEquals('Section [[field|newbehavior|layout]]', $updatedview->section);
+
+        // Delete behavior.
+        \mod_datalynx\local\field\datalynxfield_behavior::delete_behavior($behaviorid);
+
+        $deletedview = $DB->get_record('datalynx_views', ['id' => $viewid]);
+        $this->assertEquals('Desc [[field]]', $deletedview->description);
+        $this->assertEquals('Section [[field||layout]]', $deletedview->section);
+    }
+
+    /**
+     * Test that field (including fieldgroups) renaming propagates to views without active admin session.
+     */
+    public function test_field_renaming_without_admin_user(): void {
+        global $DB;
+        $this->resetAfterTest();
+
+        $course = $this->getDataGenerator()->create_course();
+        $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
+        $dlx = new datalynx($instance->id);
+
+        $fieldrecordid = $DB->insert_record('datalynx_fields', (object) [
+            'dataid' => $dlx->id(),
+            'type' => 'fieldgroup', // Test fieldgroup as well since it inherits from base.
+            'name' => 'oldfield',
+            'description' => '',
+        ]);
+        $field = $dlx->get_field_from_id($fieldrecordid);
+
+        $viewid = $DB->insert_record('datalynx_views', (object) [
+            'dataid' => $dlx->id(),
+            'type' => 'tabular',
+            'name' => 'My View',
+            'description' => '',
+            'section' => 'Section [[oldfield|behavior]]',
+        ]);
+
+        // Rename field.
+        $formdata = new stdClass();
+        $formdata->id = $field->id();
+        $formdata->name = 'newfield';
+        $field->update_field($formdata);
+
+        $updatedview = $DB->get_record('datalynx_views', ['id' => $viewid]);
+        $this->assertEquals('Section [[newfield|behavior]]', $updatedview->section);
+    }
 }
