@@ -71,7 +71,7 @@ class renderer extends MultiSelectRenderer {
 
         $group = $mform->addGroup($elemgrp, $fieldname, null, $separator, true);
         $groupclasses = 'datalynx-checkbox-group';
-        if (strpos($separator, '<br') !== false) {
+        if (str_contains($separator, '<br')) {
             $groupclasses .= ' datalynx-checkbox-group-vertical';
         }
         $group->setAttributes(['class' => $groupclasses]);

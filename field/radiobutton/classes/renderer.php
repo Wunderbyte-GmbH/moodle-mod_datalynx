@@ -72,9 +72,9 @@ class renderer extends SelectRenderer {
             $elemgrp[] = $radio;
         }
 
-        $group = $mform->addGroup($elemgrp, "{$fieldname}_group", null, $separator, false);
+        $group = $mform->addGroup($elemgrp, $fieldname . '_group', null, $separator, false);
         $groupclasses = 'datalynx-radio-group';
-        if (strpos($separator, '<br') !== false) {
+        if (str_contains($separator, '<br')) {
             $groupclasses .= ' datalynx-radio-group-vertical';
         }
         $group->setAttributes(['class' => $groupclasses]);
@@ -82,7 +82,7 @@ class renderer extends SelectRenderer {
         $mform->setDefaults([$fieldname => (int) $selected]);
 
         if ($required) {
-            $mform->addRule("{$fieldname}_group", null, 'required', null, 'client');
+            $mform->addRule($fieldname . '_group', null, 'required', null, 'client');
         }
     }
 }
