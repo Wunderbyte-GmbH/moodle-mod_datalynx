@@ -190,7 +190,13 @@ class datalynxfield_layout_form extends moodleform {
         $group[] = $mform->createElement('radio', 'noteditableoptions', '', get_string('shownothing', 'datalynx'), '___0___');
         $group[] = $mform->createElement('radio', 'noteditableoptions', '', get_string('asdisplay', 'datalynx'), '___1___');
         $group[] = $mform->createElement('radio', 'noteditableoptions', '', get_string('disabled', 'datalynx'), '___3___');
-        $group[] = $mform->createElement('radio', 'noteditableoptions', '', get_string('noteditabledependent', 'datalynx'), '___5___');
+        $group[] = $mform->createElement(
+            'radio',
+            'noteditableoptions',
+            '',
+            get_string('noteditabledependent', 'datalynx'),
+            '___5___'
+        );
         $group[] = $mform->createElement('radio', 'noteditableoptions', '', get_string('custom', 'datalynx'), '___2___');
         $group[] = $mform->createElement('textarea', 'noteditabletemplate', '', self::template_attributes('noteditable'));
         $mform->disabledIf('noteditabletemplate', 'noteditableoptions', 'eq', '___0___');
