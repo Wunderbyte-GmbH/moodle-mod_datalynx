@@ -54,7 +54,8 @@ class renderer extends MultiSelectRenderer {
 
         $content = !empty($entry->{"c{$fieldid}_content"}) ? $entry->{"c{$fieldid}_content"} : null;
 
-        $separator = $field->separators[(int) $field->get('param2')]['chr'];
+        $param3 = (int) $field->get('param3');
+        $separator = isset($field->separators[$param3]) ? $field->separators[$param3]['chr'] : $field->separators[0]['chr'];
 
         $elemgrp = [];
         foreach ($menuoptions as $i => $option) {
@@ -68,7 +69,12 @@ class renderer extends MultiSelectRenderer {
             );
         }
 
-        $mform->addGroup($elemgrp, $fieldname, null, $separator, true);
+        $group = $mform->addGroup($elemgrp, $fieldname, null, $separator, true);
+        $groupclasses = 'datalynx-checkbox-group';
+        if (strpos($separator, '<br') !== false) {
+            $groupclasses .= ' datalynx-checkbox-group-vertical';
+        }
+        $group->setAttributes(['class' => $groupclasses]);
 
         $selected = [];
         if ($entryid > 0 && $content) {

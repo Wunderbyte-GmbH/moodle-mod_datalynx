@@ -553,3 +553,26 @@ form.mform div.entry div.datalynx-field-wrapper {
     font-weight: 600;
     font-size: 0.9rem;
 }
+
+/* Radio button & Checkbox fields vertical list layout overrides */
+.datalynx-radio-group-vertical .d-flex,
+.datalynx-checkbox-group-vertical .d-flex {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+}
+
+.datalynx-radio-group-vertical .d-flex br,
+.datalynx-checkbox-group-vertical .d-flex br {
+    display: none;
+}
+
+.datalynx-radio-group-vertical .form-check-inline,
+.datalynx-checkbox-group-vertical .form-check-inline {
+    margin-right: 0 !important;
+    margin-bottom: 0.5rem;
+}
+
+.datalynx-radio-group-vertical .form-check-inline:last-child,
+.datalynx-checkbox-group-vertical .form-check-inline:last-child {
+    margin-bottom: 0;
+}

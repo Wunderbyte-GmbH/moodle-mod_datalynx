@@ -58,9 +58,9 @@ class renderer extends SelectRenderer {
         }
 
         $separator = $field->separators[0]['chr'];
-        $param2 = (int) $field->get('param2');
-        if (isset($param2) && array_key_exists($param2, $field->separators)) {
-            $separator = $field->separators[$param2]['chr'];
+        $param3 = (int) $field->get('param3');
+        if (isset($param3) && array_key_exists($param3, $field->separators)) {
+            $separator = $field->separators[$param3]['chr'];
         }
 
         $elemgrp = [];
@@ -72,7 +72,12 @@ class renderer extends SelectRenderer {
             $elemgrp[] = $radio;
         }
 
-        $mform->addGroup($elemgrp, "{$fieldname}_group", null, $separator, false);
+        $group = $mform->addGroup($elemgrp, "{$fieldname}_group", null, $separator, false);
+        $groupclasses = 'datalynx-radio-group';
+        if (strpos($separator, '<br') !== false) {
+            $groupclasses .= ' datalynx-radio-group-vertical';
+        }
+        $group->setAttributes(['class' => $groupclasses]);
 
         $mform->setDefaults([$fieldname => (int) $selected]);
 
