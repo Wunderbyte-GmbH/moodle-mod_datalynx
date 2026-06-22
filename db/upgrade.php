@@ -1373,6 +1373,15 @@ function xmldb_datalynx_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2026061900, 'datalynx');
     }
 
+    if ($oldversion < 2026061901) {
+        // Normalise all stored teammemberselect member lists to the canonical JSON array of
+        // integer user ids, so legacy rows (some writers used to store quoted strings) match
+        // what every runtime save path writes now. Idempotent.
+        \datalynxfield_teammemberselect\field::normalize_stored_content();
+
+        upgrade_mod_savepoint(true, 2026061901, 'datalynx');
+    }
+
     return true;
 }
 

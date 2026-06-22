@@ -396,70 +396,73 @@ class field extends datalynxfield_base {
         $params = [];
         $usecontent = false;
 
-        $content = "c{$fieldid}.content";
-        if ($operator === 'USER') {
-            global $USER;
-            $params[$name] = "%\"{$USER->id}\"%";
-
-            if (!!$not) {
-                $like = $DB->sql_like("content", ":{$name}", true, true);
-
-                if ($eids = $this->get_entry_ids_for_content($like, $params)) {
-                    [$notinids, $paramsnot] = $DB->get_in_or_equal(
-                        $eids,
-                        SQL_PARAMS_NAMED,
-                        "df_{$fieldid}_x_",
-                        false
-                    );
-                    $params = array_merge($params, $paramsnot);
-                    $sql = " (e.id $notinids)";
-                } else {
-                    $sql = " 1 = 0 ";
-                }
-
-                $usecontent = false;
+        if ($operator === 'USER' || $operator === 'OTHER_USER' || $operator === 'ANY_OF') {
+            // Resolve membership by decoding the JSON content in PHP rather than matching
+            // the raw text with LIKE. This is format-agnostic: it works whether the user
+            // ids were stored as JSON integers ([5,12]) or strings (["5","12"]), because
+            // get_all_userids_in_all_entries() json_decodes each row and PHP coerces a
+            // numeric string array key to the same integer key.
+            if ($operator === 'USER') {
+                global $USER;
+                $targetuserids = [$USER->id];
             } else {
-                $sql = $DB->sql_like("c{$fieldid}.content", ":{$name}", true, true);
-                $usecontent = true;
+                // OTHER_USER (view filter) and ANY_OF (customfilter) both carry an array
+                // of selected user ids in $value.
+                $targetuserids = is_array($value) ? $value : [$value];
             }
-        } else {
-            // Customfilter adds ANY_OF instead of OTHER_USER.
-            if ($operator === 'OTHER_USER' || $operator === 'ANY_OF') {
-                $conditions = [];
-                foreach ($value as $key => $userid) {
-                    $xname = $name . $key; // Unique name for every parameter.
-                    $conditions[] = $DB->sql_like($content, ":{$xname}");
-                    $params[$xname] = "%\"$userid\"%";
-                }
-                $sql = " $not (" . implode(" OR ", $conditions) . ") ";
-                $usecontent = true;
-            } else {
-                if ($operator === '') {
-                    // This is the "empty" operator.
-                    $usecontent = false;
-                    $sqlnot = $DB->sql_like("content", ":{$name}_hascontent");
 
-                    // Autocomplete stores [] if empty. Has content when at least [1].
-                    $params["{$name}_hascontent"] = "___%";
-
-                    if ($eids = $this->get_entry_ids_for_content($sqlnot, $params)) { // There are
-                                                                                      // non-empty.
-                                                                                      // Contents.
-                        [$contentids, $paramsnot] = $DB->get_in_or_equal(
-                            $eids,
-                            SQL_PARAMS_NAMED,
-                            "df_{$fieldid}_x_",
-                            !!$not
-                        );
-                        $params = array_merge($params, $paramsnot);
-                        $sql = " (e.id $contentids) ";
-                    } else { // There are no non-empty contents.
-                        if ($not) {
-                            $sql = " 0 ";
-                        } else {
-                            $sql = " 1 = 1 ";
-                        }
+            // Collect, de-duplicated, every entry id in which one of the target users is a
+            // team member.
+            $usermap = $this->get_all_userids_in_all_entries();
+            $entryids = [];
+            foreach ($targetuserids as $userid) {
+                if (isset($usermap[$userid])) {
+                    foreach ($usermap[$userid] as $entryid) {
+                        $entryids[$entryid] = $entryid;
                     }
+                }
+            }
+
+            // Match against the entry id set; $usecontent stays false (no content join).
+            if (!empty($entryids)) {
+                [$insql, $inparams] = $DB->get_in_or_equal(
+                    $entryids,
+                    SQL_PARAMS_NAMED,
+                    "df_{$fieldid}_x_",
+                    !$not
+                );
+                $params = array_merge($params, $inparams);
+                $sql = " (e.id $insql) ";
+            } else {
+                // No entry matches: a positive search yields nothing, a NOT search yields
+                // everything.
+                $sql = $not ? " 1 = 1 " : " 1 = 0 ";
+            }
+            $usecontent = false;
+        } else if ($operator === '') {
+            // This is the "empty" operator.
+            $usecontent = false;
+            $sqlnot = $DB->sql_like("content", ":{$name}_hascontent");
+
+            // Autocomplete stores [] if empty. Has content when at least [1].
+            $params["{$name}_hascontent"] = "___%";
+
+            if ($eids = $this->get_entry_ids_for_content($sqlnot, $params)) { // There are
+                                                                              // non-empty.
+                                                                              // Contents.
+                [$contentids, $paramsnot] = $DB->get_in_or_equal(
+                    $eids,
+                    SQL_PARAMS_NAMED,
+                    "df_{$fieldid}_x_",
+                    !!$not
+                );
+                $params = array_merge($params, $paramsnot);
+                $sql = " (e.id $contentids) ";
+            } else { // There are no non-empty contents.
+                if ($not) {
+                    $sql = " 0 ";
+                } else {
+                    $sql = " 1 = 1 ";
                 }
             }
         }
@@ -511,14 +514,17 @@ class field extends datalynxfield_base {
         $first = reset($values);
         $selected = !empty($first) ? $first : [];
 
-        if (!empty($selected)) {
-            // Remove Dummy value.
-            if (isset($selected[0]) && $selected[0] == -999) {
-                array_shift($selected);
-            }
-        }
+        // Normalise to a canonical list of positive integer user ids, regardless of the caller:
+        // the entry form and CSV import submit strings, while rules (e.g. teammemberbyprofile)
+        // pass integers. format_content() is the single write chokepoint for every save path, so
+        // normalising here guarantees identical storage everywhere. The -999 sentinel used to force
+        // submission of an empty autocomplete is dropped as part of the same filter.
+        $selected = array_values(array_filter(
+            array_map('intval', (array) $selected),
+            static fn($id) => $id > 0
+        ));
 
-        $contents[] = json_encode($selected); // Empty values are kept.
+        $contents[] = json_encode($selected); // Empty values are kept as [].
         return [$contents, $oldcontents];
     }
 
@@ -609,6 +615,57 @@ class field extends datalynxfield_base {
         } else {
             return false;
         }
+    }
+
+    /**
+     * Normalise stored teammemberselect content to the canonical format used by
+     * {@see self::format_content()}: a JSON array of positive integer user ids.
+     *
+     * Historically different writers stored the member list with different element types
+     * (the entry form and CSV import stored quoted strings, rules stored integers). This
+     * brings existing rows into one consistent shape. Used by the upgrade migration and by
+     * restore (after_restore) so on-disk data matches what every runtime save now writes.
+     * Idempotent: rows already in canonical form are left untouched.
+     *
+     * @param int|null $dataid Restrict to one datalynx instance, or null for all instances.
+     * @return int Number of content rows updated.
+     */
+    public static function normalize_stored_content(?int $dataid = null): int {
+        global $DB;
+
+        $params = [];
+        $sql = "SELECT c.id, c.content
+                  FROM {datalynx_contents} c
+                  JOIN {datalynx_fields} f ON f.id = c.fieldid
+                 WHERE f.type = 'teammemberselect'";
+        if ($dataid !== null) {
+            $sql .= " AND f.dataid = :dataid";
+            $params['dataid'] = $dataid;
+        }
+
+        $rs = $DB->get_recordset_sql($sql, $params);
+        $updated = 0;
+        foreach ($rs as $row) {
+            if ($row->content === null || $row->content === '') {
+                continue;
+            }
+            $decoded = json_decode($row->content, true);
+            if (!is_array($decoded)) {
+                continue;
+            }
+            $normalized = array_values(array_filter(
+                array_map('intval', $decoded),
+                static fn($id) => $id > 0
+            ));
+            $canonical = json_encode($normalized);
+            if ($canonical !== $row->content) {
+                $DB->set_field('datalynx_contents', 'content', $canonical, ['id' => $row->id]);
+                $updated++;
+            }
+        }
+        $rs->close();
+
+        return $updated;
     }
 
     /**

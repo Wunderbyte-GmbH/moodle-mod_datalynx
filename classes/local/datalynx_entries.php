@@ -1287,7 +1287,8 @@ class datalynx_entries {
 
                     $newteammemberids = array_diff($teammemberids, [$teammemberid]);
                     $newteammemberids[] = $userid;
-                    $newteammemberids = array_values($newteammemberids);
+                    // Keep the canonical integer form (see field::format_content()).
+                    $newteammemberids = array_values(array_map('intval', $newteammemberids));
 
                     if ($teamfield->referencefieldid != -1) {
                         $query = "SELECT DISTINCT de.id

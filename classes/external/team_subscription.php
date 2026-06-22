@@ -79,64 +79,49 @@ class team_subscription extends external_api {
             throw new moodle_exception('invaliduserid', 'error');
         }
 
-        // Fetch existing users.
-        $users = json_decode($DB->get_field('datalynx_contents', 'content', [
+        // Resolve the field so all writes go through the canonical save path
+        // (field::update_content() -> format_content()), exactly like the entry form, CSV import
+        // and the rules. This keeps the stored representation consistent everywhere.
+        $dlx = new \mod_datalynx\datalynx($params['d']);
+        $field = $dlx->get_field_from_id($params['fieldid']);
+        if (empty($field) || $field->type !== 'teammemberselect') {
+            throw new moodle_exception('invalidrecord', 'error', '', 'datalynx_fields');
+        }
+
+        // Fetch the existing content row and current members as integers.
+        $row = $DB->get_record('datalynx_contents', [
                 'fieldid' => $params['fieldid'],
                 'entryid' => $params['entryid'],
-        ]), true) ?? [];
-
-        // Fetch max team size setting from the field configuration.
-        $maxteamsize = $DB->get_field('datalynx_fields', 'param1', ['id' => $params['fieldid']]);
+        ]);
+        $existing = ($row && $row->content !== null && $row->content !== '')
+                ? (json_decode($row->content, true) ?? []) : [];
+        $users = array_values(array_unique(array_map('intval', (array) $existing)));
+        $userid = (int) $params['userid'];
 
         if ($params['action'] === 'subscribe') {
-            // Check if max team size is exceeded.
-            if ($maxteamsize > 0 && count($users) >= $maxteamsize) {
-                return [
-                        'success' => false,
-                        'error' => get_string('maxteamsizeexceeded', 'mod_datalynx', $maxteamsize),
-                ];
-            }
-
-            $users[] = (string) $params['userid'];
-            $users = array_unique(array_filter($users));
-
-            $record = $DB->get_record('datalynx_contents', [
-                    'fieldid' => $params['fieldid'],
-                    'entryid' => $params['entryid'],
-            ]);
-
-            $data = new stdClass();
-            $data->fieldid = $params['fieldid'];
-            $data->entryid = $params['entryid'];
-            $data->content = json_encode(array_values($users));
-
-            if ($record) {
-                // Update existing record.
-                $DB->set_field('datalynx_contents', 'content', $data->content, [
-                        'fieldid' => $params['fieldid'],
-                        'entryid' => $params['entryid'],
-                ]);
-            } else {
-                // Insert new record.
-                $DB->insert_record('datalynx_contents', $data);
+            if (!in_array($userid, $users, true)) {
+                // Check if max team size is exceeded before adding a new member.
+                $maxteamsize = (int) $field->field->param1;
+                if ($maxteamsize > 0 && count($users) >= $maxteamsize) {
+                    return [
+                            'success' => false,
+                            'error' => get_string('maxteamsizeexceeded', 'mod_datalynx', $maxteamsize),
+                    ];
+                }
+                $users[] = $userid;
             }
         } else if ($params['action'] === 'unsubscribe') {
-            $users = array_values(array_diff($users, [(string) $params['userid']]));
-
-            if (empty($users)) {
-                $DB->delete_records('datalynx_contents', [
-                        'fieldid' => $params['fieldid'],
-                        'entryid' => $params['entryid'],
-                ]);
-            } else {
-                $DB->set_field('datalynx_contents', 'content', json_encode($users), [
-                        'fieldid' => $params['fieldid'],
-                        'entryid' => $params['entryid'],
-                ]);
-            }
+            $users = array_values(array_diff($users, [$userid]));
         } else {
             throw new moodle_exception('invalidaction', 'error');
         }
+
+        // Write through the field. format_content() normalises to a canonical integer JSON array.
+        $entry = new stdClass();
+        $entry->id = $params['entryid'];
+        $entry->{"c{$params['fieldid']}_id"} = $row ? $row->id : null;
+        $entry->{"c{$params['fieldid']}_content"} = $row ? $row->content : null;
+        $field->update_content($entry, [$users]);
 
         return ['success' => true];
     }

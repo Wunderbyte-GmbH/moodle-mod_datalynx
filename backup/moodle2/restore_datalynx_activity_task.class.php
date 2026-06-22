@@ -410,6 +410,11 @@ class restore_datalynx_activity_task extends restore_activity_task {
             \core\task\manager::queue_adhoc_task($task);
         }
 
+        // Normalise restored teammemberselect content to the canonical integer-JSON form, so
+        // backups produced by versions whose writers stored quoted strings end up consistent
+        // with what every runtime save path writes (mirrors the upgrade migration).
+        \datalynxfield_teammemberselect\field::normalize_stored_content($this->get_activityid());
+
         // Migrate restored rule conditions to JSON if needed.
         global $DB;
         $sql = "SELECT r.id, r.param5, r.param10

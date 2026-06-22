@@ -241,8 +241,11 @@ class datalynx_filter {
                         if ($fieldsqloptions = $field->get_search_sql($option)) {
                             [$fieldsql, $fieldparams, $fromcontent] = $fieldsqloptions;
                             if ($fieldsql) {
-                                // If we use values from content we make it an implied AND statement.
-                                if (is_numeric($fieldid) && $this->add_fieldid($option, $field)) {
+                                // The "c$fieldid.fieldid = $fieldid" qualifier only makes sense when the
+                                // field's SQL actually references the joined content table ($fromcontent).
+                                // Operators that resolve to an entry-id set (e.g. e.id IN (...)) return
+                                // $fromcontent = false and must not be qualified, as no c$fieldid join exists.
+                                if (is_numeric($fieldid) && $fromcontent && $this->add_fieldid($option, $field)) {
                                     $whereand[] = " ( " . $fieldsql . " AND c$fieldid.fieldid = $fieldid )";
                                 } else {
                                     $whereand[] = $fieldsql;
@@ -267,8 +270,9 @@ class datalynx_filter {
                     foreach ($searchfield['OR'] as $option) {
                         if ($fieldsqloptions = $field->get_search_sql($option)) {
                             [$fieldsql, $fieldparams, $fromcontent] = $fieldsqloptions;
-                            // If we use values from content we make it an implied AND statement.
-                            if (is_numeric($fieldid) && $this->add_fieldid($option, $field)) {
+                            // See the AND branch above: only qualify with c$fieldid.fieldid when the
+                            // field's SQL references the joined content table ($fromcontent).
+                            if (is_numeric($fieldid) && $fromcontent && $this->add_fieldid($option, $field)) {
                                 $whereor[] = " ( " . $fieldsql . " AND c$fieldid.fieldid = $fieldid )";
                             } else {
                                 $whereor[] = $fieldsql;
