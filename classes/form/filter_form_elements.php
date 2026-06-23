@@ -195,9 +195,12 @@ trait filter_form_elements {
                     $mform->setDefault('searchoperator' . $count, $operator);
                 }
                 // Field search elements.
-                // For select options $value is an arry, we have to convert it to string, function param only accepts strings.
+                // render_search_mode() only accepts strings: select options arrive as an array
+                // (encode to JSON), and a condition stored without a value arrives as null.
                 if (is_array($value)) {
                     $value = json_encode($value);
+                } else {
+                    $value = $value ?? '';
                 }
                 [$elems, $separators] = $fields[$fieldid]->renderer()->render_search_mode(
                     $mform,
