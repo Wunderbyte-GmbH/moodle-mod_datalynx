@@ -1403,6 +1403,61 @@ function xmldb_datalynx_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2026062300, 'datalynx');
     }
 
+    if ($oldversion < 2026062301) {
+        // Migrate eventnotification trigger conditions from the legacy single-condition
+        // param5 (field id) + param10 (value) storage to the multi-condition JSON in param9.
+        $rules = $DB->get_records_select(
+            'datalynx_rules',
+            "type = :type AND param5 IS NOT NULL AND " . $DB->sql_compare_text('param5') . " <> :empty",
+            ['type' => 'eventnotification', 'empty' => '']
+        );
+        foreach ($rules as $rule) {
+            if (!empty($rule->param9)) {
+                continue; // Already migrated.
+            }
+            try {
+                $dlx = new \mod_datalynx\datalynx((int) $rule->dataid);
+                $field = $dlx->get_field_from_id($rule->param5);
+            } catch (\Throwable $e) {
+                $field = false;
+            }
+            if (!$field) {
+                continue;
+            }
+            $value = $rule->param10;
+            $decoded = json_decode((string) $value, true);
+            if (is_array($decoded)) {
+                $value = $decoded;
+            } else if ($field instanceof \mod_datalynx\local\field\datalynxfield_option_multiple) {
+                $value = explode(',', (string) $value);
+            }
+            // Reproduce the legacy exact-match behaviour: multi-option fields use EXACTLY,
+            // everything else '=' (falling back to the first real operator the field offers).
+            if ($field instanceof \mod_datalynx\local\field\datalynxfield_option_multiple) {
+                $operator = 'EXACTLY';
+            } else {
+                $operators = $field->get_supported_search_operators();
+                if (array_key_exists('=', $operators)) {
+                    $operator = '=';
+                } else {
+                    $operator = '';
+                    foreach (array_keys($operators) as $op) {
+                        if ($op !== '') {
+                            $operator = $op;
+                            break;
+                        }
+                    }
+                }
+            }
+            $rule->param9 = json_encode([$rule->param5 => ['AND' => [['', $operator, $value]]]]);
+            $rule->param5 = null;
+            $rule->param10 = null;
+            $DB->update_record('datalynx_rules', $rule);
+        }
+
+        upgrade_mod_savepoint(true, 2026062301, 'datalynx');
+    }
+
     return true;
 }
 

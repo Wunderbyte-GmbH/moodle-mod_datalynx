@@ -674,7 +674,9 @@ class datalynxfield_behavior {
             return self::$matchingentryidscache[$cachekey];
         }
 
-        $field = $dlx->get_field_from_id((int) ($rule['sourcefieldid'] ?? 0));
+        $sourcefieldid = $rule['sourcefieldid'] ?? 0;
+        // Internal fields (e.g. 'status', 'approve') use non-numeric string ids — keep them as-is.
+        $field = $dlx->get_field_from_id(is_numeric($sourcefieldid) ? (int) $sourcefieldid : $sourcefieldid);
         if (!$field) {
             return self::$matchingentryidscache[$cachekey] = [];
         }

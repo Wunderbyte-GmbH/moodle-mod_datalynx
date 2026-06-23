@@ -110,13 +110,15 @@ const openRuleModal = async(params) => {
         window.location.assign(window.location.pathname + '?d=' + params.d);
     });
 
-    // When the condition source field (param5) changes, reload the comparison fields via AJAX.
+    // When a trigger-condition field or AND/OR selector changes, reload the rows via AJAX
+    // so the right operator and value inputs are rendered for the chosen field.
     modal.addEventListener('change', (e) => {
-        if (e.target.name !== 'param5') {
+        const name = e.target.name || '';
+        if (!/^(searchfield|searchandor)\d+$/.test(name)) {
             return;
         }
         const form = e.target.closest('form');
-        const button = form && form.querySelector('[name="reloadconditions"]');
+        const button = form && form.querySelector('[name="addsearchsettings"]');
         if (button) {
             window.skipClientValidation = true;
             modal.processNoSubmitButton(button);

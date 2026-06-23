@@ -125,7 +125,9 @@ trait filter_form_elements {
 
         // Add current options.
         if ($customsearch) {
-            $searchfields = unserialize($customsearch);
+            // Accept either a serialized string (saved filters) or an already-decoded
+            // array (e.g. JSON-stored rule conditions).
+            $searchfields = is_array($customsearch) ? $customsearch : unserialize($customsearch);
             // If not from form then the searchfields is aggregated and we need.
             // To flatten them. An aggregated array should have a non-zero key.
             // (fieldid) in the first element.
@@ -174,16 +176,24 @@ trait filter_form_elements {
                 $arr[] = &$mform->createElement('select', 'searchnot' . $count, null, $isnotoptions);
                 $mform->setDefault('searchnot' . $count, $not);
                 // Search operator.
+                $operatoroptions = [];
                 if ($fieldid) {
                     $operatoroptions = $dlx->get_field_from_id($fieldid)->get_supported_search_operators();
                 }
-                $arr[] = &$mform->createElement(
-                    'select',
-                    'searchoperator' . $count,
-                    '',
-                    $operatoroptions
-                );
-                $mform->setDefault('searchoperator' . $count, $operator);
+                if (count($operatoroptions) === 1) {
+                    // Single operator: nothing to choose, so render it hidden. It still
+                    // serializes back through searchoperator{N}.
+                    $arr[] = &$mform->createElement('hidden', 'searchoperator' . $count, array_key_first($operatoroptions));
+                    $mform->setType('searchoperator' . $count, PARAM_RAW);
+                } else {
+                    $arr[] = &$mform->createElement(
+                        'select',
+                        'searchoperator' . $count,
+                        '',
+                        $operatoroptions
+                    );
+                    $mform->setDefault('searchoperator' . $count, $operator);
+                }
                 // Field search elements.
                 // For select options $value is an arry, we have to convert it to string, function param only accepts strings.
                 if (is_array($value)) {
@@ -241,7 +251,10 @@ trait filter_form_elements {
         $dlx = $this->dlx;
         $searchable = [];
         foreach ($fieldoptions as $fieldid => $fieldname) {
-            if ($fieldid && ($field = $dlx->get_field_from_id($fieldid)) && !$field->supports_search()) {
+            if (
+                $fieldid && ($field = $dlx->get_field_from_id($fieldid))
+                    && (!$field->supports_search() || empty($field->get_supported_search_operators()))
+            ) {
                 continue;
             }
             $searchable[$fieldid] = $fieldname;

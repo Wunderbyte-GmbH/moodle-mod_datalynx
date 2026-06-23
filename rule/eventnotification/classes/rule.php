@@ -146,36 +146,18 @@ class rule extends base {
             }
         }
 
-        // Check if we only trigger on a specific field condition.
-        if ($this->rule->param5) {
-            // If so, test for conditions and stop sending if not met.
-            $entryid = $event->get_data()['objectid'];
-            $fieldid = $this->rule->param5;
-            $content = $DB->get_record('datalynx_contents', ['fieldid' => $fieldid, 'entryid' => $entryid]);
+        // Resolve the entry id this event concerns. Comment events carry the comment id in
+        // objectid and the entry id in other.itemid.
+        if (strpos($eventname, 'comment') !== false) {
+            $entryid = (int) ($event->get_data()['other']['itemid'] ?? 0);
+        } else {
+            $entryid = (int) ($event->get_data()['objectid'] ?? 0);
+        }
 
-            if (!$content) {
-                return false;
-            }
-
-            $field = $this->dlx()->get_field_from_id($fieldid);
-            if ($field instanceof \mod_datalynx\local\field\datalynxfield_option_multiple) {
-                $compare = explode('#,#', trim($content->content, '#'));
-                $value = $this->rule->param10;
-                $decoded = json_decode($value, true);
-                if (is_array($decoded)) {
-                    $condition = $decoded;
-                } else {
-                    $condition = explode(',', $value);
-                }
-                sort($compare);
-                sort($condition);
-            } else {
-                $compare = $content->content;
-                $condition = $this->rule->param10;
-            }
-            if (isset($compare) && isset($condition) && ($compare !== $condition)) {
-                return false;
-            }
+        // Only trigger when the entry satisfies the configured trigger conditions.
+        $conditions = $this->get_trigger_conditions();
+        if ($conditions && !$this->entry_matches_conditions($entryid, $conditions)) {
+            return false;
         }
 
         $dlx = $this->dlx;
@@ -199,11 +181,8 @@ class rule extends base {
             $subject = format_string($customsubject);
         }
         if (strpos($eventname, 'comment') !== false) {
-            $entryid = $event->get_data()['other']['itemid'];
             $commentid = $event->get_data()['objectid'];
             $messagedata->commenttext = $DB->get_field('comments', 'content', ['id' => $commentid]);
-        } else {
-            $entryid = $event->get_data()['objectid'];
         }
         $authorid = $DB->get_field('datalynx_entries', 'userid', ['id' => $entryid]);
         $author = $DB->get_record('user', ['id' => $authorid]);
@@ -287,6 +266,105 @@ class rule extends base {
             \core\task\manager::queue_adhoc_task($adhocktask);
         }
         return true;
+    }
+
+    /**
+     * Resolve the trigger conditions for this rule as a customsearch array.
+     *
+     * Reads the JSON-stored multi-condition customsearch from param9. Falls back to the
+     * legacy single-condition param5/param10 storage (synthesizing a one-row customsearch)
+     * for rules not yet migrated.
+     *
+     * @return array customsearch aggregated by field id, or [] when no condition is set.
+     */
+    private function get_trigger_conditions(): array {
+        if (!empty($this->rule->param9)) {
+            $decoded = json_decode($this->rule->param9, true);
+            return is_array($decoded) ? $decoded : [];
+        }
+
+        // Legacy fallback: build a one-condition customsearch from param5/param10.
+        if (!empty($this->rule->param5)) {
+            $fieldid = $this->rule->param5;
+            $field = $this->dlx()->get_field_from_id($fieldid);
+            if (!$field) {
+                return [];
+            }
+            $value = $this->rule->param10;
+            $decoded = json_decode((string) $value, true);
+            if (is_array($decoded)) {
+                $value = $decoded;
+            } else if ($field instanceof \mod_datalynx\local\field\datalynxfield_option_multiple) {
+                $value = explode(',', (string) $value);
+            }
+            $operator = $this->legacy_condition_operator($field);
+            return [$fieldid => ['AND' => [['', $operator, $value]]]];
+        }
+
+        return [];
+    }
+
+    /**
+     * Operator that reproduces the legacy (pre-param9) exact-match condition behaviour for a field.
+     *
+     * The old trigger compared the field value for exact (set) equality, so multi-option fields map
+     * to EXACTLY and everything else to '=' (falling back to the first real operator the field offers).
+     *
+     * @param \mod_datalynx\local\field\datalynxfield_base $field
+     * @return string
+     */
+    private function legacy_condition_operator($field): string {
+        if ($field instanceof \mod_datalynx\local\field\datalynxfield_option_multiple) {
+            return 'EXACTLY';
+        }
+        $operators = $field->get_supported_search_operators();
+        if (array_key_exists('=', $operators)) {
+            return '=';
+        }
+        foreach (array_keys($operators) as $op) {
+            if ($op !== '') {
+                return $op;
+            }
+        }
+        return '';
+    }
+
+    /**
+     * Check whether the given entry matches the trigger conditions.
+     *
+     * Reuses the filter search engine ({@see \mod_datalynx\local\filter\datalynx_filter}) so a
+     * rule condition evaluates exactly like the same criterion in a saved filter — including
+     * internal fields (status/approve evaluated on the entry row) and AND/OR/NOT combinations.
+     *
+     * @param int $entryid
+     * @param array $conditions customsearch aggregated by field id
+     * @return bool
+     */
+    private function entry_matches_conditions(int $entryid, array $conditions): bool {
+        global $DB;
+
+        if (!$entryid) {
+            return false;
+        }
+
+        $dlx = $this->dlx();
+        $fields = $dlx->get_fields();
+
+        $filter = new \mod_datalynx\local\filter\datalynx_filter(
+            (object) ['dataid' => $dlx->id(), 'customsearch' => $conditions]
+        );
+        $filter->init_filter_sql();
+        [$tables, $where, $params] = $filter->get_search_sql($fields);
+
+        $params['conddataid'] = $dlx->id();
+        $params['condeid'] = $entryid;
+        // The $where fragment is already of the form " AND (...)" (or empty).
+        $sql = "SELECT e.id
+                  FROM {datalynx_entries} e
+                  JOIN {user} u ON u.id = e.userid
+                       $tables
+                 WHERE e.dataid = :conddataid AND e.id = :condeid $where";
+        return $DB->record_exists_sql($sql, $params);
     }
 
     /**

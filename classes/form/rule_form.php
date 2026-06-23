@@ -33,6 +33,8 @@ require_once($CFG->libdir . '/formslib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class rule_form extends dynamic_form {
+    use filter_form_elements;
+
     /**
      * @var object
      */
@@ -237,68 +239,50 @@ class rule_form extends dynamic_form {
             false
         );
 
-        $choices = ['0' => get_string('noselection', 'datalynx')] + $this->dlx->get_fields(['entry'], true);
-        if (count($choices) > 1) {
+        // Trigger conditions: a repeatable AND/OR/NOT search (identical to the filter UI).
+        // Only sends the notification when the event's entry matches these conditions.
+        $fieldoptions = [0 => get_string('choose')] + $this->dlx->get_fields(['entry'], true);
+        if (count($fieldoptions) > 1) {
             $mform->addElement(
-                'select',
-                'param5',
-                get_string('triggerspecificevent', 'datalynxrule_eventnotification'),
-                $choices,
-                ['onchange' => 'window.skipClientValidation = true; this.form.elements["reloadconditions"].click();']
+                'static',
+                'conditionshdr',
+                '',
+                '<h4 class="mt-3">' . get_string('triggerconditions', 'datalynxrule_eventnotification') . '</h4>'
+                    . '<div class="form-text text-muted">'
+                    . get_string('triggerconditions_help', 'datalynxrule_eventnotification') . '</div>'
             );
-            $mform->registerNoSubmitButton('reloadconditions');
 
-            $submitted = $this->optional_param('param5', null, PARAM_INT);
-            if ($submitted !== null && $submitted !== '') {
-                $fieldid = (int)$submitted;
-            } else {
-                $fieldid = !empty($this->rule->rule->param5) ? (int)$this->rule->rule->param5 : 0;
-            }
-
-            if ($fieldid) {
-                $field = $this->dlx->get_field_from_id($fieldid);
-                if ($field) {
-                    $value = !empty($this->rule->rule->param10) ? $this->rule->rule->param10 : '';
-                    if ($value !== '') {
-                        $decoded = json_decode($value, true);
-                        if ($decoded === null) {
-                            if ($field instanceof \mod_datalynx\local\field\datalynxfield_option_multiple) {
-                                $value = json_encode(explode(',', $value));
-                            }
-                        }
-                    }
-
-                    // Set up a hidden searchoperator0 so validation / disabledIf doesn't disable fields.
-                    $operators = $field->get_supported_search_operators();
-                    $defaultoperator = '';
-                    foreach (array_keys($operators) as $op) {
-                        if ($op !== '') {
-                            $defaultoperator = $op;
-                            break;
-                        }
-                    }
-                    $mform->addElement('hidden', 'searchoperator0', $defaultoperator);
-                    $mform->setType('searchoperator0', PARAM_RAW);
-
-                    [$elems, $separators] = $field->renderer()->render_search_mode($mform, 0, $value);
-                    $label = get_string('condition', 'datalynxrule_eventnotification');
-                    $sep = $separators ? array_merge([' ', ' ', ' '], $separators) : ' ';
-                    $mform->addGroup($elems, 'conditiongrp', $label, $sep, false);
-                }
-            } else {
-                $mform->addElement(
-                    'text',
-                    'param10',
-                    get_string('condition', 'datalynxrule_eventnotification'),
-                    ['disabled' => 'disabled']
-                );
-                $mform->setType('param10', PARAM_TEXT);
-            }
-            $mform->addElement('submit', 'reloadconditions', get_string('reload'), ['class' => 'd-none']);
+            $customsearch = $this->get_condition_customsearch();
+            $this->custom_search_definition($customsearch, $this->dlx->get_fields(), $fieldoptions, true);
         }
         $this->rule_definition();
         // Buttons.
         $this->add_action_buttons();
+    }
+
+    /**
+     * Resolve the customsearch used to prefill the trigger-condition rows.
+     *
+     * On a no-submit reload the rows come from the currently submitted criteria; otherwise
+     * from the stored rule param9 (a JSON object keyed by field id). The returned value is
+     * consumable by {@see filter_form_elements::custom_search_definition()} (which accepts
+     * either an aggregated array or a flat submitted array).
+     *
+     * @return array
+     */
+    protected function get_condition_customsearch(): array {
+        $ajax = is_array($this->_ajaxformdata) ? $this->_ajaxformdata : [];
+        foreach (array_keys($ajax) as $key) {
+            if (strpos($key, 'searchandor') === 0) {
+                return $this->dlx->get_filter_manager()->build_search_options_array((object) $ajax, false);
+            }
+        }
+        $stored = $this->rule->rule->param9 ?? '';
+        if (empty($stored)) {
+            return [];
+        }
+        $decoded = json_decode($stored, true);
+        return is_array($decoded) ? $decoded : [];
     }
 
     /**
@@ -313,24 +297,8 @@ class rule_form extends dynamic_form {
                 $data->$eventname = true;
             }
         }
-        if (!empty($data->param5)) {
-            $fieldid = (int)$data->param5;
-            $field = $this->dlx->get_field_from_id($fieldid);
-            if ($field) {
-                $value = !empty($data->param10) ? $data->param10 : '';
-                if ($value !== '') {
-                    $decoded = json_decode($value, true);
-                    if (is_array($decoded)) {
-                        $value = $decoded;
-                    } else {
-                        if ($field instanceof \mod_datalynx\local\field\datalynxfield_option_multiple) {
-                            $value = explode(',', $value);
-                        }
-                    }
-                }
-                $data->{"f_0_{$fieldid}"} = $value;
-            }
-        }
+        // The trigger-condition rows are prefilled from param9 in definition()
+        // via get_condition_customsearch(), so no per-field mapping is needed here.
         parent::set_data($data);
     }
 
@@ -352,24 +320,11 @@ class rule_form extends dynamic_form {
             }
             $data->param1 = json_encode($selectedevents);
 
-            if (!empty($data->param5)) {
-                $fieldid = (int)$data->param5;
-                $field = $this->dlx->get_field_from_id($fieldid);
-                if ($field) {
-                    $val = $field->parse_search($data, 0);
-                    if ($val === false) {
-                        $data->param10 = '';
-                    } else if (is_array($val)) {
-                        $data->param10 = json_encode($val);
-                    } else {
-                        $data->param10 = (string)$val;
-                    }
-                } else {
-                    $data->param10 = '';
-                }
-            } else {
-                $data->param10 = '';
-            }
+            // Multi-condition trigger stored as JSON in param9; retire legacy param5/param10.
+            $conditions = $this->dlx->get_filter_manager()->build_search_options_array($data, true);
+            $data->param9 = $conditions ? json_encode($conditions) : null;
+            $data->param5 = null;
+            $data->param10 = null;
         }
         return $data;
     }

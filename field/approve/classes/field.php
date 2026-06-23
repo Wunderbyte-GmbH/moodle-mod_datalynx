@@ -94,8 +94,24 @@ class field extends datalynxfield_no_content {
      * @return array SQL fragment, params, and join flag.
      */
     public function get_search_sql(array $search): array {
-        $value = $search[2];
-        return [" e.approved = $value ", [], false];
+        static $i = 0;
+        $value = (int) $search[2];
+        // The "choose…" sentinel (-1) imposes no constraint.
+        if ($value < 0) {
+            return ['', [], false];
+        }
+        $name = "approved_$i";
+        $i++;
+        return [" e.approved = :$name ", [$name => $value], false];
+    }
+
+    /**
+     * Approval is a binary (0/1) flag, so only equality is meaningful.
+     *
+     * @return array
+     */
+    public function get_supported_search_operators() {
+        return ['=' => get_string('equal', 'datalynx')];
     }
 
     /**

@@ -471,6 +471,22 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
             $data->param5 = $this->get_mappingid('datalynx_field', $data->param5);
         }
 
+        // Update field ids embedded as keys in the multi-condition trigger (param9 JSON object,
+        // keyed by datalynx field id). Internal string keys (e.g. 'status', 'approve') are stable
+        // and must be left untouched.
+        if (!empty($data->param9) && $data->type == 'eventnotification') {
+            $old = self::decode_rule_param($data->param9);
+            $new = [];
+            foreach ($old as $fieldid => $options) {
+                if (is_numeric($fieldid) && (int) $fieldid > 0) {
+                    $new[$this->get_mappingid('datalynx_field', (int) $fieldid)] = $options;
+                } else {
+                    $new[$fieldid] = $options;
+                }
+            }
+            $data->param9 = json_encode($new);
+        }
+
         // Update the email-template view reference (param8 holds a datalynx view id).
         if (!empty($data->param8) && $data->type == 'eventnotification') {
             $data->param8 = $this->get_mappingid('datalynx_view', $data->param8);

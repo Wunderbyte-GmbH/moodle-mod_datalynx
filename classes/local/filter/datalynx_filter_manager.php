@@ -625,8 +625,28 @@ class datalynx_filter_manager {
      * @return string Serialised search options.
      */
     public function get_search_options_from_form($formdata, $finalize = false) {
+        $searchfields = $this->build_search_options_array($formdata, $finalize);
+        if ($searchfields) {
+            return serialize($searchfields);
+        } else {
+            return '';
+        }
+    }
+
+    /**
+     * Builds the search options array from submitted form data.
+     *
+     * Identical extraction logic to {@see get_search_options_from_form()} but returns the
+     * raw array (not PHP-serialized), so callers that persist the criteria as JSON
+     * (e.g. eventnotification rule conditions) can {@see json_encode()} it instead.
+     *
+     * @param object $formdata
+     * @param bool $finalize Whether to finalise (aggregate by field/andor and drop empty criteria).
+     * @return array
+     */
+    public function build_search_options_array($formdata, $finalize = false): array {
+        $searchfields = [];
         if ($fields = $this->dlx->get_fields()) {
-            $searchfields = [];
             foreach (array_keys((array) $formdata) as $var) {
                 if (strpos($var, 'searchandor') !== 0) {
                     continue;
@@ -662,12 +682,7 @@ class datalynx_filter_manager {
                 }
             }
         }
-
-        if ($searchfields) {
-            return serialize($searchfields);
-        } else {
-            return '';
-        }
+        return $searchfields;
     }
 
     /**
