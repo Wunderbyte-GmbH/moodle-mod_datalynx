@@ -110,6 +110,7 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
             'entry',
             ['id'],
             ['userid', 'groupid', 'timecreated', 'timemodified', 'approved', 'status',
+                'timesubmitted',
             ]
         );
 

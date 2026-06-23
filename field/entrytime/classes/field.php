@@ -41,6 +41,9 @@ class field extends datalynxfield_no_content {
     /** @var string Time modified name. */
     const _TIMEMODIFIED = 'timemodified';
 
+    /** @var string Time of final submission name. */
+    const _TIMESUBMITTED = 'timesubmitted';
+
     /**
      * Check if it is internal field.
      *
@@ -66,6 +69,10 @@ class field extends datalynxfield_no_content {
         $fieldobjects[self::_TIMEMODIFIED] = (object) ['id' => self::_TIMEMODIFIED,
                 'dataid' => $dataid, 'type' => 'entrytime', 'name' => get_string('timemodified', 'datalynx'),
                 'description' => '', 'internalname' => 'timemodified'];
+
+        $fieldobjects[self::_TIMESUBMITTED] = (object) ['id' => self::_TIMESUBMITTED,
+                'dataid' => $dataid, 'type' => 'entrytime', 'name' => get_string('timesubmitted', 'datalynx'),
+                'description' => '', 'internalname' => 'timesubmitted'];
 
         return $fieldobjects;
     }

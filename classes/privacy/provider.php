@@ -63,6 +63,7 @@ class provider implements
                 'timemodified' => 'privacy:metadata:datalynx_entries:timemodified',
                 'approved' => 'privacy:metadata:datalynx_entries:approved',
                 'status' => 'privacy:metadata:datalynx_entries:status',
+                'timesubmitted' => 'privacy:metadata:datalynx_entries:timesubmitted',
                 'assessed' => 'privacy:metadata:datalynx_entries:assessed',
             ],
             'privacy:metadata:datalynx_entries'
@@ -262,6 +263,7 @@ class provider implements
             'timemodified' => transform::datetime($recordobj->timemodified),
             'approved' => transform::yesno($recordobj->approved),
             'status' => transform::yesno($recordobj->status),
+            'timesubmitted' => $recordobj->timesubmitted ? transform::datetime($recordobj->timesubmitted) : '',
             'assessed' => transform::yesno($recordobj->assessed),
         ];
         // Data about the record.

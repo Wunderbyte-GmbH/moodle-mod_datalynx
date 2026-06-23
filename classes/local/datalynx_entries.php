@@ -1416,6 +1416,18 @@ class datalynx_entries {
 
                 $entry->status = isset($data['status']) ? $data['status'] : $entry->status;
 
+                // Stamp the final-submission date exactly once and never overwrite it afterwards.
+                $oldsubmitted = $DB->get_field('datalynx_entries', 'timesubmitted', ['id' => $entry->id]);
+                if (
+                    empty($oldsubmitted)
+                        && (int) $entry->status === datalynxfield_status::STATUS_FINAL_SUBMISSION
+                ) {
+                    $entry->timesubmitted = $this->current_time();
+                } else {
+                    // Preserve the stored value; never let a later save change it.
+                    $entry->timesubmitted = $oldsubmitted ?: 0;
+                }
+
                 if ($DB->update_record('datalynx_entries', $entry)) {
                     if (!$oldapproved && $newapproved) {
                         $this->create_approved_entries_for_team([$entry->id]);
@@ -1443,6 +1455,10 @@ class datalynx_entries {
                     $entry->timemodified = $this->current_time();
                 }
                 $entry->status = isset($data['status']) ? $data['status'] : 0;
+                // Stamp the final-submission date if the entry is created directly as final.
+                if ((int) $entry->status === datalynxfield_status::STATUS_FINAL_SUBMISSION) {
+                    $entry->timesubmitted = $this->current_time();
+                }
                 $entryid = $DB->insert_record('datalynx_entries', $entry);
                 if (isset($entry->approved) && $entry->approved) {
                     $this->create_approved_entries_for_team([$entryid]);

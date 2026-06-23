@@ -1382,6 +1382,27 @@ function xmldb_datalynx_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2026061901, 'datalynx');
     }
 
+    if ($oldversion < 2026062300) {
+        // Add timesubmitted to datalynx_entries: a write-once timestamp set when an entry
+        // first reaches final submission status. No backfill - existing final entries keep 0.
+        $table = new xmldb_table('datalynx_entries');
+        $field = new xmldb_field(
+            'timesubmitted',
+            XMLDB_TYPE_INTEGER,
+            '10',
+            null,
+            XMLDB_NOTNULL,
+            null,
+            '0',
+            'status'
+        );
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, 2026062300, 'datalynx');
+    }
+
     return true;
 }
 
