@@ -107,7 +107,11 @@ class form extends datalynxfield_form {
                 'lettersonly' => get_string('err_lettersonly', 'form'),
                 'numeric' => get_string('err_numeric', 'form'),
                 'email' => get_string('err_email', 'form'),
-                'nopunctuation' => get_string('err_nopunctuation', 'form')];
+                'nopunctuation' => get_string('err_nopunctuation', 'form'),
+                'iban' => get_string('iban', 'datalynxfield_text'),
+                'bicswift' => get_string('bicswift', 'datalynxfield_text'),
+                'ipv4' => get_string('ipv4', 'datalynxfield_text'),
+                'phone' => get_string('phone', 'datalynxfield_text')];
         $mform->addElement('select', 'param4', get_string('format'), $options);
 
         // Length (param5, 6, 7) minimum, maximum, range.

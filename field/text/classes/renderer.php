@@ -96,9 +96,41 @@ class renderer extends datalynxfield_renderer {
             $format = 'numeric';
         }
         if ($format) {
-            // Special handling for lettersonly to allow Unicode letters.
+            // Special handling for client-side rules.
             if ($format === 'lettersonly') {
                 $mform->addRule($fieldname, get_string('err_lettersonly', 'form'), 'regex', '/^[\p{L}]+$/u', 'client');
+            } else if ($format === 'iban') {
+                $mform->addRule(
+                    $fieldname,
+                    get_string('err_iban', 'datalynxfield_text'),
+                    'regex',
+                    '/^[a-zA-Z]{2}[0-9]{2}[a-zA-Z0-9\s]{11,30}$/i',
+                    'client'
+                );
+            } else if ($format === 'bicswift') {
+                $mform->addRule(
+                    $fieldname,
+                    get_string('err_bicswift', 'datalynxfield_text'),
+                    'regex',
+                    '/^[a-zA-Z]{6}[a-zA-Z0-9]{2}([a-zA-Z0-9]{3})?$/i',
+                    'client'
+                );
+            } else if ($format === 'ipv4') {
+                $mform->addRule(
+                    $fieldname,
+                    get_string('err_ipv4', 'datalynxfield_text'),
+                    'regex',
+                    '/^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/',
+                    'client'
+                );
+            } else if ($format === 'phone') {
+                $mform->addRule(
+                    $fieldname,
+                    get_string('err_phone', 'datalynxfield_text'),
+                    'regex',
+                    '/^\+[1-9][0-9\s\-()]{6,20}$/',
+                    'client'
+                );
             } else {
                 $mform->addRule($fieldname, null, $format, null, 'client');
             }
@@ -108,7 +140,11 @@ class renderer extends datalynxfield_renderer {
                     $mform->setType($fieldname, PARAM_ALPHANUM);
                     break;
                 case 'lettersonly':
-                    $mform->setType($fieldname, PARAM_TEXT); // Use PARAM_TEXT to allow Unicode.
+                case 'iban':
+                case 'bicswift':
+                case 'ipv4':
+                case 'phone':
+                    $mform->setType($fieldname, PARAM_TEXT); // Use PARAM_TEXT to allow symbols/spaces.
                     break;
                 case 'numeric':
                     $mform->setType($fieldname, PARAM_INT);
@@ -263,6 +299,107 @@ class renderer extends datalynxfield_renderer {
             }
         }
 
+        // Validate format rule if the field has a value and has no prior errors.
+        $value = isset($formdata->$formfieldname) ? $formdata->$formfieldname : '';
+        if ($value !== '' && !isset($errors[$formfieldname])) {
+            $format = $this->field->get('param4');
+            if ($format) {
+                $error = $this->validate_format($format, $value);
+                if ($error) {
+                    $errors[$formfieldname] = $error;
+                }
+            }
+        }
+
         return $errors;
+    }
+
+    /**
+     * Validates a field value against the selected format rule.
+     *
+     * @param string $format The format rule to check.
+     * @param string $value The value to check.
+     * @return string|null Error message if invalid, null if valid.
+     */
+    protected function validate_format($format, $value) {
+        switch ($format) {
+            case 'alphanumeric':
+                if (!preg_match('/^[a-zA-Z0-9]+$/', $value)) {
+                    return get_string('err_alphanumeric', 'form');
+                }
+                break;
+            case 'lettersonly':
+                if (!preg_match('/^[\p{L}]+$/u', $value)) {
+                    return get_string('err_lettersonly', 'form');
+                }
+                break;
+            case 'numeric':
+                if (!preg_match('/(^-?\d\d*\.\d*$)|(^-?\d\d*$)|(^-?\.\d\d*$)/', $value)) {
+                    return get_string('err_numeric', 'form');
+                }
+                break;
+            case 'email':
+                if (!validate_email($value)) {
+                    return get_string('err_email', 'form');
+                }
+                break;
+            case 'nopunctuation':
+                if (!preg_match('/^[^().\/\*\^\?#!@$%+=,\"\'><~\[\]{}]+$/', $value)) {
+                    return get_string('err_nopunctuation', 'form');
+                }
+                break;
+            case 'iban':
+                if (!$this->validate_iban($value)) {
+                    return get_string('err_iban', 'datalynxfield_text');
+                }
+                break;
+            case 'bicswift':
+                if (!preg_match('/^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$/i', trim($value))) {
+                    return get_string('err_bicswift', 'datalynxfield_text');
+                }
+                break;
+            case 'ipv4':
+                if (filter_var(trim($value), FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === false) {
+                    return get_string('err_ipv4', 'datalynxfield_text');
+                }
+                break;
+            case 'phone':
+                if (!preg_match('/^\+[1-9][0-9\s\-()]{6,20}$/', $value)) {
+                    return get_string('err_phone', 'datalynxfield_text');
+                }
+                break;
+        }
+        return null;
+    }
+
+    /**
+     * Validate IBAN structure and Modulo 97 checksum.
+     *
+     * @param string $value
+     * @return bool
+     */
+    protected function validate_iban($value) {
+        $iban = str_replace([' ', '-'], '', strtoupper($value));
+        if (empty($iban)) {
+            return false;
+        }
+        if (!preg_match('/^[A-Z]{2}[0-9]{2}[A-Z0-9]{11,30}$/', $iban)) {
+            return false;
+        }
+        $movedchar = substr($iban, 4) . substr($iban, 0, 4);
+        $movedchararray = str_split($movedchar);
+        $newstring = "";
+        foreach ($movedchararray as $char) {
+            if (!is_numeric($char)) {
+                $newstring .= ord($char) - 55;
+            } else {
+                $newstring .= $char;
+            }
+        }
+        $remainder = 0;
+        foreach (str_split($newstring, 7) as $chunk) {
+            $remainder = ($remainder . $chunk) % 97;
+        }
+        return $remainder === 1;
     }
 }

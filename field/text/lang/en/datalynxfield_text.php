@@ -22,7 +22,15 @@
  * @copyright based on the work  by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+$string['bicswift'] = 'BIC/SWIFT';
+$string['err_bicswift'] = 'Please enter a valid BIC/SWIFT code.';
+$string['err_iban'] = 'Please enter a valid IBAN.';
+$string['err_ipv4'] = 'Please enter a valid IPv4 address.';
+$string['err_phone'] = 'Please enter a valid phone number in international format (e.g. +43 650 234234).';
 $string['fieldformat_maxlength'] = 'Excerpt length (characters)';
 $string['fieldformat_maxlength_help'] = 'Creates an excerpt by showing only the first N characters of the text in views, followed by an ellipsis (…). This only affects how the value is displayed — the full text is always stored and available for editing. Leave empty or 0 to display the full text.';
+$string['iban'] = 'IBAN';
+$string['ipv4'] = 'IPv4 Address';
+$string['phone'] = 'Phone (International)';
 $string['pluginname'] = 'Text';
 $string['privacy:metadata'] = 'Textfields do not store personal data.';
