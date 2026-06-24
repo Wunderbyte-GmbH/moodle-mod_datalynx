@@ -357,16 +357,75 @@ final class rule_conditions_test extends advanced_testcase {
     }
 
     /**
-     * _only_on_change flag: the rule fires only when the condition field actually changed.
+     * The autocomplete selection is persisted into param9 by the rule form's get_data().
+     */
+    public function test_form_saves_onlyonchange_to_param9(): void {
+        $fieldid = $this->make_field('text', 'SourceText');
+        $formclass = \datalynxrule_eventnotification\form\rule_form::class;
+        $submitted = [
+            'd' => $this->dlx->id(),
+            'cmid' => $this->dlx->cm->id,
+            'rid' => 0,
+            'type' => 'eventnotification',
+            'name' => 'OnChangeRule',
+            'description' => '',
+            'enabled' => 1,
+            'entry_updated' => 1,
+            'onlyonchangefields' => [$fieldid],
+        ];
+        $ajaxdata = $formclass::mock_ajax_submit($submitted);
+        $form = new $formclass(null, null, 'post', '', null, true, $ajaxdata);
+        $data = $form->get_data();
+        $this->assertNotNull($data, 'get_data() returned null (form not submitted/validated)');
+        $this->assertNotEmpty($data->param9, 'param9 is empty after get_data()');
+        $decoded = json_decode($data->param9, true);
+        $this->assertSame([$fieldid], $decoded['_onlyonchangefields'] ?? null);
+    }
+
+    /**
+     * The rule form's set_data_for_dynamic_submission() repopulates the autocomplete from param9.
+     */
+    public function test_form_reloads_onlyonchange_from_param9(): void {
+        global $DB;
+        $fieldid = $this->make_field('text', 'SourceText');
+        $ruleid = (int) $DB->insert_record('datalynx_rules', (object) [
+            'dataid' => $this->dlx->id(),
+            'name' => 'OnChangeReload',
+            'description' => '',
+            'type' => 'eventnotification',
+            'enabled' => 1,
+            'param1' => json_encode(['entry_updated']),
+            'param9' => json_encode(['_onlyonchangefields' => [$fieldid]]),
+        ]);
+        $formclass = \datalynxrule_eventnotification\form\rule_form::class;
+        $ajaxdata = [
+            'd' => $this->dlx->id(),
+            'cmid' => $this->dlx->cm->id,
+            'rid' => $ruleid,
+            'type' => 'eventnotification',
+        ];
+        $form = new $formclass(null, null, 'post', '', null, true, $ajaxdata);
+        $form->set_data_for_dynamic_submission();
+
+        $prop = (new \ReflectionClass(\moodleform::class))->getProperty('_form');
+        $prop->setAccessible(true);
+        $mform = $prop->getValue($form);
+        $value = $mform->getElement('onlyonchangefields')->getValue();
+        $this->assertEquals([$fieldid], array_map('intval', (array) $value));
+    }
+
+    /**
+     * On-change field list: the rule fires only when a listed field actually changed.
      *
-     * Scenario: condition is "radiobutton = 2" with _only_on_change.
+     * Scenario: condition is "radiobutton = 2" plus an on-change list containing that field.
      * - Update where the field changed (field ID in changed_field_ids) → fires.
      * - Update where the field did NOT change (empty changed_field_ids) → suppressed.
      */
     public function test_only_on_change_fires_when_field_changed(): void {
         $fieldid = $this->make_field('radiobutton', 'Priority', "low\nhigh\ncritical");
         $rule = $this->make_condition_rule([
-            $fieldid => ['AND' => [['', '=', '2']], '_only_on_change' => true],
+            $fieldid => ['AND' => [['', '=', '2']]],
+            \datalynxrule_eventnotification\rule::ONCHANGE_KEY => [$fieldid],
         ]);
 
         $entryid = $this->make_entry($fieldid, '2');
@@ -376,7 +435,23 @@ final class rule_conditions_test extends advanced_testcase {
     }
 
     /**
-     * Without _only_on_change the rule fires for every matching update, changed or not.
+     * The on-change list works independently of the trigger conditions: a rule with only an
+     * on-change field (no other condition) still fires only when that field changed.
+     */
+    public function test_only_on_change_without_other_conditions(): void {
+        $fieldid = $this->make_field('radiobutton', 'Priority', "low\nhigh\ncritical");
+        $rule = $this->make_condition_rule([
+            \datalynxrule_eventnotification\rule::ONCHANGE_KEY => [$fieldid],
+        ]);
+
+        $entryid = $this->make_entry($fieldid, '2');
+
+        $this->assertTrue($this->fire_update($rule, $entryid, [$fieldid]));
+        $this->assertFalse($this->fire_update($rule, $entryid, []));
+    }
+
+    /**
+     * Without an on-change list the rule fires for every matching update, changed or not.
      */
     public function test_without_only_on_change_fires_regardless_of_change(): void {
         $fieldid = $this->make_field('radiobutton', 'Priority', "low\nhigh\ncritical");
@@ -391,15 +466,19 @@ final class rule_conditions_test extends advanced_testcase {
     }
 
     /**
-     * _only_on_change suppresses entry_created events because they carry no changed_field_ids.
+     * The on-change list only filters entry_updated events: an entry_created event (which the
+     * rule may also listen to) still fires on its own merits, unaffected by the on-change list.
      */
-    public function test_only_on_change_suppresses_entry_created_event(): void {
+    public function test_only_on_change_does_not_affect_entry_created_event(): void {
         $fieldid = $this->make_field('radiobutton', 'Priority', "low\nhigh\ncritical");
         $rule = $this->make_condition_rule([
-            $fieldid => ['AND' => [['', '=', '2']], '_only_on_change' => true],
+            $fieldid => ['AND' => [['', '=', '2']]],
+            \datalynxrule_eventnotification\rule::ONCHANGE_KEY => [$fieldid],
         ]);
 
         $entryid = $this->make_entry($fieldid, '2');
-        $this->assertFalse($this->fire($rule, $entryid));
+        // An entry_created event carries no changed_field_ids, but the on-change filter does not
+        // apply to it, so the rule still fires because the entry matches the "= 2" condition.
+        $this->assertTrue($this->fire($rule, $entryid));
     }
 }

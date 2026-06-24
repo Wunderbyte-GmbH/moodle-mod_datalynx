@@ -54,6 +54,9 @@ class rule extends base {
     /** @var int To email */
     const TO_EMAIL = 16;
 
+    /** @var string Reserved param9 key holding the "only trigger on change" field IDs. */
+    const ONCHANGE_KEY = '_onlyonchangefields';
+
     /** @var string Rule type */
     public $type = 'eventnotification';
 
@@ -159,9 +162,16 @@ class rule extends base {
         if ($conditions && !$this->entry_matches_conditions($entryid, $conditions)) {
             return false;
         }
-        // When any condition has _only_on_change set, require at least one of those fields
-        // to have actually changed its value during this update.
-        if ($conditions && !$this->entry_satisfies_change_constraint($conditions, $event)) {
+        // When "only on change" fields are configured, require at least one of them to have
+        // actually changed its value during this update. This filter only applies to the
+        // entry_updated event (the only event carrying a changed-field list); other events the
+        // rule may also listen to are unaffected. It is independent of the trigger conditions
+        // above, so it also applies when no other condition is set.
+        $onchangeids = $this->get_onlyonchange_fieldids();
+        if (
+            $onchangeids && $event instanceof \mod_datalynx\event\entry_updated
+            && !$this->change_constraint_satisfied($onchangeids, $event)
+        ) {
             return false;
         }
 
@@ -274,24 +284,35 @@ class rule extends base {
     }
 
     /**
-     * Check if at least one condition field flagged with _only_on_change actually changed.
+     * Field IDs configured for the "only trigger when these field values change" option.
      *
-     * When no conditions carry _only_on_change the check always passes. The changed field IDs
-     * are taken from the event's other['changed_field_ids'] array, which is only populated for
-     * entry_updated events — other event types will therefore never pass this check when
-     * _only_on_change is set (preventing spurious notifications from entry_created, etc.).
+     * Stored as a JSON array under the reserved {@see self::ONCHANGE_KEY} key in param9, kept
+     * separate from the numeric condition rows so it applies independently of them.
      *
-     * @param array $conditions customsearch aggregated by field id (from param9)
+     * @return int[]
+     */
+    private function get_onlyonchange_fieldids(): array {
+        if (empty($this->rule->param9)) {
+            return [];
+        }
+        $decoded = json_decode($this->rule->param9, true);
+        if (!is_array($decoded) || empty($decoded[self::ONCHANGE_KEY])) {
+            return [];
+        }
+        return array_map('intval', (array) $decoded[self::ONCHANGE_KEY]);
+    }
+
+    /**
+     * Check that at least one of the given fields actually changed during this update.
+     *
+     * Only meaningful for entry_updated events (the caller gates on that). The changed field IDs
+     * are taken from the event's other['changed_field_ids'] array.
+     *
+     * @param int[] $onchangeids field IDs that must have changed
      * @param \core\event\base $event
      * @return bool
      */
-    private function entry_satisfies_change_constraint(array $conditions, \core\event\base $event): bool {
-        $onchangeids = [];
-        foreach ($conditions as $fieldid => $cond) {
-            if (is_numeric($fieldid) && is_array($cond) && !empty($cond['_only_on_change'])) {
-                $onchangeids[] = (int) $fieldid;
-            }
-        }
+    private function change_constraint_satisfied(array $onchangeids, \core\event\base $event): bool {
         if (!$onchangeids) {
             return true;
         }
@@ -311,7 +332,12 @@ class rule extends base {
     private function get_trigger_conditions(): array {
         if (!empty($this->rule->param9)) {
             $decoded = json_decode($this->rule->param9, true);
-            return is_array($decoded) ? $decoded : [];
+            if (!is_array($decoded)) {
+                return [];
+            }
+            // The on-change field list lives under a reserved key, not a condition row.
+            unset($decoded[self::ONCHANGE_KEY]);
+            return $decoded;
         }
 
         // Legacy fallback: build a one-condition customsearch from param5/param10.

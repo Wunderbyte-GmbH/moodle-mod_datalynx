@@ -196,9 +196,6 @@ class rule_form extends dynamic_form {
         $mform->addElement('hidden', 'type', $this->rule->type);
         $mform->setType('type', PARAM_ALPHA);
 
-        // Buttons.
-        $this->add_action_buttons();
-
         $mform->addElement('header', 'general', get_string('general', 'form'));
 
         // Name.
@@ -256,8 +253,6 @@ class rule_form extends dynamic_form {
             $this->custom_search_definition($customsearch, $this->dlx->get_fields(), $fieldoptions, true);
         }
         $this->rule_definition();
-        // Buttons.
-        $this->add_action_buttons();
     }
 
     /**
@@ -282,7 +277,12 @@ class rule_form extends dynamic_form {
             return [];
         }
         $decoded = json_decode($stored, true);
-        return is_array($decoded) ? $decoded : [];
+        if (!is_array($decoded)) {
+            return [];
+        }
+        // The on-change field list is stored under a reserved key, not as a condition row.
+        unset($decoded['_onlyonchangefields']);
+        return $decoded;
     }
 
     /**
@@ -330,7 +330,12 @@ class rule_form extends dynamic_form {
     }
 
     /**
-     * Add action buttons
+     * Add action buttons.
+     *
+     * Not called by {@see self::definition()}: this form is shown through core_form's ModalForm,
+     * whose footer supplies the Save/Cancel buttons. Rendering them here as well produced the
+     * duplicate submit buttons inside the modal. The override is retained (and emits no buttons by
+     * default) only so the legacy full-page editor can opt in explicitly if ever needed.
      *
      * @param bool $cancel
      * @param null $submit

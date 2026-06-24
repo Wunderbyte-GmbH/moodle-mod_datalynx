@@ -38,7 +38,9 @@ class rule_form extends base_rule_form {
         $mform = &$this->_form;
 
         // Only-on-change field selection: notification fires only when at least one of the
-        // selected fields actually changed its value during the triggering update event.
+        // selected fields actually changed its value during the triggering update event. This
+        // only makes sense for the "entry updated" event (it is the only event carrying a list of
+        // changed fields), so the control is hidden unless that event is selected.
         $dlfields = $this->dlx->get_fields(['entry'], true);
         if (!empty($dlfields)) {
             $options = ['multiple' => true, 'noselectionstring' => get_string('noselection', 'form')];
@@ -50,6 +52,7 @@ class rule_form extends base_rule_form {
                 $options
             );
             $mform->addHelpButton('onlyonchangefields', 'onlyonchange', 'datalynxrule_eventnotification');
+            $mform->hideIf('onlyonchangefields', 'entry_updated', 'notchecked');
         }
 
         // Message subject. When empty then use default subject in message.
@@ -305,16 +308,12 @@ class rule_form extends base_rule_form {
             $data->param7 = [];
         }
 
-        // Extract field IDs with _only_on_change set from param9 to populate the form element.
+        // Populate the autocomplete from the reserved on-change field list stored in param9.
         $data->onlyonchangefields = [];
         if (!empty($data->param9)) {
             $conditions = json_decode($data->param9, true);
-            if (is_array($conditions)) {
-                foreach ($conditions as $fieldid => $cond) {
-                    if (is_numeric($fieldid) && is_array($cond) && !empty($cond['_only_on_change'])) {
-                        $data->onlyonchangefields[] = (int) $fieldid;
-                    }
-                }
+            if (is_array($conditions) && !empty($conditions[rule::ONCHANGE_KEY])) {
+                $data->onlyonchangefields = array_map('intval', (array) $conditions[rule::ONCHANGE_KEY]);
             }
         }
 
@@ -349,20 +348,24 @@ class rule_form extends base_rule_form {
             $data->param4 = json_encode(!empty($data->param4) && is_array($data->param4) ? $data->param4 : []);
             $data->param7 = json_encode(!empty($data->param7) && is_array($data->param7) ? $data->param7 : []);
 
-            // Inject _only_on_change flags into param9 for the selected fields.
-            $onchangefields = !empty($data->onlyonchangefields) ? (array) $data->onlyonchangefields : [];
-            if ($onchangefields && !empty($data->param9)) {
-                $conditions = json_decode($data->param9, true);
-                if (is_array($conditions)) {
-                    foreach ($onchangefields as $fieldid) {
-                        $fieldid = (int) $fieldid;
-                        if (isset($conditions[$fieldid])) {
-                            $conditions[$fieldid]['_only_on_change'] = true;
-                        }
-                    }
-                    $data->param9 = json_encode($conditions);
+            // Store the selected on-change field IDs under a reserved key in param9. This is
+            // independent of the trigger conditions, so a notification can fire "only on change"
+            // even when no other condition is configured.
+            $onchangefields = !empty($data->onlyonchangefields)
+                ? array_values(array_unique(array_map('intval', (array) $data->onlyonchangefields)))
+                : [];
+            $conditions = [];
+            if (!empty($data->param9)) {
+                $decoded = json_decode($data->param9, true);
+                if (is_array($decoded)) {
+                    $conditions = $decoded;
                 }
             }
+            unset($conditions[rule::ONCHANGE_KEY]);
+            if ($onchangefields) {
+                $conditions[rule::ONCHANGE_KEY] = $onchangefields;
+            }
+            $data->param9 = $conditions ? json_encode($conditions) : null;
             unset($data->onlyonchangefields);
         }
         return $data;
