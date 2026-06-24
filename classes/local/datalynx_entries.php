@@ -872,6 +872,7 @@ class datalynx_entries {
                                 if ($entry->id = $this->update_entry($entry, $contents[$eid]['info'], true, $allowfinaledit)) {
                                     $emptycontent = []; // Array with lines and deleted contentids.
                                     $countfgfields = 0; // Store how many fields exist per line.
+                                    $changedfields = []; // Track field IDs whose content changed.
 
                                     // Variable $eid should be different from $entryid only in new entries.
                                     // Iterate through all the fields part of an entry and a fieldgroup. Field by field.
@@ -954,6 +955,9 @@ class datalynx_entries {
                                                 // TODO: MDL-66151 This relies on the correctness of the field classes
                                                 // update content.
                                                 $newcontentid = $fields[$fieldid]->update_content($entry, $tempcontent);
+                                                if ($newcontentid !== true) {
+                                                    $changedfields[$fieldid] = true;
+                                                }
 
                                                 // In case this field has no content mark and check deletion later.
                                                 // TODO: MDL-66151 Needs to be extended for all field classes in function.
@@ -967,7 +971,10 @@ class datalynx_entries {
                                             }
                                         } else {
                                             // Keep behaviour if no fieldgroup is detected.
-                                            $fields[$fieldid]->update_content($entry, $content);
+                                            $updateresult = $fields[$fieldid]->update_content($entry, $content);
+                                            if ($updateresult !== true) {
+                                                $changedfields[$fieldid] = true;
+                                            }
                                         }
                                     }
 
@@ -986,6 +993,7 @@ class datalynx_entries {
                                             $DB->delete_records_select('datalynx_contents', "id IN ($in)"); // TESTING.
                                         }
                                     }
+                                    $entry->changed_field_ids = array_keys($changedfields);
                                     $processed[$entry->id] = $entry;
 
                                     if (!$addorupdate) {

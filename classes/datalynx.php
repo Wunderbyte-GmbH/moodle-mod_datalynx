@@ -3037,8 +3037,10 @@ class datalynx {
                     $eventobj->trigger();
                     break;
                 case 'entryupdated':
+                    $updatedother = $other;
+                    $updatedother['changed_field_ids'] = $data->items[$id]->changed_field_ids ?? [];
                     $eventobj = event\entry_updated::create(
-                        ['context' => $this->context, 'objectid' => $id, 'other' => $other]
+                        ['context' => $this->context, 'objectid' => $id, 'other' => $updatedother]
                     );
                     $eventobj->trigger();
                     break;

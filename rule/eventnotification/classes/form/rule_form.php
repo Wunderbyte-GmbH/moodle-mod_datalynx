@@ -37,6 +37,21 @@ class rule_form extends base_rule_form {
         $br = html_writer::empty_tag('br');
         $mform = &$this->_form;
 
+        // Only-on-change field selection: notification fires only when at least one of the
+        // selected fields actually changed its value during the triggering update event.
+        $dlfields = $this->dlx->get_fields(['entry'], true);
+        if (!empty($dlfields)) {
+            $options = ['multiple' => true, 'noselectionstring' => get_string('noselection', 'form')];
+            $mform->addElement(
+                'autocomplete',
+                'onlyonchangefields',
+                get_string('onlyonchange', 'datalynxrule_eventnotification'),
+                $dlfields,
+                $options
+            );
+            $mform->addHelpButton('onlyonchangefields', 'onlyonchange', 'datalynxrule_eventnotification');
+        }
+
         // Message subject. When empty then use default subject in message.
         $mform->addElement('text', 'param6', get_string('asyncmessagesubject', 'backup'), ['size' => '64']);
         $mform->setType('param6', PARAM_TEXT);
@@ -289,6 +304,20 @@ class rule_form extends base_rule_form {
         } else {
             $data->param7 = [];
         }
+
+        // Extract field IDs with _only_on_change set from param9 to populate the form element.
+        $data->onlyonchangefields = [];
+        if (!empty($data->param9)) {
+            $conditions = json_decode($data->param9, true);
+            if (is_array($conditions)) {
+                foreach ($conditions as $fieldid => $cond) {
+                    if (is_numeric($fieldid) && is_array($cond) && !empty($cond['_only_on_change'])) {
+                        $data->onlyonchangefields[] = (int) $fieldid;
+                    }
+                }
+            }
+        }
+
         parent::set_data($data);
     }
 
@@ -319,6 +348,22 @@ class rule_form extends base_rule_form {
             $data->param3 = json_encode($recipients);
             $data->param4 = json_encode(!empty($data->param4) && is_array($data->param4) ? $data->param4 : []);
             $data->param7 = json_encode(!empty($data->param7) && is_array($data->param7) ? $data->param7 : []);
+
+            // Inject _only_on_change flags into param9 for the selected fields.
+            $onchangefields = !empty($data->onlyonchangefields) ? (array) $data->onlyonchangefields : [];
+            if ($onchangefields && !empty($data->param9)) {
+                $conditions = json_decode($data->param9, true);
+                if (is_array($conditions)) {
+                    foreach ($onchangefields as $fieldid) {
+                        $fieldid = (int) $fieldid;
+                        if (isset($conditions[$fieldid])) {
+                            $conditions[$fieldid]['_only_on_change'] = true;
+                        }
+                    }
+                    $data->param9 = json_encode($conditions);
+                }
+            }
+            unset($data->onlyonchangefields);
         }
         return $data;
     }

@@ -31,6 +31,7 @@ namespace mod_datalynx\event;
  *                Extra information about event.
  *
  *                - int dataid: the id of the datalynx activity.
+ *                - int[] changed_field_ids: IDs of fields whose content changed during this update.
  *                }
  *
  * @package mod_datalynx

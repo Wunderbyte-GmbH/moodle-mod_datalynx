@@ -159,6 +159,11 @@ class rule extends base {
         if ($conditions && !$this->entry_matches_conditions($entryid, $conditions)) {
             return false;
         }
+        // When any condition has _only_on_change set, require at least one of those fields
+        // to have actually changed its value during this update.
+        if ($conditions && !$this->entry_satisfies_change_constraint($conditions, $event)) {
+            return false;
+        }
 
         $dlx = $this->dlx;
         $viewurl = "$CFG->wwwroot/mod/datalynx/view.php?d=" . $dlx->id();
@@ -266,6 +271,32 @@ class rule extends base {
             \core\task\manager::queue_adhoc_task($adhocktask);
         }
         return true;
+    }
+
+    /**
+     * Check if at least one condition field flagged with _only_on_change actually changed.
+     *
+     * When no conditions carry _only_on_change the check always passes. The changed field IDs
+     * are taken from the event's other['changed_field_ids'] array, which is only populated for
+     * entry_updated events — other event types will therefore never pass this check when
+     * _only_on_change is set (preventing spurious notifications from entry_created, etc.).
+     *
+     * @param array $conditions customsearch aggregated by field id (from param9)
+     * @param \core\event\base $event
+     * @return bool
+     */
+    private function entry_satisfies_change_constraint(array $conditions, \core\event\base $event): bool {
+        $onchangeids = [];
+        foreach ($conditions as $fieldid => $cond) {
+            if (is_numeric($fieldid) && is_array($cond) && !empty($cond['_only_on_change'])) {
+                $onchangeids[] = (int) $fieldid;
+            }
+        }
+        if (!$onchangeids) {
+            return true;
+        }
+        $changed = $event->other['changed_field_ids'] ?? [];
+        return (bool) array_intersect($onchangeids, $changed);
     }
 
     /**

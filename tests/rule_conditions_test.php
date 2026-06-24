@@ -134,6 +134,23 @@ final class rule_conditions_test extends advanced_testcase {
     }
 
     /**
+     * Fire an entry_updated event carrying a specific changed_field_ids list.
+     *
+     * @param \mod_datalynx\local\rule\base $rule
+     * @param int $entryid
+     * @param int[] $changedfields field IDs that changed during the update
+     * @return bool
+     */
+    private function fire_update(\mod_datalynx\local\rule\base $rule, int $entryid, array $changedfields = []): bool {
+        $event = \mod_datalynx\event\entry_updated::create([
+            'context' => $this->dlx->context,
+            'objectid' => $entryid,
+            'other' => ['dataid' => $this->dlx->id(), 'changed_field_ids' => $changedfields],
+        ]);
+        return $rule->trigger($event);
+    }
+
+    /**
      * Test rule condition evaluation on checkbox fields (multiple options).
      */
     public function test_checkbox_rule_conditions(): void {
@@ -337,5 +354,52 @@ final class rule_conditions_test extends advanced_testcase {
     public function test_empty_conditions_always_fire(): void {
         $rule = $this->make_condition_rule([]);
         $this->assertTrue($this->fire($rule, $this->make_entry(0, null)));
+    }
+
+    /**
+     * _only_on_change flag: the rule fires only when the condition field actually changed.
+     *
+     * Scenario: condition is "radiobutton = 2" with _only_on_change.
+     * - Update where the field changed (field ID in changed_field_ids) → fires.
+     * - Update where the field did NOT change (empty changed_field_ids) → suppressed.
+     */
+    public function test_only_on_change_fires_when_field_changed(): void {
+        $fieldid = $this->make_field('radiobutton', 'Priority', "low\nhigh\ncritical");
+        $rule = $this->make_condition_rule([
+            $fieldid => ['AND' => [['', '=', '2']], '_only_on_change' => true],
+        ]);
+
+        $entryid = $this->make_entry($fieldid, '2');
+
+        $this->assertTrue($this->fire_update($rule, $entryid, [$fieldid]));
+        $this->assertFalse($this->fire_update($rule, $entryid, []));
+    }
+
+    /**
+     * Without _only_on_change the rule fires for every matching update, changed or not.
+     */
+    public function test_without_only_on_change_fires_regardless_of_change(): void {
+        $fieldid = $this->make_field('radiobutton', 'Priority', "low\nhigh\ncritical");
+        $rule = $this->make_condition_rule([
+            $fieldid => ['AND' => [['', '=', '2']]],
+        ]);
+
+        $entryid = $this->make_entry($fieldid, '2');
+
+        $this->assertTrue($this->fire_update($rule, $entryid, [$fieldid]));
+        $this->assertTrue($this->fire_update($rule, $entryid, []));
+    }
+
+    /**
+     * _only_on_change suppresses entry_created events because they carry no changed_field_ids.
+     */
+    public function test_only_on_change_suppresses_entry_created_event(): void {
+        $fieldid = $this->make_field('radiobutton', 'Priority', "low\nhigh\ncritical");
+        $rule = $this->make_condition_rule([
+            $fieldid => ['AND' => [['', '=', '2']], '_only_on_change' => true],
+        ]);
+
+        $entryid = $this->make_entry($fieldid, '2');
+        $this->assertFalse($this->fire($rule, $entryid));
     }
 }
