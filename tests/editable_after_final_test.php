@@ -179,6 +179,34 @@ final class editable_after_final_test extends advanced_testcase {
         );
     }
 
+    /**
+     * Save gate: a user with manageentries but WITHOUT editfinalsubmission cannot bypass the lock.
+     */
+    public function test_manager_without_editfinalsubmission_cannot_bypass_lock(): void {
+        global $DB;
+
+        $field = $this->create_field('text', 'Any');
+        $teacher = $this->getDataGenerator()->create_and_enrol($this->course, 'editingteacher');
+        $entryid = $this->create_final_entry($teacher->id, [$field => 'original']);
+
+        // Revoke the editfinalsubmission capability from the teacher role.
+        $teacherrole = $DB->get_record('role', ['shortname' => 'editingteacher']);
+        assign_capability('mod/datalynx:editfinalsubmission', CAP_PREVENT, $teacherrole->id, $this->dlx->context->id, true);
+
+        $this->setUser($teacher);
+        $this->run_update($entryid, [
+            "field_{$field}_{$entryid}" => 'managerchanged',
+            'field_status_' . $entryid => datalynxfield_status::STATUS_DRAFT,
+            'editablefinalfieldids' => [],
+        ]);
+
+        $this->assertEquals('original', $this->content($field, $entryid));
+        $this->assertEquals(
+            datalynxfield_status::STATUS_FINAL_SUBMISSION,
+            (int) $DB->get_field('datalynx_entries', 'status', ['id' => $entryid])
+        );
+    }
+
     // Helpers.
 
     /**

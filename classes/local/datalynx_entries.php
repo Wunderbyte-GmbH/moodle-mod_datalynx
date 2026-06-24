@@ -846,7 +846,7 @@ class datalynx_entries {
                                     );
                                     if (
                                             $entrystatus == datalynxfield_status::STATUS_FINAL_SUBMISSION
-                                            && !has_capability('mod/datalynx:manageentries', $this->dlx->context)
+                                            && !has_capability('mod/datalynx:editfinalsubmission', $this->dlx->context)
                                     ) {
                                         // Final-submission lock. Never change the status, and persist only the
                                         // fields explicitly flagged "editable after final submission" by the

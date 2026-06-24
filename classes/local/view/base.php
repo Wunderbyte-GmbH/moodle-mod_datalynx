@@ -1888,7 +1888,7 @@ abstract class base {
                         ['id' => $this->editentries[0]]
                     );
                     if (
-                        !has_capability('mod/datalynx:manageentries', $this->dlx->context) &&
+                        !has_capability('mod/datalynx:editfinalsubmission', $this->dlx->context) &&
                              $entrystatus == datalynxfield_status::STATUS_FINAL_SUBMISSION
                     ) {
                         // The whole entry is locked once final, unless this view carries fields that are

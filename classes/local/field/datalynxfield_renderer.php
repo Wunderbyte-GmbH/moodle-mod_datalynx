@@ -138,12 +138,12 @@ abstract class datalynxfield_renderer {
             $isentryauthor = empty($entry->id) || (isset($entry->userid) && (string)$entry->userid === (string)$USER->id);
             $editable = $behavior->is_editable_by_user(null, $isentryauthor) && $conditionsmet;
             // Once an entry reaches final submission, only fields whose behavior explicitly allows it
-            // stay editable for users without manageentries. The status field itself is never excepted,
+            // stay editable for users without editfinalsubmission. The status field itself is never excepted,
             // so the entry cannot be reverted to draft to bypass the lock.
             if (
                 $editable && isset($entry->status)
                 && (int) $entry->status === \datalynxfield_status\field::STATUS_FINAL_SUBMISSION
-                && !has_capability('mod/datalynx:manageentries', $this->field->dlx()->context)
+                && !has_capability('mod/datalynx:editfinalsubmission', $this->field->dlx()->context)
             ) {
                 $editable = $behavior->is_editable_after_final() && $this->field->type !== 'status';
             }

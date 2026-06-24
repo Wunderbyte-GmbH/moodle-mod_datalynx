@@ -2581,7 +2581,18 @@ class datalynx {
 
         // Teachers can always manage entries.
         if (has_capability('mod/datalynx:manageentries', $this->context)) {
-            return true;
+            // But if the entry is final, they need editfinalsubmission!
+            if (
+                $entry && !empty($entry->id) &&
+                    !($entry->status == datalynxfield_status::STATUS_DRAFT ||
+                        $entry->status == datalynxfield_status::STATUS_NOT_SET)
+            ) {
+                if (has_capability('mod/datalynx:editfinalsubmission', $this->context)) {
+                    return true;
+                }
+            } else {
+                return true;
+            }
         }
 
         // Anonymous/guest can only add entries if enabled.
@@ -2636,7 +2647,9 @@ class datalynx {
                     !($entry->status == datalynxfield_status::STATUS_DRAFT ||
                         $entry->status == datalynxfield_status::STATUS_NOT_SET)
                 ) {
-                    return false;
+                    if (!has_capability('mod/datalynx:editfinalsubmission', $this->context)) {
+                        return false;
+                    }
                 }
                 // Ok owner, what's the time (limit)?
                 if ($this->data->timelimit != -1) {

@@ -146,6 +146,7 @@ $string['customfiltersnoneindatalynx'] = 'There are no custom filters defined fo
 $string['datalynx:addinstance'] = 'Add a new datalynx';
 $string['datalynx:approve'] = 'Approve unapproved entries';
 $string['datalynx:comment'] = 'Write comments';
+$string['datalynx:editfinalsubmission'] = 'Edit entries after final submission';
 $string['datalynx:editprivilegeadmin'] = 'Edit privilege level: Administrator (no default role assignment)';
 $string['datalynx:editprivilegeguest'] = 'Edit privilege level: Guest and authenticated users';
 $string['datalynx:editprivilegemanager'] = 'Edit privilege level: Manager';

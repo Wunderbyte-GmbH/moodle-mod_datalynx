@@ -57,6 +57,14 @@ $capabilities = [
                 'archetypes' => ['editingteacher' => CAP_ALLOW, 'manager' => CAP_ALLOW],
         ],
 
+        // Edit entry despite final submission lock.
+        'mod/datalynx:editfinalsubmission' => [
+                'riskbitmask' => RISK_SPAM,
+                'captype' => 'write',
+                'contextlevel' => CONTEXT_MODULE,
+                'archetypes' => ['editingteacher' => CAP_ALLOW, 'manager' => CAP_ALLOW],
+        ],
+
         // Approve an entry.
         'mod/datalynx:approve' => [
                 'riskbitmask' => RISK_SPAM,

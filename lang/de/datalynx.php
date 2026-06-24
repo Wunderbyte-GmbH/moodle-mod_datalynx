@@ -141,6 +141,7 @@ $string['customfiltersnoneindatalynx'] = 'Für diese Datalynx sind keine benutze
 $string['datalynx:addinstance'] = 'Neue Datalynx Aktivität anlegen';
 $string['datalynx:approve'] = 'Einträge freischalten';
 $string['datalynx:comment'] = 'Kommentare schreiben';
+$string['datalynx:editfinalsubmission'] = 'Einträge nach der Abgabe bearbeiten';
 $string['datalynx:editprivilegeadmin'] = 'Bearbeitungsrecht: Administrator (keine Standard-Rollenzuweisung)';
 $string['datalynx:editprivilegeguest'] = 'Bearbeitungsrecht: Gast und angemeldete Nutzer/innen';
 $string['datalynx:editprivilegemanager'] = 'Bearbeitungsrecht: Manager';
