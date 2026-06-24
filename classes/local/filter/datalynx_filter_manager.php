@@ -661,7 +661,11 @@ class datalynx_filter_manager {
                         $parsedvalue = $fields[$searchfieldid]->parse_search($formdata, $i);
                         // Don't add empty criteria on cleanup (unless operator
                         // doesn't need an argument/search value (e.g. the "Empty" operator)).
-                        if ($finalize && ($fields[$searchfieldid]->get_argument_count($operator) > 0) && ($parsedvalue === false || $parsedvalue === null || $parsedvalue === '')) {
+                        if (
+                            $finalize
+                                && ($fields[$searchfieldid]->get_argument_count($operator) > 0)
+                                && ($parsedvalue === false || $parsedvalue === null || $parsedvalue === '')
+                        ) {
                             continue;
                         }
 
