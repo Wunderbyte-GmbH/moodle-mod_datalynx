@@ -51,6 +51,7 @@ Feature: Filter datalynx entries where I am a team member of a teammemberselect 
     And I set the field "Name" to "team"
     And I set the field "Maximum team size" to "5"
     And I set the field "Teacher" to "1"
+    And I set the field "User can add him/herself" to "1"
     And I press "Save changes"
     # --- Add the "Add team members by profile match" rule via the UI ---
     And I am on "Course 1" course homepage
@@ -95,11 +96,16 @@ Feature: Filter datalynx entries where I am a team member of a teammemberselect 
     And I follow "Datalynx Test Instance"
     And I follow "Add a new entry"
     And I set the field with xpath "//div[@data-field-name='dept']//select" to "Faculty1"
+    And I open the autocomplete suggestions list
+    And I click on "Teacher 1 (teacher1@example.com)" item in the autocomplete list
+    And I click on "Teacher 3 (teacher3@example.com)" item in the autocomplete list
     And I press "Save changes"
     And I am on "Course 1" course homepage
     And I follow "Datalynx Test Instance"
     And I follow "Add a new entry"
     And I set the field with xpath "//div[@data-field-name='dept']//select" to "Faculty2"
+    And I open the autocomplete suggestions list
+    And I click on "Teacher 2 (teacher2@example.com)" item in the autocomplete list
     And I press "Save changes"
     And I log out
 
