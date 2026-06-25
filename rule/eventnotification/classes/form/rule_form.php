@@ -313,7 +313,7 @@ class rule_form extends base_rule_form {
         if (!empty($data->param9)) {
             $conditions = json_decode($data->param9, true);
             if (is_array($conditions) && !empty($conditions[rule::ONCHANGE_KEY])) {
-                $data->onlyonchangefields = array_map('intval', (array) $conditions[rule::ONCHANGE_KEY]);
+                $data->onlyonchangefields = array_values((array) $conditions[rule::ONCHANGE_KEY]);
             }
         }
 
@@ -352,7 +352,7 @@ class rule_form extends base_rule_form {
             // independent of the trigger conditions, so a notification can fire "only on change"
             // even when no other condition is configured.
             $onchangefields = !empty($data->onlyonchangefields)
-                ? array_values(array_unique(array_map('intval', (array) $data->onlyonchangefields)))
+                ? array_values(array_unique((array) $data->onlyonchangefields))
                 : [];
             $conditions = [];
             if (!empty($data->param9)) {

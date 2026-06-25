@@ -32,14 +32,26 @@ Feature: Edit rule availability conditions in the AJAX modal
     When I set the field "Add a rule" to "Event notification"
     Then I should see "General"
     And I set the field "Name" to "TestRule"
+    And I set the field "Entry updated" to "1"
     And I set the field "searchandor0" to "AND"
     And I set the field "searchfield0" to "Datalynx field SourceText"
     And I set the field "searchoperator0" to "equal"
     And I set the field with xpath "//div[contains(@id, 'fgroup_id_customsearcharr0')]//input[@type='text']" to "mycondition"
+    And I open the autocomplete suggestions list
+    And I click on "Datalynx field SourceText" item in the autocomplete list
+    And I press "Save changes"
+    And I follow "TestRule"
+    And I should see "General"
+    And I should see "Datalynx field SourceText" in the ".form-autocomplete-selection" "css_element"
+    And I click on "span[id^='form_autocomplete_selection-']" "css_element" in the ".form-autocomplete-selection" "css_element"
+    And I should not see "Datalynx field SourceText" in the ".form-autocomplete-selection" "css_element"
+    And I open the autocomplete suggestions list
+    And I click on "Status" item in the autocomplete list
     And I press "Save changes"
     Then I should see "TestRule"
     And I follow "TestRule"
     Then I should see "General"
+    Then I should see "Status" in the ".form-autocomplete-selection" "css_element"
     And the field "searchandor0" matches value "AND"
     And the field "searchfield0" matches value "Datalynx field SourceText"
     And the field "searchoperator0" matches value "equal"

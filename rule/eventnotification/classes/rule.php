@@ -289,7 +289,7 @@ class rule extends base {
      * Stored as a JSON array under the reserved {@see self::ONCHANGE_KEY} key in param9, kept
      * separate from the numeric condition rows so it applies independently of them.
      *
-     * @return int[]
+     * @return array
      */
     private function get_onlyonchange_fieldids(): array {
         if (empty($this->rule->param9)) {
@@ -299,7 +299,7 @@ class rule extends base {
         if (!is_array($decoded) || empty($decoded[self::ONCHANGE_KEY])) {
             return [];
         }
-        return array_map('intval', (array) $decoded[self::ONCHANGE_KEY]);
+        return array_values((array) $decoded[self::ONCHANGE_KEY]);
     }
 
     /**

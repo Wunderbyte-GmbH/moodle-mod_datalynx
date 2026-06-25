@@ -37,5 +37,5 @@ $string['pluginname'] = 'Event notification';
 $string['privacy:metadata'] = 'Even notifications do not store personal data.';
 $string['roles_help_info'] = 'Note: Recipients in the selected roles must have the corresponding notification capability (e.g., "mod/datalynx:notifyentryadded" for entry creation) enabled in their Moodle permissions to receive these notifications.';
 $string['triggerconditions'] = 'Trigger conditions';
-$string['triggerconditions_help'] = 'Only send the notification when the entry that triggered the event matches these conditions. Leave empty to always send. Add several rows to combine them with AND/OR, and use NOT to negate a row. Each field offers the operators and value input that fit it (e.g. status, approval, single select or text).';
+$string['triggerconditions_help'] = 'Only send the notification when the entry that triggered the event matches these conditions. Leave empty to always send. Add several rows to combine them with AND/OR, and use NOT to negate a row. Each field offers the operators and value input that fit it (e.g. approval, single select or text).';
 $string['triggerspecificevent'] = 'Trigger only if the selected field meets a condition';
