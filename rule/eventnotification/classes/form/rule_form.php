@@ -351,8 +351,14 @@ class rule_form extends base_rule_form {
             // Store the selected on-change field IDs under a reserved key in param9. This is
             // independent of the trigger conditions, so a notification can fire "only on change"
             // even when no other condition is configured.
+            // Normalise the selected field IDs: real fields have numeric IDs (stored as int so they
+            // compare strictly), while internal fields (e.g. the status field) have string IDs such
+            // as 'status' that must be preserved verbatim for the change-detection match.
             $onchangefields = !empty($data->onlyonchangefields)
-                ? array_values(array_unique((array) $data->onlyonchangefields))
+                ? array_values(array_unique(array_map(
+                    static fn($id) => ctype_digit((string) $id) ? (int) $id : (string) $id,
+                    (array) $data->onlyonchangefields
+                )))
                 : [];
             $conditions = [];
             if (!empty($data->param9)) {

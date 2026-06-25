@@ -466,6 +466,32 @@ final class rule_conditions_test extends advanced_testcase {
     }
 
     /**
+     * End-to-end mirror of the rule_conditions_form.feature scenario, verified at the trigger level.
+     *
+     * A rule built as in that feature — event "entry updated", trigger condition "status equals final
+     * submission", plus an on-change list containing the status field — must:
+     *  - fire when the entry is in final submission AND the status field changed during the update;
+     *  - stay silent when the entry is in final submission but the status field did NOT change.
+     *
+     * This is the internal status field (id 'status'), exercising the string-keyed on-change path
+     * alongside a status condition, which is exactly what the behat form scenario configures.
+     */
+    public function test_status_final_with_status_change_triggers_notification(): void {
+        $statusid = \datalynxfield_status\field::_STATUS;
+        $rule = $this->make_condition_rule([
+            'status' => ['AND' => [['', '=', \datalynxfield_status\field::STATUS_FINAL_SUBMISSION]]],
+            \datalynxrule_eventnotification\rule::ONCHANGE_KEY => [$statusid],
+        ]);
+
+        $entryid = $this->make_entry(0, null, \datalynxfield_status\field::STATUS_FINAL_SUBMISSION);
+
+        // Status equals final submission AND the status field changed in this update -> fires.
+        $this->assertTrue($this->fire_update($rule, $entryid, [$statusid]));
+        // Status equals final submission but the status field did NOT change in this update -> suppressed.
+        $this->assertFalse($this->fire_update($rule, $entryid, []));
+    }
+
+    /**
      * The on-change list only filters entry_updated events: an entry_created event (which the
      * rule may also listen to) still fires on its own merits, unaffected by the on-change list.
      */
