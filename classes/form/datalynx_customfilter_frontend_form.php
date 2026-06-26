@@ -213,8 +213,7 @@ class datalynx_customfilter_frontend_form extends datalynx_filter_base_form {
         $data->formid = $quickform->getAttribute('id');
         $data->filtername = get_string('search');
         $data->isexpanded = $this->is_submitted() ||
-            optional_param('cfilter', 0, PARAM_INT) ||
-            optional_param('filter', 0, PARAM_INT);
+            optional_param('cfilter', 0, PARAM_INT);
 
         $hiddenfields = '';
         if (isset($quickform->_pageparams)) {
