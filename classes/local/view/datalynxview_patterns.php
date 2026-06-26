@@ -931,6 +931,9 @@ class datalynxview_patterns {
             $viewobjects = $dlx->get_all_views();
             if (!empty($viewobjects)) {
                 foreach ($viewobjects as $viewid => $view) {
+                    if ($dlx->is_internal_view_type($view->type)) {
+                        continue;
+                    }
                     $views[$viewid] = $view->name;
                 }
             }

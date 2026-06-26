@@ -553,4 +553,37 @@ final class viewlink_pattern_test extends advanced_testcase {
         $this->assertArrayHasKey('##viewlink:hiddenview;;;##', $referencecategory);
         $this->assertArrayHasKey('##viewsesslink:hiddenview;;;##', $referencecategory);
     }
+
+    /**
+     * Test that the edit-time general tag menu excludes email views.
+     *
+     * @covers ::get_menu
+     */
+    public function test_get_menu_excludes_email_views(): void {
+        global $DB;
+
+        [, , $templateobj] = $this->create_test_views('##viewurl##');
+
+        $emailview = (object) [
+            'dataid' => $templateobj->get_dlx()->id(),
+            'type' => 'email',
+            'name' => 'myemailview',
+            'description' => '',
+            'visible' => 7,
+            'filter' => 0,
+            'perpage' => 0,
+            'groupby' => '',
+            'param5' => 0,
+            'param10' => 0,
+            'section' => '',
+        ];
+        $DB->insert_record('datalynx_views', $emailview);
+
+        $menu = $templateobj->patternclass()->get_menu(false, false);
+        $this->assertArrayHasKey(get_string('reference', 'datalynx'), $menu);
+
+        $referencecategory = $menu[get_string('reference', 'datalynx')][get_string('reference', 'datalynx')];
+        $this->assertArrayNotHasKey('##viewlink:myemailview;;;##', $referencecategory);
+        $this->assertArrayNotHasKey('##viewsesslink:myemailview;;;##', $referencecategory);
+    }
 }
