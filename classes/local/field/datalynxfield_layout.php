@@ -197,7 +197,10 @@ class datalynxfield_layout {
             'displaytemplate' => self::DISPLAY_MODE_TEMPLATE_NONE,
             'novaluetemplate' => self::NO_VALUE_SHOW_NOTHING,
             'edittemplate' => self::EDIT_MODE_TEMPLATE_NONE,
-            'noteditabletemplate' => self::NOT_EDITABLE_SHOW_NOTHING,
+            // Match the layout form default (datalynxfield_layout_form) so that a field which is
+            // visible but not editable shows its value (as read-only display text) in edit mode,
+            // rather than vanishing. Previously this was NOT_EDITABLE_SHOW_NOTHING.
+            'noteditabletemplate' => self::NOT_EDITABLE_SHOW_AS_DISPLAY_MODE,
     ];
 
     /**
