@@ -466,15 +466,17 @@ final class rule_conditions_test extends advanced_testcase {
     }
 
     /**
-     * End-to-end mirror of the rule_conditions_form.feature scenario, verified at the trigger level.
+     * Rule evaluation for the rule_conditions_form.feature scenario, given a correct changed-field list.
      *
      * A rule built as in that feature — event "entry updated", trigger condition "status equals final
      * submission", plus an on-change list containing the status field — must:
      *  - fire when the entry is in final submission AND the status field changed during the update;
      *  - stay silent when the entry is in final submission but the status field did NOT change.
      *
-     * This is the internal status field (id 'status'), exercising the string-keyed on-change path
-     * alongside a status condition, which is exactly what the behat form scenario configures.
+     * This exercises only the rule's evaluation logic: the changed_field_ids list is injected directly
+     * via {@see self::fire_update()}, so it does NOT cover how that list is built when an entry is saved.
+     * The production save path is covered separately by
+     * {@see self::test_status_change_via_process_entries_records_status_in_changed_field_ids()}.
      */
     public function test_status_final_with_status_change_triggers_notification(): void {
         $statusid = \datalynxfield_status\field::_STATUS;
@@ -506,5 +508,103 @@ final class rule_conditions_test extends advanced_testcase {
         // An entry_created event carries no changed_field_ids, but the on-change filter does not
         // apply to it, so the rule still fires because the entry matches the "= 2" condition.
         $this->assertTrue($this->fire($rule, $entryid));
+    }
+
+    /**
+     * Reproduction at the production save path: changing an entry's status to final must record the
+     * status field in the entry_updated event's changed_field_ids.
+     *
+     * The status field is internal (id 'status'), stored in datalynx_entries.status rather than in
+     * datalynx_contents. process_entries() builds changed_field_ids only from the ordinary content
+     * fields, so before the fix a pure status change produced an empty changed_field_ids and any
+     * "only trigger when the status field changes" notification rule never fired — silently sending
+     * no email. This drives the real save path (not an injected list) and asserts 'status' is present.
+     */
+    public function test_status_change_via_process_entries_records_status_in_changed_field_ids(): void {
+        $entryid = $this->make_entry(0, null, \datalynxfield_status\field::STATUS_DRAFT);
+
+        // Load the entry exactly as a view does before processing a submission.
+        $filter = new \mod_datalynx\local\filter\datalynx_filter(
+            (object) ['dataid' => $this->dlx->id(), 'eids' => (string) $entryid]
+        );
+        $entries = new \mod_datalynx\local\datalynx_entries($this->dlx, $filter);
+        $entries->set_content();
+
+        // Submit a status change to final submission, as the entry edit form posts it.
+        $data = (object) [
+            'field_' . \datalynxfield_status\field::_STATUS . '_' . $entryid =>
+                \datalynxfield_status\field::STATUS_FINAL_SUBMISSION,
+        ];
+
+        $sink = $this->redirectEvents();
+        $entries->process_entries('update', (string) $entryid, $data, true);
+        $events = $sink->get_events();
+        $sink->close();
+
+        $updated = null;
+        foreach ($events as $event) {
+            if ($event instanceof \mod_datalynx\event\entry_updated) {
+                $updated = $event;
+            }
+        }
+        $this->assertNotNull($updated, 'An entry_updated event should have been fired.');
+        $this->assertContains(
+            \datalynxfield_status\field::_STATUS,
+            $updated->other['changed_field_ids'],
+            'A status change must be recorded in changed_field_ids so on-change notification rules fire.'
+        );
+    }
+
+    /**
+     * Full reproduction of the reported bug: an "entry updated" rule with trigger condition "status is
+     * final", on-change constraint "status changed" and a specific "Other user" recipient must queue a
+     * notification when an entry is moved to final submission through the normal save path.
+     *
+     * Before the fix the status change was absent from changed_field_ids, so the on-change constraint
+     * was never satisfied and no sendmessage task was queued (no email). After the fix exactly one
+     * message task is queued, addressed to the chosen recipient.
+     */
+    public function test_status_final_onchange_rule_queues_message_via_process_entries(): void {
+        global $DB;
+
+        $recipient = $this->getDataGenerator()->create_user();
+
+        $statusid = \datalynxfield_status\field::_STATUS;
+        $DB->insert_record('datalynx_rules', (object) [
+            'dataid' => $this->dlx->id(),
+            'name' => 'Status final notification',
+            'description' => '',
+            'type' => 'eventnotification',
+            'enabled' => 1,
+            'param1' => json_encode(['entry_updated']),
+            'param2' => \datalynxrule_eventnotification\rule::FROM_CURRENT_USER,
+            'param3' => json_encode(['specificuserid' => (int) $recipient->id]),
+            'param9' => json_encode([
+                'status' => ['AND' => [['', '=', \datalynxfield_status\field::STATUS_FINAL_SUBMISSION]]],
+                \datalynxrule_eventnotification\rule::ONCHANGE_KEY => [$statusid],
+            ]),
+        ]);
+
+        $entryid = $this->make_entry(0, null, \datalynxfield_status\field::STATUS_DRAFT);
+
+        $filter = new \mod_datalynx\local\filter\datalynx_filter(
+            (object) ['dataid' => $this->dlx->id(), 'eids' => (string) $entryid]
+        );
+        $entries = new \mod_datalynx\local\datalynx_entries($this->dlx, $filter);
+        $entries->set_content();
+
+        $data = (object) [
+            'field_' . $statusid . '_' . $entryid => \datalynxfield_status\field::STATUS_FINAL_SUBMISSION,
+        ];
+
+        // Let the event observers run so the notification rule is evaluated end to end.
+        $entries->process_entries('update', (string) $entryid, $data, true);
+
+        $tasks = \core\task\manager::get_adhoc_tasks(\mod_datalynx\task\sendmessage_task::class);
+        $this->assertCount(1, $tasks, 'The status-change rule should queue exactly one notification.');
+
+        $messages = unserialize(base64_decode(reset($tasks)->get_custom_data_as_string()));
+        $recipientids = array_map(fn($message) => (int) $message->userto->id, $messages);
+        $this->assertSame([(int) $recipient->id], $recipientids);
     }
 }

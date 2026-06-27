@@ -869,10 +869,35 @@ class datalynx_entries {
                                     }
                                 }
 
+                                // Capture the stored internal values before update_entry() overwrites them, so we
+                                // can detect changes to internal fields (status, approved). These fields live in
+                                // ['info'], not ['fields'], so the content loop below never sees them; without this
+                                // a pure status change would leave changed_field_ids empty and any "only trigger when
+                                // this field changes" notification rule keyed on the status field would never fire.
+                                $oldstatus = isset($entry->status) ? (int) $entry->status : null;
+                                $oldapproved = isset($entry->approved) ? (int) $entry->approved : null;
+
                                 if ($entry->id = $this->update_entry($entry, $contents[$eid]['info'], true, $allowfinaledit)) {
                                     $emptycontent = []; // Array with lines and deleted contentids.
                                     $countfgfields = 0; // Store how many fields exist per line.
                                     $changedfields = []; // Track field IDs whose content changed.
+
+                                    // Record changes to internal fields under their field id so they appear in
+                                    // changed_field_ids alongside ordinary content fields. The ['info'] array is keyed
+                                    // by the field's internalname ('status', 'approved'); map back to the field id used
+                                    // by rules (datalynxfield_status::_STATUS = 'status', _APPROVED = 'approve').
+                                    if (
+                                            isset($contents[$eid]['info']['status']) && $oldstatus !== null
+                                            && (int) $contents[$eid]['info']['status'] !== $oldstatus
+                                    ) {
+                                        $changedfields[datalynxfield_status::_STATUS] = true;
+                                    }
+                                    if (
+                                            isset($contents[$eid]['info']['approved']) && $oldapproved !== null
+                                            && (int) $contents[$eid]['info']['approved'] !== $oldapproved
+                                    ) {
+                                        $changedfields[datalynxfield_approve::_APPROVED] = true;
+                                    }
 
                                     // Variable $eid should be different from $entryid only in new entries.
                                     // Iterate through all the fields part of an entry and a fieldgroup. Field by field.
