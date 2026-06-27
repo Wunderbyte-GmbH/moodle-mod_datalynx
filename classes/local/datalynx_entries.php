@@ -267,7 +267,7 @@ class datalynx_entries {
 
         $what = ' DISTINCT ' .
                 // Entry.
-                ' e.id, e.approved, e.timecreated, e.timemodified, e.userid, e.groupid, e.status ' .
+                ' e.id, e.approved, e.timecreated, e.timemodified, e.timesubmitted, e.userid, e.groupid, e.status ' .
                 // User.
                 $selectfields . ', ' .
                 // Group (TODO g.description AS groupdesc need to be varchar for MSSQL).
