@@ -253,6 +253,7 @@ class manager {
         $fieldsbyname['group'] = 'entrygroup';
         $fieldsbyname['timecreated'] = 'entrytime';
         $fieldsbyname['timemodified'] = 'entrytime';
+        $fieldsbyname['timesubmitted'] = 'entrytime';
         $fieldsbyname['ratings'] = 'rating';
         $fieldsbyname['comments'] = 'comment';
 
