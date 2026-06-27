@@ -52,19 +52,37 @@ class renderer extends datalynxfield_renderer {
             $content = $entry->{"c{$fieldid}_content"};
         }
 
+        // Configurable input width (param2 = numeric value, param3 = unit). Applied as a
+        // responsive max-width; the size attribute is unreliable under Boost (.form-control
+        // forces width: 100%). Empty value = default width.
+        $widthval = $field->get('param2');
+        $widthunit = $field->get('param3') ?: 'px';
+        $widthstyle = '';
+        if ($widthval !== false && $widthval !== '' && (int)$widthval > 0) {
+            $allowedunits = ['px', '%', 'em'];
+            if (!in_array($widthunit, $allowedunits, true)) {
+                $widthunit = 'px';
+            }
+            $widthstyle = 'max-width: ' . (int)$widthval . $widthunit . ';';
+        }
+
         // Render disabled input as raw HTML — Moodle's QuickForm does not reliably
         // propagate the disabled attribute through its template-based rendering.
         if (!empty($options['disabled'])) {
+            $styleattr = $widthstyle ? ' style="' . s($widthstyle) . '"' : '';
             $mform->addElement(
                 'html',
                 '<input type="text" name="' . $fieldname . '" value="' . s($content) .
-                '" size="30" disabled="disabled" class="form-control">'
+                '" size="30"' . $styleattr . ' disabled="disabled" class="form-control">'
             );
             return;
         }
 
         $fieldattr = [];
         $fieldattr['size'] = 30;
+        if ($widthstyle) {
+            $fieldattr['style'] = $widthstyle;
+        }
 
         if ($field->get('param4')) {
             $fieldattr['class'] = s($field->get('param4'));
