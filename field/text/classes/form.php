@@ -58,7 +58,7 @@ class form extends datalynxfield_form {
         $mform->addGroup($grp, 'widthgrp', get_string('inputwidth', 'datalynxfield_text'), ' ', false);
         $mform->addHelpButton('widthgrp', 'inputwidth', 'datalynxfield_text');
         $mform->setType('param2', PARAM_INT);
-        $mform->setType('param3', PARAM_ALPHA);
+        $mform->setType('param3', PARAM_RAW);
         $mform->setDefault('param3', 'px');
         $mform->addGroupRule('widthgrp', ['param2' => [[null, 'numeric', null, 'client']]]);
         $mform->disabledIf('param3', 'param2', 'eq', '');
