@@ -2402,8 +2402,6 @@ abstract class base {
         $approve = optional_param('approve', '', PARAM_SEQUENCE);
         // Disapprove entries (all)or by record ids (comma delimited eids).
         $disapprove = optional_param('disapprove', '', PARAM_SEQUENCE);
-        // Set status of entries (all) or by record ids (comma delimited eids).
-        $status = optional_param('status', '', PARAM_SEQUENCE);
         // Confirm submission of data.
         $confirmed = optional_param('confirmed', 0, PARAM_BOOL);
 
@@ -2531,14 +2529,6 @@ abstract class base {
                                 return $this->entries->process_entries('disapprove', $disapprove, null, true);
                             } else {
                                 $illegalaction = true;
-                            }
-                        } else {
-                            if ($status) {
-                                if (confirm_sesskey() && $this->confirm_view_action("status")) {
-                                    return $this->entries->process_entries('status', $status, null, true);
-                                } else {
-                                    $illegalaction = true;
-                                }
                             }
                         }
                     }
