@@ -646,17 +646,21 @@ class renderer extends datalynxfield_renderer {
             $patterns['##author##'] = [true, $cat];
         }
 
+        // Built-in legacy modifiers (##author:email##, ##author:username##, ...) are deprecated in
+        // favour of Field Formats and must no longer appear in the tag-selection dropdown. Register
+        // them as [false] so they stay recognised (and keep rendering in existing templates) but are
+        // hidden from get_menu(). Adding a field format used to silently drop these from the
+        // recognised set, turning the tags into literal text. A user/migration-created format of the
+        // same name overrides the entry below with a visible [true] one.
+        $patterns["##author:{$fieldinternalname}##"] = [false];
+        if ($fieldinternalname === 'picture') {
+            $patterns["##author:picturelarge##"] = [false];
+        }
+
         $formats = \mod_datalynx\local\field_format\manager::get_formats_for_instance(
             $this->field->dlx()->id(),
             'entryauthor'
         );
-        if (empty($formats)) {
-            $patterns["##author:{$fieldinternalname}##"] = [true, $cat];
-            if ($fieldinternalname === 'picture') {
-                $patterns["##author:picturelarge##"] = [true, $cat];
-            }
-            return $patterns;
-        }
 
         foreach ($formats as $format) {
             // Custom profile-field formats are owned by their dedicated profile-editor pseudo-field
