@@ -536,6 +536,8 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
         $data->timemodified = $this->apply_date_offset($data->timemodified);
         if (!empty($data->timesubmitted)) {
             $data->timesubmitted = $this->apply_date_offset($data->timesubmitted);
+        } else {
+            $data->timesubmitted = null;
         }
 
         if ($userid = $this->task->get_ownerid()) {

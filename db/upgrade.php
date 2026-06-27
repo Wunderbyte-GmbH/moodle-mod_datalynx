@@ -1454,8 +1454,32 @@ function xmldb_datalynx_upgrade($oldversion) {
             $rule->param10 = null;
             $DB->update_record('datalynx_rules', $rule);
         }
-
         upgrade_mod_savepoint(true, 2026062301, 'datalynx');
+    }
+
+    if ($oldversion < 2026062700) {
+        // Change timesubmitted field in datalynx_entries to be nullable and have no default.
+        $table = new xmldb_table('datalynx_entries');
+        $field = new xmldb_field(
+            'timesubmitted',
+            XMLDB_TYPE_INTEGER,
+            '10',
+            null,
+            null,
+            null,
+            null,
+            'status'
+        );
+
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->change_field_notnull($table, $field);
+            $dbman->change_field_default($table, $field);
+        }
+
+        // Backfill/migrate any existing 0 values to NULL.
+        $DB->execute("UPDATE {datalynx_entries} SET timesubmitted = NULL WHERE timesubmitted = 0");
+
+        upgrade_mod_savepoint(true, 2026062700, 'datalynx');
     }
 
     return true;

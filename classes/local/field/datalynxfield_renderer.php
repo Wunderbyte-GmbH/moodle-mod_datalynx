@@ -520,6 +520,10 @@ abstract class datalynxfield_renderer {
      * add their legacy keys as [false] so the suffixes keep rendering in old templates without being
      * advertised in the menu.
      *
+     * WARNING: Hardcoded legacy modifiers (e.g. [[fieldname:suffix]]) are deprecated. All new field
+     * modifiers MUST be implemented as Field Formats instead. Developers and AI agents must NOT
+     * introduce new hardcoded/legacy modifiers or suffixes.
+     *
      * @return array pattern => array(visible in menu)
      */
     protected function format_patterns(): array {
@@ -543,6 +547,10 @@ abstract class datalynxfield_renderer {
      * they are no longer advertised in the field-tags menu — field formats are the surfaced mechanism.
      * A legacy suffix is only added when a user-created format of the same name has not already claimed
      * the tag (so a format named e.g. "url" keeps its visible [true] entry instead of being hidden).
+     *
+     * @deprecated Since Moodle 4.5. Hardcoded legacy modifiers are deprecated. All new modifiers
+     *             MUST be implemented as Field Formats. Developers and AI agents must NOT introduce
+     *             new hardcoded/legacy modifiers or suffixes in patterns or replacements.
      *
      * @param array $patterns Existing pattern list (typically from parent::patterns()).
      * @param array $suffixes Legacy suffix names, e.g. ['url', 'size', 'download'].
