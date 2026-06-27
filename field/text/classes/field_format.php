@@ -30,20 +30,15 @@ class field_format extends \mod_datalynx\local\field_format\base {
      * @param \MoodleQuickForm $mform
      */
     public function config_form(\MoodleQuickForm &$mform) {
-        $mform->addElement('text', 'maxlength', 'Truncate length');
-        $mform->setType('maxlength', PARAM_INT);
+        // Default implementation does not add any extra elements.
     }
 
     /**
-     * Get legacy/default settings for name.
+     * Returns whether this field format supports custom configuration options.
      *
-     * @param string $name
-     * @return array
+     * @return bool
      */
-    public function get_default_settings_for_name(string $name): array {
-        if (is_numeric($name)) {
-            return ['maxlength' => (int)$name];
-        }
-        return [];
+    public function has_options(): bool {
+        return false;
     }
 }

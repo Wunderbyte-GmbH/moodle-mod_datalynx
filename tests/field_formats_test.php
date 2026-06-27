@@ -205,7 +205,6 @@ final class field_formats_test extends advanced_testcase {
         $this->assertArrayHasKey('checkbox', $types);
         $this->assertArrayHasKey('select', $types);
         $this->assertArrayHasKey('radiobutton', $types);
-        $this->assertArrayHasKey('text', $types);
         $this->assertArrayHasKey('textarea', $types);
         $this->assertArrayHasKey('youtube', $types);
         $this->assertArrayHasKey('gradeitem', $types);
@@ -219,6 +218,7 @@ final class field_formats_test extends advanced_testcase {
 
         // Assert empty fields are not present.
         $this->assertArrayNotHasKey('approve', $types);
+        $this->assertArrayNotHasKey('text', $types);
         $this->assertArrayNotHasKey('comment', $types);
         $this->assertArrayNotHasKey('datalynxview', $types);
         $this->assertArrayNotHasKey('entry', $types);
@@ -439,15 +439,6 @@ final class field_formats_test extends advanced_testcase {
         ]);
         $defaults = $numberformat->get_default_settings_for_name('2');
         $this->assertEquals(2, $defaults['decimals']);
-
-        // Test text format default settings.
-        $textformat = \mod_datalynx\local\field_format\manager::get_format_instance((object)[
-            'fieldtype' => 'text',
-            'name' => '10',
-            'settings' => json_encode([]),
-        ]);
-        $defaults = $textformat->get_default_settings_for_name('10');
-        $this->assertEquals(10, $defaults['maxlength']);
 
         // Test url format default settings.
         $urlformat = \mod_datalynx\local\field_format\manager::get_format_instance((object)[

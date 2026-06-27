@@ -136,7 +136,6 @@ final class field_format_menu_test extends advanced_testcase {
     public static function format_field_types_provider(): array {
         return [
             'number' => ['number', ['decimals' => 2]],
-            'text' => ['text', ['maxlength' => 5]],
             'textarea' => ['textarea', ['maxlength' => 5]],
             'select' => ['select', ['option' => 'key']],
             'multiselect' => ['multiselect', ['option' => 'comma']],
@@ -171,26 +170,5 @@ final class field_format_menu_test extends advanced_testcase {
 
         $out = $field->renderer()->render_display_mode($entry, ['field_format' => $format]);
         $this->assertSame('3.14', trim($out));
-    }
-
-    /**
-     * A text "maxlength" format truncates the displayed value at render time.
-     */
-    public function test_text_maxlength_format_applies(): void {
-        [$dlx, $fieldid] = $this->instance_with_field('text', 'Title');
-        manager::save_format((object) [
-            'dataid' => $dlx->id(),
-            'name' => 'short',
-            'fieldtype' => 'text',
-            'settings' => json_encode(['maxlength' => 5]),
-        ]);
-
-        $field = $dlx->get_fields()[$fieldid];
-        $format = manager::get_format_by_name($dlx->id(), 'short');
-        $entry = (object) ['id' => 1, "c{$fieldid}_content" => 'Hello World'];
-
-        $out = $field->renderer()->render_display_mode($entry, ['field_format' => $format]);
-        $this->assertStringStartsWith('Hello', $out);
-        $this->assertStringContainsString('...', $out);
     }
 }
