@@ -607,4 +607,139 @@ final class rule_conditions_test extends advanced_testcase {
         $recipientids = array_map(fn($message) => (int) $message->userto->id, $messages);
         $this->assertSame([(int) $recipient->id], $recipientids);
     }
+
+    /**
+     * Reproduce the reported bug: a rule configured to notify the entry author AND the manager role
+     * must queue a message to BOTH the author and the manager. Before the fix only the manager
+     * (role recipient) received a message; the author was dropped.
+     */
+    public function test_author_and_role_recipients_both_notified(): void {
+        global $DB;
+
+        // Distinct author (a student) and a manager.
+        $author = $this->getDataGenerator()->create_user();
+        $manager = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($author->id, $this->dlx->course->id, 'student');
+        $managerrole = $DB->get_field('role', 'id', ['shortname' => 'manager'], MUST_EXIST);
+        role_assign($managerrole, $manager->id, \context_course::instance($this->dlx->course->id));
+
+        // Notify author + manager role.
+        $ruleid = (int) $DB->insert_record('datalynx_rules', (object) [
+            'dataid' => $this->dlx->id(),
+            'name' => 'Author and manager notification',
+            'description' => '',
+            'type' => 'eventnotification',
+            'enabled' => 1,
+            'param1' => json_encode(['entry_created']),
+            'param3' => json_encode(['author' => 1, 'roles' => [datalynx::PERMISSION_MANAGER]]),
+        ]);
+        $rule = $this->dlx->get_rule_manager()->get_rule_from_id($ruleid);
+
+        // Entry authored by the student.
+        $entryid = (int) $DB->insert_record('datalynx_entries', (object) [
+            'dataid' => $this->dlx->id(), 'userid' => $author->id, 'groupid' => 0,
+            'approved' => 1, 'status' => 0, 'timecreated' => time(), 'timemodified' => time(),
+        ]);
+
+        // Trigger as the manager (the current user who saves the entry).
+        $this->setUser($manager);
+
+        $this->assertTrue($this->fire($rule, $entryid));
+
+        $tasks = \core\task\manager::get_adhoc_tasks(\mod_datalynx\task\sendmessage_task::class);
+        $this->assertCount(1, $tasks, 'The rule should queue exactly one notification task.');
+        $messages = unserialize(base64_decode(reset($tasks)->get_custom_data_as_string()));
+        $recipientids = array_map(fn($message) => (int) $message->userto->id, $messages);
+        sort($recipientids);
+        $expected = [(int) $author->id, (int) $manager->id];
+        sort($expected);
+        $this->assertSame($expected, $recipientids, 'Both the author and the manager must be queued.');
+
+        // Now actually run the adhoc task and capture what is really delivered.
+        $sink = $this->redirectMessages();
+        $task = reset($tasks);
+        ob_start();
+        $task->execute();
+        ob_end_clean();
+        $delivered = $sink->get_messages();
+        $sink->close();
+
+        $deliveredto = array_map(fn($m) => (int) $m->useridto, $delivered);
+        sort($deliveredto);
+        $this->assertSame($expected, $deliveredto, 'Both the author and the manager must actually receive a message.');
+    }
+
+    /**
+     * The form must round-trip the "author" recipient checkbox into param3 when it is checked
+     * together with a role. Reproduces the reported bug where only the role recipient was saved.
+     */
+    public function test_form_saves_author_and_role_recipients(): void {
+        $formclass = \datalynxrule_eventnotification\form\rule_form::class;
+        $submitted = [
+            'd' => $this->dlx->id(),
+            'cmid' => $this->dlx->cm->id,
+            'rid' => 0,
+            'type' => 'eventnotification',
+            'name' => 'AuthorAndRole',
+            'description' => '',
+            'enabled' => 1,
+            'entry_created' => 1,
+            'author' => 1,
+            'roles' => [datalynx::PERMISSION_MANAGER],
+        ];
+        $ajaxdata = $formclass::mock_ajax_submit($submitted);
+        $form = new $formclass(null, null, 'post', '', null, true, $ajaxdata);
+        $data = $form->get_data();
+
+        $this->assertNotNull($data, 'get_data() returned null (form not submitted/validated)');
+        $recipients = json_decode($data->param3, true);
+        $this->assertArrayHasKey('author', $recipients, 'The author recipient must be saved in param3.');
+        $this->assertArrayHasKey('roles', $recipients, 'The role recipients must be saved in param3.');
+        $this->assertEquals([datalynx::PERMISSION_MANAGER], $recipients['roles']);
+    }
+
+    /**
+     * With sender FROM_AUTHOR the message must be "from" the entry author, even when a different
+     * user triggers the event. Regression test for the broken event-name guard that always fell
+     * back to the current user.
+     */
+    public function test_sender_from_author_uses_author_as_userfrom(): void {
+        global $DB;
+
+        $author = $this->getDataGenerator()->create_user();
+        $recipient = $this->getDataGenerator()->create_user();
+
+        $ruleid = (int) $DB->insert_record('datalynx_rules', (object) [
+            'dataid' => $this->dlx->id(),
+            'name' => 'From author notification',
+            'description' => '',
+            'type' => 'eventnotification',
+            'enabled' => 1,
+            'param1' => json_encode(['entry_created']),
+            'param2' => \datalynxrule_eventnotification\rule::FROM_AUTHOR,
+            'param3' => json_encode(['specificuserid' => (int) $recipient->id]),
+        ]);
+        $rule = $this->dlx->get_rule_manager()->get_rule_from_id($ruleid);
+
+        $entryid = (int) $DB->insert_record('datalynx_entries', (object) [
+            'dataid' => $this->dlx->id(), 'userid' => $author->id, 'groupid' => 0,
+            'approved' => 1, 'status' => 0, 'timecreated' => time(), 'timemodified' => time(),
+        ]);
+
+        // A different user triggers the event.
+        $trigger = $this->getDataGenerator()->create_user();
+        $this->setUser($trigger);
+
+        $this->assertTrue($this->fire($rule, $entryid));
+
+        $tasks = \core\task\manager::get_adhoc_tasks(\mod_datalynx\task\sendmessage_task::class);
+        $this->assertCount(1, $tasks);
+        $messages = unserialize(base64_decode(reset($tasks)->get_custom_data_as_string()));
+        $this->assertCount(1, $messages);
+        $this->assertSame(
+            (int) $author->id,
+            (int) reset($messages)->userfrom->id,
+            'FROM_AUTHOR must set the message sender to the entry author, not the triggering user.'
+        );
+    }
 }

@@ -23,23 +23,29 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
+// Note: these providers intentionally declare no 'capability' requirement. The recipients of an
+// event notification are chosen explicitly by the rule configuration (author, roles, teams,
+// specific users). A per-provider capability gate makes message_send() silently drop any
+// rule-selected recipient who lacks that capability — most notably the entry author, who is
+// typically a student without the notify* capabilities. The rule is the sole authority on who
+// receives the notification, so no additional capability filter is applied here.
 $messageproviders = [
 
-        'event_entry_created' => ['capability' => 'mod/datalynx:notifyentryadded'],
+        'event_entry_created' => [],
 
-        'event_entry_updated' => ['capability' => 'mod/datalynx:notifyentryupdated'],
+        'event_entry_updated' => [],
 
-        'event_entry_deleted' => ['capability' => 'mod/datalynx:notifyentrydeleted'],
+        'event_entry_deleted' => [],
 
-        'event_entry_approved' => ['capability' => 'mod/datalynx:notifyentryapproved'],
+        'event_entry_approved' => [],
 
-        'event_entry_disapproved' => ['capability' => 'mod/datalynx:notifyentrydisapproved'],
+        'event_entry_disapproved' => [],
 
-        'event_comment_created' => ['capability' => 'mod/datalynx:notifycommentadded'],
+        'event_comment_created' => [],
 
-        'event_rating_added' => ['capability' => 'mod/datalynx:notifyratingadded'],
+        'event_rating_added' => [],
 
-        'event_rating_updated' => ['capability' => 'mod/datalynx:notifyratingadded'],
+        'event_rating_updated' => [],
 
-        'event_team_updated' => ['capability' => 'mod/datalynx:notifyteamupdated'],
+        'event_team_updated' => [],
 ];

@@ -194,8 +194,10 @@ class rule extends base {
         $authorid = $DB->get_field('datalynx_entries', 'userid', ['id' => $entryid]);
         $author = $DB->get_record('user', ['id' => $authorid]);
 
-        $userfrom = (strpos($eventname, 'event') !== false &&
-                $this->sender == self::FROM_AUTHOR) ? $author : $USER;
+        // The configured sender determines who the message is "from": the entry author when the
+        // rule is set to FROM_AUTHOR (falling back to the current user when no author can be
+        // resolved, e.g. a non entry-related event), otherwise the current user.
+        $userfrom = ($this->sender == self::FROM_AUTHOR && $author) ? $author : $USER;
         $messagedata->senderprofilelink = html_writer::link(
             new moodle_url('/user/profile.php', ['id' => $userfrom->id]),
             fullname($userfrom)
