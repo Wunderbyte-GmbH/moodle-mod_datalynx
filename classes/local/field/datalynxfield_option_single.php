@@ -183,6 +183,11 @@ class datalynxfield_option_single extends datalynxfield_option {
         }
 
         if ($excludeentries && $operator !== '') {
+            // Resolve the positive criterion against the content table to get the matching entry ids,
+            // then exclude them via "e.id NOT IN (...)" without a content join. Joining on the content
+            // table here would drop entries that have no content row for this field (their LEFT JOIN
+            // columns are NULL, so the "cX.fieldid = X" qualifier added by datalynx_filter fails),
+            // even though those entries do meet the NOT criterion. See datalynxfield_base::get_search_sql().
             $sqlnot = str_replace($content, 'content', $sql);
             $sqlnot = str_replace('NOT (', '(', $sqlnot);
             if ($eids = $this->get_entry_ids_for_content($sqlnot, $params)) {
@@ -193,9 +198,11 @@ class datalynxfield_option_single extends datalynxfield_option {
                     "df_{$fieldid}_x_",
                     $notinidsequal
                 );
-                $params = array_merge($params, $paramsnot);
-                $sql = " ($sql OR e.id $notinids) ";
+                return [" e.id $notinids ", $paramsnot, false];
             }
+            // No entry holds the excluded value, so the NOT criterion matches every entry:
+            // contribute no condition and let all entries through.
+            return ['', '', ''];
         }
 
         return [$sql, $params, $usecontent];
