@@ -20,8 +20,9 @@ Feature: Edit rule availability conditions in the AJAX modal
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I add to the "RuleTest" datalynx the following fields:
-      | type | name       | description |
-      | text | SourceText |             |
+      | type     | name       | description | param1               | param2 | param3 |
+      | text     | SourceText |             |                      |        |        |
+      | checkbox | Choices    |             | myoption,otheroption |        |        |
     And I am on "Course 1" course homepage
     And I follow "RuleTest"
     And I click on ".nav-item [title='Manage']" "css_element"
@@ -56,3 +57,22 @@ Feature: Edit rule availability conditions in the AJAX modal
     And the field "searchfield0" matches value "Datalynx field SourceText"
     And the field "searchoperator0" matches value "equal"
     And the field with xpath "//div[contains(@id, 'fgroup_id_customsearcharr0')]//input[@type='text']" matches value "mycondition"
+
+  Scenario: Add a checkbox "is exactly" rule condition and verify it persists
+    When I set the field "Add a rule" to "Event notification"
+    Then I should see "General"
+    And I set the field "Name" to "CheckboxRule"
+    And I set the field "Entry updated" to "1"
+    And I set the field "searchandor0" to "AND"
+    And I set the field "searchfield0" to "Datalynx field Choices"
+    And I set the field "searchoperator0" to "exactly"
+    And I click on "//div[contains(@id, 'fgroup_id_customsearcharr0')]//span[contains(@class, 'form-autocomplete-downarrow')]" "xpath_element"
+    And I click on "myoption" item in the autocomplete list
+    And I press "Save changes"
+    Then I should see "CheckboxRule"
+    And I follow "CheckboxRule"
+    Then I should see "General"
+    And the field "searchandor0" matches value "AND"
+    And the field "searchfield0" matches value "Datalynx field Choices"
+    And the field "searchoperator0" matches value "exactly"
+    And I should see "myoption" in the "//div[contains(@id, 'fgroup_id_customsearcharr0')]" "xpath_element"
