@@ -57,7 +57,9 @@ class rule_form extends base_rule_form {
         // One value control per eligible field; built-in hideIf shows only the selected one.
         foreach ($valuefields as $fieldid => $field) {
             $elname = "fieldvalue_$fieldid";
-            $label = get_string('newvalue', 'datalynxrule_updatefield');
+            // Unique per-field label so each value control is individually addressable
+            // (the controls share the form and only one is shown at a time via hideIf).
+            $label = get_string('newvaluefor', 'datalynxrule_updatefield', $field->field->name);
 
             if ($field instanceof datalynxfield_option_multiple) {
                 // Checkbox / multiselect: pick one or more option keys.

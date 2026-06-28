@@ -29,6 +29,7 @@ $string['err_nofield'] = 'Bitte wählen Sie ein Feld aus, das aktualisiert werde
 $string['err_novalue'] = 'Bitte geben Sie den zu setzenden Wert an.';
 $string['newvalue'] = 'Neuer Wert';
 $string['newvalue_help'] = 'Der Wert, der in das ausgewählte Feld geschrieben wird, wenn die Regel ausgelöst wird. Bei Auswahl-, Radiobutton- und Checkbox-Feldern wählen Sie aus den Optionen des Feldes; bei Textfeldern geben Sie den Wert ein.';
+$string['newvaluefor'] = 'Neuer Wert ({$a})';
 $string['pluginname'] = 'Feld aktualisieren';
 $string['privacy:metadata'] = 'Das Plugin datalynxrule_updatefield speichert keine personenbezogenen Daten.';
 $string['targetfield'] = 'Zu aktualisierendes Feld';
