@@ -36,6 +36,16 @@ use stdClass;
  */
 abstract class base {
     /**
+     * Reserved param9 key holding the "only trigger on change" field IDs.
+     *
+     * Stored alongside the numeric condition rows but kept separate from them so it applies
+     * independently of the trigger conditions. Shared by all rule types that gate on changes.
+     *
+     * @var string
+     */
+    const ONCHANGE_KEY = '_onlyonchangefields';
+
+    /**
      * Subclasses must override the type with their name.
      * @var string
      */
@@ -142,6 +152,120 @@ abstract class base {
             );
         }
         return $triggers;
+    }
+
+    /**
+     * Resolve the entry id that the given event concerns.
+     *
+     * Comment events carry the comment id in objectid and the entry id in other.itemid;
+     * all other (entry/rating/team) events carry the entry id directly in objectid.
+     *
+     * @param \core\event\base $event
+     * @return int entry id, or 0 when none could be resolved
+     */
+    protected function resolve_entryid(\core\event\base $event): int {
+        $eventname = (new \ReflectionClass($event))->getShortName();
+        if (strpos($eventname, 'comment') !== false) {
+            return (int) ($event->get_data()['other']['itemid'] ?? 0);
+        }
+        return (int) ($event->get_data()['objectid'] ?? 0);
+    }
+
+    /**
+     * Resolve the trigger conditions for this rule as a customsearch array.
+     *
+     * Reads the JSON-stored multi-condition customsearch from param9, dropping the reserved
+     * on-change key (which is not a condition row). Subclasses may override to add legacy
+     * fallbacks.
+     *
+     * @return array customsearch aggregated by field id, or [] when no condition is set.
+     */
+    protected function get_trigger_conditions(): array {
+        if (empty($this->rule->param9)) {
+            return [];
+        }
+        $decoded = json_decode($this->rule->param9, true);
+        if (!is_array($decoded)) {
+            return [];
+        }
+        // The on-change field list lives under a reserved key, not a condition row.
+        unset($decoded[self::ONCHANGE_KEY]);
+        return $decoded;
+    }
+
+    /**
+     * Check whether the given entry matches the trigger conditions.
+     *
+     * Reuses the filter search engine ({@see \mod_datalynx\local\filter\datalynx_filter}) so a
+     * rule condition evaluates exactly like the same criterion in a saved filter — including
+     * internal fields (status/approve evaluated on the entry row) and AND/OR/NOT combinations.
+     *
+     * @param int $entryid
+     * @param array $conditions customsearch aggregated by field id
+     * @return bool
+     */
+    protected function entry_matches_conditions(int $entryid, array $conditions): bool {
+        global $DB;
+
+        if (!$entryid) {
+            return false;
+        }
+
+        $dlx = $this->dlx();
+        $fields = $dlx->get_fields();
+
+        $filter = new \mod_datalynx\local\filter\datalynx_filter(
+            (object) ['dataid' => $dlx->id(), 'customsearch' => $conditions]
+        );
+        $filter->init_filter_sql();
+        [$tables, $where, $params] = $filter->get_search_sql($fields);
+
+        $params['conddataid'] = $dlx->id();
+        $params['condeid'] = $entryid;
+        // The $where fragment is already of the form " AND (...)" (or empty).
+        $sql = "SELECT e.id
+                  FROM {datalynx_entries} e
+                  JOIN {user} u ON u.id = e.userid
+                       $tables
+                 WHERE e.dataid = :conddataid AND e.id = :condeid $where";
+        return $DB->record_exists_sql($sql, $params);
+    }
+
+    /**
+     * Field IDs configured for the "only trigger when these field values change" option.
+     *
+     * Stored as a JSON array under the reserved {@see self::ONCHANGE_KEY} key in param9, kept
+     * separate from the numeric condition rows so it applies independently of them.
+     *
+     * @return array
+     */
+    protected function get_onlyonchange_fieldids(): array {
+        if (empty($this->rule->param9)) {
+            return [];
+        }
+        $decoded = json_decode($this->rule->param9, true);
+        if (!is_array($decoded) || empty($decoded[self::ONCHANGE_KEY])) {
+            return [];
+        }
+        return array_values((array) $decoded[self::ONCHANGE_KEY]);
+    }
+
+    /**
+     * Check that at least one of the given fields actually changed during this update.
+     *
+     * Only meaningful for entry_updated events (the caller gates on that). The changed field IDs
+     * are taken from the event's other['changed_field_ids'] array.
+     *
+     * @param int[] $onchangeids field IDs that must have changed
+     * @param \core\event\base $event
+     * @return bool
+     */
+    protected function change_constraint_satisfied(array $onchangeids, \core\event\base $event): bool {
+        if (!$onchangeids) {
+            return true;
+        }
+        $changed = $event->other['changed_field_ids'] ?? [];
+        return (bool) array_intersect($onchangeids, $changed);
     }
 
     /**

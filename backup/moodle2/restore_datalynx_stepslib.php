@@ -424,6 +424,27 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
     }
 
     /**
+     * Remap a list of datalynx field ids to their restored ids.
+     *
+     * Numeric ids are translated through the 'datalynx_field' mapping; non-numeric ids (internal
+     * fields such as 'status' or 'approve') are stable and returned unchanged.
+     *
+     * @param mixed $ids array of field ids (numeric or internal string ids)
+     * @return array
+     */
+    protected function remap_rule_fieldids($ids): array {
+        $result = [];
+        foreach ((array) $ids as $id) {
+            if (is_numeric($id) && (int) $id > 0) {
+                $result[] = $this->get_mappingid('datalynx_field', (int) $id);
+            } else {
+                $result[] = $id;
+            }
+        }
+        return $result;
+    }
+
+    /**
      * Process a datalynx_rule element from backup data.
      *
      * @param array $data Backup element data.
@@ -471,20 +492,28 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
             $data->param5 = $this->get_mappingid('datalynx_field', $data->param5);
         }
 
-        // Update field ids embedded as keys in the multi-condition trigger (param9 JSON object,
-        // keyed by datalynx field id). Internal string keys (e.g. 'status', 'approve') are stable
-        // and must be left untouched.
-        if (!empty($data->param9) && $data->type == 'eventnotification') {
+        // Update field ids embedded in the multi-condition trigger (param9 JSON object, keyed by
+        // datalynx field id) for every rule type that uses the shared condition machinery. Internal
+        // string keys (e.g. 'status', 'approve') are stable and must be left untouched. The reserved
+        // on-change key holds an array of field ids, whose numeric ids are remapped individually.
+        if (!empty($data->param9) && in_array($data->type, ['eventnotification', 'updatefield'], true)) {
             $old = self::decode_rule_param($data->param9);
             $new = [];
             foreach ($old as $fieldid => $options) {
-                if (is_numeric($fieldid) && (int) $fieldid > 0) {
+                if ($fieldid === \mod_datalynx\local\rule\base::ONCHANGE_KEY) {
+                    $new[$fieldid] = $this->remap_rule_fieldids($options);
+                } else if (is_numeric($fieldid) && (int) $fieldid > 0) {
                     $new[$this->get_mappingid('datalynx_field', (int) $fieldid)] = $options;
                 } else {
                     $new[$fieldid] = $options;
                 }
             }
             $data->param9 = json_encode($new);
+        }
+
+        // Update the target field reference for the updatefield rule (param2 holds a datalynx field id).
+        if ($data->type == 'updatefield' && !empty($data->param2)) {
+            $data->param2 = $this->get_mappingid('datalynx_field', $data->param2);
         }
 
         // Update the email-template view reference (param8 holds a datalynx view id).
