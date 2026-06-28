@@ -335,6 +335,75 @@ final class email_view_test extends advanced_testcase {
     }
 
     /**
+     * A notification URL tag URL-encoded by TinyMCE inside an href must still resolve.
+     *
+     * TinyMCE rewrites href="##notificationentryurl##" to href="#%23notificationentryurl%23%23"
+     * on save; the view must restore the delimiters so the tag is replaced with the real URL.
+     *
+     * @covers \mod_datalynx\local\view\base::restore_editor_tag_delimiters
+     * @covers \datalynxrule_eventnotification\rule::render_email_template
+     */
+    public function test_eventnotification_restores_urlencoded_notification_url_tag(): void {
+        $dlx = $this->create_test_datalynx();
+        $emailview = $this->create_view_record(
+            $dlx,
+            'email',
+            'Email view',
+            '##entries##',
+            '<p><a href="#%23notificationentryurl%23%23">Zur Prüfung öffnen</a></p>',
+            1
+        );
+        $entryid = $this->create_entry($dlx);
+        $rule = $this->create_notification_rule($dlx, (int) $emailview->id);
+
+        $method = new ReflectionMethod($rule, 'render_email_template');
+        $method->setAccessible(true);
+        $html = $method->invoke(
+            $rule,
+            $entryid,
+            new moodle_url('/mod/datalynx/view.php', ['d' => $dlx->id(), 'eids' => $entryid]),
+            new moodle_url('/mod/datalynx/view.php', ['d' => $dlx->id()]),
+            get_admin()
+        );
+
+        $this->assertIsString($html);
+        $this->assertStringContainsString('eids=' . $entryid, $html);
+        $this->assertStringNotContainsString('%23notificationentryurl', $html);
+        $this->assertStringNotContainsString('notificationentryurl##', $html);
+    }
+
+    /**
+     * The delimiter-restore helper must only touch encoded tags, not genuine URLs.
+     *
+     * @covers \mod_datalynx\local\view\base::restore_editor_tag_delimiters
+     */
+    public function test_restore_editor_tag_delimiters_edge_cases(): void {
+        $dlx = $this->create_test_datalynx();
+        $viewrecord = $this->create_view_record($dlx, 'email', 'Email view', '##entries##', '<p>x</p>', 1);
+        $view = $dlx->get_view($viewrecord->type, $viewrecord);
+
+        $method = new ReflectionMethod($view, 'restore_editor_tag_delimiters');
+        $method->setAccessible(true);
+
+        $cases = [
+            // First hash kept, the rest percent-encoded (the common TinyMCE form).
+            ['<a href="#%23notificationentryurl%23%23">', '<a href="##notificationentryurl##">'],
+            // Both leading hashes percent-encoded.
+            ['<a href="%23%23notificationentryurl%23%23">', '<a href="##notificationentryurl##">'],
+            // Already-clean tag is left untouched (idempotent).
+            ['##notificationentryurl##', '##notificationentryurl##'],
+            // A genuine in-page fragment must not be altered.
+            ['<a href="page.html#section">', '<a href="page.html#section">'],
+            // A real URL containing a single encoded hash must not be altered.
+            ['<a href="https://example.invalid/a%23b">', '<a href="https://example.invalid/a%23b">'],
+        ];
+
+        foreach ($cases as [$input, $expected]) {
+            $this->assertSame($expected, $method->invoke($view, $input));
+        }
+    }
+
+    /**
      * Student recipient selection must not include teacher-only users.
      *
      * @covers \datalynxrule_eventnotification\rule::get_recipients

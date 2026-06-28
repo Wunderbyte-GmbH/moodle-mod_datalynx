@@ -388,7 +388,11 @@ abstract class base {
                         $text = $editordata;
                     }
                 }
+                $text = $this->restore_editor_tag_delimiters($text);
                 $this->view->{"e{$editor}"} = $text;
+                // Also normalize the source property so the immediately-following
+                // set__patterns() scan (which reads $this->view->$editor) sees clean tags.
+                $this->view->$editor = $text;
             } else { // View from form or editor areas updated.
                 $this->view->$editor = null;
                 if (isset($data->{"e{$editor}"})) {
@@ -398,9 +402,35 @@ abstract class base {
                         $text = !empty($currenteditor['text']) ? $currenteditor['text'] : '';
                     }
                 }
+                $text = $this->restore_editor_tag_delimiters($text);
                 $this->view->$editor = $text;
             }
         }
+    }
+
+    /**
+     * Restore tag delimiters that the HTML editor URL-encoded inside href/src attributes.
+     *
+     * TinyMCE treats an attribute value such as href="##notificationentryurl##" as a URL and
+     * percent-encodes the hash characters, producing #%23notificationentryurl%23%23 (or
+     * %23%23notificationentryurl%23%23). The tag scanner and replacer only recognise the literal
+     * ##tag## form, so the encoded version is never substituted and leaks into the sent email.
+     * This rewrites any run of two leading and two trailing #/%23 delimiters around a plain-word
+     * tag body back to ##body##. Restricting the body to word characters leaves genuine URLs
+     * (which contain "/", ".", "?", etc.) and already-clean tags untouched.
+     *
+     * @param string $text Editor text possibly containing URL-encoded tag delimiters.
+     * @return string Text with tag delimiters restored.
+     */
+    protected function restore_editor_tag_delimiters(string $text): string {
+        if ($text === '') {
+            return $text;
+        }
+        return preg_replace(
+            '/(?:#|%23){2}([A-Za-z0-9_]+)(?:#|%23){2}/',
+            '##$1##',
+            $text
+        );
     }
 
     /**
