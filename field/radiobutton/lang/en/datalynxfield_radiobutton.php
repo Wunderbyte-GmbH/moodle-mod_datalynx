@@ -24,8 +24,12 @@
  */
 $string['fieldformat_option'] = 'Display format';
 $string['fieldformat_option_default'] = 'Label only';
-$string['fieldformat_option_help'] = 'Controls what is displayed in views. "Label only" shows the human-readable option label. "Key-value pairs" renders label=key. "Key/index" shows only the stored key or index value.';
+$string['fieldformat_option_help'] = 'Controls what is displayed in views. "Label only" shows the human-readable option label. "Key-value pairs" renders label=key. "Key/index" shows only the stored key or index value. "Stepper progress" displays options as a progress bar stepper.';
 $string['fieldformat_option_key'] = 'Selected option key/index';
 $string['fieldformat_option_options'] = 'Key-value pairs';
+$string['fieldformat_option_stepper'] = 'Stepper progress';
+$string['fieldformat_option_stepper_icons'] = 'Stepper icons';
+$string['fieldformat_option_stepper_icons_help'] = 'A comma-separated list of FontAwesome icon classes (e.g. "shopping-cart, cogs, medal, car, home") to display inside each step\'s circle. If empty or missing, step numbers will be used.';
 $string['pluginname'] = 'Radio button';
 $string['privacy:metadata'] = 'Radiobuttons do not store personal data.';
+

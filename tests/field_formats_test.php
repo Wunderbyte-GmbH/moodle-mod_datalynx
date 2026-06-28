@@ -530,4 +530,60 @@ final class field_formats_test extends advanced_testcase {
         // The option-bearing time format is still created as before.
         $this->assertNotNull(\mod_datalynx\local\field_format\manager::get_format_by_name($dlx->id(), 'datey'));
     }
+
+    /**
+     * Test the radiobutton stepper format.
+     */
+    public function test_radiobutton_stepper_format(): void {
+        global $DB;
+        $dlx = $this->create_test_datalynx();
+
+        // 1. Create a radiobutton field with options
+        $fieldrecord = (object)[
+            'dataid' => $dlx->id(),
+            'name' => 'Status',
+            'type' => 'radiobutton',
+            'description' => '',
+            'param1' => "Confirmed\nProcessing\nDelivered",
+        ];
+        $fieldid = $DB->insert_record('datalynx_fields', $fieldrecord);
+
+        // 2. Save the stepper format
+        $formatid = \mod_datalynx\local\field_format\manager::save_format((object)[
+            'dataid' => $dlx->id(),
+            'name' => 'trackprogress',
+            'fieldtype' => 'radiobutton',
+            'settings' => json_encode([
+                'option' => 'stepper',
+                'stepper_icons' => 'shopping-cart, cogs, home',
+            ]),
+        ]);
+
+        $field = $dlx->get_field_from_id($fieldid, true);
+        $format = \mod_datalynx\local\field_format\manager::get_format_by_id($formatid);
+
+        // Create an entry where the second option ("Processing", key 2) is selected
+        // Note: options menu generates keys 1, 2, 3...
+        $entry = (object)[
+            'id' => 123,
+            "c{$fieldid}_content" => 2, // Processing
+        ];
+
+        $html = $field->renderer()->render_display_mode($entry, ['field_format' => $format]);
+
+        // Assert that the generated HTML has the stepper structure and is correct
+        $this->assertStringContainsString('datalynx-stepper', $html);
+        $this->assertStringContainsString('step completed', $html); // First two steps are completed
+        $this->assertStringContainsString('fa fa-shopping-cart', $html);
+        $this->assertStringContainsString('fa fa-cogs', $html);
+        $this->assertStringContainsString('fa fa-home', $html);
+        $this->assertStringContainsString('Confirmed', $html);
+        $this->assertStringContainsString('Processing', $html);
+        $this->assertStringContainsString('Delivered', $html);
+
+        // Third step should not be completed
+        $this->assertStringContainsString('<div class="step completed">', $html);
+        $this->assertStringContainsString('<div class="step">', $html);
+    }
 }
+

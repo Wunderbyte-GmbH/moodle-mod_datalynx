@@ -1,0 +1,58 @@
+{{!
+    This file is part of mod_datalynx for Moodle - http://moodle.org/
+
+    It is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    It is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_datalynx/field_radiobutton_stepper
+
+    Displays a stepper progress bar for a radiobutton field.
+
+    Example context (json):
+    {
+        "steps": [
+            {
+                "label": "Step 1",
+                "completed": true,
+                "icon": "fa fa-shopping-cart",
+                "hasicon": true,
+                "number": 1
+            },
+            {
+                "label": "Step 2",
+                "completed": false,
+                "icon": "",
+                "hasicon": false,
+                "number": 2
+            }
+        ]
+    }
+}}
+<div class="datalynx-stepper steps d-flex flex-wrap flex-sm-nowrap justify-content-between my-4">
+    {{#steps}}
+        <div class="step{{#completed}} completed{{/completed}}">
+            <div class="step-icon-wrap">
+                <div class="step-icon">
+                    {{#hasicon}}
+                        <i class="{{icon}}" aria-hidden="true"></i>
+                    {{/hasicon}}
+                    {{^hasicon}}
+                        {{number}}
+                    {{/hasicon}}
+                </div>
+            </div>
+            <h5 class="step-title">{{label}}</h5>
+        </div>
+    {{/steps}}
+</div>

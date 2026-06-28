@@ -31,13 +31,24 @@ class field_format extends \mod_datalynx\local\field_format\base {
      */
     public function config_form(\MoodleQuickForm &$mform) {
         $options = [
-            'default' => 'Default (Label only)',
-            'options' => 'Key-value pairs',
-            'key' => 'Selected option key/index',
+            'default' => get_string('fieldformat_option_default', 'datalynxfield_radiobutton'),
+            'options' => get_string('fieldformat_option_options', 'datalynxfield_radiobutton'),
+            'key' => get_string('fieldformat_option_key', 'datalynxfield_radiobutton'),
+            'stepper' => get_string('fieldformat_option_stepper', 'datalynxfield_radiobutton'),
         ];
         $mform->addElement('select', 'option', get_string('fieldformatoption', 'mod_datalynx'), $options);
         $mform->setType('option', PARAM_ALPHA);
         $mform->addRule('option', get_string('required'), 'required', null, 'client');
+
+        $mform->addElement(
+            'text',
+            'stepper_icons',
+            get_string('fieldformat_option_stepper_icons', 'datalynxfield_radiobutton'),
+            ['size' => 60]
+        );
+        $mform->setType('stepper_icons', PARAM_TEXT);
+        $mform->addHelpButton('stepper_icons', 'fieldformat_option_stepper_icons', 'datalynxfield_radiobutton');
+        $mform->hideIf('stepper_icons', 'option', 'neq', 'stepper');
     }
 
     /**
@@ -47,7 +58,7 @@ class field_format extends \mod_datalynx\local\field_format\base {
      * @return array
      */
     public function get_default_settings_for_name(string $name): array {
-        if (in_array($name, ['options', 'key'])) {
+        if (in_array($name, ['options', 'key', 'stepper'])) {
             return ['option' => $name];
         }
         return [];
