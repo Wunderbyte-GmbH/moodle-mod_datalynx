@@ -34,6 +34,7 @@ class field_format_form extends \mod_datalynx\form\field_format_base_form {
             'default' => get_string('fieldformat_option_default', 'datalynxfield_radiobutton'),
             'options' => get_string('fieldformat_option_options', 'datalynxfield_radiobutton'),
             'key'     => get_string('fieldformat_option_key', 'datalynxfield_radiobutton'),
+            'stepper' => get_string('fieldformat_option_stepper', 'datalynxfield_radiobutton'),
         ];
         $mform->addElement(
             'select',
@@ -44,5 +45,15 @@ class field_format_form extends \mod_datalynx\form\field_format_base_form {
         $mform->setType('option', PARAM_ALPHA);
         $mform->addRule('option', get_string('required'), 'required', null, 'client');
         $mform->addHelpButton('option', 'fieldformat_option', 'datalynxfield_radiobutton');
+
+        $mform->addElement(
+            'text',
+            'stepper_icons',
+            get_string('fieldformat_option_stepper_icons', 'datalynxfield_radiobutton'),
+            ['size' => 60]
+        );
+        $mform->setType('stepper_icons', PARAM_TEXT);
+        $mform->addHelpButton('stepper_icons', 'fieldformat_option_stepper_icons', 'datalynxfield_radiobutton');
+        $mform->hideIf('stepper_icons', 'option', 'neq', 'stepper');
     }
 }

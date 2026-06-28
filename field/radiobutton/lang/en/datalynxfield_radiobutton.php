@@ -32,4 +32,3 @@ $string['fieldformat_option_stepper_icons'] = 'Stepper icons';
 $string['fieldformat_option_stepper_icons_help'] = 'A comma-separated list of FontAwesome icon classes (e.g. "shopping-cart, cogs, medal, car, home") to display inside each step\'s circle. If empty or missing, step numbers will be used.';
 $string['pluginname'] = 'Radio button';
 $string['privacy:metadata'] = 'Radiobuttons do not store personal data.';
-
