@@ -465,9 +465,16 @@ class datalynxview_base_form extends moodleform {
                 $fieldid = array_search(substr($fieldgroup, 2, -2), $dlx->get_fieldnames());
                 $subfields = $dlx->get_field_from_id($fieldid);
 
+                if (!$subfields || empty($subfields->fieldids)) {
+                    continue;
+                }
+
                 $lookup = '';
                 foreach ($subfields->fieldids as $subfieldid) {
                     $subfield = $dlx->get_field_from_id($subfieldid);
+                    if (!$subfield) {
+                        continue;
+                    }
                     $lookup .= " [[" . $subfield->field->name . "]]";
                 }
 
