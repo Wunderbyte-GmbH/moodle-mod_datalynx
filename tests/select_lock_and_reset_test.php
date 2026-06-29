@@ -160,7 +160,7 @@ final class select_lock_and_reset_test extends advanced_testcase {
             'param1' => '', 'param2' => '', 'param3' => '', 'param4' => '', 'param5' => '',
             'param6' => '', 'param7' => '', 'param8' => '', 'param9' => '', 'param10' => '',
         ]);
-        $entryid = $this->make_entry(datalynxfield_status::STATUS_FINAL_SUBMISSION, 1);
+        $entryid = $this->make_entry(datalynxfield_status::STATUS_SUBMISSION, 1);
         $this->set_content($selectid, $entryid, '1');
         $this->set_content($textid, $entryid, 'some answer');
         $this->assertEquals(2, $DB->count_records('datalynx_contents', ['entryid' => $entryid]));
@@ -179,5 +179,26 @@ final class select_lock_and_reset_test extends advanced_testcase {
         // With the value gone the single-choice field is editable again.
         $select = $this->dlx->get_field_from_id($selectid);
         $this->assertFalse($select->is_locked_for_entry((object) ['id' => $entryid]));
+    }
+
+    /**
+     * A final-submission entry can never be reset, even by a manager, and its data is left intact.
+     */
+    public function test_reset_blocked_after_final_submission(): void {
+        global $DB;
+
+        $selectid = $this->make_field('select', 1);
+        $entryid = $this->make_entry(datalynxfield_status::STATUS_FINAL_SUBMISSION, 1);
+        $this->set_content($selectid, $entryid, '1');
+        $this->assertEquals(1, $DB->count_records('datalynx_contents', ['entryid' => $entryid]));
+
+        // Running as admin (manageentries). Reset must still be refused once final.
+        $entries = new datalynx_entries($this->dlx, new datalynx_filter((object) ['dataid' => $this->dlx->id()]));
+        $entries->process_entries('reset', (string) $entryid, null, true);
+
+        // Nothing was wiped and the entry stays final.
+        $this->assertEquals(1, $DB->count_records('datalynx_contents', ['entryid' => $entryid]));
+        $entry = $DB->get_record('datalynx_entries', ['id' => $entryid]);
+        $this->assertEquals(datalynxfield_status::STATUS_FINAL_SUBMISSION, (int) $entry->status);
     }
 }

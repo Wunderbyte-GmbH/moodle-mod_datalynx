@@ -995,6 +995,18 @@ abstract class base {
             $this->entriesprocessedsuccessfully = true;
             $this->notifications['good']['entries'] = $strnotify;
 
+            // After a reset, return the user to exactly the URL they triggered it from (the edit form
+            // when resetting while editing, or the current view listing otherwise) so the action
+            // params (reset/sesskey/confirmed) drop off and a refresh does not re-run the reset.
+            if (optional_param('reset', '', PARAM_SEQUENCE)) {
+                if (!empty($strnotify)) {
+                    \core\notification::success($strnotify);
+                }
+                $returnurl = optional_param('returnurl', '', PARAM_LOCALURL);
+                $url = $returnurl ? new moodle_url($returnurl) : new moodle_url($this->baseurl);
+                redirect($url);
+            }
+
             $redirectid = $this->redirect ?: 0;
             if ($redirectid && $redirectid != $this->id()) {
                 if (!empty($strnotify)) {

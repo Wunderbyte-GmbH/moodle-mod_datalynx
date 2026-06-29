@@ -663,6 +663,16 @@ class datalynx_entries {
 
             if ($entries) {
                 foreach ($entries as $eid => $entry) {
+                    // Reset must never be available once an entry reached final submission, regardless
+                    // of role. This mirrors the hidden reset link and blocks crafted reset URLs.
+                    if (
+                            $action == 'reset' && isset($entry->status) &&
+                            $entry->status == datalynxfield_status::STATUS_FINAL_SUBMISSION
+                    ) {
+                        unset($entries[$eid]);
+                        $errorstring .= get_string('affectedid', 'mod_datalynx', $eid) . '<br>';
+                        continue;
+                    }
                     // Filter approvable entries.
                     if (
                             ($action == 'approve' || $action == 'disapprove') &&
@@ -691,14 +701,16 @@ class datalynx_entries {
             if (!$confirmed) {
                 // Print a confirmation page.
                 echo $OUTPUT->header();
+                $confirmcontinueparams = [$action => implode(',', array_keys($entries)),
+                        'sesskey' => sesskey(), 'confirmed' => true];
+                // Preserve the post-action return URL (set by the reset action) across the
+                // confirmation step so the redirect after processing lands on the right URL.
+                if ($returnurl = optional_param('returnurl', '', PARAM_LOCALURL)) {
+                    $confirmcontinueparams['returnurl'] = $returnurl;
+                }
                 echo $OUTPUT->confirm(
                     get_string("entriesconfirm$action", 'datalynx', count($entries)),
-                    new moodle_url(
-                        $PAGE->url,
-                        [$action => implode(',', array_keys($entries)),
-                                        'sesskey' => sesskey(), 'confirmed' => true,
-                                ]
-                    ),
+                    new moodle_url($PAGE->url, $confirmcontinueparams),
                     new moodle_url($PAGE->url)
                 );
 

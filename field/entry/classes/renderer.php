@@ -54,6 +54,13 @@ class renderer extends datalynxfield_renderer {
                                 $entry->status != datalynxfield_status::STATUS_FINAL_SUBMISSION) ||
                         has_capability('mod/datalynx:manageentries', $this->field->dlx->context));
 
+        // Reset is gated differently from the other actions. It must also be shown inside the edit
+        // form (so a user can clear a locked entry while editing it), yet it must disappear once the
+        // entry reaches final submission for every role, including managers.
+        $entryisfinal = isset($entry->status) &&
+                $entry->status == datalynxfield_status::STATUS_FINAL_SUBMISSION;
+        $resetavailable = (!empty($options['manage']) || !empty($options['edit'])) && !$entryisfinal;
+
         // No edit mode.
         $replacements = [];
         foreach ($tags as $tag) {
@@ -91,7 +98,7 @@ class renderer extends datalynxfield_renderer {
                         $str = $manageable ? $this->display_delete($entry) : '';
                         break;
                     case '##reset##':
-                        $str = $manageable ? $this->display_reset($entry) : '';
+                        $str = $resetavailable ? $this->display_reset($entry, $options) : '';
                         break;
                     case '##export##':
                         $str = $this->display_export($entry);
@@ -220,13 +227,30 @@ class renderer extends datalynxfield_renderer {
      * Renders the reset action link for an entry. The reset wipes all of the entry's saved field
      * data (keeping the entry record) so a locked single-choice value can be changed again.
      *
-     * @param object $entry The current entry.
+     * @param object $entry   The current entry.
+     * @param array  $options Rendering options (e.g. 'edit' when shown inside the edit form).
      * @return string
      */
-    protected function display_reset($entry) {
+    protected function display_reset($entry, array $options = []) {
         global $OUTPUT;
 
-        $params = ['reset' => $entry->id, 'sesskey' => sesskey()];
+        // Capture the exact URL the user is viewing so we can return there once the reset completes.
+        // When the reset link is shown inside the edit form, return to that same edit form (now with
+        // cleared fields); otherwise return to the current view listing with its filter/paging state.
+        $returnurl = new moodle_url($entry->baseurl);
+        if (!empty($options['edit'])) {
+            $returnurl->params([
+                'editentries' => $entry->id,
+                'eids' => $entry->id,
+                'sesskey' => sesskey(),
+            ]);
+        }
+
+        $params = [
+            'reset' => $entry->id,
+            'sesskey' => sesskey(),
+            'returnurl' => $returnurl->out_as_local_url(false),
+        ];
         $url = new moodle_url($entry->baseurl, $params);
         $str = get_string('resetentryid', 'datalynx', $entry->id);
         $sronly = html_writer::span($str, 'sr-only');
