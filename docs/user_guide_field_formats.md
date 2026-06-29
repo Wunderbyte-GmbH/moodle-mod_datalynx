@@ -114,13 +114,24 @@ selector. When **Editable** is off, the format displays the profile field value 
 
 ### Entry Time (`entrytime`)
 
-Controls the display format of the entry creation or modification timestamp.
+Controls the display format of an entry timestamp.
 
 | Setting | What it configures |
 |---|---|
 | **Date format** | A PHP `date()` format string, for example `d.m.Y` or `Y-m-d H:i` |
 
-**Example:** Create a format named `short` with date format `d.m.Y`, then use `##timecreated:short##` or `##timemodified:short##`.
+The `entrytime` format applies to three built-in timestamp tags:
+
+| Tag | Shows |
+|---|---|
+| `[[timecreated]]` | When the entry was created |
+| `[[timemodified]]` | When the entry was last modified |
+| `[[timesubmitted]]` | **Time of final submission** — set when the entry reaches *Final submission* status, and cleared if it is moved back from that status |
+
+**Example:** Create a format named `short` with date format `d.m.Y`, then use `##timecreated:short##`, `##timemodified:short##`, or `##timesubmitted:short##`.
+
+> **Pro-Tip**  
+> `[[timesubmitted]]` is empty until an entry is finally submitted, which makes it a clean way to show — or filter by — only entries that have actually been handed in.
 
 ---
 
@@ -184,11 +195,23 @@ Controls the rendering mode for multiple-selection option fields.
 
 ### Radio Button (`radiobutton`)
 
-Controls rendering for radio button fields.
+Controls rendering for radio button fields, set via the **Display format** option.
+
+| Display format | What it renders |
+|---|---|
+| **Label only** | The human-readable option label |
+| **Key-value pairs** | The label and stored key together, as `label=key` |
+| **Key/index** | Only the stored key or index value |
+| **Stepper progress** | The options as a horizontal progress *stepper* — a row of numbered (or icon) steps with the selected option highlighted, ideal for showing workflow stages such as approval steps |
+
+When **Stepper progress** is selected, an extra setting appears:
 
 | Setting | What it configures |
 |---|---|
-| **Output mode** | How the selected option is rendered |
+| **Stepper icons** | An optional comma-separated list of FontAwesome icon classes (for example `shopping-cart, cogs, medal, car, home`) shown inside each step’s circle. Leave empty to show step numbers instead. |
+
+> **Pro-Tip**  
+> The stepper turns a status-like radio field (for example *Draft → In review → Approved*) into a clear visual progress indicator in your views.
 
 ---
 

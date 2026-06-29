@@ -47,6 +47,7 @@ A safe permission setup protects privacy and prevents accidental workflow change
 | Manage templates | Can modify presentation and behavior broadly | Editing teacher, manager |
 | Manage entries | Can perform wide operational actions | Editing teacher, manager |
 | Approve entries | Controls publication/moderation flow | Teacher, editing teacher, manager |
+| Edit after final submission (`mod/datalynx:editfinalsubmission`) | Allows changing an entry *after* it has reached **Final submission** status | Editing teacher, manager |
 | Write entries | Allows user submissions | Student and higher roles (as configured) |
 | Manage comments/ratings | Controls review interactions | Teacher and above |
 | Export entries | Controls data extraction | Teacher/manager according to policy |
@@ -87,6 +88,17 @@ Datalynx supports role-targeted view links and privilege mapping so different us
 
 > **Warning**  
 > Changing permissions mid-term can immediately alter visibility of existing entries.
+
+### Locking entries at final submission
+
+When an entry reaches the **Final submission** status, it is locked so authors can no longer change it. This protects handed-in work from further edits.
+
+- Users with **`mod/datalynx:editfinalsubmission`** (editing teachers and managers by default) can still edit finally-submitted entries — useful for corrections or unlocking.
+- Users with **Manage entries** can also edit them.
+- Individual fields can be allowed to remain editable after final submission by enabling the field behavior’s *editable after final* option.
+
+> **Pro-Tip**  
+> Grant `mod/datalynx:editfinalsubmission` sparingly. It is flagged as a spam-risk capability because it lets a user change records that learners consider “submitted and final”.
 
 ---
 

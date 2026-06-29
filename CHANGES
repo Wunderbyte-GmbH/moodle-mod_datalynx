@@ -1,6 +1,35 @@
 mod_datalynx changes
 ====================
 
+2026-06-29
+----------
+
+- Views: added a per-view **permitted filters** whitelist. A view keeps its
+  configured filter (now labelled **Default filter**) and can list additional
+  filters users may switch to; any other filter is rejected and the default is
+  applied. The legacy "filter override" option is now **Allow all filters** and
+  supersedes the whitelist. Existing views are migrated so their behavior is
+  unchanged. Backup/restore and older backups are supported.
+- Rules: added the **Update field** rule type, which writes a fixed value into a
+  text, select, radio button, checkbox or multi-select field when triggered
+  (with optional follow-up events).
+- Rules: event-notification and update-field rules support multi-row **trigger
+  conditions** combined with AND/OR and optional NOT.
+- Entries: added **timesubmitted** ("Time of final submission"), shown via the
+  `[[timesubmitted]]` tag with the `entrytime` field format; set when an entry
+  reaches Final submission and cleared if it is moved back.
+- Field formats: radio button fields gained a **Stepper progress** display format
+  (with optional FontAwesome step icons).
+- Fields: the **Text** field type gained a responsive **Input field width**
+  setting (value + px/%/em unit).
+- Field layouts: the layout editor gained curated Bootstrap-5 **presets**; field
+  layouts were renamed from "renderers". Fieldgroup subfields can carry their own
+  layout/behavior, and a `:totals` field format adds a numeric totals row.
+- Permissions: added capability `mod/datalynx:editfinalsubmission` to allow
+  editing entries after they reach Final submission status.
+- Documentation: updated the user guides (Views, Rules, Fields, Field Formats,
+  Permissions, Patterns & Styling) to cover the above.
+
 2026-04-20
 ----------
 

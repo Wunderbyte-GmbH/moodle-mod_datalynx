@@ -88,6 +88,17 @@ For most first deployments, begin with:
 > **Warning**  
 > Changing visibility or edit permissions on live activities can immediately change what users can see and modify.
 
+### Type-specific settings worth knowing
+
+Some field types add their own settings on top of the common ones above. A useful example:
+
+| Field type | Setting | What it does |
+|---|---|---|
+| **Text** | **Input field width** | Sets the visible width of the input box in the entry form. Enter a number and pick a unit (`px`, `%`, or `em`). It is applied as a responsive maximum width, so the box still shrinks on narrow screens. Leave the number empty for the default width. |
+
+> **Pro-Tip**  
+> Use **Input field width** to right-size short inputs (such as a postcode or a reference number) instead of letting every text box span the full form width.
+
 ---
 
 ## Scenario: Booking Management System field design

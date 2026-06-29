@@ -349,6 +349,21 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
             $data->filter = $this->get_mappingid('datalynx_filter', $data->filter);
         }
 
+        // Adjust the permitted-filters whitelist ids (JSON array). Guarded so older backups that lack
+        // this field restore unchanged.
+        if (!empty($data->permittedfilters)) {
+            $permitted = json_decode($data->permittedfilters);
+            if (is_array($permitted)) {
+                $remapped = [];
+                foreach ($permitted as $filterid) {
+                    if ($newfilterid = $this->get_mappingid('datalynx_filter', $filterid)) {
+                        $remapped[] = (int) $newfilterid;
+                    }
+                }
+                $data->permittedfilters = $remapped ? json_encode($remapped) : null;
+            }
+        }
+
         // Adjust filter id in patterns used in the view template general section.
         if ($data->section) {
             $searchpattern = "/;filter=([0-9]+?);/";

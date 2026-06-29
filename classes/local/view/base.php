@@ -274,11 +274,16 @@ abstract class base {
             $this->view->description = '';
             $this->view->visible = 7;
             $this->view->filter = 0;
+            $this->view->permittedfilters = null;
             $this->view->perpage = 0;
             $this->view->groupby = '';
             $this->view->param10 = 0;
             $this->view->param5 = 0; // Overridefilter.
             $this->view->param9 = 0;
+        }
+
+        if (!isset($this->view->permittedfilters)) {
+            $this->view->permittedfilters = null;
         }
 
         if (!isset($this->view->param9)) {
@@ -351,6 +356,8 @@ abstract class base {
         $this->view->perpage = !empty($data->perpage) ? $data->perpage : 0;
         $this->view->groupby = !empty($data->groupby) ? $data->groupby : '';
         $this->view->filter = !empty($data->filter) ? $data->filter : 0;
+        $this->view->permittedfilters = !empty($data->permittedfilters)
+                ? json_encode(array_values(array_map('intval', (array) $data->permittedfilters))) : null;
 
         for ($i = 1; $i <= 10; $i++) {
             if (isset($data->{"param$i"})) {
@@ -515,6 +522,19 @@ abstract class base {
         $search = !empty($urloptions['search']) ? $urloptions['search'] : '';
         $usersearch = !empty($urloptions['usersearch']) ? $urloptions['usersearch'] : '';
 
+        // Permitted-filters whitelist (strict). When a whitelist is configured and "allow all
+        // filters" (param5) is off, only the default and whitelisted filters may be selected as the
+        // base filter: a non-permitted (or negative/user) filter id falls back to the default, and
+        // ad-hoc base-replacing filters (advanced/custom) are blocked. Narrowing-on-top options
+        // (eids, search, ...) are deliberately left untouched.
+        if ($this->is_filter_whitelist_active()) {
+            if ($fid && !in_array((int) $fid, $this->get_permitted_filter_ids(), true)) {
+                $fid = 0;
+            }
+            $afilter = 0;
+            $cfilter = 0;
+        }
+
         $filterid = $fid ? $fid : ($this->view->filter ? $this->view->filter : 0);
 
         $this->filter = $fm->get_filter_from_id($filterid, ['view' => $this, 'advanced' => $afilter,
@@ -649,6 +669,9 @@ abstract class base {
     public function to_form($data = null) {
         $data = $data ?: $this->view;
         $data = $this->prepare_view_editors($data);
+        // Decode the permitted filters whitelist so the multiselect form element can preselect it.
+        $data->permittedfilters = !empty($data->permittedfilters)
+                ? (array) json_decode($data->permittedfilters) : [];
         return $data;
     }
 
@@ -2382,14 +2405,64 @@ abstract class base {
     }
 
     /**
+     * Return the configured "additional permitted filters" whitelist (decoded).
+     *
+     * These are the extra filter ids — beside the default filter — a user may switch to in view
+     * mode. An empty array means the whitelist feature is not in use for this view.
+     *
+     * @return int[]
+     */
+    public function get_permitted_filters_setting(): array {
+        if (empty($this->view->permittedfilters)) {
+            return [];
+        }
+        // Normally a JSON string from the DB, but may already be a decoded array after to_form().
+        $ids = is_array($this->view->permittedfilters)
+                ? $this->view->permittedfilters : json_decode($this->view->permittedfilters);
+        return is_array($ids) ? array_values(array_filter(array_map('intval', $ids))) : [];
+    }
+
+    /**
+     * Return the full set of filter ids a user may switch to: the default filter plus the whitelist.
+     *
+     * Used both to gate the URL filter parameter and to build the user-facing filter dropdown.
+     *
+     * @return int[]
+     */
+    public function get_permitted_filter_ids(): array {
+        $ids = $this->get_permitted_filters_setting();
+        if (!empty($this->view->filter)) {
+            array_unshift($ids, (int) $this->view->filter);
+        }
+        return array_values(array_unique(array_filter($ids)));
+    }
+
+    /**
+     * Whether the permitted-filters whitelist is the active restriction for this view.
+     *
+     * True when a whitelist is configured and "allow all filters" (param5) is off. While active,
+     * only the default and whitelisted filters may be selected and personal/ad-hoc filters are blocked.
+     *
+     * @return bool
+     */
+    public function is_filter_whitelist_active(): bool {
+        return empty($this->view->param5) && !empty($this->get_permitted_filters_setting());
+    }
+
+    /**
      * Indicate whether this view forces a predefined filter.
      *
      * @return bool|int
      */
     public function is_forcing_filter() {
 
-        // If overridefilter is selected we don't force filters.
+        // If "allow all filters" (override) is selected we don't force filters.
         if ($this->view->param5) {
+            return false;
+        }
+        // A whitelist that offers a real choice (more than just the default) allows gated switching
+        // via the URL filter parameter; a single-entry whitelist stays locked, exactly as before.
+        if (count($this->get_permitted_filter_ids()) > 1) {
             return false;
         }
         return $this->view->filter;

@@ -29,6 +29,7 @@ Typical rule outcomes include:
 | Rule Type | Primary purpose | Typical use |
 |---|---|---|
 | **Event notification** | Sends notifications based on entry events | Alert reviewers when a new submission is added |
+| **Update field** | Automatically writes a fixed value into a field when the rule is triggered | Set a status to “In review” when an entry is submitted |
 | **FTP Sync Data** | Synchronizes data/files to FTP destination workflows | Integrate with external downstream process |
 
 > **Important Note**  
@@ -49,6 +50,45 @@ Typical rule outcomes include:
 7. Add relevant tags (for example, `[[Text]]`, `##entryid##`, and view links).
 8. Click **Save rule**.
 9. Submit a test entry to verify the message.
+
+---
+
+## Trigger conditions (only act when the entry matches)
+
+Both **Event notification** and **Update field** rules can be limited with **Trigger conditions**, so the rule only fires when the entry that triggered the event matches what you specify. Leave the conditions empty to always run.
+
+Each condition is one row. Add several rows to combine them:
+
+| Row control | What it does |
+|---|---|
+| **AND / OR** | Combines this row with the previous one. The first row has no connector. **AND** = all combined rows must match; **OR** = any may match. |
+| **Field** | The field to test (for example *Status*, *Approval*, a select field, or a text field). Leave empty to skip the row. |
+| **NOT** | Inverts the row, so it matches when the condition is *not* met. |
+| **Operator** | The comparison appropriate to the field (for example `=`, `>`, `between`, or *any of*). |
+| **Value** | The value(s) to compare against, using the input that fits the field. |
+
+> **Pro-Tip**  
+> A common pattern is to notify only when a meaningful change happens — for example *Approval = Approved*, or *Status changed to Final submission* — instead of on every save. This keeps notifications relevant and avoids noise.
+
+---
+
+## Build an Update field rule (step-by-step)
+
+An **Update field** rule sets a field to a fixed value automatically when its events fire and its trigger conditions match. Only text, dropdown (select / radio button) and checkbox / multi-select fields can be updated.
+
+1. Click **Add a rule**.
+2. Select **Update field**.
+3. Enter a clear name (for example, “Set status to In review on submit”).
+4. Select the trigger event(s) (for example, *Entry created* or *Entry updated*).
+5. Add **Trigger conditions** if the update should only happen in certain cases (see above).
+6. In the **Field update** section:
+   - **Field to update** — choose the target field.
+   - **New value** — choose the option (for dropdown/radio/checkbox fields) or type the value (for text fields).
+7. (Optional) Tick **Trigger follow-up events** if other rules should react to this change as well.
+8. Click **Save rule** and test with a sample entry.
+
+> **Important Note**  
+> Use **Trigger follow-up events** deliberately. It lets one rule’s change set off other rules, which is powerful for chained workflows but can cause loops if two rules update each other. Datalynx guards against infinite loops, but a clear, one-directional design is still best.
 
 ---
 

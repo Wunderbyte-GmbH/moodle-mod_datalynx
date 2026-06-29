@@ -137,24 +137,39 @@ class datalynxview_base_form extends moodleform {
                 8
             );
 
-            // Filter.
-            $filtersmenu = $dlx->get_filter_manager()->get_filters(null, true);
-            if (!$filtersmenu) {
+            // Default filter.
+            $allfilters = $dlx->get_filter_manager()->get_filters(null, true);
+            if (!$allfilters) {
                 $filtersmenu = [0 => get_string('filtersnonedefined', 'datalynx')];
             } else {
-                $filtersmenu = [0 => get_string('choose')] + $filtersmenu;
+                $filtersmenu = [0 => get_string('choose')] + $allfilters;
             }
-            $mform->addElement('select', 'filter', get_string('viewfilter', 'datalynx'), $filtersmenu);
+            $mform->addElement('select', 'filter', get_string('viewdefaultfilter', 'datalynx'), $filtersmenu);
             $mform->setDefault('filter', 0);
 
-            // Overridefilter.
+            // Permitted filters: the additional filters a user may switch to in view mode (a whitelist
+            // beside the default filter). Empty = locked to the default filter.
+            if ($allfilters) {
+                $mform->addElement(
+                    'autocomplete',
+                    'permittedfilters',
+                    get_string('viewpermittedfilters', 'datalynx'),
+                    $allfilters,
+                    ['multiple' => true]
+                );
+                $mform->addHelpButton('permittedfilters', 'viewpermittedfilters', 'datalynx');
+                $mform->setType('permittedfilters', PARAM_INT);
+            }
+
+            // Allow all filters (legacy override): overrides the whitelist and lets the user switch to
+            // any visible filter, including ones created later.
             $mform->addElement(
                 'advcheckbox',
                 'param5',
-                get_string('viewfilteroverride', 'datalynx'),
-                get_string('viewfoverride', 'datalynx')
+                get_string('viewallowallfilters', 'datalynx'),
+                get_string('viewallowallfilters_desc', 'datalynx')
             );
-            $mform->addHelpButton('param5', 'viewfoverride', 'datalynx');
+            $mform->addHelpButton('param5', 'viewallowallfilters', 'datalynx');
             $mform->setType('param5', PARAM_INT);
             $mform->setDefault('param5', 0);
 
@@ -415,6 +430,12 @@ class datalynxview_base_form extends moodleform {
         // Check if the view name is already used.
         if ($dlx->name_exists('views', $data['name'], $view->id())) {
             $errors['name'] = get_string('invalidname', 'datalynx', get_string('view', 'datalynx'));
+        }
+
+        // A permitted-filters whitelist is only safe if the default filter is itself restrictive,
+        // so require a default filter whenever a whitelist is configured.
+        if (!empty($data['permittedfilters']) && empty($data['filter'])) {
+            $errors['filter'] = get_string('viewpermittedfiltersnodefault', 'datalynx');
         }
 
         // Check if a field is used multiple times in entryview.

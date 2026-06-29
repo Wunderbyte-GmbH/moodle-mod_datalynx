@@ -1188,7 +1188,12 @@ class datalynxview_patterns {
             if (!$menufilters = $fm->get_filters(null, true)) {
                 $menufilters = [];
             }
-            if ($userfilters = $fm->get_user_filters_menu($view->id())) {
+            // When a permitted-filters whitelist is the active restriction, offer only the default
+            // and whitelisted filters and suppress personal filters.
+            if ($view->is_filter_whitelist_active()) {
+                $allowed = $view->get_permitted_filter_ids();
+                $menufilters = array_intersect_key($menufilters, array_flip($allowed));
+            } else if ($userfilters = $fm->get_user_filters_menu($view->id())) {
                 $menufilters[] = [get_string('filtermy', 'datalynx') => $userfilters];
             }
 

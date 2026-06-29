@@ -1482,6 +1482,31 @@ function xmldb_datalynx_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2026062700, 'datalynx');
     }
 
+    if ($oldversion < 2026062900) {
+        // Add the permittedfilters column to datalynx_views: a JSON array of the filter ids a user
+        // may switch to in view mode (a whitelist beside the default filter).
+        $table = new xmldb_table('datalynx_views');
+        $field = new xmldb_field('permittedfilters', XMLDB_TYPE_TEXT, null, null, null, null, null, 'filter');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Migrate existing enforcement into the new model. Locked views (param5 "Allow all filters"
+        // off) with a configured filter become "default + only that filter permitted", so the
+        // restriction is still enforced. Override views (param5 on) are left as live "allow all":
+        // permittedfilters stays null and is ignored while allow-all is on.
+        $rs = $DB->get_recordset_select('datalynx_views', 'filter > 0', null, '', 'id, filter, param5');
+        foreach ($rs as $view) {
+            if (empty($view->param5)) {
+                $value = json_encode([(int) $view->filter]);
+                $DB->set_field('datalynx_views', 'permittedfilters', $value, ['id' => $view->id]);
+            }
+        }
+        $rs->close();
+
+        upgrade_mod_savepoint(true, 2026062900, 'datalynx');
+    }
+
     return true;
 }
 

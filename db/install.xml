@@ -90,6 +90,7 @@
         <FIELD NAME="perpage" TYPE="int" LENGTH="8" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="groupby" TYPE="char" LENGTH="64" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="filter" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="permittedfilters" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="JSON array of filter ids a user may switch to in view mode"/>
         <FIELD NAME="patterns" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="section" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="sectionpos" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>

@@ -56,6 +56,27 @@ Field layouts help standardize how field output appears across views.
 4. Save and apply in target views.
 5. Verify with sample entries.
 
+### Start from a preset
+
+The field-layout editor includes a set of curated **Bootstrap-5 presets** so you do not have to build a layout from scratch. Pick a preset, apply it in one click, then hand-edit the result. Presets are grouped into families:
+
+| Preset family | Good for |
+|---|---|
+| **Cards** | Card-style display blocks |
+| **Inline** | Compact, label-next-to-value display |
+| **Edit** | Tidy edit-mode input layouts |
+| **Typographic** | Heading/emphasis-led text display |
+
+> **Pro-Tip**  
+> Apply a preset, save, and view it with a real entry before refining. Starting from a preset keeps spacing and responsive behavior consistent across your activity.
+
+### Fieldgroups
+
+A **fieldgroup** bundles several subfields into one repeatable block (think of repeatable line items). Inside an entry template you can:
+
+- Give each **subfield its own field layout and behavior**, using the usual `[[Subfield|behavior|layout]]` pattern, so a repeated row looks exactly how you want.
+- Add a **totals row** for numeric subfields by putting a field format on the fieldgroup tag, for example `[[Mygroup:totals]]`. The format’s **Totals label** setting sets the text shown next to the totals (default “Total”).
+
 ---
 
 ## Field behaviors
