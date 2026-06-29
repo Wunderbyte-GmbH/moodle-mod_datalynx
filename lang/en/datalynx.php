@@ -416,7 +416,6 @@ $string['filetypes'] = 'Accepted file types';
 $string['filetypevideo'] = 'Video files';
 $string['filter'] = 'Filter';
 $string['filteradd'] = 'Add a filter';
-$string['filteradvanced'] = 'Custom filter';
 $string['filterbypage'] = 'By page';
 $string['filtercancel'] = 'Cancel filter';
 $string['filtercreate'] = 'Create a new filter';

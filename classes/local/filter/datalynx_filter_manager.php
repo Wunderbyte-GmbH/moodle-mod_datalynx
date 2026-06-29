@@ -17,7 +17,6 @@
 namespace mod_datalynx\local\filter;
 use html_table;
 use html_writer;
-use mod_datalynx\form\datalynx_advanced_filter_form;
 use mod_datalynx\form\datalynx_customfilter_frontend_form;
 use mod_datalynx\form\datalynx_filter_form;
 use moodle_url;
@@ -89,12 +88,11 @@ class datalynx_filter_manager {
             // For actual user filters we need a view and whether advanced.
             $view = !empty($options['view']) ? $options['view'] : null;
             $viewid = $view ? $view->id() : 0;
-            $advanced = !empty($options['advanced']);
             $customfilter = !empty($options['customfilter']) ? $options['customfilter'] : null;
 
             // User preferences.
-            if (($filterid == self::USER_FILTER_SET || $advanced || $customfilter) && $view && $view->is_active()) {
-                $filter = $this->set_user_filter($filterid, $view, $advanced, $customfilter);
+            if (($filterid == self::USER_FILTER_SET || $customfilter) && $view && $view->is_active()) {
+                $filter = $this->set_user_filter($filterid, $view, $customfilter);
                 return new datalynx_filter($filter);
             }
 
@@ -988,21 +986,6 @@ class datalynx_filter_manager {
         ];
     }
 
-    // ADVANCED FILTER.
-
-    /**
-     * Builds and returns the advanced filter moodleform for the given view.
-     *
-     * @param \stdClass $filter
-     * @param \mod_datalynx\local\view\base $view
-     * @return datalynx_advanced_filter_form
-     */
-    public function get_advanced_filter_form($filter, $view) {
-        $formurl = new moodle_url($view->get_navigationurl(), ['filter' => self::USER_FILTER_SET, 'afilter' => 1]);
-        $mform = new datalynx_advanced_filter_form($this->dlx, $filter, $formurl, ['view' => $view]);
-        return $mform;
-    }
-
     // CUSTOM FILTER.
 
     /**
@@ -1055,39 +1038,13 @@ class datalynx_filter_manager {
      *
      * @param int $filterid
      * @param \mod_datalynx\local\view\base $view
-     * @param bool $advanced
      * @param bool $customfilter
      * @return datalynx_filter
      */
-    public function set_user_filter($filterid, \mod_datalynx\local\view\base $view, $advanced = false, $customfilter = false) {
+    public function set_user_filter($filterid, \mod_datalynx\local\view\base $view, $customfilter = false) {
         $dlx = $this->dlx;
         $dfid = $dlx->id();
         $viewid = $view->id();
-
-        // Advanced filter.
-        if ($advanced) {
-            $filter = new datalynx_filter((object) ['id' => $filterid, 'dataid' => $dfid]);
-            $mform = $this->get_advanced_filter_form($filter, $view);
-
-            // Regenerate form and filter to obtain custom search data.
-            $formdata = $mform->get_submitted_data();
-            $filter = $this->get_filter_from_form($filter, $formdata);
-            $filter->id = $filterid;
-            $filterform = $this->get_advanced_filter_form($filter, $view);
-
-            // Return to form (on reload button press).
-            if ($filterform->no_submit_button_pressed()) {
-                return $filter;
-
-                // Process validated.
-            } else {
-                if ($formdata = $filterform->get_data()) {
-                    // Get clean filter from formdata.
-                    $filter = $this->get_filter_from_form($filter, $formdata, true);
-                    $modifycurrent = !empty($formdata->savebutton);
-                }
-            }
-        }
 
         // Custom filter form.
         if ($customfilter) {
@@ -1105,7 +1062,7 @@ class datalynx_filter_manager {
         }
 
         // Quick filters.
-        if (!$advanced && !$customfilter) {
+        if (!$customfilter) {
             if ($filterid >= self::USER_FILTER_ID_START) {
                 $filter = $this->get_filter_from_id($filterid);
             } else {
@@ -1285,7 +1242,6 @@ class datalynx_filter_manager {
                 'eids' => ['eids', 0, PARAM_SEQUENCE],
                 'users' => ['users', '', PARAM_SEQUENCE],
                 'groups' => ['groups', '', PARAM_SEQUENCE],
-                'afilter' => ['afilter', 0, PARAM_INT],
                 'cfilter' => ['cfilter', 0, PARAM_INT],
                 'usersearch' => ['usersearch', 0, PARAM_RAW]];
 
@@ -1357,7 +1313,6 @@ class datalynx_filter_manager {
                 'eids' => 'eids',
                 'users' => 'users',
                 'groups' => 'groups',
-                'afilter' => 'afilter',
                 'usersearch' => 'usersearch',
         ];
 

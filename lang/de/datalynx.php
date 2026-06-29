@@ -374,7 +374,6 @@ $string['filetypepng'] = 'png Dateien';
 $string['filetypes'] = 'Zulässige Dateitypen';
 $string['filter'] = 'Filter';
 $string['filteradd'] = 'Einen Filter hinzufügen';
-$string['filteradvanced'] = 'Erweiterter Filter';
 $string['filterbypage'] = 'Nach Seite';
 $string['filtercancel'] = 'Filter zurücksetzen';
 $string['filtercreate'] = 'Einen neuen Filter anlegen';

@@ -506,7 +506,6 @@ abstract class base {
         }
 
         $fid = !empty($urloptions['filterid']) ? $urloptions['filterid'] : 0;
-        $afilter = !empty($urloptions['afilter']) ? $urloptions['afilter'] : 0;
         $cfilter = !empty($urloptions['cfilter']) ? $urloptions['cfilter'] : 0;
         $eids = !empty($urloptions['eids']) ? $urloptions['eids'] : null;
         $users = !empty($urloptions['users']) ? $urloptions['users'] : null;
@@ -525,19 +524,18 @@ abstract class base {
         // Permitted-filters whitelist (strict). When a whitelist is configured and "allow all
         // filters" (param5) is off, only the default and whitelisted filters may be selected as the
         // base filter: a non-permitted (or negative/user) filter id falls back to the default, and
-        // ad-hoc base-replacing filters (advanced/custom) are blocked. Narrowing-on-top options
+        // ad-hoc base-replacing filters (custom) are blocked. Narrowing-on-top options
         // (eids, search, ...) are deliberately left untouched.
         if ($this->is_filter_whitelist_active()) {
             if ($fid && !in_array((int) $fid, $this->get_permitted_filter_ids(), true)) {
                 $fid = 0;
             }
-            $afilter = 0;
             $cfilter = 0;
         }
 
         $filterid = $fid ? $fid : ($this->view->filter ? $this->view->filter : 0);
 
-        $this->filter = $fm->get_filter_from_id($filterid, ['view' => $this, 'advanced' => $afilter,
+        $this->filter = $fm->get_filter_from_id($filterid, ['view' => $this,
                 'customfilter' => $cfilter]);
 
         // Set specific entry id.

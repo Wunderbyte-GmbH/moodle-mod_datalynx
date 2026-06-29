@@ -36,17 +36,11 @@ use stdClass;
  * @package mod_datalynx\customfilter
  */
 class datalynx_customfilter_manager {
-    /** @var int Maximum number of user filters allowed. */
-    const USER_FILTER_MAX_NUM = 5;
-
     /** @var int Constant representing a blank filter. */
     const BLANK_FILTER = -1;
 
     /** @var int Constant representing a user filter set. */
     const USER_FILTER_SET = -2;
-
-    /** @var int Starting id for user filters. */
-    const USER_FILTER_ID_START = -10;
 
     /** @var object The datalynx instance. */
     protected $dlx;
@@ -86,11 +80,6 @@ class datalynx_customfilter_manager {
         if ($filterid < 0) {
             $view = !empty($options['view']) ? $options['view'] : null;
             $viewid = $view ? $view->id() : 0;
-
-            if ($filterid == self::USER_FILTER_SET && $view && $view->is_active()) {
-                $filter = $this->set_user_filter($filterid, $view);
-                return new datalynx_customfilter($filter);
-            }
 
             if (
                 $filterid != self::USER_FILTER_SET &&
@@ -546,82 +535,6 @@ class datalynx_customfilter_manager {
         echo html_writer::empty_tag('br');
     }
 
-    /**
-     * Get the user's saved filter menu for a given view.
-     *
-     * @param int $viewid
-     * @return array
-     * @throws \coding_exception
-     */
-    public function get_user_filters_menu($viewid) {
-        $filters = [];
-
-        $dlx = $this->dlx;
-        $dlid = $dlx->id();
-        if ($filternames = get_user_preferences("datalynxcustomfilter-$dlid-$viewid-userfilters", '')) {
-            foreach (explode(';', $filternames) as $filteridname) {
-                [$filterid, $name] = explode(' ', $filteridname, 2);
-                $filters[$filterid] = $name;
-            }
-        }
-        return $filters;
-    }
-
-    /**
-     * Set and save a user filter preference for a given view.
-     *
-     * @param int $filterid
-     * @param mixed $view
-     * @return ?datalynx_customfilter
-     * @throws \coding_exception
-     */
-    public function set_user_filter($filterid, $view) {
-        $dlx = $this->dlx;
-        $dlid = $dlx->id();
-        $viewid = $view->id();
-
-        if ($filterid >= $this->USER_FILTER_ID_START) {
-            $filter = $this->get_filter_from_userpreferences($filterid);
-        } else {
-            $filter = $this->get_filter_from_url(null, true);
-        }
-        if (!$filter) {
-            return null;
-        }
-
-        if ($userfilters = $this->get_user_filters_menu($viewid)) {
-            if (empty($userfilters[$filterid])) {
-                $filterid = key($userfilters) - 1;
-            }
-        } else {
-            $filterid = self::USER_FILTER_ID_START;
-        }
-
-        if (count($userfilters) >= self::USER_FILTER_MAX_NUM) {
-            $fids = array_keys($userfilters);
-            while (count($fids) >= self::USER_FILTER_MAX_NUM) {
-                $fid = array_pop($fids);
-                unset($userfilters[$fid]);
-                unset_user_preference("datalynxfilter-$dlid-$viewid-$fid");
-            }
-        }
-
-        $filter->id = $filterid;
-        $filter->dataid = $dlid;
-        if (empty($filter->name)) {
-            $filter->name = get_string('filtermy', 'datalynx') . ' ' . abs($filterid);
-        }
-        set_user_preference("datalynxfilter-$dlid-$viewid-$filterid", serialize($filter));
-
-        $userfilters = [$filterid => $filter->name] + $userfilters;
-        foreach ($userfilters as $filterid => $name) {
-            $userfilters[$filterid] = "$filterid $name";
-        }
-        set_user_preference("datalynxfilter-$dlid-$viewid-userfilters", implode(';', $userfilters));
-
-        return $filter;
-    }
-
     // HELPERS.
 
     /**
@@ -643,7 +556,6 @@ class datalynx_customfilter_manager {
             'eids' => ['eids', 0, PARAM_INT],
             'users' => ['users', '', PARAM_SEQUENCE],
             'groups' => ['groups', '', PARAM_SEQUENCE],
-            'afilter' => ['afilter', 0, PARAM_INT],
             'usersearch' => ['usersearch', 0, PARAM_RAW]];
 
         $options = [];
@@ -704,7 +616,7 @@ class datalynx_customfilter_manager {
         $filteroptions = [ // Left: urlparam-names, right: userpreferences-names.
         'perpage' => 'uperpage', 'selection' => 'uselection', 'groupby' => 'ugroupby',
             'customsort' => 'usort', 'customsearch' => 'usearch', 'page' => 'page',
-            'eids' => 'eids', 'users' => 'users', 'groups' => 'groups', 'afilter' => 'afilter',
+            'eids' => 'eids', 'users' => 'users', 'groups' => 'groups',
             'usersearch' => 'usersearch'];
 
         $options = [];

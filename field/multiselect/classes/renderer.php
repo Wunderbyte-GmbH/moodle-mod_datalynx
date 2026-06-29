@@ -225,10 +225,7 @@ class renderer extends datalynxfield_renderer {
         $mform->setType($fieldname, PARAM_INT);
         $mform->setDefault($fieldname, $default);
 
-        if (
-            $mform->_formName == 'mod_datalynx_form_datalynx_filter_form' || $mform->_formName ==
-                'mod_datalynx_form_datalynx_advanced_filter_form'
-        ) {
+        if ($mform->_formName == 'mod_datalynx_form_datalynx_filter_form') {
             $mform->disabledIf($fieldname, "searchoperator{$i}", 'eq', '');
         }
 

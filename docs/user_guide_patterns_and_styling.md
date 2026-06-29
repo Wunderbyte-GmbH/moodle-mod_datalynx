@@ -198,7 +198,6 @@ Available when ratings are enabled for the activity.
 | `##filtersmenu##` | Filter menu |
 | `##quicksearch##` | Quick search box |
 | `##quickperpage##` | Per-page selector |
-| `##advancedfilter##` | Advanced (custom) filter form |
 | `##customfilter:NAME##` | A specific saved custom filter, by name |
 | `##pagingbar##` | Pagination bar |
 | `##numentriestotal##` | Total number of entries matching the filter |

@@ -455,8 +455,6 @@ class datalynxview_patterns {
             switch ($tag) {
                 case '##quickperpage##':
                     return $this->print_quick_perpage(true);
-                case '##advancedfilter##':
-                    return $this->print_advanced_filter($filter, true);
             }
             // When we just updated an entry, only a continue button is shown, so do not display the form.
             if ($this->view->entriesprocessedsuccessfully) {
@@ -870,8 +868,7 @@ class datalynxview_patterns {
 
         $cat = get_string('userpref', 'datalynx');
         $patterns = ['##quicksearch##' => [true, $cat],
-                '##quickperpage##' => [true, $cat],
-                '##advancedfilter##' => [true, $cat]];
+                '##quickperpage##' => [true, $cat]];
         $dataid = $this->view->view->dataid;
         $where = ['dataid' => $dataid, 'visible' => '1'];
         $rs = $DB->get_records('datalynx_customfilters', $where, 'name', 'id,name');
@@ -1189,12 +1186,10 @@ class datalynxview_patterns {
                 $menufilters = [];
             }
             // When a permitted-filters whitelist is the active restriction, offer only the default
-            // and whitelisted filters and suppress personal filters.
+            // and whitelisted filters.
             if ($view->is_filter_whitelist_active()) {
                 $allowed = $view->get_permitted_filter_ids();
                 $menufilters = array_intersect_key($menufilters, array_flip($allowed));
-            } else if ($userfilters = $fm->get_user_filters_menu($view->id())) {
-                $menufilters[] = [get_string('filtermy', 'datalynx') => $userfilters];
             }
 
             $baseurl = $baseurl->out_omit_querystring();
@@ -1312,35 +1307,6 @@ class datalynxview_patterns {
             return $perpagejump;
         } else {
             echo $perpagejump;
-        }
-    }
-
-    /**
-     * Retrieve and print advanced filter
-     *
-     * @param ?mixed $options
-     * @param bool $return
-     * @return string
-     */
-    protected function print_advanced_filter($options, $return = false) {
-
-        $view = $this->view;
-        $dlx = $view->get_dlx();
-        $filter = $view->get_filter();
-
-        $fm = $dlx->get_filter_manager();
-        $filterform = $fm->get_advanced_filter_form($filter, $view);
-
-        if ($return) {
-            return html_writer::tag(
-                'div',
-                $filterform->html(),
-                ['class' => 'mdl-left']
-            );
-        } else {
-            html_writer::start_tag('div', ['class' => 'mdl-left']);
-            $filterform->display();
-            html_writer::end_tag('div');
         }
     }
 

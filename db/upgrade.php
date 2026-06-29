@@ -1507,6 +1507,16 @@ function xmldb_datalynx_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2026062900, 'datalynx');
     }
 
+    if ($oldversion < 2026063000) {
+        // Retire advancedfilter and personal user filters (now superseded by customfilter).
+        // Purge the leftover per-user filter preferences they stored; the retained quick controls
+        // (##quicksearch##/##quickperpage##) recreate transient rows as needed.
+        $DB->delete_records_select('user_preferences', 'name LIKE ?', ['datalynxfilter-%']);
+        $DB->delete_records_select('user_preferences', 'name LIKE ?', ['datalynxcustomfilter-%']);
+
+        upgrade_mod_savepoint(true, 2026063000, 'datalynx');
+    }
+
     return true;
 }
 
