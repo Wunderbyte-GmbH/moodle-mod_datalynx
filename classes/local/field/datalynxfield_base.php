@@ -371,6 +371,19 @@ abstract class datalynxfield_base {
     }
 
     /**
+     * Whether this field's value is locked (read-only) for the given entry.
+     *
+     * Field types can override this to freeze a value once it has been saved. The renderer uses it
+     * to force the field not-editable. The default is no lock.
+     *
+     * @param stdClass $entry The entry record (as loaded for rendering).
+     * @return bool
+     */
+    public function is_locked_for_entry($entry): bool {
+        return false;
+    }
+
+    /**
      * Update the content of a field in an entry. That happens in table datalynx_conents.
      *
      * @param stdClass $entry

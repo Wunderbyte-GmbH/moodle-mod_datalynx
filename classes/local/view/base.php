@@ -2501,6 +2501,8 @@ abstract class base {
         $duplicate = optional_param('duplicate', '', PARAM_SEQUENCE);
         // Delete entries (all) or by record Ids (comma delimited eids).
         $delete = optional_param('delete', '', PARAM_SEQUENCE);
+        // Reset entries (wipe all field data, keep the record) by record ids (comma delimited eids).
+        $reset = optional_param('reset', '', PARAM_SEQUENCE);
         // Approve entries (all) or by record ids (comma delimited eids).
         $approve = optional_param('approve', '', PARAM_SEQUENCE);
         // Disapprove entries (all)or by record ids (comma delimited eids).
@@ -2616,6 +2618,12 @@ abstract class base {
                 if ($delete) {
                     if (confirm_sesskey() && $this->confirm_view_action("delete")) {
                         return $this->entries->process_entries('delete', $delete, null, $confirmed);
+                    } else {
+                        $illegalaction = true;
+                    }
+                } else if ($reset) {
+                    if (confirm_sesskey() && $this->confirm_view_action("reset")) {
+                        return $this->entries->process_entries('reset', $reset, null, $confirmed);
                     } else {
                         $illegalaction = true;
                     }

@@ -86,7 +86,7 @@ Feature: Filter datalynx entries where I am a team member of a teammemberselect 
     And I click on ".nav-item [title='Manage']" "css_element"
     And I select "Tabular" from the "type" singleselect
     And I set the field "Name" to "teamview"
-    And I set the field "Filter" to "myteamfilter"
+    And I set the field "Default filter" to "myteamfilter"
     And I press "Save changes"
     And I follow "Set as default view"
     And I follow "Set as edit view"

@@ -63,5 +63,9 @@ class form extends datalynxfield_option_form {
         }
         $mform->addElement('select', 'param5', get_string('limitchoice', 'datalynx'), $options);
         $mform->addHelpButton('param5', 'limitchoice', 'datalynx');
+
+        // Lock the value once the entry has been saved with a value.
+        $mform->addElement('selectyesno', 'param7', get_string('lockaftersave', 'datalynx'));
+        $mform->addHelpButton('param7', 'lockaftersave', 'datalynx');
     }
 }

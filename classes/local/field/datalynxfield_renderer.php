@@ -147,6 +147,11 @@ abstract class datalynxfield_renderer {
             ) {
                 $editable = $behavior->is_editable_after_final() && $this->field->type !== 'status';
             }
+            // A single-choice field set to lock after first save is read-only for everyone once the
+            // entry has a saved value. The value can only be changed by resetting the entry (##reset##).
+            if ($editable && $this->field->is_locked_for_entry($entry)) {
+                $editable = false;
+            }
             $currentoptions['editable'] = $editable;
             $currentoptions['required'] = $behavior->is_required() && $conditionsmet;
             $currentoptions['internal'] = $this->field->is_internal();

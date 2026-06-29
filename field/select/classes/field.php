@@ -45,6 +45,38 @@ class field extends datalynxfield_option_single {
     protected $forfieldgroup = true;
 
     /**
+     * Whether this single-choice field is locked for the given entry.
+     *
+     * When the field is configured to lock after first save (param7), the value becomes read-only
+     * for everyone once the entry has been saved with a value. Inherited by the radiobutton field.
+     *
+     * @param \stdClass $entry The entry record (as loaded for rendering).
+     * @return bool
+     */
+    public function is_locked_for_entry($entry): bool {
+        if (empty($this->field->param7) || empty($entry->id)) {
+            return false;
+        }
+        return !empty($this->get_saved_content($entry));
+    }
+
+    /**
+     * Returns the field's saved content for an entry: from the loaded entry record if available,
+     * otherwise from the database.
+     *
+     * @param \stdClass $entry The entry record.
+     * @return mixed The stored content, or null/empty when there is no value.
+     */
+    protected function get_saved_content($entry) {
+        global $DB;
+        $prop = "c{$this->field->id}_content";
+        if (property_exists($entry, $prop)) {
+            return $entry->$prop;
+        }
+        return $DB->get_field('datalynx_contents', 'content', ['fieldid' => $this->field->id, 'entryid' => $entry->id]);
+    }
+
+    /**
      *
      * {@inheritDoc}
      * @param string $column The database column name.

@@ -1148,6 +1148,31 @@ class datalynx_entries {
                         $strnotify = 'entriesdeleted';
                         break;
 
+                    case 'reset':
+                        $completiontype = COMPLETION_INCOMPLETE;
+                        // Wipe all saved field data but keep the entry record, returning it to a clean
+                        // draft state. This lets a user safely change a locked single-choice value.
+                        foreach ($entries as $entry) {
+                            foreach ($dlx->get_fields() as $field) {
+                                $field->delete_content($entry->id);
+                            }
+                            $DB->update_record('datalynx_entries', (object) [
+                                'id' => $entry->id,
+                                'status' => datalynxfield_status::STATUS_DRAFT,
+                                'approved' => 0,
+                                'timesubmitted' => null,
+                                'timemodified' => time(),
+                            ]);
+                            $processed[$entry->id] = $entry;
+                        }
+                        if ($processed) {
+                            $eventdata = (object) ['items' => $processed];
+                            $dlx->events_trigger("entryupdated", $eventdata);
+                        }
+
+                        $strnotify = 'entriesreset';
+                        break;
+
                     default:
                         break;
                 }

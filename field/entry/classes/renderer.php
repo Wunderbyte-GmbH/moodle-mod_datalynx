@@ -90,6 +90,9 @@ class renderer extends datalynxfield_renderer {
                     case '##delete##':
                         $str = $manageable ? $this->display_delete($entry) : '';
                         break;
+                    case '##reset##':
+                        $str = $manageable ? $this->display_reset($entry) : '';
+                        break;
                     case '##export##':
                         $str = $this->display_export($entry);
                         break;
@@ -214,6 +217,23 @@ class renderer extends datalynxfield_renderer {
     }
 
     /**
+     * Renders the reset action link for an entry. The reset wipes all of the entry's saved field
+     * data (keeping the entry record) so a locked single-choice value can be changed again.
+     *
+     * @param object $entry The current entry.
+     * @return string
+     */
+    protected function display_reset($entry) {
+        global $OUTPUT;
+
+        $params = ['reset' => $entry->id, 'sesskey' => sesskey()];
+        $url = new moodle_url($entry->baseurl, $params);
+        $str = get_string('resetentryid', 'datalynx', $entry->id);
+        $sronly = html_writer::span($str, 'sr-only');
+        return html_writer::link($url->out(false), $OUTPUT->pix_icon('t/reload', '') . $sronly);
+    }
+
+    /**
      * Renders the portfolio export link for an entry.
      *
      * @param object $entry The current entry.
@@ -249,6 +269,7 @@ class renderer extends datalynxfield_renderer {
         $actions = get_string('actions', 'datalynx');
         $patterns["##edit##"] = [true, $actions];
         $patterns["##delete##"] = [true, $actions];
+        $patterns["##reset##"] = [true, $actions];
         $patterns["##select##"] = [true, $actions];
         $patterns["##export##"] = [true, $actions];
         $patterns["##duplicate##"] = [true, $actions];
