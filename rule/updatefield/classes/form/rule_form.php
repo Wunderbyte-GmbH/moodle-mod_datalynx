@@ -39,6 +39,24 @@ class rule_form extends base_rule_form {
     public function rule_definition() {
         $mform = &$this->_form;
 
+        // Only-on-change field selection: the rule fires only when at least one of the
+        // selected fields actually changed its value during the triggering update event.
+        // This only makes sense for the "entry updated" event (the only one carrying a list
+        // of changed fields), so the control is hidden unless that event is selected.
+        $dlfields = $this->dlx->get_fields(['entry'], true);
+        if (!empty($dlfields)) {
+            $options = ['multiple' => true, 'noselectionstring' => get_string('noselection', 'form')];
+            $mform->addElement(
+                'autocomplete',
+                'onlyonchangefields',
+                get_string('onlyonchange', 'datalynxrule_updatefield'),
+                $dlfields,
+                $options
+            );
+            $mform->addHelpButton('onlyonchangefields', 'onlyonchange', 'datalynxrule_updatefield');
+            $mform->hideIf('onlyonchangefields', 'entry_updated', 'notchecked');
+        }
+
         $mform->addElement('header', 'updatefieldhdr', get_string('action', 'datalynxrule_updatefield'));
 
         // Target field: only fields the rule can safely write to.
@@ -118,6 +136,16 @@ class rule_form extends base_rule_form {
                 $data->$elname = $data->param3;
             }
         }
+
+        // Populate the autocomplete from the reserved on-change field list stored in param9.
+        $data->onlyonchangefields = [];
+        if (!empty($data->param9)) {
+            $conditions = json_decode($data->param9, true);
+            if (is_array($conditions) && !empty($conditions[rule::ONCHANGE_KEY])) {
+                $data->onlyonchangefields = array_values((array) $conditions[rule::ONCHANGE_KEY]);
+            }
+        }
+
         parent::set_data($data);
     }
 
@@ -145,6 +173,29 @@ class rule_form extends base_rule_form {
             }
 
             $data->param4 = !empty($data->param4) ? '1' : null;
+
+            // Store the selected on-change field IDs under a reserved key in param9, independent
+            // of the trigger conditions. Numeric field IDs are cast to int for strict comparison;
+            // internal-field string IDs (e.g. 'status') are preserved verbatim.
+            $onchangefields = !empty($data->onlyonchangefields)
+                ? array_values(array_unique(array_map(
+                    static fn($id) => ctype_digit((string) $id) ? (int) $id : (string) $id,
+                    (array) $data->onlyonchangefields
+                )))
+                : [];
+            $conditions = [];
+            if (!empty($data->param9)) {
+                $decoded = json_decode($data->param9, true);
+                if (is_array($decoded)) {
+                    $conditions = $decoded;
+                }
+            }
+            unset($conditions[rule::ONCHANGE_KEY]);
+            if ($onchangefields) {
+                $conditions[rule::ONCHANGE_KEY] = $onchangefields;
+            }
+            $data->param9 = $conditions ? json_encode($conditions) : null;
+            unset($data->onlyonchangefields);
 
             // Drop the transient per-field value controls; only param3 is persisted.
             foreach (array_keys((array) $data) as $k) {
