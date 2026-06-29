@@ -97,66 +97,66 @@ class renderer extends SelectRenderer {
         $field = $this->field;
         $fieldid = $field->id();
 
-        if (isset($entry->{"c{$fieldid}_content"})) {
-            $selected = (int) $entry->{"c{$fieldid}_content"};
-            $fieldformat = $options['field_format'] ?? null;
-            $formatmode = '';
-            if ($fieldformat) {
-                $formatmode = $fieldformat->get_setting('option');
-            }
+        $fieldformat = $options['field_format'] ?? null;
+        $formatmode = '';
+        if ($fieldformat) {
+            $formatmode = $fieldformat->get_setting('option');
+        }
 
-            if ($formatmode === 'stepper') {
-                // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
-                global $OUTPUT;
-                $menuoptions = $field->options_menu();
+        if ($formatmode === 'stepper') {
+            // Render the stepper even when no value is set yet, showing all steps as not completed.
+            $selected = isset($entry->{"c{$fieldid}_content"}) ? (int) $entry->{"c{$fieldid}_content"} : 0;
 
-                // Find position of selected option in the options menu keys.
+            // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
+            global $OUTPUT;
+            $menuoptions = $field->options_menu();
+
+            // Find position of selected option in the options menu keys.
+            $selectedindex = -1;
+            $keys = array_keys($menuoptions);
+            $selectedindex = array_search($selected, $keys);
+            if ($selectedindex === false) {
                 $selectedindex = -1;
-                $keys = array_keys($menuoptions);
-                $selectedindex = array_search($selected, $keys);
-                if ($selectedindex === false) {
-                    $selectedindex = -1;
-                }
-
-                $icons = [];
-                $iconssetting = $fieldformat->get_setting('stepper_icons');
-                if (!empty($iconssetting)) {
-                    $icons = array_map('trim', explode(',', $iconssetting));
-                }
-
-                $steps = [];
-                $i = 0;
-                foreach ($menuoptions as $key => $label) {
-                    $iconclass = '';
-                    if (isset($icons[$i]) && $icons[$i] !== '') {
-                        $iconclass = $icons[$i];
-                        if (!str_contains($iconclass, ' ')) {
-                            if (!str_starts_with($iconclass, 'fa-')) {
-                                $iconclass = 'fa-' . $iconclass;
-                            }
-                            $iconclass = 'fa ' . $iconclass;
-                        }
-                    }
-
-                    $completed = ($selectedindex !== -1 && $i <= $selectedindex);
-
-                    $steps[] = [
-                        'label' => format_string($label),
-                        'completed' => $completed,
-                        'icon' => $iconclass,
-                        'hasicon' => !empty($iconclass),
-                        'number' => $i + 1,
-                    ];
-                    $i++;
-                }
-
-                $mustachecontext = [
-                    'steps' => $steps,
-                ];
-
-                // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
-                return $OUTPUT->render_from_template('mod_datalynx/field_radiobutton_stepper', $mustachecontext);
             }
+
+            $icons = [];
+            $iconssetting = $fieldformat->get_setting('stepper_icons');
+            if (!empty($iconssetting)) {
+                $icons = array_map('trim', explode(',', $iconssetting));
+            }
+
+            $steps = [];
+            $i = 0;
+            foreach ($menuoptions as $key => $label) {
+                $iconclass = '';
+                if (isset($icons[$i]) && $icons[$i] !== '') {
+                    $iconclass = $icons[$i];
+                    if (!str_contains($iconclass, ' ')) {
+                        if (!str_starts_with($iconclass, 'fa-')) {
+                            $iconclass = 'fa-' . $iconclass;
+                        }
+                        $iconclass = 'fa ' . $iconclass;
+                    }
+                }
+
+                $completed = ($selectedindex !== -1 && $i <= $selectedindex);
+
+                $steps[] = [
+                    'label' => format_string($label),
+                    'completed' => $completed,
+                    'icon' => $iconclass,
+                    'hasicon' => !empty($iconclass),
+                    'number' => $i + 1,
+                ];
+                $i++;
+            }
+
+            $mustachecontext = [
+                'steps' => $steps,
+            ];
+
+            // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
+            return $OUTPUT->render_from_template('mod_datalynx/field_radiobutton_stepper', $mustachecontext);
         }
 
         return parent::render_display_mode($entry, $options);
