@@ -34,29 +34,29 @@ class field_format_form extends \mod_datalynx\form\field_format_base_form {
         $mform->addElement(
             'select',
             'aggregation',
-            get_string('fieldformat_aggregation', 'datalynxfield_fieldgroup'),
+            get_string('fieldformataggregation', 'datalynxfield_fieldgroup'),
             \datalynxfield_fieldgroup\field_format::get_aggregation_options()
         );
         $mform->setDefault('aggregation', 'sum');
-        $mform->addHelpButton('aggregation', 'fieldformat_aggregation', 'datalynxfield_fieldgroup');
+        $mform->addHelpButton('aggregation', 'fieldformataggregation', 'datalynxfield_fieldgroup');
 
         // Decimal places for the aggregated value (blank = use each subfield's own setting).
         $mform->addElement(
             'text',
             'decimals',
-            get_string('fieldformat_decimals', 'datalynxfield_fieldgroup'),
+            get_string('fieldformatdecimals', 'datalynxfield_fieldgroup'),
             ['size' => 3]
         );
         $mform->setType('decimals', PARAM_INT);
-        $mform->addHelpButton('decimals', 'fieldformat_decimals', 'datalynxfield_fieldgroup');
+        $mform->addHelpButton('decimals', 'fieldformatdecimals', 'datalynxfield_fieldgroup');
 
         // Optional label shown next to the totals row (blank = default "Total").
         $mform->addElement(
             'text',
             'label',
-            get_string('fieldformat_label', 'datalynxfield_fieldgroup')
+            get_string('fieldformatlabel', 'datalynxfield_fieldgroup')
         );
         $mform->setType('label', PARAM_TEXT);
-        $mform->addHelpButton('label', 'fieldformat_label', 'datalynxfield_fieldgroup');
+        $mform->addHelpButton('label', 'fieldformatlabel', 'datalynxfield_fieldgroup');
     }
 }

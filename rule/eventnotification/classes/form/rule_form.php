@@ -91,9 +91,9 @@ class rule_form extends base_rule_form {
         );
         $grp[] = &$mform->createElement(
             'static',
-            'roles_help_info',
+            'roleshelpinfo',
             '',
-            '<div class="form-text text-muted">' . get_string('roles_help_info', 'datalynxrule_eventnotification') . '</div>'
+            '<div class="form-text text-muted">' . get_string('roleshelpinfo', 'datalynxrule_eventnotification') . '</div>'
         );
         $grp[] = &$mform->createElement('static', '', '', $br);
 

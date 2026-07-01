@@ -31,10 +31,10 @@ class field_format extends \mod_datalynx\local\field_format\base {
      */
     public function config_form(\MoodleQuickForm &$mform) {
         $options = [
-            'default' => get_string('fieldformat_option_default', 'datalynxfield_radiobutton'),
-            'options' => get_string('fieldformat_option_options', 'datalynxfield_radiobutton'),
-            'key' => get_string('fieldformat_option_key', 'datalynxfield_radiobutton'),
-            'stepper' => get_string('fieldformat_option_stepper', 'datalynxfield_radiobutton'),
+            'default' => get_string('fieldformatoptiondefault', 'datalynxfield_radiobutton'),
+            'options' => get_string('fieldformatoptionoptions', 'datalynxfield_radiobutton'),
+            'key' => get_string('fieldformatoptionkey', 'datalynxfield_radiobutton'),
+            'stepper' => get_string('fieldformatoptionstepper', 'datalynxfield_radiobutton'),
         ];
         $mform->addElement('select', 'option', get_string('fieldformatoption', 'mod_datalynx'), $options);
         $mform->setType('option', PARAM_ALPHA);
@@ -43,11 +43,11 @@ class field_format extends \mod_datalynx\local\field_format\base {
         $mform->addElement(
             'text',
             'stepper_icons',
-            get_string('fieldformat_option_stepper_icons', 'datalynxfield_radiobutton'),
+            get_string('fieldformatoptionsteppericons', 'datalynxfield_radiobutton'),
             ['size' => 60]
         );
         $mform->setType('stepper_icons', PARAM_TEXT);
-        $mform->addHelpButton('stepper_icons', 'fieldformat_option_stepper_icons', 'datalynxfield_radiobutton');
+        $mform->addHelpButton('stepper_icons', 'fieldformatoptionsteppericons', 'datalynxfield_radiobutton');
         $mform->hideIf('stepper_icons', 'option', 'neq', 'stepper');
     }
 

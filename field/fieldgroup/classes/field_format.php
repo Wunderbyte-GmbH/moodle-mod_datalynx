@@ -37,7 +37,7 @@ class field_format extends \mod_datalynx\local\field_format\base {
         $mform->addElement(
             'select',
             'aggregation',
-            get_string('fieldformat_aggregation', 'datalynxfield_fieldgroup'),
+            get_string('fieldformataggregation', 'datalynxfield_fieldgroup'),
             self::get_aggregation_options()
         );
         $mform->setDefault('aggregation', 'sum');
@@ -45,12 +45,12 @@ class field_format extends \mod_datalynx\local\field_format\base {
         $mform->addElement(
             'text',
             'decimals',
-            get_string('fieldformat_decimals', 'datalynxfield_fieldgroup'),
+            get_string('fieldformatdecimals', 'datalynxfield_fieldgroup'),
             ['size' => 3]
         );
         $mform->setType('decimals', PARAM_INT);
 
-        $mform->addElement('text', 'label', get_string('fieldformat_label', 'datalynxfield_fieldgroup'));
+        $mform->addElement('text', 'label', get_string('fieldformatlabel', 'datalynxfield_fieldgroup'));
         $mform->setType('label', PARAM_TEXT);
     }
 
@@ -70,11 +70,11 @@ class field_format extends \mod_datalynx\local\field_format\base {
      */
     public static function get_aggregation_options(): array {
         return [
-            'sum' => get_string('fieldformat_agg_sum', 'datalynxfield_fieldgroup'),
-            'avg' => get_string('fieldformat_agg_avg', 'datalynxfield_fieldgroup'),
-            'min' => get_string('fieldformat_agg_min', 'datalynxfield_fieldgroup'),
-            'max' => get_string('fieldformat_agg_max', 'datalynxfield_fieldgroup'),
-            'count' => get_string('fieldformat_agg_count', 'datalynxfield_fieldgroup'),
+            'sum' => get_string('fieldformataggsum', 'datalynxfield_fieldgroup'),
+            'avg' => get_string('fieldformataggavg', 'datalynxfield_fieldgroup'),
+            'min' => get_string('fieldformataggmin', 'datalynxfield_fieldgroup'),
+            'max' => get_string('fieldformataggmax', 'datalynxfield_fieldgroup'),
+            'count' => get_string('fieldformataggcount', 'datalynxfield_fieldgroup'),
         ];
     }
 
@@ -143,6 +143,6 @@ class field_format extends \mod_datalynx\local\field_format\base {
      */
     public function get_label(): string {
         $label = trim((string) $this->get_setting('label', ''));
-        return $label !== '' ? $label : get_string('fieldformat_total', 'datalynxfield_fieldgroup');
+        return $label !== '' ? $label : get_string('fieldformattotal', 'datalynxfield_fieldgroup');
     }
 }

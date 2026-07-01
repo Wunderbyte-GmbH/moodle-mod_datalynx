@@ -25,16 +25,16 @@ $string['mode'] = 'Vorhandene Teammitglieder';
 $string['mode_help'] = 'Wie mit bereits im Teammitglieder-Feld vorhandenen Mitgliedern umgegangen wird, wenn die Regel ausgeführt wird.
 
 "Überschreiben" ersetzt das Feld durch genau die übereinstimmenden Personen (nicht übereinstimmende Mitglieder werden entfernt). "Nur hinzufügen" behält die vorhandenen Mitglieder und fügt die übereinstimmenden hinzu.';
-$string['mode_merge'] = 'Nur hinzufügen (vorhandene Mitglieder behalten)';
-$string['mode_overwrite'] = 'Überschreiben (durch übereinstimmende Personen ersetzen)';
+$string['modemerge'] = 'Nur hinzufügen (vorhandene Mitglieder behalten)';
+$string['modeoverwrite'] = 'Überschreiben (durch übereinstimmende Personen ersetzen)';
 $string['pluginname'] = 'Teammitglieder anhand Profilfeld hinzufügen';
 $string['privacy:metadata'] = 'Die Regel „Teammitglieder anhand Profilfeld hinzufügen“ speichert nur ihre eigene Konfiguration und keine personenbezogenen Daten.';
 $string['privilege'] = 'Erforderliche Berechtigung';
-$string['privilege_guest'] = 'Gast';
 $string['privilege_help'] = 'Nur Personen, die in dieser Aktivität die entsprechende Datalynx-Ansichtsberechtigung besitzen, kommen als Teammitglieder in Frage.';
-$string['privilege_manager'] = 'Manager/in';
-$string['privilege_student'] = 'Teilnehmer/in';
-$string['privilege_teacher'] = 'Trainer/in';
+$string['privilegeguest'] = 'Gast';
+$string['privilegemanager'] = 'Manager/in';
+$string['privilegestudent'] = 'Teilnehmer/in';
+$string['privilegeteacher'] = 'Trainer/in';
 $string['profilefield'] = 'Nutzerprofilfeld';
 $string['profilefield_help'] = 'Das Nutzerprofilfeld, dessen Wert mit der Bezeichnung der ausgewählten Option des Auswahlfeldes verglichen wird. Es stehen sowohl Standardfelder (z. B. Abteilung oder Institution) als auch benutzerdefinierte Profilfelder zur Verfügung. Beim Vergleich werden Groß-/Kleinschreibung und umgebende Leerzeichen ignoriert.';
 $string['selectfield'] = 'Auswahlfeld';

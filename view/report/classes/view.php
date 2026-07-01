@@ -925,7 +925,7 @@ class view extends base {
         foreach (['all', 'year', 'month', 'range'] as $modekey) {
             $modes[] = $this->scope_option(
                 $modekey,
-                get_string('scopemode_' . $modekey, 'datalynxview_report'),
+                get_string('scopemode' . $modekey, 'datalynxview_report'),
                 $scope['mode'] === $modekey
             );
         }

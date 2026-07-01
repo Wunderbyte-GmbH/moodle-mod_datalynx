@@ -22,8 +22,10 @@
  * @copyright based on the work  by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-$string['fieldformat_dateformat'] = 'Date format';
-$string['fieldformat_dateformat_examples'] = '<details class="mt-2 mb-3">
+$string['fieldformat_desc'] = 'Controls display of entry timestamps. Specify the Date format below.';
+$string['fieldformatdateformat'] = 'Date format';
+$string['fieldformatdateformat_help'] = 'Enter a PHP strftime format string to control how the date/time is shown. Enter "timestamp" to output a raw Unix integer. Leave empty to use Moodle\'s default date-time format.';
+$string['fieldformatdateformatexamples'] = '<details class="mt-2 mb-3">
   <summary class="text-info" style="cursor: pointer;">Common strftime format examples (Click to expand)</summary>
   <table class="table table-sm table-bordered mt-2">
     <thead><tr><th>Format string</th><th>Example output</th><th>Description</th></tr></thead>
@@ -40,6 +42,4 @@ $string['fieldformat_dateformat_examples'] = '<details class="mt-2 mb-3">
     </tbody>
   </table>
 </details>';
-$string['fieldformat_dateformat_help'] = 'Enter a PHP strftime format string to control how the date/time is shown. Enter "timestamp" to output a raw Unix integer. Leave empty to use Moodle\'s default date-time format.';
-$string['fieldformat_desc'] = 'Controls display of entry timestamps. Specify the Date format below.';
 $string['pluginname'] = 'Datalynx Time Field';

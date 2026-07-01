@@ -23,8 +23,8 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 $string['cols'] = 'Columns';
-$string['fieldformat_maxlength'] = 'Excerpt length (characters)';
-$string['fieldformat_maxlength_help'] = 'Creates an excerpt by showing only the first N characters of the text in views, followed by an ellipsis (…). This only affects how the value is displayed — the full text is always stored and available for editing. Leave empty or 0 to display the full text.';
+$string['fieldformatmaxlength'] = 'Excerpt length (characters)';
+$string['fieldformatmaxlength_help'] = 'Creates an excerpt by showing only the first N characters of the text in views, followed by an ellipsis (…). This only affects how the value is displayed — the full text is always stored and available for editing. Leave empty or 0 to display the full text.';
 $string['pluginname'] = 'Text area';
 $string['privacy:metadata'] = 'Textareas do not store personal data.';
 $string['rows'] = 'Rows';

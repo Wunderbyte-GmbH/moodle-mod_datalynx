@@ -31,11 +31,11 @@ class field_format_form extends \mod_datalynx\form\field_format_base_form {
         $mform = &$this->_form;
 
         $options = [
-            'newline'    => get_string('fieldformat_separator_newline', 'datalynxfield_multiselect'),
-            'space'      => get_string('fieldformat_separator_space', 'datalynxfield_multiselect'),
-            'comma'      => get_string('fieldformat_separator_comma', 'datalynxfield_multiselect'),
-            'commaspace' => get_string('fieldformat_separator_commaspace', 'datalynxfield_multiselect'),
-            'list'       => get_string('fieldformat_separator_list', 'datalynxfield_multiselect'),
+            'newline'    => get_string('fieldformatseparatornewline', 'datalynxfield_multiselect'),
+            'space'      => get_string('fieldformatseparatorspace', 'datalynxfield_multiselect'),
+            'comma'      => get_string('fieldformatseparatorcomma', 'datalynxfield_multiselect'),
+            'commaspace' => get_string('fieldformatseparatorcommaspace', 'datalynxfield_multiselect'),
+            'list'       => get_string('fieldformatseparatorlist', 'datalynxfield_multiselect'),
         ];
         $mform->addElement(
             'select',
@@ -45,6 +45,6 @@ class field_format_form extends \mod_datalynx\form\field_format_base_form {
         );
         $mform->setType('option', PARAM_ALPHA);
         $mform->addRule('option', get_string('required'), 'required', null, 'client');
-        $mform->addHelpButton('option', 'fieldformat_separator', 'datalynxfield_multiselect');
+        $mform->addHelpButton('option', 'fieldformatseparator', 'datalynxfield_multiselect');
     }
 }

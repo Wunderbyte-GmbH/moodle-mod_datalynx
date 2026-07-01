@@ -103,7 +103,7 @@ final class totals_format_test extends advanced_testcase {
         $this->resetAfterTest();
 
         $this->assertSame(
-            get_string('fieldformat_total', 'datalynxfield_fieldgroup'),
+            get_string('fieldformattotal', 'datalynxfield_fieldgroup'),
             $this->make_format([])->get_label()
         );
         $this->assertSame('Gesamt', $this->make_format(['label' => 'Gesamt'])->get_label());
@@ -255,7 +255,7 @@ final class totals_format_test extends advanced_testcase {
         // With the format: a totals row with the summed columns.
         $html = $renderer->render_display_mode($entry, ['field_format' => $format, 'edit' => false]);
         $this->assertStringContainsString('datalynx-fieldgroup-totals', $html);
-        $this->assertStringContainsString(get_string('fieldformat_total', 'datalynxfield_fieldgroup'), $html);
+        $this->assertStringContainsString(get_string('fieldformattotal', 'datalynxfield_fieldgroup'), $html);
         $this->assertStringContainsString('60.00', $html);
         $this->assertStringContainsString('3.00', $html);
 

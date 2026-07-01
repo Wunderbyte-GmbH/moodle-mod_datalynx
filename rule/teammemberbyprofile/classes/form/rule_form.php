@@ -61,10 +61,10 @@ class rule_form extends \mod_datalynx\form\rule_form {
 
         // Required view privilege the candidate users must hold.
         $tiers = [
-            'manager' => get_string('privilege_manager', $comp),
-            'teacher' => get_string('privilege_teacher', $comp),
-            'student' => get_string('privilege_student', $comp),
-            'guest' => get_string('privilege_guest', $comp),
+            'manager' => get_string('privilegemanager', $comp),
+            'teacher' => get_string('privilegeteacher', $comp),
+            'student' => get_string('privilegestudent', $comp),
+            'guest' => get_string('privilegeguest', $comp),
         ];
         $mform->addElement('select', 'param9', get_string('privilege', $comp), $tiers);
         $mform->addHelpButton('param9', 'privilege', $comp);
@@ -72,8 +72,8 @@ class rule_form extends \mod_datalynx\form\rule_form {
 
         // How to treat members already present in the team field.
         $modes = [
-            'overwrite' => get_string('mode_overwrite', $comp),
-            'merge' => get_string('mode_merge', $comp),
+            'overwrite' => get_string('modeoverwrite', $comp),
+            'merge' => get_string('modemerge', $comp),
         ];
         $mform->addElement('select', 'param2', get_string('mode', $comp), $modes);
         $mform->addHelpButton('param2', 'mode', $comp);

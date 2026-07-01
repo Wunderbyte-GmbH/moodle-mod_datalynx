@@ -33,7 +33,7 @@ class field_format_form extends \mod_datalynx\form\field_format_base_form {
         $mform->addElement(
             'text',
             'width',
-            get_string('fieldformat_width', 'datalynxfield_youtube'),
+            get_string('fieldformatwidth', 'datalynxfield_youtube'),
             ['size' => 5]
         );
         $mform->setType('width', PARAM_INT);
@@ -41,10 +41,10 @@ class field_format_form extends \mod_datalynx\form\field_format_base_form {
         $mform->addElement(
             'text',
             'height',
-            get_string('fieldformat_height', 'datalynxfield_youtube'),
+            get_string('fieldformatheight', 'datalynxfield_youtube'),
             ['size' => 5]
         );
         $mform->setType('height', PARAM_INT);
-        $mform->addHelpButton('width', 'fieldformat_dimensions', 'datalynxfield_youtube');
+        $mform->addHelpButton('width', 'fieldformatdimensions', 'datalynxfield_youtube');
     }
 }

@@ -219,13 +219,13 @@ class rule_form extends base_rule_form {
 
         $fieldid = (int) ($data['param2'] ?? 0);
         if (!$fieldid) {
-            $errors['param2'] = get_string('err_nofield', 'datalynxrule_updatefield');
+            $errors['param2'] = get_string('errnofield', 'datalynxrule_updatefield');
             return $errors;
         }
 
         $field = $this->get_dlx()->get_field_from_id($fieldid);
         if (!$field || !rule::is_supported_field($field)) {
-            $errors['param2'] = get_string('err_nofield', 'datalynxrule_updatefield');
+            $errors['param2'] = get_string('errnofield', 'datalynxrule_updatefield');
             return $errors;
         }
 
@@ -240,7 +240,7 @@ class rule_form extends base_rule_form {
             $hasvalue = ($value !== '' && $value !== null);
         }
         if (!$hasvalue) {
-            $errors[$elname] = get_string('err_novalue', 'datalynxrule_updatefield');
+            $errors[$elname] = get_string('errnovalue', 'datalynxrule_updatefield');
         }
 
         return $errors;

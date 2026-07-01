@@ -33,10 +33,10 @@ class field_format_form extends \mod_datalynx\form\field_format_base_form {
         $mform->addElement(
             'text',
             'maxlength',
-            get_string('fieldformat_maxlength', 'datalynxfield_textarea'),
+            get_string('fieldformatmaxlength', 'datalynxfield_textarea'),
             ['size' => 6]
         );
         $mform->setType('maxlength', PARAM_INT);
-        $mform->addHelpButton('maxlength', 'fieldformat_maxlength', 'datalynxfield_textarea');
+        $mform->addHelpButton('maxlength', 'fieldformatmaxlength', 'datalynxfield_textarea');
     }
 }

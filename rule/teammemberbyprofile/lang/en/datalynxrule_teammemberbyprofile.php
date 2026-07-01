@@ -25,16 +25,16 @@ $string['mode'] = 'Existing team members';
 $string['mode_help'] = 'How to treat members already present in the team member field when the rule runs.
 
 "Overwrite" replaces the field with exactly the matched users (members not matching the criteria are removed). "Add only" keeps the existing members and adds the matched ones.';
-$string['mode_merge'] = 'Add only (keep existing members)';
-$string['mode_overwrite'] = 'Overwrite (replace with matched users)';
+$string['modemerge'] = 'Add only (keep existing members)';
+$string['modeoverwrite'] = 'Overwrite (replace with matched users)';
 $string['pluginname'] = 'Add team members by profile match';
 $string['privacy:metadata'] = 'The "Add team members by profile match" rule only stores its own configuration; it stores no personal data.';
 $string['privilege'] = 'Required privilege';
-$string['privilege_guest'] = 'Guest';
 $string['privilege_help'] = 'Only users holding the matching datalynx view privilege in this activity are considered as candidates to be added to the team.';
-$string['privilege_manager'] = 'Manager';
-$string['privilege_student'] = 'Student';
-$string['privilege_teacher'] = 'Teacher';
+$string['privilegeguest'] = 'Guest';
+$string['privilegemanager'] = 'Manager';
+$string['privilegestudent'] = 'Student';
+$string['privilegeteacher'] = 'Teacher';
 $string['profilefield'] = 'User profile field';
 $string['profilefield_help'] = 'The user profile field whose value is compared with the selected option label of the select field. Both standard fields (such as department or institution) and custom profile fields are available. The comparison ignores case and surrounding whitespace.';
 $string['selectfield'] = 'Select field';

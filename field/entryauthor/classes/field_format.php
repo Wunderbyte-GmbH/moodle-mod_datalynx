@@ -37,12 +37,12 @@ class field_format extends \mod_datalynx\local\field_format\base {
 
         // Allow inline editing of the target user profile field (only meaningful for custom profile fields).
         $mform->addElement('advcheckbox', 'editable', get_string('turneditingon', 'moodle'));
-        $mform->addHelpButton('editable', 'infofield_editable', 'datalynxfield_entryauthor');
+        $mform->addHelpButton('editable', 'infofieldeditable', 'datalynxfield_entryauthor');
         $mform->setType('editable', PARAM_BOOL);
 
         // Require a non-empty value when the profile field is edited inline.
         $mform->addElement('advcheckbox', 'mandatory', get_string('requiredelement', 'form'));
-        $mform->addHelpButton('mandatory', 'infofield_mandatory', 'datalynxfield_entryauthor');
+        $mform->addHelpButton('mandatory', 'infofieldmandatory', 'datalynxfield_entryauthor');
         $mform->setType('mandatory', PARAM_BOOL);
         $mform->disabledIf('mandatory', 'editable', 'notchecked');
     }

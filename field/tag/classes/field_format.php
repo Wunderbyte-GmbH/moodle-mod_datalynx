@@ -30,7 +30,7 @@ class field_format extends \mod_datalynx\local\field_format\base {
      * @param \MoodleQuickForm $mform
      */
     public function config_form(\MoodleQuickForm &$mform) {
-        $mform->addElement('selectyesno', 'linked', get_string('fieldformat_tag_linked', 'datalynxfield_tag'));
+        $mform->addElement('selectyesno', 'linked', get_string('fieldformattaglinked', 'datalynxfield_tag'));
         $mform->setDefault('linked', 1);
         $mform->setType('linked', PARAM_INT);
     }

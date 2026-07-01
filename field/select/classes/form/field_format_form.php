@@ -31,9 +31,9 @@ class field_format_form extends \mod_datalynx\form\field_format_base_form {
         $mform = &$this->_form;
 
         $options = [
-            'default' => get_string('fieldformat_option_default', 'datalynxfield_select'),
-            'options' => get_string('fieldformat_option_options', 'datalynxfield_select'),
-            'key'     => get_string('fieldformat_option_key', 'datalynxfield_select'),
+            'default' => get_string('fieldformatoptiondefault', 'datalynxfield_select'),
+            'options' => get_string('fieldformatoptionoptions', 'datalynxfield_select'),
+            'key'     => get_string('fieldformatoptionkey', 'datalynxfield_select'),
         ];
         $mform->addElement(
             'select',
@@ -43,6 +43,6 @@ class field_format_form extends \mod_datalynx\form\field_format_base_form {
         );
         $mform->setType('option', PARAM_ALPHA);
         $mform->addRule('option', get_string('required'), 'required', null, 'client');
-        $mform->addHelpButton('option', 'fieldformat_option', 'datalynxfield_select');
+        $mform->addHelpButton('option', 'fieldformatoption', 'datalynxfield_select');
     }
 }

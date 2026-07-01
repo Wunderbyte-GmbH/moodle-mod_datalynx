@@ -45,7 +45,7 @@ class field_format extends \mod_datalynx\local\field_format\base {
         $mform->addElement(
             'advcheckbox',
             'addnew',
-            get_string('fieldformat_multiselect_addnew', 'datalynxfield_multiselect')
+            get_string('fieldformatmultiselectaddnew', 'datalynxfield_multiselect')
         );
         $mform->setType('addnew', PARAM_INT);
     }

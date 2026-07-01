@@ -33,10 +33,10 @@ class field_format_form extends \mod_datalynx\form\field_format_base_form {
         $mform->addElement(
             'text',
             'decimals',
-            get_string('fieldformat_decimals', 'datalynxfield_number'),
+            get_string('fieldformatdecimals', 'datalynxfield_number'),
             ['size' => 3]
         );
         $mform->setType('decimals', PARAM_INT);
-        $mform->addHelpButton('decimals', 'fieldformat_decimals', 'datalynxfield_number');
+        $mform->addHelpButton('decimals', 'fieldformatdecimals', 'datalynxfield_number');
     }
 }

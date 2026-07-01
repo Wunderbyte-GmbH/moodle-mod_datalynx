@@ -23,10 +23,10 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 $string['bicswift'] = 'BIC/SWIFT';
-$string['err_bicswift'] = 'Please enter a valid BIC/SWIFT code.';
-$string['err_iban'] = 'Please enter a valid IBAN.';
-$string['err_ipv4'] = 'Please enter a valid IPv4 address.';
-$string['err_phone'] = 'Please enter a valid phone number in international format (e.g. +43 650 234234).';
+$string['errbicswift'] = 'Please enter a valid BIC/SWIFT code.';
+$string['erriban'] = 'Please enter a valid IBAN.';
+$string['erripv4'] = 'Please enter a valid IPv4 address.';
+$string['errphone'] = 'Please enter a valid phone number in international format (e.g. +43 650 234234).';
 $string['iban'] = 'IBAN';
 $string['inputwidth'] = 'Input field width';
 $string['inputwidth_help'] = 'Sets the visible width of the input box in the entry form. Enter a number and choose a unit (px, %, or em). Applied as a responsive maximum width, so the field shrinks on narrow screens. Leave the number empty for the default width.';

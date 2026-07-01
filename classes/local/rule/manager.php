@@ -63,13 +63,17 @@ class manager {
             if ($observer['callback'] == self::class . '::trigger_rules') {
                 // Eventname is formed as follows: mod_datalynx\event\<name>, trimming backspace.
                 // Chars just in case.
-                $eventname = explode('\\', trim($observer['eventname'], '\\'))[2];
+                $eventclass = $observer['eventname'];
+                $eventname = explode('\\', trim($eventclass, '\\'))[2];
+                // Use each event class's own get_name() rather than reconstructing a
+                // language string key from the event name: this is the core-idiomatic
+                // way to label an event and avoids fragile string keys (e.g. the
+                // cron_triggered event resolves to the existing 'crontrigger' string).
                 if ($eventname !== 'team_updated') {
-                    $eventmenu[$eventname] = get_string("event_$eventname", 'mod_datalynx');
+                    $eventmenu[$eventname] = $eventclass::get_name();
                 } else {
                     foreach (self::get_team_fields_menu($dataid) as $id => $teamfieldname) {
-                        $eventmenu["$eventname:$id"] = get_string("event_$eventname", 'mod_datalynx') .
-                                ": $teamfieldname";
+                        $eventmenu["$eventname:$id"] = $eventclass::get_name() . ": $teamfieldname";
                     }
                 }
             }

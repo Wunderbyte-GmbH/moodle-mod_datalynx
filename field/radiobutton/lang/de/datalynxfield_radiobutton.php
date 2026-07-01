@@ -21,13 +21,13 @@
  * @copyright 2026 David Bogner
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-$string['fieldformat_option'] = 'Anzeigeformat';
-$string['fieldformat_option_default'] = 'Nur Label';
-$string['fieldformat_option_help'] = 'Steuert, was in Ansichten angezeigt wird. "Nur Label" zeigt den lesbaren Namen der Option. "Schlüssel-Wert-Paare" rendert Label=Schlüssel. "Schlüssel/Index" zeigt nur den gespeicherten Schlüssel oder Indexwert. "Schrittweiser Fortschritt" zeigt die Optionen als Fortschrittsleiste an.';
-$string['fieldformat_option_key'] = 'Ausgewählter Optionsschlüssel/-index';
-$string['fieldformat_option_options'] = 'Schlüssel-Wert-Paare';
-$string['fieldformat_option_stepper'] = 'Schrittweiser Fortschritt';
-$string['fieldformat_option_stepper_icons'] = 'Symbole für Schritte';
-$string['fieldformat_option_stepper_icons_help'] = 'Eine kommagetrennte Liste von FontAwesome Icon-Klassen (z. B. "shopping-cart, cogs, medal, car, home"), die in den Kreisen der einzelnen Schritte angezeigt werden. Wenn leer, werden Schrittnummern verwendet.';
+$string['fieldformatoption'] = 'Anzeigeformat';
+$string['fieldformatoption_help'] = 'Steuert, was in Ansichten angezeigt wird. "Nur Label" zeigt den lesbaren Namen der Option. "Schlüssel-Wert-Paare" rendert Label=Schlüssel. "Schlüssel/Index" zeigt nur den gespeicherten Schlüssel oder Indexwert. "Schrittweiser Fortschritt" zeigt die Optionen als Fortschrittsleiste an.';
+$string['fieldformatoptiondefault'] = 'Nur Label';
+$string['fieldformatoptionkey'] = 'Ausgewählter Optionsschlüssel/-index';
+$string['fieldformatoptionoptions'] = 'Schlüssel-Wert-Paare';
+$string['fieldformatoptionstepper'] = 'Schrittweiser Fortschritt';
+$string['fieldformatoptionsteppericons'] = 'Symbole für Schritte';
+$string['fieldformatoptionsteppericons_help'] = 'Eine kommagetrennte Liste von FontAwesome Icon-Klassen (z. B. "shopping-cart, cogs, medal, car, home"), die in den Kreisen der einzelnen Schritte angezeigt werden. Wenn leer, werden Schrittnummern verwendet.';
 $string['pluginname'] = 'Auswahlknopf (Radiobutton)';
 $string['privacy:metadata'] = 'Auswahlknöpfe speichern keine personenbezogenen Daten.';

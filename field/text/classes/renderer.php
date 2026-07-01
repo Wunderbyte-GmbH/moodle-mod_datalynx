@@ -120,7 +120,7 @@ class renderer extends datalynxfield_renderer {
             } else if ($format === 'iban') {
                 $mform->addRule(
                     $fieldname,
-                    get_string('err_iban', 'datalynxfield_text'),
+                    get_string('erriban', 'datalynxfield_text'),
                     'regex',
                     '/^[a-zA-Z]{2}[0-9]{2}[a-zA-Z0-9\s]{11,30}$/i',
                     'client'
@@ -128,7 +128,7 @@ class renderer extends datalynxfield_renderer {
             } else if ($format === 'bicswift') {
                 $mform->addRule(
                     $fieldname,
-                    get_string('err_bicswift', 'datalynxfield_text'),
+                    get_string('errbicswift', 'datalynxfield_text'),
                     'regex',
                     '/^[a-zA-Z]{6}[a-zA-Z0-9]{2}([a-zA-Z0-9]{3})?$/i',
                     'client'
@@ -136,7 +136,7 @@ class renderer extends datalynxfield_renderer {
             } else if ($format === 'ipv4') {
                 $mform->addRule(
                     $fieldname,
-                    get_string('err_ipv4', 'datalynxfield_text'),
+                    get_string('erripv4', 'datalynxfield_text'),
                     'regex',
                     '/^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/',
                     'client'
@@ -144,7 +144,7 @@ class renderer extends datalynxfield_renderer {
             } else if ($format === 'phone') {
                 $mform->addRule(
                     $fieldname,
-                    get_string('err_phone', 'datalynxfield_text'),
+                    get_string('errphone', 'datalynxfield_text'),
                     'regex',
                     '/^\+[1-9][0-9\s\-()]{6,20}$/',
                     'client'
@@ -360,22 +360,22 @@ class renderer extends datalynxfield_renderer {
                 break;
             case 'iban':
                 if (!$this->validate_iban($value)) {
-                    return get_string('err_iban', 'datalynxfield_text');
+                    return get_string('erriban', 'datalynxfield_text');
                 }
                 break;
             case 'bicswift':
                 if (!preg_match('/^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$/i', trim($value))) {
-                    return get_string('err_bicswift', 'datalynxfield_text');
+                    return get_string('errbicswift', 'datalynxfield_text');
                 }
                 break;
             case 'ipv4':
                 if (filter_var(trim($value), FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === false) {
-                    return get_string('err_ipv4', 'datalynxfield_text');
+                    return get_string('erripv4', 'datalynxfield_text');
                 }
                 break;
             case 'phone':
                 if (!preg_match('/^\+[1-9][0-9\s\-()]{6,20}$/', $value)) {
-                    return get_string('err_phone', 'datalynxfield_text');
+                    return get_string('errphone', 'datalynxfield_text');
                 }
                 break;
         }

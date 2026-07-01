@@ -21,10 +21,10 @@
  * @copyright 2021 michael pollak <moodle@michaelpollak.org>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-$string['fieldformat_dimensions'] = 'Player dimensions';
-$string['fieldformat_dimensions_help'] = 'Sets the width and height of the embedded YouTube player in pixels. Leave empty to use the field\'s default dimensions.';
-$string['fieldformat_height'] = 'Player height (px)';
-$string['fieldformat_width'] = 'Player width (px)';
+$string['fieldformatdimensions'] = 'Player dimensions';
+$string['fieldformatdimensions_help'] = 'Sets the width and height of the embedded YouTube player in pixels. Leave empty to use the field\'s default dimensions.';
+$string['fieldformatheight'] = 'Player height (px)';
+$string['fieldformatwidth'] = 'Player width (px)';
 $string['heightpx'] = 'Height in pixels.';
 $string['pluginname'] = 'Youtube';
 $string['privacy:metadata'] = 'Youtubefields do not store personal data.';

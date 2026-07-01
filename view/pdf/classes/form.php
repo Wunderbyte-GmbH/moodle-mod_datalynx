@@ -78,18 +78,18 @@ class form extends datalynxview_base_form {
             $options
         );
         // Unit.
-        $options = ['mm' => get_string('unit_mm', 'datalynxview_pdf'),
-                'pt' => get_string('unit_pt', 'datalynxview_pdf'),
-                'cm' => get_string('unit_cm', 'datalynxview_pdf'),
-                'in' => get_string('unit_in', 'datalynxview_pdf')];
+        $options = ['mm' => get_string('unitmm', 'datalynxview_pdf'),
+                'pt' => get_string('unitpt', 'datalynxview_pdf'),
+                'cm' => get_string('unitcm', 'datalynxview_pdf'),
+                'in' => get_string('unitin', 'datalynxview_pdf')];
         $mform->addElement('select', 'unit', get_string('unit', 'datalynxview_pdf'), $options);
         // Format.
         $options = ['A4' => get_string('A4', 'datalynxview_pdf'),
                 'LETTER' => get_string('LETTER', 'datalynxview_pdf')];
         $mform->addElement('select', 'format', get_string('format', 'datalynxview_pdf'), $options);
         // Destination.
-        $options = ['D' => get_string('dest_D', 'datalynxview_pdf'),
-                'I' => get_string('dest_I', 'datalynxview_pdf')];
+        $options = ['D' => get_string('destd', 'datalynxview_pdf'),
+                'I' => get_string('desti', 'datalynxview_pdf')];
         $mform->addElement(
             'select',
             'destination',

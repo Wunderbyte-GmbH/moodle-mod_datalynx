@@ -25,8 +25,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['action'] = 'Field update';
-$string['err_nofield'] = 'Please choose a field to update.';
-$string['err_novalue'] = 'Please provide the value to set.';
+$string['errnofield'] = 'Please choose a field to update.';
+$string['errnovalue'] = 'Please provide the value to set.';
 $string['newvalue'] = 'New value';
 $string['newvalue_help'] = 'The value that will be written to the selected field when the rule is triggered. For dropdown, radio button and checkbox fields, choose from the field\'s options; for text fields, type the value.';
 $string['newvaluefor'] = 'New value ({$a})';

@@ -22,11 +22,11 @@
  * @copyright based on the work  by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-$string['fieldformat_option'] = 'Display format';
-$string['fieldformat_option_default'] = 'Label only';
-$string['fieldformat_option_help'] = 'Controls what is displayed in views. "Label only" shows the human-readable option label. "Key-value pairs" renders label=key. "Key/index" shows only the stored key or index value.';
-$string['fieldformat_option_key'] = 'Selected option key/index';
-$string['fieldformat_option_options'] = 'Key-value pairs';
+$string['fieldformatoption'] = 'Display format';
+$string['fieldformatoption_help'] = 'Controls what is displayed in views. "Label only" shows the human-readable option label. "Key-value pairs" renders label=key. "Key/index" shows only the stored key or index value.';
+$string['fieldformatoptiondefault'] = 'Label only';
+$string['fieldformatoptionkey'] = 'Selected option key/index';
+$string['fieldformatoptionoptions'] = 'Key-value pairs';
 $string['matchesmyprofilefield'] = 'Matches my profile field';
 $string['matchesmyprofilefield_help'] = 'Shows only entries whose selected option matches the value of the chosen profile field for the currently logged-in user. The option label is compared with the profile value (case-insensitive). Combine this with an "author is me" criterion to restrict the result to the user\'s own entries.';
 $string['pluginname'] = 'Select';

@@ -92,13 +92,13 @@ class view extends base {
      * @return array
      */
     public static function get_permission_options() {
-        return ['print' => get_string('perm_print', 'datalynxview_pdf'),
-                'modify' => get_string('perm_modify', 'datalynxview_pdf'),
-                'copy' => get_string('perm_copy', 'datalynxview_pdf'),
-                'fill-forms' => get_string('perm_fill-forms', 'datalynxview_pdf'),
-                'extract' => get_string('perm_extract', 'datalynxview_pdf'),
-                'assemble' => get_string('perm_assemble', 'datalynxview_pdf'),
-                'print-high' => get_string('perm_print-high', 'datalynxview_pdf')];
+        return ['print' => get_string('permprint', 'datalynxview_pdf'),
+                'modify' => get_string('permmodify', 'datalynxview_pdf'),
+                'copy' => get_string('permcopy', 'datalynxview_pdf'),
+                'fill-forms' => get_string('permfill-forms', 'datalynxview_pdf'),
+                'extract' => get_string('permextract', 'datalynxview_pdf'),
+                'assemble' => get_string('permassemble', 'datalynxview_pdf'),
+                'print-high' => get_string('permprint-high', 'datalynxview_pdf')];
     }
 
     /**

@@ -25,8 +25,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['action'] = 'Feldaktualisierung';
-$string['err_nofield'] = 'Bitte wählen Sie ein Feld aus, das aktualisiert werden soll.';
-$string['err_novalue'] = 'Bitte geben Sie den zu setzenden Wert an.';
+$string['errnofield'] = 'Bitte wählen Sie ein Feld aus, das aktualisiert werden soll.';
+$string['errnovalue'] = 'Bitte geben Sie den zu setzenden Wert an.';
 $string['newvalue'] = 'Neuer Wert';
 $string['newvalue_help'] = 'Der Wert, der in das ausgewählte Feld geschrieben wird, wenn die Regel ausgelöst wird. Bei Auswahl-, Radiobutton- und Checkbox-Feldern wählen Sie aus den Optionen des Feldes; bei Textfeldern geben Sie den Wert ein.';
 $string['newvaluefor'] = 'Neuer Wert ({$a})';

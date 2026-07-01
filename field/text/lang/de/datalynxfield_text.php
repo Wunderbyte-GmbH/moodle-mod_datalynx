@@ -24,10 +24,10 @@
  */
 
 $string['bicswift'] = 'BIC/SWIFT';
-$string['err_bicswift'] = 'Bitte geben Sie einen gültigen BIC/SWIFT-Code ein.';
-$string['err_iban'] = 'Bitte geben Sie eine gültige IBAN ein.';
-$string['err_ipv4'] = 'Bitte geben Sie eine gültige IPv4-Adresse ein.';
-$string['err_phone'] = 'Bitte geben Sie eine gültige Telefonnummer im internationalen Format ein (z. B. +43 650 234234).';
+$string['errbicswift'] = 'Bitte geben Sie einen gültigen BIC/SWIFT-Code ein.';
+$string['erriban'] = 'Bitte geben Sie eine gültige IBAN ein.';
+$string['erripv4'] = 'Bitte geben Sie eine gültige IPv4-Adresse ein.';
+$string['errphone'] = 'Bitte geben Sie eine gültige Telefonnummer im internationalen Format ein (z. B. +43 650 234234).';
 $string['iban'] = 'IBAN';
 $string['inputwidth'] = 'Breite des Eingabefelds';
 $string['inputwidth_help'] = 'Legt die sichtbare Breite des Eingabefelds im Eintragsformular fest. Geben Sie eine Zahl ein und wählen Sie eine Einheit (px, %, em). Wird als responsive Maximalbreite angewendet, sodass das Feld auf schmalen Bildschirmen schrumpft. Lassen Sie die Zahl leer für die Standardbreite.';

@@ -21,11 +21,11 @@
  * @copyright 2026 David Bogner
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-$string['fieldformat_option'] = 'Anzeigeformat';
-$string['fieldformat_option_default'] = 'Nur Bezeichnung';
-$string['fieldformat_option_help'] = 'Legt fest, was in Ansichten angezeigt wird. "Nur Bezeichnung" zeigt die lesbare Bezeichnung der Option. "Schlüssel-Wert-Paare" zeigt Bezeichnung=Schlüssel. "Schlüssel/Index" zeigt nur den gespeicherten Schlüssel- bzw. Indexwert.';
-$string['fieldformat_option_key'] = 'Schlüssel/Index der gewählten Option';
-$string['fieldformat_option_options'] = 'Schlüssel-Wert-Paare';
+$string['fieldformatoption'] = 'Anzeigeformat';
+$string['fieldformatoption_help'] = 'Legt fest, was in Ansichten angezeigt wird. "Nur Bezeichnung" zeigt die lesbare Bezeichnung der Option. "Schlüssel-Wert-Paare" zeigt Bezeichnung=Schlüssel. "Schlüssel/Index" zeigt nur den gespeicherten Schlüssel- bzw. Indexwert.';
+$string['fieldformatoptiondefault'] = 'Nur Bezeichnung';
+$string['fieldformatoptionkey'] = 'Schlüssel/Index der gewählten Option';
+$string['fieldformatoptionoptions'] = 'Schlüssel-Wert-Paare';
 $string['matchesmyprofilefield'] = 'Stimmt mit meinem Profilfeld überein';
 $string['matchesmyprofilefield_help'] = 'Zeigt nur Einträge an, deren ausgewählte Option mit dem Wert des gewählten Profilfelds der aktuell angemeldeten Person übereinstimmt. Die Bezeichnung der Option wird (ohne Berücksichtigung der Groß-/Kleinschreibung) mit dem Profilwert verglichen. Kombinieren Sie dies mit dem Kriterium "Autor/in bin ich", um das Ergebnis auf die eigenen Einträge zu beschränken.';
 $string['pluginname'] = 'Auswahl';
