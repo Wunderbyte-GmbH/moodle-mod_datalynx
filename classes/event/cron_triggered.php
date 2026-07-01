@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The mod_datalynx comment created event.
+ * The mod_datalynx cron triggered event.
  *
  * @package mod_datalynx
  * @copyright 2023 Thomas Winkler
@@ -25,14 +25,14 @@
 namespace mod_datalynx\event;
 
 /**
- * The mod_datalynx comment created event class.
+ * The mod_datalynx cron triggered event class.
  *
  * @package mod_datalynx
  * @since Moodle 4.0
  * @copyright 2023 Thomas Winkler
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class crontrigger extends \core\event\base {
+class cron_triggered extends \core\event\base {
     /**
      * Init method.
      *
