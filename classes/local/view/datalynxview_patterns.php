@@ -24,6 +24,7 @@
 
 namespace mod_datalynx\local\view;
 
+use core_filters\filter_manager;
 use html_writer;
 use mod_datalynx\local\filter\datalynx_filter_manager;
 use moodle_url;
@@ -263,6 +264,12 @@ class datalynxview_patterns {
                     if (strpos($linktext, '_pixicon:') === 0) {
                         [, $icon, $titletext] = explode(':', $linktext);
                         $linktext = $OUTPUT->pix_icon($icon, $titletext);
+                    } else {
+                        // Apply content filters (e.g. multilang2) so filter tags such as
+                        // {mlang ...} can be used in the link text. The datalynx tag itself
+                        // was shielded from filtering while masked in set_view_tags(), so the
+                        // label reaches here unresolved and is localised at build time.
+                        $linktext = filter_manager::instance()->filter_text($linktext, $dlx->context);
                     }
                     // Replace pipes in urlquery with &.
                     $urlquery = str_replace('|', '&', $urlquery);

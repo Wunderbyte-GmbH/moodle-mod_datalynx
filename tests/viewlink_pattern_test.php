@@ -586,4 +586,87 @@ final class viewlink_pattern_test extends advanced_testcase {
         $this->assertArrayNotHasKey('##viewlink:myemailview;;;##', $referencecategory);
         $this->assertArrayNotHasKey('##viewsesslink:myemailview;;;##', $referencecategory);
     }
+
+    /**
+     * Enable the multilang2 content filter globally for the current test.
+     */
+    private function enable_multilang_filter(): void {
+        filter_set_global_state('multilang2', TEXTFILTER_ON);
+        \filter_manager::reset_caches();
+    }
+
+    /**
+     * Force the current language for the request. Sets $SESSION->forcelang directly
+     * (rather than force_current_language(), which is a no-op when the language pack
+     * is not installed in the test environment) and resets the relevant caches.
+     *
+     * @param string $lang the language code to force, e.g. 'de' or 'en'.
+     */
+    private function set_current_language(string $lang): void {
+        global $SESSION;
+        $SESSION->forcelang = $lang;
+        \filter_multilang2\text_filter::reset_parentcache();
+        \filter_manager::reset_caches();
+    }
+
+    /**
+     * Test that a {mlang ...} block used as the link text of a ##viewlink:...## tag is
+     * localised for the current language when the link is built.
+     *
+     * @covers ::get_replacements
+     */
+    public function test_get_replacements_localises_mlang_link_text(): void {
+        $this->enable_multilang_filter();
+
+        $mlang = '{mlang de}Neuen Antrag stellen{mlang}{mlang other}Submit new application{mlang}';
+        $tag = "##viewlink:myview;$mlang;;btn##";
+        [, , $templateobj] = $this->create_test_views($tag);
+        $patternclass = $templateobj->patternclass();
+
+        // German user sees the German block.
+        $this->set_current_language('de');
+        $replacements = $patternclass->get_replacements([$tag], null, []);
+        $this->assertStringContainsString('>Neuen Antrag stellen<', $replacements[$tag]);
+        $this->assertStringNotContainsString('Submit new application', $replacements[$tag]);
+        $this->assertStringNotContainsString('{mlang', $replacements[$tag]);
+
+        // Any other language (here English) falls back to the "other" block.
+        $this->set_current_language('en');
+        $replacements = $patternclass->get_replacements([$tag], null, []);
+        $this->assertStringContainsString('>Submit new application<', $replacements[$tag]);
+        $this->assertStringNotContainsString('Neuen Antrag stellen', $replacements[$tag]);
+        $this->assertStringNotContainsString('{mlang', $replacements[$tag]);
+    }
+
+    /**
+     * Test that mask_tags()/unmask_tags() shield a datalynx tag (and any filter tags in
+     * its arguments) from format_text(), so the tag survives the filtering pass byte
+     * identical and can still be substituted with its content afterwards.
+     *
+     * This is the mechanism that lets {mlang ...} be used inside a ##viewsesslink:...##
+     * link text without breaking the tag-to-link substitution.
+     *
+     * @covers \mod_datalynx\local\view\base::mask_tags
+     * @covers \mod_datalynx\local\view\base::unmask_tags
+     */
+    public function test_mask_tags_shields_datalynx_tag_from_filters(): void {
+        $this->enable_multilang_filter();
+        $this->set_current_language('en');
+
+        $tag = '##viewsesslink:myview;{mlang de}Neuen Antrag stellen{mlang}'
+            . '{mlang other}Submit new application{mlang};new=1;btn##';
+        [$dlx, , $templateobj] = $this->create_test_views($tag);
+
+        $text = "before $tag after";
+        $masked = $templateobj->mask_tags($text);
+
+        // While masked, the raw tag (and its {mlang}) must be gone from the filtered text.
+        $filtered = format_text($masked, FORMAT_HTML, ['context' => $dlx->context, 'filter' => true]);
+        $this->assertStringNotContainsString('##viewsesslink', $filtered);
+        $this->assertStringNotContainsString('{mlang', $filtered);
+
+        // After unmasking, the original tag is restored verbatim, ready for substitution.
+        $restored = $templateobj->unmask_tags($filtered);
+        $this->assertStringContainsString($tag, $restored);
+    }
 }

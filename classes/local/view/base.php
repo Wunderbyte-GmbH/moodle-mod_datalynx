@@ -152,6 +152,14 @@ abstract class base {
     protected array $tags = [];
 
     /**
+     * Map of opaque placeholder token => original datalynx tag, populated by
+     * {@see mask_tags()} and consumed by {@see unmask_tags()}.
+     *
+     * @var array
+     */
+    protected array $maskedtags = [];
+
+    /**
      * Base URL for the current view.
      *
      * @var moodle_url
@@ -1369,7 +1377,16 @@ abstract class base {
     }
 
     /**
-     * Masks view and field tags so that they do not get auto-linked
+     * Masks view and field tags with opaque placeholder tokens so that the text
+     * filters applied by format_text() (multilang2, auto-link, emoticons, ...)
+     * cannot rewrite the tag internals. The original tags are restored verbatim
+     * by {@see unmask_tags()} before they are substituted with their content.
+     *
+     * Using an opaque token (rather than merely wrapping the tag in a nolink
+     * span) is what allows filter tags such as {mlang ...} to be used inside a
+     * datalynx tag's arguments, e.g. the link text of a ##viewsesslink:...## tag:
+     * the tag reaches unmask_tags() byte-identical, so it still matches the key
+     * used for the subsequent content substitution.
      *
      * @param string $text a string with tags to mask
      * @return $text HTML with masked tags
@@ -1378,6 +1395,7 @@ abstract class base {
         $matches = [];
         $find = [];
         $replace = [];
+        $this->maskedtags = [];
         // Regex to mask all known tag patterns. Patterns followed by @ are not masked.
         // The ##[^#]+## clause already covers ##viewlink:...## and ##viewsesslink:...## tags.
         preg_match_all(
@@ -1389,8 +1407,13 @@ abstract class base {
         $map = array_unique($matches[0]);
         foreach ($map as $index => $match) {
             if ($match != '##entries##') {
+                // The @@...@@ token cannot be matched by ALL_TAGS_REGEX ([[..]], ##..##, %%..%%)
+                // and contains nothing for any enabled filter to rewrite, so it survives
+                // format_text() untouched.
+                $token = '@@DATALYNXTAG' . $index . '@@';
                 $find[$index] = "/" . preg_quote($match, '/') . "(?!@)/";
-                $replace[$index] = '<span class="nolink" title="donotreplaceme">' . $match . '</span>';
+                $replace[$index] = $token;
+                $this->maskedtags[$token] = $match;
             }
         }
         $text = preg_replace($find, $replace, $text);
@@ -1398,15 +1421,16 @@ abstract class base {
     }
 
     /**
-     * Unmasks view and field tags
+     * Unmasks view and field tags previously replaced by {@see mask_tags()},
+     * restoring the original tag strings verbatim.
      *
      * @param string $text a string with masked tags
      * @return $text HTML with unmasked tags
      */
     public function unmask_tags($text) {
-        $find = '/<span class="nolink" title="donotreplaceme">(.+?)<\/span>/is';
-        $replace = '$1';
-        $text = preg_replace($find, $replace, $text);
+        if (!empty($this->maskedtags)) {
+            $text = str_replace(array_keys($this->maskedtags), array_values($this->maskedtags), $text);
+        }
         return $text;
     }
 
