@@ -64,7 +64,9 @@ class renderer extends SelectRenderer {
         }
 
         $elemgrp = [];
-        foreach ($menuoptions as $id => $option) {
+        // Only the labels: the default value above is matched against the raw option text.
+        // Radio labels are rendered as html, so keep the default escaping.
+        foreach ($this->format_option_labels($menuoptions, true) as $id => $option) {
             $radio = &$mform->createElement('radio', $fieldname, '', $option, $id);
             if ($id == $selected) {
                 $radio->setChecked(true);

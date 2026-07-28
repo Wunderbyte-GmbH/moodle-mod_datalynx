@@ -135,7 +135,21 @@ abstract class base {
      *
      * @var array
      */
-    protected array $vieweditors = ['section', 'param2'];
+    protected array $vieweditors = ['section'];
+
+    /**
+     * Cache for {@see get_prepared_entry_template()}: [raw source, language, prepared result].
+     *
+     * Keyed on the raw text rather than a "done" flag, because datalynx::get_view() shares one
+     * view record between every view object it builds and each constructor re-derives the e*
+     * properties from the source columns — so another view object can reset our template at any
+     * time. Comparing the source detects that. The language is part of the key because filtered
+     * output depends on it: a notification run renders the same email view for recipients with
+     * different languages inside one request.
+     *
+     * @var ?array
+     */
+    private ?array $preparedentrytemplate = null;
 
     /**
      * Cached entries handler.
@@ -1751,7 +1765,7 @@ abstract class base {
 
         // Split the entry template to tags and html.
         $tags = array_keys($fielddefinitions);
-        $parts = $this->split_template_by_tags($tags, $this->view->eparam2);
+        $parts = $this->split_template_by_tags($tags, $this->get_prepared_entry_template());
 
         foreach ($parts as $part) {
             if (in_array($part, $tags)) {
@@ -1764,6 +1778,55 @@ abstract class base {
         }
 
         return $elements;
+    }
+
+    /**
+     * The entry template, ready for output: file urls rewritten and text filters applied.
+     *
+     * This is the single place the entry template is prepared. Every way of rendering an entry —
+     * the classic definition_to_html()/definition_to_form() path and the AJAX view managers via
+     * render_entry_html() — goes through entry_definition(), so both get identical text. The
+     * template is deliberately not part of $vieweditors: set_view_tags() prepares the view section
+     * for the page shell, this prepares the entry template for the entries.
+     *
+     * Datalynx tags are masked before filtering so no filter can rewrite a tag's internals, and
+     * restored verbatim afterwards for the per-entry substitution in entry_definition().
+     *
+     * @return string
+     */
+    protected function get_prepared_entry_template(): string {
+        $raw = (string) ($this->view->eparam2 ?? '');
+        $lang = current_language();
+
+        if (
+            $this->preparedentrytemplate !== null && $this->preparedentrytemplate[0] === $raw &&
+                $this->preparedentrytemplate[1] === $lang
+        ) {
+            return $this->preparedentrytemplate[2];
+        }
+
+        // No-op once an export has already resolved @@PLUGINFILE@@ through its own path.
+        $text = file_rewrite_pluginfile_urls(
+            $raw,
+            'pluginfile.php',
+            $this->dlx->context->id,
+            'mod_datalynx',
+            'viewparam2',
+            $this->id()
+        );
+        $text = $this->mask_tags($text);
+        // The context is passed explicitly: the AJAX browse path runs inside a web service call
+        // where $PAGE->context cannot be relied upon to be the module context.
+        $text = format_text($text, FORMAT_HTML, [
+            'trusted' => 1,
+            'filter' => true,
+            'context' => $this->dlx->context,
+        ]);
+        $text = $this->unmask_tags($text);
+
+        $this->preparedentrytemplate = [$raw, $lang, $text];
+
+        return $text;
     }
 
     /**
@@ -2045,28 +2108,7 @@ abstract class base {
             $html .= $content;
         }
 
-        return $this->apply_multilang_filter($html);
-    }
-
-    /**
-     * Resolve multilang2 ({mlang ...}) markup in entry-template text.
-     *
-     * The view section is filtered via format_text(), but entry-template HTML is emitted directly,
-     * so language markup inside entries would otherwise show raw. This applies only the multilang2
-     * filter, leaving datalynx tags (##...##, [[...]]) and the rest of the HTML untouched.
-     *
-     * @param string $text
-     * @return string
-     */
-    protected function apply_multilang_filter(string $text): string {
-        if (strpos($text, '{mlang') === false) {
-            return $text;
-        }
-        if (!class_exists('\\filter_multilang2\\text_filter') || !filter_is_enabled('multilang2')) {
-            return $text;
-        }
-        $filter = new \filter_multilang2\text_filter($this->dlx->context, []);
-        return $filter->filter($text);
+        return $html;
     }
 
     /**
@@ -2082,7 +2124,7 @@ abstract class base {
             if (!empty($element)) {
                 [$type, $content] = $element;
                 if ($type === 'html') {
-                    $mform->addElement('html', $this->apply_multilang_filter($content));
+                    $mform->addElement('html', $content);
                 } else {
                     $params = [];
                     $func = $content[0];

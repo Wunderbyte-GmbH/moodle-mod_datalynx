@@ -297,6 +297,28 @@ abstract class datalynxfield_renderer {
     }
 
     /**
+     * Run a menu of user defined option labels through format_string().
+     *
+     * Option labels are authored text (the lines of a field's param1) and are inserted into the
+     * entry html and the filter widgets after the surrounding template has already been filtered,
+     * so this is where filter markup in them gets resolved.
+     *
+     * @param array $menu key => raw label
+     * @param bool $escape False when the consumer (a form element, a Mustache placeholder) escapes
+     *                     the label itself; leaving it true there would double encode ampersands.
+     * @return array key => formatted label
+     */
+    protected function format_option_labels(array $menu, bool $escape = false): array {
+        $context = $this->field->dlx()->context;
+
+        return array_map(static function ($label) use ($context, $escape) {
+            return is_string($label)
+                ? format_string($label, true, ['context' => $context, 'escape' => $escape])
+                : $label;
+        }, $menu);
+    }
+
+    /**
      * TODO: make abstract once all field types have been updated
      * Outputs the HTML representation of the field and its value
      *

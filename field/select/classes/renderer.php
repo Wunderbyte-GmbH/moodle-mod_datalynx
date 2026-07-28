@@ -74,10 +74,11 @@ class renderer extends datalynxfield_renderer {
             $disabled = [];
         }
 
-        foreach ($menuoptions as $id => $name) {
+        // Only the labels: the default value above is matched against the raw option text.
+        foreach ($this->format_option_labels($menuoptions) as $id => $name) {
             $option = new stdClass();
             $option->id = $id;
-            $option->name = format_string($name);
+            $option->name = $name;
             $menuoptions[$id] = $option;
         }
         // Sort the options alphabetically.
@@ -166,7 +167,7 @@ class renderer extends datalynxfield_renderer {
         $field = $this->field;
         $fieldid = $field->id();
         $fieldname = "f_{$i}_{$fieldid}";
-        $menu = [-1 => ''] + $field->options_menu();
+        $menu = [-1 => ''] + $this->format_option_labels($field->options_menu());
         $options = ['multiple' => true];
         $elements = [];
         $elements[] = $mform->createElement('autocomplete', $fieldname, null, $menu, $options);

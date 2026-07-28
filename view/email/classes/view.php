@@ -34,8 +34,8 @@ class view extends base {
     /** @var array Editors used by the email template view. */
     protected array $editors = ['param2'];
 
-    /** @var array Editors used in form processing. */
-    protected array $vieweditors = ['param2'];
+    /** @var array Editors used in form processing. The entry template is prepared by the base seam. */
+    protected array $vieweditors = [];
 
     /**
      * Constructor.
@@ -135,7 +135,7 @@ class view extends base {
             $tags = array_merge($tags, $patterns);
         }
 
-        $parts = $this->split_template_by_tags($tags, $this->view->eparam2);
+        $parts = $this->split_template_by_tags($tags, $this->get_prepared_entry_template());
         foreach ($parts as $part) {
             if (in_array($part, $tags)) {
                 if (isset($patterndefinitions[$part]) && $def = $patterndefinitions[$part]) {
@@ -157,24 +157,10 @@ class view extends base {
      * @return string
      */
     public function render_email_entry(stdClass $entry, array $options = []): string {
-        $originaltemplate = $this->view->eparam2;
-        $this->view->eparam2 = file_rewrite_pluginfile_urls(
-            $this->view->eparam2,
-            'pluginfile.php',
-            $this->dlx->context->id,
-            'mod_datalynx',
-            'viewparam2',
-            $this->id()
-        );
-
-        try {
-            $html = $this->render_entry_html($entry, array_merge([
-                'edit' => false,
-                'manage' => false,
-            ], $options));
-        } finally {
-            $this->view->eparam2 = $originaltemplate;
-        }
+        $html = $this->render_entry_html($entry, array_merge([
+            'edit' => false,
+            'manage' => false,
+        ], $options));
 
         return $this->process_calculations($html);
     }

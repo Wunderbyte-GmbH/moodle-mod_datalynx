@@ -73,7 +73,7 @@ class view extends base {
     /**
      * @var array List of view editors
      */
-    protected array $vieweditors = ['section', 'param2', 'param3', 'param4',
+    protected array $vieweditors = ['section', 'param3', 'param4',
     ];
 
     /**
@@ -659,7 +659,7 @@ class view extends base {
         }
 
         // Split the entry template to tags and html.
-        $parts = $this->split_template_by_tags($tags, $this->view->eparam2);
+        $parts = $this->split_template_by_tags($tags, $this->get_prepared_entry_template());
 
         foreach ($parts as $part) {
             if (in_array($part, $tags)) {

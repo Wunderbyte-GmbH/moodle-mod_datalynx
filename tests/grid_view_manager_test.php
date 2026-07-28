@@ -20,6 +20,11 @@ use advanced_testcase;
 use mod_datalynx\local\view\manager\grid_view_manager;
 use stdClass;
 
+defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
+require_once($CFG->dirroot . '/mod/datalynx/tests/fixtures/multilang_test_trait.php');
+
 /**
  * Tests for the Grid view browse payload manager.
  *
@@ -29,12 +34,15 @@ use stdClass;
  * @coversDefaultClass \mod_datalynx\local\view\manager\grid_view_manager
  */
 final class grid_view_manager_test extends advanced_testcase {
+    use multilang_test_trait;
+
     /**
      * Build a minimal datalynx fixture with a Grid view, one text field, and one entry.
      *
+     * @param string $param2 Optional entry template for the Grid view.
      * @return array
      */
-    private function create_grid_fixture(): array {
+    private function create_grid_fixture(string $param2 = ''): array {
         global $DB, $USER;
 
         $course = $this->getDataGenerator()->create_course();
@@ -53,7 +61,7 @@ final class grid_view_manager_test extends advanced_testcase {
             'param5' => 0,
             'param10' => 0,
             'section' => '',
-            'param2' => '',
+            'param2' => $param2,
         ];
         $view->id = (int) $DB->insert_record('datalynx_views', $view);
 
@@ -227,5 +235,60 @@ final class grid_view_manager_test extends advanced_testcase {
         $this->assertTrue($payload['nowrapper']);
         $this->assertSame('', $payload['entrywrapperclass']);
         $this->assertSame('', $payload['groupclass']);
+    }
+
+    /**
+     * The entry template must be filtered in the AJAX browse payload, not only when a view is
+     * rendered the classic way.
+     *
+     * Regression test: this payload is built without going through base::display(), so before the
+     * entry template got its own preparation step it reached the browser exactly as stored and any
+     * filter markup in it was shown verbatim on every Grid view.
+     *
+     * @covers ::get_browse_payload
+     */
+    public function test_browse_payload_filters_the_entry_template(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $this->enable_multilang_filter();
+
+        [$dlx, $view] = $this->create_grid_fixture('<div>' . $this->multilang_markup() . ' [[Title]]</div>');
+
+        foreach (['de', 'en'] as $lang) {
+            $this->set_current_language($lang);
+            $entryhtml = $this->get_first_entry_html($dlx->id(), $view->id);
+            $this->assert_localised($lang, $entryhtml, 'grid browse payload');
+            // The datalynx tag must still be resolved against this entry's content.
+            $this->assertStringContainsString('Hello Grid', $entryhtml);
+        }
+    }
+
+    /**
+     * Files embedded in the entry template must be rewritten in the AJAX browse payload too.
+     *
+     * @covers ::get_browse_payload
+     */
+    public function test_browse_payload_rewrites_pluginfile_urls_in_entry_template(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        [$dlx, $view] = $this->create_grid_fixture('<div><img src="@@PLUGINFILE@@/logo.png"> [[Title]]</div>');
+
+        $entryhtml = $this->get_first_entry_html($dlx->id(), $view->id);
+        $this->assertStringNotContainsString('@@PLUGINFILE@@', $entryhtml);
+        $this->assertStringContainsString('pluginfile.php', $entryhtml);
+    }
+
+    /**
+     * Fetch the rendered entry html of the first entry in a Grid browse payload.
+     *
+     * @param int $datalynxid
+     * @param int $viewid
+     * @return string
+     */
+    private function get_first_entry_html(int $datalynxid, int $viewid): string {
+        $payload = (new grid_view_manager())->get_browse_payload($datalynxid, $viewid);
+
+        return $payload['groups'][0]['entries'][0]['entryhtml'];
     }
 }

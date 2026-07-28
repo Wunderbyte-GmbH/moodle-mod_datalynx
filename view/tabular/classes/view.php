@@ -53,7 +53,7 @@ class view extends base {
     /**
      * @var array List of view editors
      */
-    protected array $vieweditors = ['section', 'param2'];
+    protected array $vieweditors = ['section'];
 
     /**
      * Generates the default view
@@ -211,7 +211,7 @@ class view extends base {
     protected function apply_entry_group_layout($entriesset, $name = '') {
         global $OUTPUT;
 
-        $tablehtml = trim($this->view->eparam2);
+        $tablehtml = trim($this->get_prepared_entry_template());
         $opengroupdiv = html_writer::start_tag('div', ['class' => 'entriesview']);
         $closegroupdiv = html_writer::end_tag('div');
         if ($name) {
