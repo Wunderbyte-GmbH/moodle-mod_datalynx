@@ -157,30 +157,7 @@ class view extends base {
      * @return string
      */
     public function render_email_entry(stdClass $entry, array $options = []): string {
-        $html = $this->render_entry_html($entry, array_merge([
-            'edit' => false,
-            'manage' => false,
-        ], $options));
-
-        return $this->process_calculations($html);
-    }
-
-    /**
-     * Prepare the email template for output.
-     *
-     * Email templates only get their file urls rewritten. Unlike a browsed view they are
-     * deliberately not run through format_text(): the result is the body of an outgoing message,
-     * which must not pick up the rewriting that content filters such as mediaplugin, emoticon or
-     * activity-name autolinking would apply.
-     *
-     * @param ?string $pluginfileurl Unused for email; files are always rewritten to pluginfile.php.
-     */
-    public function prepare_editors_for_output(?string $pluginfileurl = null): void {
-        if ($this->vieweditorsprepared) {
-            return;
-        }
-        $this->vieweditorsprepared = true;
-
+        $originaltemplate = $this->view->eparam2;
         $this->view->eparam2 = file_rewrite_pluginfile_urls(
             $this->view->eparam2,
             'pluginfile.php',
@@ -189,6 +166,17 @@ class view extends base {
             'viewparam2',
             $this->id()
         );
+
+        try {
+            $html = $this->render_entry_html($entry, array_merge([
+                'edit' => false,
+                'manage' => false,
+            ], $options));
+        } finally {
+            $this->view->eparam2 = $originaltemplate;
+        }
+
+        return $this->process_calculations($html);
     }
 
     /**

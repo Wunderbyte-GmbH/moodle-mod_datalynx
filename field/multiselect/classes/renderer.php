@@ -98,7 +98,7 @@ class renderer extends datalynxfield_renderer {
 
         // Render as autocomplete field (param6 not empty) or select field.
         if ($autocomplete) {
-            $menuoptions = $this->format_option_labels($field->options_menu(false, true));
+            $menuoptions = $field->options_menu(false, true);
             $menuoptions[-999] = null; // Allow this option for empty values.
 
             // Open up the option to add new menu options when requested via either the legacy
@@ -112,7 +112,7 @@ class renderer extends datalynxfield_renderer {
 
             $select = &$mform->addElement('autocomplete', $fieldname, null, $menuoptions, $fieldattr);
         } else {
-            $menuoptions = $this->format_option_labels($field->options_menu());
+            $menuoptions = $field->options_menu();
 
             // Adapt height of select menu to options within bounds.
             $size = 5;
@@ -148,8 +148,7 @@ class renderer extends datalynxfield_renderer {
             $content = $entry->{"c{$fieldid}_content"};
             $contentprepare = str_replace("#", "", $content);
 
-            // Emitted straight into the entry HTML, so keep the default escaping.
-            $menuoptions = $this->format_option_labels($field->options_menu(), true);
+            $menuoptions = $field->options_menu();
 
             $contents = explode(',', $contentprepare);
 
@@ -212,7 +211,7 @@ class renderer extends datalynxfield_renderer {
         $field = $this->field;
         $fieldid = $field->id();
         $fieldname = "f_{$i}_{$fieldid}";
-        $menu = [-1 => ''] + $this->format_option_labels($field->options_menu());
+        $menu = [-1 => ''] + $field->options_menu();
         $options = ['multiple' => true];
         $elements = [];
         $elements[] = $mform->createElement('autocomplete', $fieldname, null, $menu, $options);

@@ -74,10 +74,10 @@ class renderer extends datalynxfield_renderer {
             $disabled = [];
         }
 
-        foreach ($this->format_option_labels($menuoptions) as $id => $name) {
+        foreach ($menuoptions as $id => $name) {
             $option = new stdClass();
             $option->id = $id;
-            $option->name = $name;
+            $option->name = format_string($name);
             $menuoptions[$id] = $option;
         }
         // Sort the options alphabetically.
@@ -135,19 +135,19 @@ class renderer extends datalynxfield_renderer {
                     $str[] = "$isselected $option";
                 }
                 $str = implode(',', $str);
-                return format_string($str, true, ['context' => $field->dlx()->context]);
+                return format_string($str);
             }
 
             if (!empty($options['key']) || $formatmode === 'key') {
                 if ($selected) {
-                    return format_string($selected, true, ['context' => $field->dlx()->context]);
+                    return format_string($selected);
                 } else {
                     return '';
                 }
             }
 
             if ($selected && isset($menuoptions[$selected])) {
-                return format_string($menuoptions[$selected], true, ['context' => $field->dlx()->context]);
+                return format_string($menuoptions[$selected]);
             }
         }
         return '';
@@ -166,7 +166,7 @@ class renderer extends datalynxfield_renderer {
         $field = $this->field;
         $fieldid = $field->id();
         $fieldname = "f_{$i}_{$fieldid}";
-        $menu = [-1 => ''] + $this->format_option_labels($field->options_menu());
+        $menu = [-1 => ''] + $field->options_menu();
         $options = ['multiple' => true];
         $elements = [];
         $elements[] = $mform->createElement('autocomplete', $fieldname, null, $menu, $options);

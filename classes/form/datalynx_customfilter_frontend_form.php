@@ -134,8 +134,6 @@ class datalynx_customfilter_frontend_form extends datalynx_filter_base_form {
         }
 
         if (!empty($sortfields)) {
-            // These are collected outside keep_sortable_fieldoptions(), so format them here.
-            $sortfields = array_map([$this, 'format_field_label'], $sortfields);
             // Important, keep fieldids intact.
             $sortfields = [0 => get_string('choosedots')] + $sortfields;
 
