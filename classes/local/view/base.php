@@ -2045,7 +2045,28 @@ abstract class base {
             $html .= $content;
         }
 
-        return $html;
+        return $this->apply_multilang_filter($html);
+    }
+
+    /**
+     * Resolve multilang2 ({mlang ...}) markup in entry-template text.
+     *
+     * The view section is filtered via format_text(), but entry-template HTML is emitted directly,
+     * so language markup inside entries would otherwise show raw. This applies only the multilang2
+     * filter, leaving datalynx tags (##...##, [[...]]) and the rest of the HTML untouched.
+     *
+     * @param string $text
+     * @return string
+     */
+    protected function apply_multilang_filter(string $text): string {
+        if (strpos($text, '{mlang') === false) {
+            return $text;
+        }
+        if (!class_exists('\\filter_multilang2\\text_filter') || !filter_is_enabled('multilang2')) {
+            return $text;
+        }
+        $filter = new \filter_multilang2\text_filter($this->dlx->context, []);
+        return $filter->filter($text);
     }
 
     /**
@@ -2061,7 +2082,7 @@ abstract class base {
             if (!empty($element)) {
                 [$type, $content] = $element;
                 if ($type === 'html') {
-                    $mform->addElement('html', $content);
+                    $mform->addElement('html', $this->apply_multilang_filter($content));
                 } else {
                     $params = [];
                     $func = $content[0];
