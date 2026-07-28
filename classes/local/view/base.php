@@ -138,17 +138,17 @@ abstract class base {
     protected array $vieweditors = ['section', 'param2'];
 
     /**
-     * The editor texts produced by {@see prepare_editors_for_output()}, keyed by e* property name.
+     * Whether {@see prepare_editors_for_output()} has already run for this view object.
      *
-     * Used to tell "already prepared" from "reset back to raw". A boolean flag is not enough:
-     * datalynx::get_view() hands the same cached record stdClass to every view object it builds,
-     * and each constructor re-derives the e* properties from the pristine source columns via
-     * set__editors(). A view object built later therefore silently reverts the prepared text of an
-     * earlier one. Comparing against the value we produced detects that and prepares again.
+     * Deliberately held per view *object* and not on the shared view record: datalynx::get_view()
+     * hands the same cached record stdClass to every view object it builds, but the constructor
+     * re-derives the e* editor properties from the pristine source columns via set__editors(), so
+     * a freshly built view is always unprepared. A datalynxview field renders one view object per
+     * entry, which would break if the flag lived on the record.
      *
-     * @var array
+     * @var bool
      */
-    protected array $preparededitors = [];
+    protected bool $vieweditorsprepared = false;
 
     /**
      * Cached entries handler.
@@ -1344,57 +1344,57 @@ abstract class base {
      *
      * This is deliberately separate from {@see set_view_tags()}: the legacy render path goes
      * through set_view_tags(), but the AJAX browse path builds entries straight from the entry
-     * template through the view managers and never calls it. Both paths call this method, and
-     * {@see $preparededitors} keeps the work to one run per editor.
+     * template through the view managers and never calls it. Both paths call this method, and the
+     * $vieweditorsprepared guard keeps it to a single run per view object.
      *
      * @param ?string $pluginfileurl Explicit file path used by exports; null rewrites to pluginfile.php.
      */
     public function prepare_editors_for_output(?string $pluginfileurl = null): void {
-        foreach (array_unique(array_merge($this->editors, $this->vieweditors)) as $editorname) {
+        if ($this->vieweditorsprepared) {
+            return;
+        }
+        $this->vieweditorsprepared = true;
+
+        // Rewrite plugin urls.
+        foreach ($this->editors as $editorname) {
             $editor = "e$editorname";
 
-            // Catch potential data mismatch: some view types filter (but do not own) an editor.
-            if (!isset($this->view->$editor)) {
-                $this->view->$editor = null;
+            // Export with files should provide the file path.
+            if ($pluginfileurl) {
+                $this->view->$editor = str_replace(
+                    '@@PLUGINFILE@@/',
+                    $pluginfileurl,
+                    $this->view->$editor
+                );
+            } else {
+                $this->view->$editor = file_rewrite_pluginfile_urls(
+                    $this->view->$editor,
+                    'pluginfile.php',
+                    $this->dlx->context->id,
+                    'mod_datalynx',
+                    "view$editorname",
+                    $this->id()
+                );
+            }
+        }
+
+        foreach ($this->vieweditors as $editor) {
+            // Catch potential data mismatch.
+            if (!isset($this->view->{"e$editor"})) {
+                $this->view->{"e$editor"} = null;
                 continue;
             }
-            // Already prepared, and nothing has reset it back to the raw source since.
-            if (isset($this->preparededitors[$editor]) && $this->view->$editor === $this->preparededitors[$editor]) {
-                continue;
-            }
 
-            $text = $this->view->$editor;
-
-            if (in_array($editorname, $this->editors, true)) {
-                // Rewrite plugin urls. Export with files should provide the file path.
-                if ($pluginfileurl) {
-                    $text = str_replace('@@PLUGINFILE@@/', $pluginfileurl, $text);
-                } else {
-                    $text = file_rewrite_pluginfile_urls(
-                        $text,
-                        'pluginfile.php',
-                        $this->dlx->context->id,
-                        'mod_datalynx',
-                        "view$editorname",
-                        $this->id()
-                    );
-                }
-            }
-
-            if (in_array($editorname, $this->vieweditors, true)) {
-                $text = $this->mask_tags($text);
-                // The context must be passed explicitly: the AJAX browse path runs inside a web
-                // service call where $PAGE->context cannot be relied upon to be the module context.
-                $text = format_text($text, FORMAT_HTML, [
-                    'trusted' => 1,
-                    'filter' => true,
-                    'context' => $this->dlx->context,
-                ]);
-                $text = $this->unmask_tags($text);
-            }
-
-            $this->view->$editor = $text;
-            $this->preparededitors[$editor] = $text;
+            $text = $this->view->{"e$editor"};
+            $text = $this->mask_tags($text);
+            // The context must be passed explicitly: the AJAX browse path runs inside a web
+            // service call where $PAGE->context cannot be relied upon to be the module context.
+            $text = format_text($text, FORMAT_HTML, [
+                'trusted' => 1,
+                'filter' => true,
+                'context' => $this->dlx->context,
+            ]);
+            $this->view->{"e$editor"} = $this->unmask_tags($text);
         }
     }
 

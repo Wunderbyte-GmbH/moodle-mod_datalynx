@@ -176,9 +176,10 @@ class view extends base {
      * @param ?string $pluginfileurl Unused for email; files are always rewritten to pluginfile.php.
      */
     public function prepare_editors_for_output(?string $pluginfileurl = null): void {
-        if (isset($this->preparededitors['eparam2']) && $this->view->eparam2 === $this->preparededitors['eparam2']) {
+        if ($this->vieweditorsprepared) {
             return;
         }
+        $this->vieweditorsprepared = true;
 
         $this->view->eparam2 = file_rewrite_pluginfile_urls(
             $this->view->eparam2,
@@ -188,7 +189,6 @@ class view extends base {
             'viewparam2',
             $this->id()
         );
-        $this->preparededitors['eparam2'] = $this->view->eparam2;
     }
 
     /**

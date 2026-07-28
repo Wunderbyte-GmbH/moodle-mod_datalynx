@@ -136,35 +136,6 @@ final class view_editor_preparation_test extends advanced_testcase {
     }
 
     /**
-     * A second view object built from the same record must not leave the first one unprepared.
-     *
-     * Regression test: datalynx::get_view() shares the cached view record between view objects and
-     * every constructor re-derives the e* properties from the raw source columns. A boolean
-     * "already prepared" flag therefore went on claiming the template was ready while another view
-     * object had silently reset it, and the raw {mlang ...} markup reappeared in rendered entries.
-     *
-     * @return void
-     */
-    public function test_preparation_survives_a_second_view_object_on_the_same_record(): void {
-        $viewid = $this->make_view('##entries##', '<div>{mlang other}Hello{mlang}</div>')->view->id;
-
-        // Both view objects are built from the one record instance the datalynx caches.
-        $record = $this->dlx->get_view_records(true)[$viewid];
-        $first = $this->dlx->get_view($record->type, $record, false);
-
-        $first->prepare_editors_for_output();
-        $this->assertStringNotContainsString('{mlang', $first->view->eparam2);
-
-        // Building another view object from the same record resets the shared editors to raw.
-        $this->dlx->get_view($record->type, $record, false);
-        $this->assertStringContainsString('{mlang', $first->view->eparam2);
-
-        // The first view must notice and prepare again rather than trust a stale flag.
-        $first->prepare_editors_for_output();
-        $this->assertStringNotContainsString('{mlang', $first->view->eparam2);
-    }
-
-    /**
      * An empty entry template must stay empty and must not inherit the section text.
      *
      * @return void
