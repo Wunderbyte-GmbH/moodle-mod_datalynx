@@ -58,7 +58,8 @@ class renderer extends MultiSelectRenderer {
         $separator = isset($field->separators[$param3]) ? $field->separators[$param3]['chr'] : $field->separators[0]['chr'];
 
         $elemgrp = [];
-        foreach ($menuoptions as $i => $option) {
+        // Checkbox labels are rendered as HTML, so keep the default escaping.
+        foreach ($this->format_option_labels($menuoptions, true) as $i => $option) {
             $elemgrp[] = &$mform->createElement(
                 'advcheckbox',
                 $i,

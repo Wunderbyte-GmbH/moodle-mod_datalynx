@@ -138,6 +138,19 @@ abstract class base {
     protected array $vieweditors = ['section', 'param2'];
 
     /**
+     * Whether {@see prepare_editors_for_output()} has already run for this view object.
+     *
+     * Deliberately held per view *object* and not on the shared view record: datalynx::get_view()
+     * hands the same cached record stdClass to every view object it builds, but the constructor
+     * re-derives the e* editor properties from the pristine source columns via set__editors(), so
+     * a freshly built view is always unprepared. A datalynxview field renders one view object per
+     * entry, which would break if the flag lived on the record.
+     *
+     * @var bool
+     */
+    protected bool $vieweditorsprepared = false;
+
+    /**
      * Cached entries handler.
      *
      * @var ?datalynx_entries
@@ -392,8 +405,9 @@ abstract class base {
      * @param ?stdClass $data Submitted form data.
      */
     protected function set__editors($data = null) {
-        $text = '';
         foreach ($this->editors as $editor) { // New view or from DB so add editor fields.
+            // Must be reset per editor: otherwise an empty param2 would inherit section's text.
+            $text = '';
             if (is_null($data)) {
                 if (!empty($this->view->$editor)) {
                     $editordata = $this->view->$editor;
@@ -1105,6 +1119,11 @@ abstract class base {
         $pluginfileurl = $options['pluginfileurl'] ?? null;
         $entriesplaceholder = $options['entriesplaceholder'] ?? null;
 
+        // Make the editors ready for output before anything can read them. Doing it here rather
+        // than leaving it to the first lazy caller guarantees that an export passing its own
+        // pluginfileurl wins over a later no-argument call.
+        $this->prepare_editors_for_output($pluginfileurl);
+
         // Build entries display definition.
         $requiresmanageentries = $this->set_display_definition($options);
 
@@ -1316,13 +1335,27 @@ abstract class base {
     }
 
     /**
-     * Replace the tags in the view template section of a view with the appropriate values
+     * Make the view editors ready for output: rewrite file urls and apply text filters.
      *
-     * @param array $options
+     * Both the view section and the entry template are user authored content, so they must pass
+     * through format_text() before anything is emitted. That is what makes filters such as
+     * multilang2 work inside them. Datalynx tags are masked first so filters cannot rewrite a
+     * tag's internals, and are restored verbatim afterwards for the later tag substitution.
+     *
+     * This is deliberately separate from {@see set_view_tags()}: the legacy render path goes
+     * through set_view_tags(), but the AJAX browse path builds entries straight from the entry
+     * template through the view managers and never calls it. Both paths call this method, and the
+     * $vieweditorsprepared guard keeps it to a single run per view object.
+     *
+     * @param ?string $pluginfileurl Explicit file path used by exports; null rewrites to pluginfile.php.
      */
-    public function set_view_tags(array $options): void {
+    public function prepare_editors_for_output(?string $pluginfileurl = null): void {
+        if ($this->vieweditorsprepared) {
+            return;
+        }
+        $this->vieweditorsprepared = true;
+
         // Rewrite plugin urls.
-        $pluginfileurl = !empty($options['pluginfileurl']) ? $options['pluginfileurl'] : null;
         foreach ($this->editors as $editorname) {
             $editor = "e$editorname";
 
@@ -1345,8 +1378,6 @@ abstract class base {
             }
         }
 
-        $tags = $this->tags['view'];
-        $replacements = $this->patternclass()->get_replacements($tags, null, $options);
         foreach ($this->vieweditors as $editor) {
             // Catch potential data mismatch.
             if (!isset($this->view->{"e$editor"})) {
@@ -1356,8 +1387,34 @@ abstract class base {
 
             $text = $this->view->{"e$editor"};
             $text = $this->mask_tags($text);
-            $text = format_text($text, FORMAT_HTML, ['trusted' => 1, 'filter' => true]);
-            $text = $this->unmask_tags($text);
+            // The context must be passed explicitly: the AJAX browse path runs inside a web
+            // service call where $PAGE->context cannot be relied upon to be the module context.
+            $text = format_text($text, FORMAT_HTML, [
+                'trusted' => 1,
+                'filter' => true,
+                'context' => $this->dlx->context,
+            ]);
+            $this->view->{"e$editor"} = $this->unmask_tags($text);
+        }
+    }
+
+    /**
+     * Replace the tags in the view template section of a view with the appropriate values
+     *
+     * @param array $options
+     */
+    public function set_view_tags(array $options): void {
+        $this->prepare_editors_for_output(!empty($options['pluginfileurl']) ? $options['pluginfileurl'] : null);
+
+        $tags = $this->tags['view'];
+        $replacements = $this->patternclass()->get_replacements($tags, null, $options);
+        foreach ($this->vieweditors as $editor) {
+            // Catch potential data mismatch.
+            if (!isset($this->view->{"e$editor"})) {
+                continue;
+            }
+
+            $text = $this->view->{"e$editor"};
 
             $editortags = [];
             $editorreplacements = [];
@@ -1749,6 +1806,9 @@ abstract class base {
     protected function entry_definition($fielddefinitions) {
         $elements = [];
 
+        // The AJAX browse path reaches the entry template without going through set_view_tags().
+        $this->prepare_editors_for_output();
+
         // Split the entry template to tags and html.
         $tags = array_keys($fielddefinitions);
         $parts = $this->split_template_by_tags($tags, $this->view->eparam2);
@@ -2045,28 +2105,7 @@ abstract class base {
             $html .= $content;
         }
 
-        return $this->apply_multilang_filter($html);
-    }
-
-    /**
-     * Resolve multilang2 ({mlang ...}) markup in entry-template text.
-     *
-     * The view section is filtered via format_text(), but entry-template HTML is emitted directly,
-     * so language markup inside entries would otherwise show raw. This applies only the multilang2
-     * filter, leaving datalynx tags (##...##, [[...]]) and the rest of the HTML untouched.
-     *
-     * @param string $text
-     * @return string
-     */
-    protected function apply_multilang_filter(string $text): string {
-        if (strpos($text, '{mlang') === false) {
-            return $text;
-        }
-        if (!class_exists('\\filter_multilang2\\text_filter') || !filter_is_enabled('multilang2')) {
-            return $text;
-        }
-        $filter = new \filter_multilang2\text_filter($this->dlx->context, []);
-        return $filter->filter($text);
+        return $html;
     }
 
     /**
@@ -2082,7 +2121,7 @@ abstract class base {
             if (!empty($element)) {
                 [$type, $content] = $element;
                 if ($type === 'html') {
-                    $mform->addElement('html', $this->apply_multilang_filter($content));
+                    $mform->addElement('html', $content);
                 } else {
                     $params = [];
                     $func = $content[0];
@@ -2170,6 +2209,7 @@ abstract class base {
      * @return string
      */
     public function render_entry_html(stdClass $entry, array $options = []): string {
+        $this->prepare_editors_for_output();
         $fielddefinitions = $this->get_entry_tag_replacements($entry, $options);
         $elements = $this->entry_definition($fielddefinitions);
         $html = '';

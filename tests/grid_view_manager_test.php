@@ -32,9 +32,10 @@ final class grid_view_manager_test extends advanced_testcase {
     /**
      * Build a minimal datalynx fixture with a Grid view, one text field, and one entry.
      *
+     * @param string $param2 Optional entry template for the Grid view.
      * @return array
      */
-    private function create_grid_fixture(): array {
+    private function create_grid_fixture(string $param2 = ''): array {
         global $DB, $USER;
 
         $course = $this->getDataGenerator()->create_course();
@@ -53,7 +54,7 @@ final class grid_view_manager_test extends advanced_testcase {
             'param5' => 0,
             'param10' => 0,
             'section' => '',
-            'param2' => '',
+            'param2' => $param2,
         ];
         $view->id = (int) $DB->insert_record('datalynx_views', $view);
 
@@ -227,5 +228,91 @@ final class grid_view_manager_test extends advanced_testcase {
         $this->assertTrue($payload['nowrapper']);
         $this->assertSame('', $payload['entrywrapperclass']);
         $this->assertSame('', $payload['groupclass']);
+    }
+
+    /**
+     * Content filters must be applied to the entry template in the AJAX browse payload.
+     *
+     * Regression test: the browse payload is built by this manager, which never goes through
+     * base::set_view_tags(). The entry template therefore reached the browser unfiltered and
+     * {mlang ...} markup showed up raw on every Grid view.
+     *
+     * @covers ::get_browse_payload
+     */
+    public function test_browse_payload_applies_content_filters_to_entry_template(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $this->enable_multilang_filter();
+
+        $template = '<div>{mlang de}GERMANLABEL{mlang}{mlang other}ENGLISHLABEL{mlang} [[Title]]</div>';
+        [$dlx, $view] = $this->create_grid_fixture($template);
+
+        $this->set_current_language('de');
+        $entryhtml = $this->get_first_entry_html($dlx->id(), $view->id);
+        $this->assertStringNotContainsString('{mlang', $entryhtml);
+        $this->assertStringContainsString('GERMANLABEL', $entryhtml);
+        $this->assertStringNotContainsString('ENGLISHLABEL', $entryhtml);
+        // The datalynx tag must still have been resolved against the entry content.
+        $this->assertStringContainsString('Hello Grid', $entryhtml);
+
+        $this->set_current_language('en');
+        $entryhtml = $this->get_first_entry_html($dlx->id(), $view->id);
+        $this->assertStringNotContainsString('{mlang', $entryhtml);
+        $this->assertStringContainsString('ENGLISHLABEL', $entryhtml);
+        $this->assertStringNotContainsString('GERMANLABEL', $entryhtml);
+    }
+
+    /**
+     * Files embedded in the entry template must be rewritten in the AJAX browse payload too.
+     *
+     * @covers ::get_browse_payload
+     */
+    public function test_browse_payload_rewrites_pluginfile_urls_in_entry_template(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        [$dlx, $view] = $this->create_grid_fixture('<div><img src="@@PLUGINFILE@@/logo.png"> [[Title]]</div>');
+
+        $entryhtml = $this->get_first_entry_html($dlx->id(), $view->id);
+        $this->assertStringNotContainsString('@@PLUGINFILE@@', $entryhtml);
+        $this->assertStringContainsString('pluginfile.php', $entryhtml);
+    }
+
+    /**
+     * Fetch the rendered entry HTML of the first entry in a Grid browse payload.
+     *
+     * @param int $datalynxid
+     * @param int $viewid
+     * @return string
+     */
+    private function get_first_entry_html(int $datalynxid, int $viewid): string {
+        $manager = new grid_view_manager();
+        $payload = $manager->get_browse_payload($datalynxid, $viewid);
+
+        return $payload['groups'][0]['entries'][0]['entryhtml'];
+    }
+
+    /**
+     * Enable the multilang2 content filter globally for the current test.
+     */
+    private function enable_multilang_filter(): void {
+        filter_set_global_state('multilang2', TEXTFILTER_ON);
+        \filter_manager::reset_caches();
+    }
+
+    /**
+     * Force the current language for the request.
+     *
+     * Sets $SESSION->forcelang directly (rather than force_current_language(), which is a no-op
+     * when the language pack is not installed in the test environment) and resets the caches that
+     * would otherwise hand back a result filtered for the previous language.
+     *
+     * @param string $lang the language code to force, e.g. 'de' or 'en'.
+     */
+    private function set_current_language(string $lang): void {
+        global $SESSION;
+        $SESSION->forcelang = $lang;
+        \filter_multilang2\text_filter::reset_parentcache();
+        \filter_manager::reset_caches();
     }
 }

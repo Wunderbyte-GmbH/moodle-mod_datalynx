@@ -245,7 +245,8 @@ trait filter_form_elements {
      * Only fields that declare support for searching (see {@see datalynxfield_base::supports_search()})
      * may be offered as filter criteria. Internal helper fields that hold no content, such as the
      * submit and cancel button fields, are therefore excluded. The reserved "choose" entry (key 0)
-     * and any unresolvable key are kept as-is.
+     * and any unresolvable key are kept as-is. The names are also run through
+     * {@see format_field_label()} because this menu is only ever used for display.
      *
      * @param array $fieldoptions fieldid => name menu
      * @return array the filtered menu
@@ -260,9 +261,23 @@ trait filter_form_elements {
             ) {
                 continue;
             }
-            $searchable[$fieldid] = $fieldname;
+            $searchable[$fieldid] = $this->format_field_label($fieldname);
         }
         return $searchable;
+    }
+
+    /**
+     * Format a field name for use as a filter label or menu option.
+     *
+     * Field names are authored text, so filter markup such as multilang2's {mlang ...} has to be
+     * resolved before they are shown. Escaping is left to the consumer: both mform select options
+     * and the customfilter Mustache template escape the value again.
+     *
+     * @param string $name
+     * @return string
+     */
+    protected function format_field_label(string $name): string {
+        return format_string($name, true, ['context' => $this->dlx->context, 'escape' => false]);
     }
 
     /**
@@ -283,7 +298,7 @@ trait filter_form_elements {
             if ($fieldid && ($field = $dlx->get_field_from_id($fieldid)) && !$field->supports_sort()) {
                 continue;
             }
-            $sortable[$fieldid] = $fieldname;
+            $sortable[$fieldid] = $this->format_field_label($fieldname);
         }
         return $sortable;
     }
