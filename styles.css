@@ -316,23 +316,65 @@ form.mform div.entry div.datalynx-field-wrapper {
     display: block; /* inline-flex */
 }
 
-/* When a field uses a custom edit template with #input, suppress Moodle's
-   Bootstrap grid wrapper (col-md-3 label + col-md-9 input columns).
-   display:contents removes the layout box but preserves DOM parentage so
-   descendant selectors (.has-danger .form-control) and JS error enhancers
-   still work correctly. */
+/* A field using a custom edit template with #input supplies its own label and help
+   text, so Moodle's fitem grid (col-md-3 label column + col-md-9 input column) must
+   not impose its own layout.
+
+   This cannot be done by hiding the label column: Moodle's element-template.mustache
+   puts .d-flex on it, and Bootstrap's .d-flex{display:flex!important} beats any
+   display:none we could write. So keep the row a real flex container instead, shrink
+   the label column to its content and reorder it after the input — which puts the
+   required marker inline, right of the control, instead of stacked above it. */
 .datalynx-no-fitem-wrapper .fitem {
-    display: contents;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    /* Undo .row's negative gutters so the control aligns with the template's own label. */
+    margin-left: 0;
+    margin-right: 0;
 }
-.datalynx-no-fitem-wrapper .col-md-3.col-form-label {
-    display: none;
+
+/* The usual case: no label text (femptylabel), so the label column holds nothing but
+   the required marker. Fitems that do carry a label (fieldgroup sub-elements pass
+   $shortname) keep the normal label-left order. The .col-md-* grid classes carry no
+   !important, so plain specificity is enough to override them here. */
+.datalynx-no-fitem-wrapper .fitem.femptylabel > .col-md-3.col-form-label {
+    order: 2;
+    flex: 0 0 auto;
+    width: auto;
+    max-width: none;
+    padding: 0;
 }
-.datalynx-no-fitem-wrapper .felement {
-    flex: 0 0 100%;
+
+/* Shrink-wrap by default so the marker stays next to a small control (checkbox,
+   radio) instead of being stranded at the far edge of the row. */
+.datalynx-no-fitem-wrapper .fitem.femptylabel > .felement {
+    order: 1;
+    flex: 0 1 auto;
+    width: auto;
     max-width: 100%;
+    min-width: 0;
     padding-left: 0;
     padding-right: 0;
-    display: block;
+}
+
+/* ...but a block-level control still spans the row, as it does without a custom
+   layout. Browsers without :has() fall back to the shrink-wrapped width above, which
+   still renders correctly - only narrower. */
+.datalynx-no-fitem-wrapper .fitem.femptylabel > .felement:has(> select, > input.form-control, > textarea) {
+    flex: 1 1 auto;
+}
+
+.datalynx-no-fitem-wrapper .fitem.femptylabel > .felement > select,
+.datalynx-no-fitem-wrapper .fitem.femptylabel > .felement > input.form-control,
+.datalynx-no-fitem-wrapper .fitem.femptylabel > .felement > textarea {
+    flex: 1 1 auto;
+}
+
+/* Gap only when the column actually shows something — the .form-label-addon wrapper
+   is emitted for every element, but only gets children when there is a marker. */
+.datalynx-no-fitem-wrapper .fitem.femptylabel .form-label-addon > * {
+    margin-left: 0.5rem;
 }
 
 /* ##submit## and ##cancel## are always placed in custom view HTML, so their
