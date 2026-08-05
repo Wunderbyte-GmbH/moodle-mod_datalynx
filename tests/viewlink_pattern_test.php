@@ -648,4 +648,35 @@ final class viewlink_pattern_test extends advanced_testcase {
         $restored = $templateobj->unmask_tags($filtered);
         $this->assertStringContainsString($tag, $restored);
     }
+
+    /**
+     * Test that ##viewsesslink:...## tags targeting a DIFFERENT view are rendered even
+     * when the current view is in edit mode (enabling multi-step wizard step navigation).
+     *
+     * @covers ::get_regexp_replacements
+     */
+    public function test_viewsesslink_rendered_in_edit_mode_when_targeting_different_view(): void {
+        [$dlx, $targetobj, $templateobj] = $this->create_test_views(
+            '##viewsesslink:myview;Go to Step 1;editentries=##entryid##;badge##'
+        );
+
+        $tag = '##viewsesslink:myview;Go to Step 1;editentries=##entryid##;badge##';
+        $entry = (object) ['id' => 42];
+
+        // Simulate templateobj (a different view from targetobj 'myview') being in edit mode.
+        $templateobj->set_editentries([42]);
+        $this->assertTrue($templateobj->user_is_editing());
+
+        $patternclass = $templateobj->patternclass();
+        $pobj = new $patternclass($templateobj);
+        $replacements = $pobj->get_replacements([$tag], $entry, []);
+
+        $this->assertArrayHasKey($tag, $replacements);
+        $this->assertNotEmpty($replacements[$tag], 'viewsesslink targeting a different view must not be suppressed in edit mode');
+        $this->assertStringContainsString('href="', $replacements[$tag]);
+        $this->assertStringContainsString('editentries=42', $replacements[$tag]);
+        $this->assertStringContainsString('>Go to Step 1<', $replacements[$tag]);
+
+        unset($_GET['editentries']);
+    }
 }

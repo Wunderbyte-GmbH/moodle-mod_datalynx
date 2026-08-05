@@ -250,9 +250,10 @@ class datalynxview_patterns {
                 $viewlink = strpos($tag, "##viewlink:$viewname;");
                 $sesslink = strpos($tag, "##viewsesslink:$viewname;");
                 if ($viewlink === 0 || $sesslink === 0) {
-                    // Already editing the entry so do not show link for editing entry.
+                    // Already editing the entry in this view so do not show link for editing entry in the same view.
                     if (
                         $sesslink === 0 && $currentview && $currentview->user_is_editing() &&
+                        $view->name() === $currentview->name() &&
                         strpos($tag, 'editentries') !== false
                     ) {
                         return '';
