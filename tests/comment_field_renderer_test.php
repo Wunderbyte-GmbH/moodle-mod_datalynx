@@ -68,4 +68,68 @@ final class comment_field_renderer_test extends advanced_testcase {
             $PAGE->url->out_as_local_url(false)
         );
     }
+
+    /**
+     * Every placeholder must occur exactly once in the comment template.
+     *
+     * M.core_comment.render() in comment/comment.js substitutes them with
+     * String.prototype.replace() and a string pattern, which only replaces the first match, so a
+     * duplicated placeholder would silently render as literal text in the browser while the PHP
+     * path (str_replace) still looked correct.
+     *
+     * @covers ::datalynx_comment_template
+     */
+    public function test_comment_template_contains_each_placeholder_exactly_once(): void {
+        global $CFG;
+        require_once($CFG->dirroot . '/mod/datalynx/lib.php');
+
+        $template = datalynx_comment_template(new \stdClass());
+
+        foreach (['___picture___', '___name___', '___time___', '___content___'] as $placeholder) {
+            $this->assertSame(
+                1,
+                substr_count($template, $placeholder),
+                "Placeholder {$placeholder} must appear exactly once in the comment template."
+            );
+        }
+    }
+
+    /**
+     * Core must actually pick the template callback up for datalynx comments.
+     *
+     * comment_template is a long-standing but undocumented extension point, and Moodle 5.x
+     * renames the comment class to \core_comment\manager. If a future core release stops
+     * invoking the callback, the widget would quietly fall back to core's markup and only the
+     * styling would look wrong; this test turns that into a visible failure.
+     *
+     * @covers ::datalynx_comment_template
+     */
+    public function test_core_applies_the_datalynx_comment_template(): void {
+        global $CFG, $PAGE;
+        require_once($CFG->dirroot . '/comment/lib.php');
+
+        $course = $this->getDataGenerator()->create_course();
+        $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
+        $cm = get_coursemodule_from_instance('datalynx', $instance->id, $course->id, false, MUST_EXIST);
+
+        $PAGE = new moodle_page();
+        $PAGE->set_url('/mod/datalynx/view.php', ['id' => $cm->id]);
+
+        $args = new \stdClass();
+        $args->context = \context_module::instance($cm->id);
+        $args->courseid = $course->id;
+        $args->cm = $cm;
+        $args->component = 'mod_datalynx';
+        $args->area = 'entry';
+        $args->itemid = 1;
+
+        $comment = new \comment($args);
+
+        $property = new \ReflectionProperty(\comment::class, 'template');
+        $property->setAccessible(true);
+        $template = $property->getValue($comment);
+
+        $this->assertStringContainsString('datalynx-comment-body', $template);
+        $this->assertSame(datalynx_comment_template($args), $template);
+    }
 }

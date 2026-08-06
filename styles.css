@@ -781,3 +781,294 @@ form.mform div.entry div.datalynx-field-wrapper {
     }
 }
 
+/* ---------------------------------------------------------------------------
+ * Comment widget (##comments##) — wraps core's comment output, which datalynx
+ * emits verbatim from field/comment/classes/renderer.php and marks up with
+ * .datalynx-comment-widget. Core's own baseline (theme/boost/scss/moodle/core.scss)
+ * is 11-12px type with float-based avatars and legacy .mdl-left/.db/.fd wrappers,
+ * so everything below is a deliberate override.
+ *
+ * Every selector is scoped to .datalynx-comment-widget. That alone outranks the
+ * unprefixed Boost rules on specificity, which is why no !important is needed and
+ * why no styling leaks into comments rendered by other activities.
+ *
+ * Rules are written against BOTH the datalynx classes injected by
+ * datalynx_comment_template() and the core classes they sit alongside, so the
+ * thread still reads correctly if that callback ever stops being invoked (it is a
+ * long-standing but undocumented core extension point).
+ *
+ * Two things must NOT be styled here: .comment-ctrl's display, which core JS drives
+ * via an inline style when opening/closing the thread, and the post control's
+ * element type, which Behat drives with "I follow "Save comment"".
+ * --------------------------------------------------------------------------- */
+
+/* Toggle: "Comments (N)". Core keeps aria-expanded in sync, so the chevron needs no JS. */
+.datalynx-comment-widget .comment-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0;
+    color: var(--bs-primary, #0f6cbf);
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.datalynx-comment-widget .comment-link:hover,
+.datalynx-comment-widget .comment-link:focus {
+    text-decoration: underline;
+}
+
+.datalynx-comment-widget .comment-link:focus-visible {
+    outline: 2px solid #0f6cbf;
+    outline-offset: 2px;
+}
+
+/* Replace core's t/collapsed pix image with a CSS chevron. The image carries the
+   accessible name, so it is hidden rather than removed. */
+.datalynx-comment-widget .comment-link .icon {
+    width: 0;
+    height: 0;
+    margin: 0;
+    visibility: hidden;
+}
+
+.datalynx-comment-widget .comment-link::before {
+    content: '';
+    display: inline-block;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: rotate(-45deg);
+    transition: transform 0.2s ease-in-out;
+}
+
+.datalynx-comment-widget .comment-link[aria-expanded="true"]::before {
+    transform: rotate(45deg);
+}
+
+.datalynx-comment-widget .comment-ctrl {
+    font-size: inherit;
+}
+
+/* Thread */
+.datalynx-comment-widget .comment-list {
+    margin: 0.75rem 0 0;
+    padding: 0;
+    font-size: inherit;
+    list-style: none;
+}
+
+.datalynx-comment-widget .comment-list li {
+    position: relative;
+    margin: 0;
+    padding: 0.5rem 0;
+}
+
+.datalynx-comment-widget .comment-list li + li {
+    border-top: 1px solid var(--bs-border-color, #dee2e6);
+}
+
+.datalynx-comment-widget .comment-list li.first {
+    display: none;
+}
+
+/* One comment: avatar column beside the author/time header and message body.
+   Keyed on .datalynx-comment, which only exists while datalynx_comment_template() is applied.
+   Without it, core's template keeps its own block layout and the shared rules below still
+   apply, so the thread degrades to a tidier version of the stock widget rather than to a
+   broken flex row. */
+.datalynx-comment-widget .datalynx-comment {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+}
+
+.datalynx-comment-widget .datalynx-comment .picture {
+    flex-shrink: 0;
+    float: none; /* Boost floats the avatar; the flex row places it instead. */
+}
+
+.datalynx-comment-widget .comment-message .picture img {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+}
+
+.datalynx-comment-widget .datalynx-comment-body {
+    flex: 1 1 auto;
+    min-width: 0; /* Lets long words wrap instead of stretching the row. */
+}
+
+.datalynx-comment-widget .comment-message-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.datalynx-comment-widget .comment-message-meta .user {
+    color: var(--bs-body-color, #212529);
+    font-weight: 600;
+}
+
+.datalynx-comment-widget .comment-message-meta .time {
+    color: var(--bs-secondary, #6c757d);
+    font-size: 0.8125rem;
+}
+
+.datalynx-comment-widget .comment-message .text {
+    margin: 0;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    background-color: var(--bs-light, #f8f9fa);
+    color: var(--bs-body-color, #212529);
+    overflow-wrap: anywhere; /* Long URLs must wrap, never widen the entry card. */
+}
+
+.datalynx-comment-widget .comment-message .text > p:last-child {
+    margin-bottom: 0;
+}
+
+/* Delete control. Core appends it inside ___content___, positioned against the <li>. */
+.datalynx-comment-widget .comment-delete {
+    position: absolute;
+    top: 0.5rem;
+    right: 0;
+    line-height: 1;
+}
+
+.datalynx-comment-widget .comment-delete a {
+    display: inline-flex;
+    padding: 0.25rem;
+    border-radius: 0.375rem;
+    color: var(--bs-secondary, #6c757d);
+    opacity: 0.6;
+    transition: opacity 0.15s ease-in-out, background-color 0.15s ease-in-out;
+}
+
+.datalynx-comment-widget .comment-delete a:hover,
+.datalynx-comment-widget .comment-delete a:focus {
+    background-color: var(--bs-light, #f8f9fa);
+    opacity: 1;
+}
+
+/* Paging */
+.datalynx-comment-widget .comment-paging {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    margin-top: 0.5rem;
+}
+
+.datalynx-comment-widget .comment-paging .pageno,
+.datalynx-comment-widget .comment-paging .curpage {
+    padding: 0.125rem 0.5rem;
+    border: 1px solid var(--bs-border-color, #dee2e6);
+    border-radius: 0.375rem;
+    text-decoration: none;
+}
+
+.datalynx-comment-widget .comment-paging .curpage {
+    border-color: var(--bs-primary, #0f6cbf);
+    background-color: var(--bs-primary, #0f6cbf);
+    color: #fff;
+}
+
+/* Post form. Boost caps .comment-area at 400px, which looks stranded in a wide card. */
+.datalynx-comment-widget .comment-area {
+    max-width: none;
+    margin-top: 0.75rem;
+}
+
+.datalynx-comment-widget .comment-area textarea {
+    width: 100%;
+    min-height: 4.5rem;
+    padding: 0.375rem 0.75rem;
+    border: 1px solid var(--bs-border-color, #ced4da);
+    border-radius: 0.375rem;
+    background-color: var(--bs-body-bg, #fff);
+    color: var(--bs-body-color, #212529);
+    font-family: inherit;
+    font-size: inherit;
+    line-height: 1.5;
+}
+
+.datalynx-comment-widget .comment-area textarea:focus {
+    border-color: #0f6cbf;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(15, 108, 191, 0.25);
+}
+
+.datalynx-comment-widget .comment-area .fd {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    text-align: right;
+}
+
+/* The save control stays an <a> (Behat follows it by name); only its looks change. */
+.datalynx-comment-widget .comment-area .fd a {
+    display: inline-block;
+    padding: 0.375rem 0.75rem;
+    border: 1px solid var(--bs-primary, #0f6cbf);
+    border-radius: 0.375rem;
+    background-color: var(--bs-primary, #0f6cbf);
+    color: #fff;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.datalynx-comment-widget .comment-area .fd a:hover,
+.datalynx-comment-widget .comment-area .fd a:focus {
+    background-color: #0d5ba3;
+    border-color: #0d5ba3;
+    color: #fff;
+}
+
+.datalynx-comment-widget .comment-area .fd a:focus-visible {
+    outline: 2px solid #0f6cbf;
+    outline-offset: 2px;
+}
+
+/* The cancel link sits after a "|" separator; render it as a plain secondary action. */
+.datalynx-comment-widget .comment-area .fd span {
+    display: none;
+}
+
+.datalynx-comment-widget .comment-area .fd a + a {
+    border-color: transparent;
+    background-color: transparent;
+    color: var(--bs-secondary, #6c757d);
+}
+
+.datalynx-comment-widget .comment-area .fd a + a:hover,
+.datalynx-comment-widget .comment-area .fd a + a:focus {
+    background-color: var(--bs-light, #f8f9fa);
+    border-color: transparent;
+    color: var(--bs-body-color, #212529);
+}
+
+@media (max-width: 576px) {
+    .datalynx-comment-widget .comment-message {
+        gap: 0.5rem;
+    }
+
+    .datalynx-comment-widget .comment-message .picture img {
+        width: 2rem;
+        height: 2rem;
+    }
+
+    .datalynx-comment-widget .comment-area .fd {
+        justify-content: stretch;
+    }
+
+    .datalynx-comment-widget .comment-area .fd a {
+        flex: 1 1 auto;
+        text-align: center;
+    }
+}
+

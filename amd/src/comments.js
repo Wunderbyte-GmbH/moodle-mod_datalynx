@@ -14,7 +14,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Re-initialise Moodle comment widgets after Datalynx injects browse content with AJAX.
+ * Bootstrap Moodle comment widgets for Datalynx.
+ *
+ * Handles lazy initialisation, re-initialisation after Datalynx injects browse content with AJAX,
+ * and the one piece of presentation that CSS cannot reach: core writes its "Add comment..."
+ * prompt into the textarea's value rather than using a placeholder.
  *
  * @module      mod_datalynx/comments
  * @copyright   2026 David Bogner
@@ -22,6 +26,7 @@
  */
 
 import YUI from 'core/yui';
+import {getString} from 'core/str';
 
 /** @type {boolean} */
 let isListeningForUpdates = false;
@@ -29,10 +34,83 @@ let isListeningForUpdates = false;
 /** @type {boolean} */
 let isListeningForInteraction = false;
 
+/** @type {Promise<string>|null} */
+let addCommentStringPromise = null;
+
 const COMMENT_WIDGET_SELECTOR = '.datalynx-comment-widget';
 const COMMENT_TOGGLE_SELECTOR = '.comment-link';
+const COMMENT_TEXTAREA_SELECTOR = 'textarea[name="content"]';
+const COMMENT_LIST_SELECTOR = '.comment-list';
 const COMMENT_OPEN_KEYS = ['Enter', ' ', 'Spacebar'];
 const commentWidgetInitialisation = new WeakMap();
+
+/**
+ * Resolve core's "Add comment..." prompt once per page.
+ *
+ * @returns {Promise<string>}
+ */
+const getAddCommentString = () => {
+    if (!addCommentStringPromise) {
+        addCommentStringPromise = getString('addcomment', 'moodle').catch(() => '');
+    }
+
+    return addCommentStringPromise;
+};
+
+/**
+ * Turn core's placeholder-as-value into a real placeholder attribute.
+ *
+ * toggle_textarea() in comment/comment.js writes the "Add comment..." string into the textarea's
+ * value and greys it out with an inline colour, so it reads as pre-filled content that has to be
+ * deleted before typing. Core already clears it again on focus, and post() refuses to submit an
+ * empty value exactly as it refused to submit the prompt string, so swapping it for a real
+ * placeholder is a presentation change only.
+ *
+ * @param {HTMLElement} widget
+ * @returns {Promise<void>}
+ */
+const normaliseCommentTextarea = async (widget) => {
+    const textarea = widget.querySelector(COMMENT_TEXTAREA_SELECTOR);
+    if (!(textarea instanceof HTMLTextAreaElement)) {
+        return;
+    }
+
+    const prompt = await getAddCommentString();
+    if (!prompt) {
+        return;
+    }
+
+    textarea.placeholder = prompt;
+    if (textarea.value === prompt) {
+        textarea.value = '';
+    }
+    textarea.style.removeProperty('color');
+};
+
+/**
+ * Re-normalise the textarea whenever core re-renders the thread.
+ *
+ * Posting appends to the comment list and calls toggle_textarea() again, which re-inserts the
+ * prompt. The value is assigned as a DOM property and so cannot be observed directly, but the
+ * list mutation that accompanies it can.
+ *
+ * @param {HTMLElement} widget
+ */
+const watchCommentTextarea = (widget) => {
+    if (widget.dataset.commentTextareaWatched === '1') {
+        return;
+    }
+
+    const list = widget.querySelector(COMMENT_LIST_SELECTOR);
+    if (!list) {
+        return;
+    }
+
+    widget.dataset.commentTextareaWatched = '1';
+    new MutationObserver(() => {
+        normaliseCommentTextarea(widget);
+    }).observe(list, {childList: true});
+};
 
 /**
  * Convert one widget wrapper into the option object expected by M.core_comment.init.
@@ -77,6 +155,8 @@ const initialiseCommentWidget = (widget) => {
             widget.dataset.commentInitialized = '1';
             delete widget.dataset.commentInitializing;
             commentWidgetInitialisation.delete(widget);
+            normaliseCommentTextarea(widget);
+            watchCommentTextarea(widget);
             resolve();
         });
     });

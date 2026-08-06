@@ -1064,6 +1064,51 @@ function datalynx_comment_validate($commentparam) {
 function datalynx_comment_add($newcomment, $commentparam) {
 }
 
+/**
+ * Replace the markup of a single rendered comment.
+ *
+ * Core builds a default per-comment template in comment::__construct() and then offers it to the
+ * owning plugin through plugin_callback(..., 'comment', 'template', ...). Returning our own
+ * string here is the only supported way to restructure a comment without forking core: the
+ * layout below turns the flat "avatar name - time" meta line into an avatar column next to an
+ * author/time header and a message body, which is what mod/datalynx/styles.css styles.
+ *
+ * Four placeholders are substituted at runtime, in PHP by comment::print_comment() and in
+ * JavaScript by M.core_comment.render() (comment/comment.js). The JS path uses
+ * String.prototype.replace() with a *string* pattern, which only ever replaces the first
+ * occurrence, so each placeholder must appear exactly once. datalynx_comment_template_test
+ * covers that.
+ *
+ * Two further constraints come from core and are easy to break by accident:
+ * - The delete control is appended to ___content___ by the JS before substitution, so it is
+ *   rendered inside the message body rather than as a sibling. The stylesheet positions it
+ *   against the surrounding <li>, which core marks up.
+ * - The template is emitted into #cmt-tmpl once per page (comment::output() guards on a static),
+ *   so every datalynx comment widget on a page shares this markup. Nothing here may therefore
+ *   depend on a particular entry or comment area.
+ *
+ * The core class names (comment-message, user, time, text) are kept alongside the datalynx ones
+ * so that the widget still degrades to a sane layout if this callback ever stops being invoked.
+ *
+ * @param stdClass $commentparam Comment parameters, as passed to the other comment callbacks.
+ * @return string The template, containing the ___picture___, ___name___, ___time___ and
+ *                ___content___ placeholders exactly once each.
+ */
+function datalynx_comment_template($commentparam) {
+    $meta = html_writer::tag('span', '___name___', ['class' => 'user datalynx-comment-author']) .
+            html_writer::tag('span', '___time___', ['class' => 'time datalynx-comment-time']);
+
+    $body = html_writer::tag('div', $meta, ['class' => 'comment-message-meta datalynx-comment-meta']) .
+            html_writer::tag('div', '___content___', ['class' => 'text datalynx-comment-text']);
+
+    return html_writer::tag(
+        'div',
+        html_writer::tag('div', '___picture___', ['class' => 'picture datalynx-comment-avatar']) .
+                html_writer::tag('div', $body, ['class' => 'datalynx-comment-body']),
+        ['class' => 'comment-message datalynx-comment']
+    );
+}
+
 // Grading.
 
 /**
