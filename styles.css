@@ -1072,3 +1072,281 @@ form.mform div.entry div.datalynx-field-wrapper {
     }
 }
 
+/* ==========================================================================
+   Pendlerportal (Ride-Sharing Commuter Portal) Design System
+   ========================================================================== */
+
+:root {
+    --pp-primary: #0284c7;
+    --pp-primary-hover: #0369a1;
+    --pp-success: #10b981;
+    --pp-bg-card: #ffffff;
+    --pp-border: #e2e8f0;
+    --pp-text: #1e293b;
+    --pp-text-muted: #64748b;
+    --pp-radius: 12px;
+    --pp-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    --pp-shadow-hover: 0 8px 24px rgba(2, 132, 199, 0.12);
+}
+
+.pendlerportal-wrapper {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    color: var(--pp-text);
+}
+
+/* --- Multi-step Wizard ("Fahrt einstellen") --- */
+.pendler-wizard-nav {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    position: relative;
+    border-bottom: 2px solid #f1f5f9;
+    padding-bottom: 1rem;
+}
+
+.pendler-wizard-step {
+    flex: 1;
+    text-align: center;
+    position: relative;
+    padding: 0.5rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--pp-text-muted);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.pendler-wizard-step.active {
+    color: var(--pp-primary);
+}
+
+.pendler-wizard-step.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1rem;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background-color: var(--pp-primary);
+    border-radius: 3px 3px 0 0;
+}
+
+.pendler-wizard-step .step-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background-color: #f1f5f9;
+    color: var(--pp-text-muted);
+    margin-right: 0.5rem;
+    font-size: 0.85rem;
+}
+
+.pendler-wizard-step.active .step-number {
+    background-color: var(--pp-primary);
+    color: #ffffff;
+}
+
+/* --- Interactive Split-View Layout ("Fahrt suchen") --- */
+.pendler-split-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    align-items: start;
+}
+
+@media (max-width: 992px) {
+    .pendler-split-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+.pendler-sticky-map {
+    position: sticky;
+    top: 1rem;
+    height: calc(100vh - 120px);
+    min-height: 400px;
+    border-radius: var(--pp-radius);
+    overflow: hidden;
+    box-shadow: var(--pp-shadow);
+}
+
+/* --- Ride Cards ("Fahrtenkarten") --- */
+.pendler-card {
+    background: var(--pp-bg-card);
+    border: 1px solid var(--pp-border);
+    border-radius: var(--pp-radius);
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    box-shadow: var(--pp-shadow);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.pendler-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--pp-shadow-hover);
+    border-color: #cbd5e1;
+}
+
+.pendler-card .driver-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* --- Day Badges (MO-SO) --- */
+.pendler-days-wrapper {
+    display: inline-flex;
+    gap: 4px;
+}
+
+.pendler-day-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    background-color: #f1f5f9;
+    color: #94a3b8;
+}
+
+.pendler-day-badge.active {
+    background-color: var(--pp-primary);
+    color: #ffffff;
+}
+
+/* --- Gender & Preference Radio Cards --- */
+.pendler-card-selector-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 0.75rem;
+}
+
+.pendler-radio-card {
+    border: 2px solid var(--pp-border);
+    border-radius: var(--pp-radius);
+    padding: 1rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background-color: #ffffff;
+}
+
+.pendler-radio-card:hover {
+    border-color: var(--pp-primary);
+    background-color: #f0f9ff;
+}
+
+.pendler-radio-card.selected {
+    border-color: var(--pp-primary);
+    background-color: #e0f2fe;
+    color: var(--pp-primary);
+}
+
+/* --- Range Slider with Live Badge --- */
+.pendler-slider-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.pendler-slider-value {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    background-color: var(--pp-primary);
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 0.9rem;
+    min-width: 65px;
+    text-align: center;
+}
+
+/* --- Location Field Styles --- */
+
+/* Force all elements inside the location wrapper to stack vertically at full width.
+   Moodle Boost wraps each addElement() in .fitem which can get flex-row treatment;
+   override to block. */
+.datalynx-field-wrapper[data-field-type="location"] {
+    display: block !important;
+    width: 100% !important;
+}
+
+.datalynx-field-wrapper[data-field-type="location"] .fitem {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-bottom: 0 !important;
+}
+
+.datalynx-field-wrapper[data-field-type="location"] .fitem .felement {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+}
+
+/* Hide Moodle's auto-generated label column for the location text input. */
+.datalynx-field-wrapper[data-field-type="location"] .fitem .col-form-label {
+    display: none !important;
+}
+
+.datalynx-location-picker-wrapper {
+    width: 100%;
+    margin-top: 0.5rem;
+    position: relative;
+    clear: both;
+}
+
+.datalynx-location-picker-wrapper .location-map-container {
+    width: 100% !important;
+    height: 320px !important;
+    min-height: 320px !important;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    position: relative;
+    z-index: 1;
+}
+
+/* Leaflet tile and control overrides to ensure map internals render correctly. */
+.datalynx-location-picker-wrapper .location-map-container .leaflet-tile-pane,
+.datalynx-location-picker-wrapper .location-map-container .leaflet-tile {
+    visibility: visible !important;
+}
+
+.datalynx-location-picker-wrapper .location-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 1050;
+    max-height: 220px;
+    overflow-y: auto;
+    background: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-radius: 0.375rem;
+}
+
+/* Display mode mini-map */
+.datalynx-location-display {
+    width: 100%;
+}
+
+.datalynx-location-display .location-minimap-container {
+    width: 100% !important;
+    height: 200px !important;
+    min-height: 200px !important;
+    max-width: 400px;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    position: relative;
+    z-index: 1;
+}
+
