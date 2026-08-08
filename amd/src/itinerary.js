@@ -453,7 +453,11 @@ const initPicker = async (element) => {
                 minlength,
                 trigger: null,
                 onSelect: (place) => {
-                    stops[index] = {...stops[index], address: place.address, lat: place.lat, lng: place.lng};
+                    stops[index] = Object.assign({}, stops[index], {
+                        address: place.address,
+                        lat: place.lat,
+                        lng: place.lng,
+                    });
                     address.value = place.address;
                     save();
                     updateStatus();

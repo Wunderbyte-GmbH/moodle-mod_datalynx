@@ -1080,7 +1080,7 @@ form.mform div.entry div.datalynx-field-wrapper {
     --pp-primary: #0284c7;
     --pp-primary-hover: #0369a1;
     --pp-success: #10b981;
-    --pp-bg-card: #ffffff;
+    --pp-bg-card: #fff;
     --pp-border: #e2e8f0;
     --pp-text: #1e293b;
     --pp-text-muted: #64748b;
@@ -1146,7 +1146,7 @@ form.mform div.entry div.datalynx-field-wrapper {
 
 .pendler-wizard-step.active .step-number {
     background-color: var(--pp-primary);
-    color: #ffffff;
+    color: #fff;
 }
 
 /* --- Interactive Split-View Layout ("Fahrt suchen") --- */
@@ -1218,7 +1218,7 @@ form.mform div.entry div.datalynx-field-wrapper {
 
 .pendler-day-badge.active {
     background-color: var(--pp-primary);
-    color: #ffffff;
+    color: #fff;
 }
 
 /* --- Gender & Preference Radio Cards --- */
@@ -1235,7 +1235,7 @@ form.mform div.entry div.datalynx-field-wrapper {
     text-align: center;
     cursor: pointer;
     transition: all 0.2s ease;
-    background-color: #ffffff;
+    background-color: #fff;
 }
 
 .pendler-radio-card:hover {
@@ -1261,7 +1261,7 @@ form.mform div.entry div.datalynx-field-wrapper {
     padding: 0.25rem 0.75rem;
     border-radius: 20px;
     background-color: var(--pp-primary);
-    color: #ffffff;
+    color: #fff;
     font-weight: 600;
     font-size: 0.9rem;
     min-width: 65px;
