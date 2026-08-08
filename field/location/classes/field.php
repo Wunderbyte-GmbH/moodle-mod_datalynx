@@ -100,8 +100,8 @@ class field extends datalynxfield_base {
         if (!empty($values)) {
             if (isset($values['address']) || isset($values['lat']) || isset($values['lng'])) {
                 $address = isset($values['address']) ? clean_param($values['address'], PARAM_TEXT) : null;
-                $lat     = isset($values['lat'])     ? clean_param($values['lat'], PARAM_RAW) : null;
-                $lng     = isset($values['lng'])     ? clean_param($values['lng'], PARAM_RAW) : null;
+                $lat     = isset($values['lat']) ? clean_param($values['lat'], PARAM_RAW) : null;
+                $lng     = isset($values['lng']) ? clean_param($values['lng'], PARAM_RAW) : null;
             } else {
                 // If submitted directly as plain values or import string (e.g. "Address##Lat##Lng").
                 $rawvalue = reset($values);
@@ -116,10 +116,16 @@ class field extends datalynxfield_base {
             }
         }
 
-        if (!is_null($address) && $address !== '') {
-            $contents[] = $address;
-            $contents[] = (string) $lat;
-            $contents[] = (string) $lng;
+        $hasaddress = !is_null($address) && trim($address) !== '';
+        $hascoords = is_numeric($lat) && is_numeric($lng);
+
+        // A location is worth storing as soon as either half of it is known: the
+        // user may drop a marker where reverse geocoding finds no address, or type
+        // an address the geocoder cannot resolve to coordinates.
+        if ($hasaddress || $hascoords) {
+            $contents[] = $hasaddress ? trim($address) : sprintf('%s, %s', $lat, $lng);
+            $contents[] = $hascoords ? (string) (float) $lat : '';
+            $contents[] = $hascoords ? (string) (float) $lng : '';
         }
 
         return [$contents, $oldcontents];

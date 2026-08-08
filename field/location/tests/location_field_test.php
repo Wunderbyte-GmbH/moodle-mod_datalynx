@@ -30,7 +30,6 @@ use mod_datalynx\datalynx;
  * @covers     \datalynxfield_location\field
  */
 final class location_field_test extends advanced_testcase {
-
     /**
      * Set up test environment.
      */
@@ -100,6 +99,49 @@ final class location_field_test extends advanced_testcase {
         $this->assertEquals('Alexanderplatz 1, 10178 Berlin', $contents[0]);
         $this->assertEquals('52.521918', $contents[1]);
         $this->assertEquals('13.413215', $contents[2]);
+    }
+
+    /**
+     * A marker dropped where reverse geocoding fails still stores its coordinates.
+     */
+    public function test_format_content_without_address(): void {
+        [, $fieldobj] = $this->create_location_field_fixture();
+
+        $entry = new stdClass();
+        $entry->id = 1;
+
+        $ref = new \ReflectionMethod($fieldobj, 'format_content');
+        $ref->setAccessible(true);
+        [$contents] = $ref->invoke($fieldobj, $entry, [
+            'address' => '',
+            'lat' => '48.20849',
+            'lng' => '16.37313',
+        ]);
+
+        $this->assertCount(3, $contents);
+        $this->assertEquals('48.20849, 16.37313', $contents[0]);
+        $this->assertEquals('48.20849', $contents[1]);
+        $this->assertEquals('16.37313', $contents[2]);
+    }
+
+    /**
+     * An entirely empty submission stores nothing.
+     */
+    public function test_format_content_empty(): void {
+        [, $fieldobj] = $this->create_location_field_fixture();
+
+        $entry = new stdClass();
+        $entry->id = 1;
+
+        $ref = new \ReflectionMethod($fieldobj, 'format_content');
+        $ref->setAccessible(true);
+        [$contents] = $ref->invoke($fieldobj, $entry, [
+            'address' => '',
+            'lat' => '',
+            'lng' => '',
+        ]);
+
+        $this->assertSame([], $contents);
     }
 
     /**

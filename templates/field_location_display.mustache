@@ -1,0 +1,77 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_datalynx/field_location_display
+
+    Display mode output of a datalynxfield_location field.
+
+    The map container carries its whole configuration in data attributes so that
+    mod_datalynx/location can pick it up both on a normal page load and after a
+    view browser region was replaced over AJAX. The basemap settings come from
+    the site's map service configuration rather than being hardcoded in the JS.
+
+    Context variables required for this template:
+    * address - The stored address text.
+    * hasmap - Whether a mini map should be rendered below the address.
+    * hasroute - Whether the address should link out to a routing service.
+    * routeurl - Target of the routing link, used when hasroute is set.
+    * lat - Latitude, used when hasmap is set.
+    * lng - Longitude, used when hasmap is set.
+    * zoom - Initial zoom level, used when hasmap is set.
+    * tileurl - Basemap tile URL template.
+    * attribution - Basemap attribution.
+    * maxzoom - Highest zoom level the tile source offers.
+
+    Example context (json):
+    {
+        "address": "Bruno-Marek-Allee 5, 1020 Wien",
+        "hasmap": true,
+        "hasroute": false,
+        "routeurl": "",
+        "lat": "48.228712",
+        "lng": "16.391983",
+        "zoom": 13,
+        "tileurl": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+        "attribution": "OpenStreetMap contributors",
+        "maxzoom": 19
+    }
+}}
+<div class="datalynx-location">
+    <div class="datalynx-location__address">
+        <i class="icon fa fa-map-marker-alt fa-fw text-danger" aria-hidden="true"></i>
+        {{#hasroute}}
+            <a href="{{routeurl}}" target="_blank" rel="noreferrer noopener">{{address}}</a>
+        {{/hasroute}}
+        {{^hasroute}}
+            <span>{{address}}</span>
+        {{/hasroute}}
+    </div>
+    {{#hasmap}}
+        <div class="datalynx-location__map"
+             data-region="datalynx-location-map"
+             data-lat="{{lat}}"
+             data-lng="{{lng}}"
+             data-zoom="{{zoom}}"
+             data-address="{{address}}"
+             data-tileurl="{{tileurl}}"
+             data-attribution="{{attribution}}"
+             data-maxzoom="{{maxzoom}}"
+             role="img"
+             aria-label="{{address}}">
+        </div>
+    {{/hasmap}}
+</div>

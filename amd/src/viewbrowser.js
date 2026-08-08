@@ -25,6 +25,8 @@ import Ajax from 'core/ajax';
 import Notification from 'core/notification';
 import Templates from 'core/templates';
 import {init as initApprove} from 'mod_datalynx/approve';
+import {init as initItinerary} from 'mod_datalynx/itinerary';
+import {init as initLocation} from 'mod_datalynx/location';
 import {init as initPdf} from 'mod_datalynx/pdfembed';
 import {init as initTeammemberselect} from 'mod_datalynx/teammemberselect';
 
@@ -88,6 +90,8 @@ export default {
             .then(({html, js}) => Templates.replaceNodeContents(element, html, js))
             .then(() => {
                 initApprove(element);
+                initItinerary(element);
+                initLocation(element);
                 initPdf(element);
                 initTeammemberselect();
                 notifyContentUpdated(element);

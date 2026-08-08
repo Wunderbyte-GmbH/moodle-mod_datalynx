@@ -25,5 +25,5 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'datalynxfield_location';
-$plugin->version   = 2026080700;
+$plugin->version   = 2026080702;
 $plugin->requires  = 2024100400;

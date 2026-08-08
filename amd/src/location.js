@@ -14,544 +14,728 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Location field Leaflet & Nominatim map picker and geocoding integration.
+ * Leaflet maps and Nominatim geocoding for the datalynxfield_location field type.
+ *
+ * Every widget is described entirely by data attributes on its container, so the
+ * same `init()` entry point works for server rendered pages and for the regions
+ * that {@link module:mod_datalynx/viewbrowser} fills in over AJAX. Initialising
+ * twice is harmless: containers are flagged once they are wired up.
  *
  * @module      mod_datalynx/location
  * @copyright   2026 Wunderbyte GmbH
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+import Ajax from 'core/ajax';
+import Config from 'core/config';
+import {getStrings} from 'core/str';
+
 /**
- * Debounce helper to limit API query frequency.
+ * Base URL of the Leaflet copy vendored in this plugin.
  *
- * @param {Function} func
- * @param {number} wait
- * @returns {Function}
- */
-const debounce = (func, wait) => {
-    let timeout;
-    return (...args) => {
-        clearTimeout(timeout);
-        timeout = setTimeout(() => func(...args), wait);
-    };
-};
-
-/**
- * Ensure Leaflet CSS is injected into the document head if not present.
- */
-const ensureLeafletCss = () => {
-    if (!document.querySelector('link[href*="leaflet.css"]')) {
-        const link = document.createElement('link');
-        link.rel = 'stylesheet';
-        link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-        document.head.appendChild(link);
-    }
-};
-
-/**
- * Configure Leaflet default icon paths to unpkg CDN.
+ * Deliberately not a CDN: see mod/datalynx/leaflet/readme_moodle.txt.
  *
- * @param {Object} L
+ * @type {string}
  */
-const configureLeafletIcons = (L) => {
-    if (L && L.Icon && L.Icon.Default) {
-        delete L.Icon.Default.prototype._getIconUrl;
-        L.Icon.Default.mergeOptions({
-            iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-            iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-            shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-        });
-    }
+const LEAFLET_BASE = `${Config.wwwroot}/mod/datalynx/leaflet`;
+
+/** @type {string} RequireJS module id this plugin registers Leaflet under. */
+const LEAFLET_MODULE = 'mod_datalynx_leaflet';
+
+// Several helpers below are exported so that mod_datalynx/itinerary can build on
+// the same Leaflet loading, sizing, tile and address-lookup behaviour instead of
+// duplicating it. They are shared implementation, not a public API.
+
+/** @type {Object} Centre used when the site configured no default. */
+export const WORLD_VIEW = {lat: 20, lng: 0, zoom: 2};
+
+/** @type {Object} Selectors for the regions this module owns. */
+const SELECTORS = {
+    map: '[data-region="datalynx-location-map"]',
+    picker: '[data-region="datalynx-location-picker"]',
+    search: '[data-region="datalynx-location-search"]',
+    pickermap: '[data-region="map"]',
 };
 
+/** @type {?Promise<Object>} Shared promise resolving to the Leaflet namespace. */
+let leafletPromise = null;
+
+/** @type {?Promise<Object>} Shared promise resolving to the translated strings. */
+let stringsPromise = null;
+
 /**
- * Promise helper to load Leaflet JS library reliably across Moodle pages.
+ * Fetch and cache every string this module shows to the user.
  *
  * @returns {Promise<Object>}
  */
-const loadLeaflet = () => {
-    return new Promise((resolve, reject) => {
-        ensureLeafletCss();
+export const getLabels = () => {
+    if (!stringsPromise) {
+        const keys = [
+            'geolocating',
+            'geolocationdenied',
+            'geolocationunsupported',
+            'maploadfailed',
+            'nosuggestions',
+            'use_current_location',
+        ];
+        stringsPromise = getStrings(keys.map((key) => ({key, component: 'datalynxfield_location'})))
+            .then((values) => Object.fromEntries(keys.map((key, index) => [key, values[index]])));
+    }
 
-        // Already loaded.
-        if (typeof window.L !== 'undefined') {
-            configureLeafletIcons(window.L);
-            resolve(window.L);
-            return;
-        }
-
-        // Guard against double-resolution.
-        let resolved = false;
-        const done = (L) => {
-            if (!resolved) {
-                resolved = true;
-                configureLeafletIcons(L);
-                resolve(L);
-            }
-        };
-        const fail = (msg) => {
-            if (!resolved) {
-                resolved = true;
-                reject(new Error(msg));
-            }
-        };
-
-        // Remove any existing Leaflet script that might have been added by
-        // Moodle's $PAGE->requires->js() — those get AMD-shimmed and don't
-        // set window.L.
-        let script = document.querySelector('script[src*="leaflet"][src*=".js"]');
-        if (script && typeof window.L === 'undefined') {
-            // Script exists but L is not defined — it was probably shimmed.
-            // Create a fresh one.
-            script = null;
-        }
-
-        if (!script) {
-            script = document.createElement('script');
-            script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-            script.crossOrigin = 'anonymous';
-            document.head.appendChild(script);
-        }
-
-        script.addEventListener('load', () => {
-            if (typeof window.L !== 'undefined') {
-                done(window.L);
-            }
-        });
-
-        script.addEventListener('error', () => {
-            fail('Failed to load Leaflet script from CDN');
-        });
-
-        // Polling fallback: handles race conditions where script was already
-        // loading from a previous call, or loaded synchronously from cache.
-        let retries = 0;
-        const interval = setInterval(() => {
-            if (typeof window.L !== 'undefined') {
-                clearInterval(interval);
-                done(window.L);
-            } else if (++retries > 100) {
-                clearInterval(interval);
-                fail('Leaflet loading timed out after 10s');
-            }
-        }, 100);
-    });
+    return stringsPromise;
 };
 
 /**
- * Reverse geocode latitude and longitude to address text via Nominatim.
+ * Add a stylesheet to the document head once and resolve when it settled.
  *
+ * @param {string} href
+ * @returns {Promise<void>}
+ */
+const loadStylesheet = (href) => new Promise((resolve) => {
+    if (document.querySelector('link[data-datalynx-leaflet]')) {
+        resolve();
+        return;
+    }
+
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = href;
+    link.dataset.datalynxLeaflet = '1';
+    // A missing stylesheet degrades the map, it does not break it, so never reject.
+    link.addEventListener('load', () => resolve());
+    link.addEventListener('error', () => resolve());
+    document.head.appendChild(link);
+});
+
+/**
+ * Fetch Leaflet through RequireJS and resolve with its namespace.
+ *
+ * Leaflet ships as a UMD bundle. RequireJS is always present on a Moodle page,
+ * so Leaflet's wrapper takes the AMD branch and calls define() anonymously —
+ * which means injecting it with a plain script tag makes RequireJS throw
+ * "Mismatched anonymous define()" and leaves window.L undefined. Letting
+ * RequireJS load it is what pairs that anonymous define() with a module id, the
+ * same way Moodle itself configures jQuery and jQuery UI.
+ *
+ * @returns {Promise<Object>}
+ */
+const loadLeafletModule = () => new Promise((resolve, reject) => {
+    // RequireJS appends the .js extension itself, so the path must not carry one.
+    window.requirejs.config({
+        paths: {[LEAFLET_MODULE]: `${LEAFLET_BASE}/leaflet`},
+    });
+    window.requirejs([LEAFLET_MODULE], resolve, reject);
+});
+
+/**
+ * Resolve the Leaflet namespace, loading the library on first use.
+ *
+ * @returns {Promise<Object>}
+ */
+export const getLeaflet = () => {
+    if (!leafletPromise) {
+        leafletPromise = (async () => {
+            await loadStylesheet(`${LEAFLET_BASE}/leaflet.css`);
+
+            // window.L is only set when something outside RequireJS already
+            // loaded Leaflet; otherwise the AMD module value is the namespace.
+            const L = window.L || await loadLeafletModule();
+            if (!L || !L.map) {
+                throw new Error('Leaflet loaded but did not expose its namespace');
+            }
+
+            // Leaflet guesses its image path from the script tag, which is not
+            // where RequireJS puts it, so point at the marker icons explicitly.
+            delete L.Icon.Default.prototype._getIconUrl;
+            L.Icon.Default.mergeOptions({
+                iconUrl: `${LEAFLET_BASE}/images/marker-icon.png`,
+                iconRetinaUrl: `${LEAFLET_BASE}/images/marker-icon-2x.png`,
+                shadowUrl: `${LEAFLET_BASE}/images/marker-shadow.png`,
+            });
+
+            return L;
+        })();
+    }
+
+    return leafletPromise;
+};
+
+/**
+ * Resolve once the element occupies space, so Leaflet can measure it.
+ *
+ * Datalynx renders maps into cards and collapsibles that are still being laid
+ * out when this runs, and a Leaflet map created against a zero sized container
+ * never paints its tiles.
+ *
+ * @param {HTMLElement} element
+ * @param {number} timeout Give up waiting after this many milliseconds.
+ * @returns {Promise<void>}
+ */
+export const whenVisible = (element, timeout = 5000) => new Promise((resolve) => {
+    const hasSize = () => element.offsetWidth > 0 && element.offsetHeight > 0;
+
+    if (hasSize()) {
+        resolve();
+        return;
+    }
+
+    let timer = null;
+    const observer = new ResizeObserver(() => {
+        if (hasSize()) {
+            observer.disconnect();
+            window.clearTimeout(timer);
+            resolve();
+        }
+    });
+
+    // Resolve anyway on timeout: a collapsed container is better served by a map
+    // that repairs itself on the next resize than by no map at all.
+    timer = window.setTimeout(() => {
+        observer.disconnect();
+        resolve();
+    }, timeout);
+
+    observer.observe(element);
+});
+
+/**
+ * Keep a Leaflet map in sync with a container whose size changes after creation.
+ *
+ * @param {Object} map
+ * @param {HTMLElement} element
+ */
+export const trackSize = (map, element) => {
+    const observer = new ResizeObserver(() => map.invalidateSize({animate: false}));
+    observer.observe(element);
+    map.on('unload', () => observer.disconnect());
+};
+
+/**
+ * Create a Leaflet map with the site's configured basemap on the given element.
+ *
+ * The tile source comes from the site settings via data attributes rather than
+ * being hardcoded, so an admin can point at a self-hosted or commercial tile
+ * server without touching this module.
+ *
+ * @param {Object} L
+ * @param {HTMLElement} element
+ * @param {Object} tiles Basemap settings: tileurl, attribution, maxzoom.
+ * @param {Object} options Leaflet map options.
+ * @returns {Object} The Leaflet map.
+ */
+export const createMap = (L, element, tiles, options) => {
+    const map = L.map(element, options);
+
+    L.tileLayer(tiles.tileurl, {
+        maxZoom: tiles.maxzoom,
+        attribution: tiles.attribution,
+    }).addTo(map);
+
+    trackSize(map, element);
+
+    return map;
+};
+
+/**
+ * Read the basemap settings a region carries.
+ *
+ * @param {HTMLElement} element
+ * @returns {Object}
+ */
+export const readTiles = (element) => ({
+    tileurl: element.dataset.tileurl,
+    attribution: element.dataset.attribution || '',
+    maxzoom: parseInt(element.dataset.maxzoom, 10) || 19,
+});
+
+/**
+ * Read where a picker should open when the field holds no location yet.
+ *
+ * Comes from the site's default centre setting, so an institution can open its
+ * maps on its own region instead of a world view.
+ *
+ * @param {HTMLElement} element
+ * @returns {{lat: number, lng: number, zoom: number}}
+ */
+export const readDefaultView = (element) => {
+    const lat = parseFloat(element.dataset.defaultlat);
+    const lng = parseFloat(element.dataset.defaultlng);
+
+    if (Number.isNaN(lat) || Number.isNaN(lng)) {
+        return WORLD_VIEW;
+    }
+
+    return {lat, lng, zoom: parseInt(element.dataset.defaultzoom, 10) || WORLD_VIEW.zoom};
+};
+
+/**
+ * Show a non-blocking failure notice in place of a map.
+ *
+ * @param {HTMLElement} element
+ * @param {string} message
+ */
+const showMapError = async (element, message) => {
+    element.classList.add('datalynx-location-map--failed');
+    element.textContent = message || (await getLabels()).maploadfailed;
+};
+
+/**
+ * Read the coordinate pair a container carries, if it carries a usable one.
+ *
+ * @param {HTMLElement} element
+ * @returns {?{lat: number, lng: number}}
+ */
+const readCoords = (element) => {
+    const lat = parseFloat(element.dataset.lat);
+    const lng = parseFloat(element.dataset.lng);
+
+    if (Number.isNaN(lat) || Number.isNaN(lng)) {
+        return null;
+    }
+
+    return {lat, lng};
+};
+
+/**
+ * Ask this site to geocode an address query.
+ *
+ * The geocoding provider is never contacted from here. It is reached through
+ * Moodle so that the request carries the User-Agent the providers require, is
+ * cached and rate limited site-wide, and so that an API key stays on the server.
+ * Which provider answers is a site setting the browser never learns.
+ *
+ * @param {number} fieldid
+ * @param {string} query
+ * @returns {Promise<Array>} Places, empty when nothing matched or the service failed.
+ */
+export const geocodeSearch = async (fieldid, query) => {
+    try {
+        const response = await Ajax.call([{
+            methodname: 'mod_datalynx_geocode_search',
+            args: {fieldid, query},
+        }])[0];
+
+        return response.places || [];
+    } catch (error) {
+        return [];
+    }
+};
+
+/**
+ * Ask this site for the address at a coordinate pair.
+ *
+ * @param {number} fieldid
  * @param {number} lat
  * @param {number} lng
- * @param {string} apiurl
- * @returns {Promise<string>}
+ * @returns {Promise<string>} The address, or an empty string when unavailable.
  */
-const reverseGeocode = async (lat, lng, apiurl) => {
-    const url = `${apiurl.replace(/\/$/, '')}/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`;
+export const geocodeReverse = async (fieldid, lat, lng) => {
     try {
-        const response = await fetch(url);
-        if (!response.ok) {
-            return '';
-        }
-        const data = await response.json();
-        return data.display_name || '';
-    } catch (e) {
+        const response = await Ajax.call([{
+            methodname: 'mod_datalynx_geocode_reverse',
+            args: {fieldid, lat, lng},
+        }])[0];
+
+        return response.found ? response.address : '';
+    } catch (error) {
         return '';
     }
 };
 
 /**
- * Forward geocode address query text via Nominatim.
+ * Debounce a function so that bursts of calls issue a single request.
  *
- * @param {string} query
- * @param {string} apiurl
- * @param {string} countries
- * @returns {Promise<Array>}
+ * @param {Function} callback
+ * @param {number} wait
+ * @returns {Function}
  */
-const searchLocations = async (query, apiurl, countries) => {
-    if (!query || query.length < 3) {
-        return [];
+export const debounce = (callback, wait) => {
+    let timer = null;
+
+    return (...args) => {
+        window.clearTimeout(timer);
+        timer = window.setTimeout(() => callback(...args), wait);
+    };
+};
+
+/**
+ * Turn a text input into an address picker backed by the site's geocoder.
+ *
+ * Whether suggestions appear as the user types depends on the configured
+ * provider: Nominatim's usage policy forbids querying it per keystroke, so with
+ * that engine the lookup waits for the user to press Enter or click the search
+ * button. `typeahead` carries that decision down from the server.
+ *
+ * @param {HTMLInputElement} input
+ * @param {Object} config
+ * @param {number} config.fieldid Location field the lookups are attributed to.
+ * @param {boolean} config.typeahead Whether to search while typing.
+ * @param {number} config.minlength Shortest query worth sending.
+ * @param {?HTMLElement} config.trigger Button that submits the query manually.
+ * @param {Function} config.onSelect Called with the chosen place.
+ */
+export const attachAutocomplete = (input, {fieldid, typeahead, minlength, trigger, onSelect}) => {
+    const anchor = input.closest('.felement') || input.parentElement;
+    if (!anchor) {
+        return;
     }
-    let url = `${apiurl.replace(/\/$/, '')}/search?format=json&q=${encodeURIComponent(query)}&limit=5&addressdetails=1`;
-    if (countries) {
-        url += `&countrycodes=${encodeURIComponent(countries)}`;
-    }
-    try {
-        const response = await fetch(url);
-        if (!response.ok) {
-            return [];
+    anchor.classList.add('datalynx-location-autocomplete');
+
+    const list = document.createElement('div');
+    list.className = 'datalynx-location-suggestions list-group d-none';
+    list.setAttribute('role', 'listbox');
+    anchor.appendChild(list);
+
+    const close = () => {
+        list.replaceChildren();
+        list.classList.add('d-none');
+    };
+
+    const renderMessage = (message) => {
+        list.replaceChildren();
+
+        const empty = document.createElement('div');
+        empty.className = 'list-group-item small text-muted';
+        empty.textContent = message;
+        list.appendChild(empty);
+        list.classList.remove('d-none');
+    };
+
+    const render = (places) => {
+        list.replaceChildren();
+
+        places.forEach((place) => {
+            const option = document.createElement('button');
+            option.type = 'button';
+            option.className = 'list-group-item list-group-item-action small text-wrap';
+            option.setAttribute('role', 'option');
+            option.textContent = place.address;
+            option.addEventListener('click', () => {
+                close();
+                onSelect(place);
+            });
+            list.appendChild(option);
+        });
+
+        list.classList.remove('d-none');
+    };
+
+    const lookup = async () => {
+        const query = input.value.trim();
+        if (query.length < minlength) {
+            close();
+            return;
         }
-        return await response.json();
-    } catch (e) {
-        return [];
+
+        const places = await geocodeSearch(fieldid, query);
+        if (places.length) {
+            render(places);
+        } else {
+            renderMessage((await getLabels()).nosuggestions);
+        }
+    };
+
+    input.setAttribute('autocomplete', 'off');
+
+    if (typeahead) {
+        input.addEventListener('input', debounce(lookup, 350));
+    }
+
+    input.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+            close();
+            return;
+        }
+        if (event.key === 'Enter') {
+            // The address field sits inside the entry form; searching must not
+            // submit it.
+            event.preventDefault();
+            lookup();
+        }
+    });
+
+    if (trigger) {
+        trigger.addEventListener('click', lookup);
+    }
+
+    document.addEventListener('click', (event) => {
+        if (event.target !== input && event.target !== trigger && !list.contains(event.target)) {
+            close();
+        }
+    });
+};
+
+/**
+ * Render one read-only mini map for a stored location.
+ *
+ * @param {HTMLElement} element
+ * @returns {Promise<void>}
+ */
+const initDisplayMap = async (element) => {
+    const coords = readCoords(element);
+    if (!coords) {
+        return;
+    }
+
+    try {
+        const L = await getLeaflet();
+        await whenVisible(element);
+
+        const map = createMap(L, element, readTiles(element), {
+            center: [coords.lat, coords.lng],
+            zoom: parseInt(element.dataset.zoom, 10) || WORLD_VIEW.zoom,
+            zoomControl: false,
+            attributionControl: false,
+            scrollWheelZoom: false,
+            dragging: false,
+            keyboard: false,
+            doubleClickZoom: false,
+        });
+
+        const marker = L.marker([coords.lat, coords.lng]).addTo(map);
+        if (element.dataset.address) {
+            marker.bindPopup(element.dataset.address);
+        }
+    } catch (error) {
+        await showMapError(element);
     }
 };
 
 /**
- * Initialize interactive map picker for entry creation and editing.
+ * Wire up one interactive picker: map, marker, geolocation and autocomplete.
  *
- * @param {Object} options
+ * @param {HTMLElement} element
+ * @returns {Promise<void>}
  */
-export const initPicker = async (options) => {
-    const { fieldid, entryid, apiurl, zoom, countries, initialLat, initialLng } = options;
-
-    const prefix       = `field_${fieldid}_${entryid}`;
-    const addressInput = document.getElementById(`${prefix}_address`);
-    const latInput     = document.getElementById(`${prefix}_lat`);
-    const lngInput     = document.getElementById(`${prefix}_lng`);
-    const mapElement   = document.getElementById(`map_${fieldid}_${entryid}`);
-    const suggestions  = document.getElementById(`${prefix}_suggestions`);
-    const geoBtn       = document.getElementById(`${prefix}_geolocate_btn`);
+const initPickerRegion = async (element) => {
+    const {addressid, latid, lngid} = element.dataset;
+    const addressInput = addressid ? document.getElementById(addressid) : null;
+    const latInput = latid ? document.getElementById(latid) : null;
+    const lngInput = lngid ? document.getElementById(lngid) : null;
+    const mapElement = element.querySelector(SELECTORS.pickermap);
 
     if (!addressInput || !mapElement) {
         return;
     }
 
-    // Helper to update form values.
-    const updateCoords = (lat, lng, address = null) => {
+    const fieldid = parseInt(element.dataset.fieldid, 10);
+    const stored = readCoords(element);
+    const zoom = parseInt(element.dataset.zoom, 10) || WORLD_VIEW.zoom;
+    const fallback = readDefaultView(element);
+
+    /**
+     * Write a location back into the form.
+     *
+     * @param {number} lat
+     * @param {number} lng
+     * @param {?string} address Leave null to keep the current address text.
+     */
+    const store = (lat, lng, address = null) => {
         if (latInput) {
             latInput.value = lat.toFixed(6);
         }
         if (lngInput) {
             lngInput.value = lng.toFixed(6);
         }
-        if (address !== null && addressInput) {
+        if (address !== null) {
             addressInput.value = address;
         }
     };
 
-    // Attach Geolocation Button Handler immediately.
-    if (geoBtn) {
-        geoBtn.addEventListener('click', (e) => {
-            e.preventDefault();
+    let map = null;
+    let marker = null;
+
+    /**
+     * Move the marker and the viewport to a location and persist it.
+     *
+     * @param {number} lat
+     * @param {number} lng
+     * @param {?string} address
+     * @param {?number} targetzoom
+     */
+    const moveTo = (lat, lng, address = null, targetzoom = null) => {
+        store(lat, lng, address);
+
+        if (!map) {
+            return;
+        }
+        marker.setLatLng([lat, lng]);
+        map.setView([lat, lng], targetzoom || map.getZoom());
+    };
+
+    /**
+     * Persist a coordinate pair and fill the address in from the geocoder.
+     *
+     * @param {number} lat
+     * @param {number} lng
+     */
+    const adopt = async (lat, lng) => {
+        moveTo(lat, lng);
+        const address = await geocodeReverse(fieldid, lat, lng);
+        if (address) {
+            store(lat, lng, address);
+        }
+    };
+
+    attachAutocomplete(addressInput, {
+        fieldid,
+        typeahead: element.dataset.typeahead === '1',
+        minlength: parseInt(element.dataset.minlength, 10) || 3,
+        trigger: element.querySelector('[data-action="search"]'),
+        onSelect: (place) => moveTo(place.lat, place.lng, place.address, 16),
+    });
+
+    const geolocate = element.querySelector('[data-action="geolocate"]');
+    if (geolocate) {
+        geolocate.addEventListener('click', async () => {
+            const labels = await getLabels();
+
             if (!navigator.geolocation) {
-                alert('Geolocation is not supported by your browser.');
+                geolocate.disabled = true;
+                geolocate.textContent = labels.geolocationunsupported;
                 return;
             }
-            geoBtn.disabled = true;
-            const originalHtml = geoBtn.innerHTML;
-            geoBtn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i> Locating...';
+
+            const original = geolocate.innerHTML;
+            geolocate.disabled = true;
+            geolocate.textContent = labels.geolocating;
+
+            const restore = () => {
+                geolocate.disabled = false;
+                geolocate.innerHTML = original;
+            };
 
             navigator.geolocation.getCurrentPosition(
-                async (pos) => {
-                    const lat = pos.coords.latitude;
-                    const lng = pos.coords.longitude;
-                    updateCoords(lat, lng);
-
-                    if (window.datalynxMapPicker && window.datalynxMapPicker[`${fieldid}_${entryid}`]) {
-                        const { map, marker } = window.datalynxMapPicker[`${fieldid}_${entryid}`];
-                        map.setView([lat, lng], 15);
-                        marker.setLatLng([lat, lng]);
-                        map.invalidateSize();
+                async (position) => {
+                    await adopt(position.coords.latitude, position.coords.longitude);
+                    if (map) {
+                        map.setZoom(16);
                     }
-
-                    const addr = await reverseGeocode(lat, lng, apiurl);
-                    if (addr) {
-                        updateCoords(lat, lng, addr);
-                    }
-                    geoBtn.disabled = false;
-                    geoBtn.innerHTML = originalHtml;
+                    restore();
                 },
-                (err) => {
-                    alert('Could not retrieve your location: ' + err.message);
-                    geoBtn.disabled = false;
-                    geoBtn.innerHTML = originalHtml;
+                () => {
+                    restore();
+                    geolocate.setAttribute('title', labels.geolocationdenied);
                 },
-                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                {enableHighAccuracy: true, timeout: 10000, maximumAge: 0}
             );
         });
     }
 
-    /**
-     * Wait for a DOM element to have actual layout dimensions.
-     * Leaflet needs a non-zero-sized container to render tiles correctly.
-     *
-     * @param {HTMLElement} el
-     * @param {number} maxWait
-     * @returns {Promise<void>}
-     */
-    const waitForSize = (el, maxWait = 5000) => new Promise((resolve) => {
-        const start = Date.now();
-        const check = () => {
-            if (el.offsetWidth > 0 && el.offsetHeight > 0) {
-                resolve();
-            } else if (Date.now() - start < maxWait) {
-                requestAnimationFrame(check);
-            } else {
-                // Timeout — resolve anyway and let Leaflet try its best.
-                resolve();
-            }
-        };
-        check();
-    });
-
-    // Load Leaflet and initialize map.
-    try {
-        const L = await loadLeaflet();
-        const startLat = initialLat || 52.52;
-        const startLng = initialLng || 13.405;
-
-        // Wait until the container has actual pixel dimensions before creating the map.
-        await waitForSize(mapElement);
-
-        // Create Leaflet Map.
-        const map = L.map(mapElement, {
-            center: [startLat, startLng],
-            zoom: zoom || 13,
-        });
-
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
-
-        // Add Draggable Marker.
-        const marker = L.marker([startLat, startLng], { draggable: true }).addTo(map);
-
-        window.datalynxMapPicker = window.datalynxMapPicker || {};
-        window.datalynxMapPicker[`${fieldid}_${entryid}`] = { map, marker };
-
-        // Force Leaflet to recalculate bounds aggressively.
-        // Moodle templates can shift layout for several hundred milliseconds after initial render.
-        const forceResize = () => {
-            try {
-                map.invalidateSize({ animate: false });
-            } catch (ignore) {
-                // Map may have been removed.
-            }
-        };
-        forceResize();
-        setTimeout(forceResize, 100);
-        setTimeout(forceResize, 300);
-        setTimeout(forceResize, 600);
-        setTimeout(forceResize, 1200);
-        setTimeout(forceResize, 2500);
-
-        // Marker Drag End Handler.
-        marker.on('dragend', async () => {
-            const pos = marker.getLatLng();
-            map.panTo(pos);
-            updateCoords(pos.lat, pos.lng);
-            const addr = await reverseGeocode(pos.lat, pos.lng, apiurl);
-            if (addr) {
-                updateCoords(pos.lat, pos.lng, addr);
-            }
-        });
-
-        // Map Click Handler.
-        map.on('click', async (e) => {
-            const { lat, lng } = e.latlng;
-            marker.setLatLng([lat, lng]);
-            map.panTo([lat, lng]);
-            updateCoords(lat, lng);
-            const addr = await reverseGeocode(lat, lng, apiurl);
-            if (addr) {
-                updateCoords(lat, lng, addr);
-            }
-        });
-    } catch (e) {
-        // eslint-disable-next-line no-console
-        console.error('Failed to load Leaflet map:', e);
-    }
-
-    // Autocomplete Suggestions.
-    if (suggestions) {
-        const renderSuggestions = (items) => {
-            suggestions.innerHTML = '';
-            if (!items || items.length === 0) {
-                suggestions.classList.add('d-none');
-                return;
-            }
-
-            items.forEach((item) => {
-                const btn = document.createElement('button');
-                btn.type = 'button';
-                btn.className = 'list-group-item list-group-item-action text-truncate small';
-                btn.textContent = item.display_name;
-
-                btn.addEventListener('click', () => {
-                    const lat = parseFloat(item.lat);
-                    const lng = parseFloat(item.lon);
-                    updateCoords(lat, lng, item.display_name);
-
-                    if (window.datalynxMapPicker && window.datalynxMapPicker[`${fieldid}_${entryid}`]) {
-                        const { map, marker } = window.datalynxMapPicker[`${fieldid}_${entryid}`];
-                        map.setView([lat, lng], 15);
-                        marker.setLatLng([lat, lng]);
-                        map.invalidateSize();
-                    }
-
-                    suggestions.classList.add('d-none');
-                });
-
-                suggestions.appendChild(btn);
-            });
-
-            suggestions.classList.remove('d-none');
-        };
-
-        addressInput.addEventListener('input', debounce(async (e) => {
-            const query = e.target.value.trim();
-            if (query.length < 3) {
-                suggestions.classList.add('d-none');
-                return;
-            }
-            const results = await searchLocations(query, apiurl, countries);
-            renderSuggestions(results);
-        }, 350));
-
-        document.addEventListener('click', (e) => {
-            if (!suggestions.contains(e.target) && e.target !== addressInput) {
-                suggestions.classList.add('d-none');
-            }
-        });
-    }
-};
-
-/**
- * Initialize Mini-Map display for entry detailed and list view.
- *
- * @param {Object} options
- */
-export const initMiniMap = async (options) => {
-    const { containerId, lat, lng, address, zoom } = options;
-    const container = document.getElementById(containerId);
-
-    if (!container) {
-        return;
-    }
-
-    /**
-     * Wait for element to have layout dimensions.
-     * @param {HTMLElement} el
-     * @param {number} maxWait
-     * @returns {Promise<void>}
-     */
-    const waitForSize = (el, maxWait = 5000) => new Promise((resolve) => {
-        const start = Date.now();
-        const check = () => {
-            if (el.offsetWidth > 0 && el.offsetHeight > 0) {
-                resolve();
-            } else if (Date.now() - start < maxWait) {
-                requestAnimationFrame(check);
-            } else {
-                resolve();
-            }
-        };
-        check();
-    });
-
-    try {
-        const L = await loadLeaflet();
-        await waitForSize(container);
-
-        const map = L.map(container, {
-            zoomControl: false,
-            attributionControl: false,
-            center: [lat, lng],
-            zoom: zoom || 13,
-        });
-
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19
-        }).addTo(map);
-
-        const marker = L.marker([lat, lng]).addTo(map);
-        if (address) {
-            marker.bindPopup(`<b>${address}</b>`);
-        }
-
-        // Aggressive invalidateSize to handle Moodle's dynamic layout.
-        const forceResize = () => {
-            try {
-                map.invalidateSize({ animate: false });
-            } catch (ignore) {
-                // Container may have been removed.
-            }
-        };
-        forceResize();
-        setTimeout(forceResize, 100);
-        setTimeout(forceResize, 300);
-        setTimeout(forceResize, 600);
-        setTimeout(forceResize, 1200);
-        setTimeout(forceResize, 2500);
-    } catch (e) {
-        // eslint-disable-next-line no-console
-        console.error('Failed to load mini map:', e);
-    }
-};
-
-/**
- * Initialize search autocomplete for location filter.
- *
- * @param {Object} options
- */
-export const initSearch = (options) => {
-    const { fieldname, apiurl, countries } = options;
-
-    const addressInput = document.getElementById(`${fieldname}_address`);
-    const latInput     = document.getElementById(`${fieldname}_lat`);
-    const lngInput     = document.getElementById(`${fieldname}_lng`);
-
-    if (!addressInput) {
-        return;
-    }
-
-    // Create dynamic suggestion box.
-    const suggestions = document.createElement('div');
-    suggestions.className = 'list-group position-absolute z-3 w-100 shadow-sm d-none';
-    addressInput.parentNode.style.position = 'relative';
-    addressInput.parentNode.appendChild(suggestions);
-
-    const renderSuggestions = (items) => {
-        suggestions.innerHTML = '';
-        if (!items || items.length === 0) {
-            suggestions.classList.add('d-none');
-            return;
-        }
-
-        items.forEach((item) => {
-            const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.className = 'list-group-item list-group-item-action text-truncate small';
-            btn.textContent = item.display_name;
-
-            btn.addEventListener('click', () => {
-                addressInput.value = item.display_name;
-                if (latInput) {
-                    latInput.value = parseFloat(item.lat).toFixed(6);
-                }
-                if (lngInput) {
-                    lngInput.value = parseFloat(item.lon).toFixed(6);
-                }
-                suggestions.classList.add('d-none');
-            });
-
-            suggestions.appendChild(btn);
-        });
-
-        suggestions.classList.remove('d-none');
-    };
-
-    addressInput.addEventListener('input', debounce(async (e) => {
-        const query = e.target.value.trim();
-        if (query.length < 3) {
-            suggestions.classList.add('d-none');
+    const clear = element.querySelector('[data-action="clear"]');
+    if (clear) {
+        clear.addEventListener('click', () => {
+            addressInput.value = '';
             if (latInput) {
                 latInput.value = '';
             }
             if (lngInput) {
                 lngInput.value = '';
             }
-            return;
-        }
-        const results = await searchLocations(query, apiurl, countries);
-        renderSuggestions(results);
-    }, 350));
+            addressInput.focus();
+        });
+    }
 
-    document.addEventListener('click', (e) => {
-        if (!suggestions.contains(e.target) && e.target !== addressInput) {
-            suggestions.classList.add('d-none');
+    try {
+        const L = await getLeaflet();
+        await whenVisible(mapElement);
+
+        const centre = stored || fallback;
+        map = createMap(L, mapElement, readTiles(element), {
+            center: [centre.lat, centre.lng],
+            zoom: stored ? zoom : fallback.zoom,
+        });
+
+        marker = L.marker([centre.lat, centre.lng], {draggable: true}).addTo(map);
+        marker.on('dragend', () => {
+            const position = marker.getLatLng();
+            adopt(position.lat, position.lng);
+        });
+        map.on('click', (event) => adopt(event.latlng.lat, event.latlng.lng));
+    } catch (error) {
+        await showMapError(mapElement);
+    }
+};
+
+/**
+ * Wire up the address autocomplete of one location filter.
+ *
+ * @param {HTMLElement} element
+ */
+const initSearchRegion = (element) => {
+    const {addressid, latid, lngid} = element.dataset;
+    const addressInput = addressid ? document.getElementById(addressid) : null;
+    const latInput = latid ? document.getElementById(latid) : null;
+    const lngInput = lngid ? document.getElementById(lngid) : null;
+
+    if (!addressInput) {
+        return;
+    }
+
+    attachAutocomplete(addressInput, {
+        fieldid: parseInt(element.dataset.fieldid, 10),
+        typeahead: element.dataset.typeahead === '1',
+        minlength: parseInt(element.dataset.minlength, 10) || 3,
+        trigger: null,
+        onSelect: (place) => {
+            addressInput.value = place.address;
+            if (latInput) {
+                latInput.value = place.lat.toFixed(6);
+            }
+            if (lngInput) {
+                lngInput.value = place.lng.toFixed(6);
+            }
+        },
+    });
+
+    // A filter without coordinates falls back to a plain text match, so drop
+    // stale coordinates as soon as the user edits the address by hand.
+    addressInput.addEventListener('input', () => {
+        if (latInput) {
+            latInput.value = '';
+        }
+        if (lngInput) {
+            lngInput.value = '';
         }
     });
+};
+
+/**
+ * Collect the not-yet-initialised regions matching a selector, marking them.
+ *
+ * @param {Element|Document|DocumentFragment} root
+ * @param {string} selector
+ * @returns {Array<HTMLElement>}
+ */
+export const claimRegions = (root, selector) => {
+    const found = [...root.querySelectorAll(selector)];
+
+    if (typeof root.matches === 'function' && root.matches(selector)) {
+        found.unshift(root);
+    }
+
+    return found.filter((element) => {
+        if (element.dataset.locationInitialised) {
+            return false;
+        }
+        element.dataset.locationInitialised = '1';
+
+        return true;
+    });
+};
+
+/**
+ * Initialise every location widget inside the given root.
+ *
+ * Safe to call repeatedly and on overlapping roots: each container is wired up
+ * at most once.
+ *
+ * @param {Element|Document} [root=document] Scope to search for widgets.
+ */
+export const init = (root = document) => {
+    const scope = root && typeof root.querySelectorAll === 'function' ? root : document;
+
+    claimRegions(scope, SELECTORS.map).forEach(initDisplayMap);
+    claimRegions(scope, SELECTORS.picker).forEach(initPickerRegion);
+    claimRegions(scope, SELECTORS.search).forEach(initSearchRegion);
 };

@@ -23,6 +23,8 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
+use mod_datalynx\local\map\provider_config;
+
 if ($ADMIN->fulltree) {
     // Enable rss feeds.
     if (empty($CFG->enablerssfeeds)) {
@@ -108,6 +110,157 @@ if ($ADMIN->fulltree) {
             get_string('configanonymousentries', 'datalynx'),
             0,
             $options
+        )
+    );
+
+    // Map services, used by the location field type.
+    // Note these use plugin scoped names (mod_datalynx/...) rather than the
+    // legacy global datalynx_* names above.
+    $settings->add(
+        new admin_setting_heading(
+            'mod_datalynx/mapserviceshdr',
+            get_string('mapservices', 'datalynx'),
+            get_string('mapservices_desc', 'datalynx')
+        )
+    );
+
+    if (provider_config::uses_shared_endpoint()) {
+        $settings->add(
+            new admin_setting_description(
+                'mod_datalynx/mapsharedwarning',
+                '',
+                $OUTPUT->notification(get_string('mapsharedwarning', 'datalynx'), 'warning', false)
+            )
+        );
+    }
+
+    // Basemap. Tiles are fetched by the browser directly from the tile server.
+    $settings->add(
+        new admin_setting_configtext(
+            'mod_datalynx/map_tileurl',
+            get_string('map_tileurl', 'datalynx'),
+            get_string('map_tileurl_desc', 'datalynx'),
+            provider_config::DEFAULT_TILE_URL,
+            PARAM_RAW_TRIMMED
+        )
+    );
+
+    $settings->add(
+        new admin_setting_configtext(
+            'mod_datalynx/map_tileattribution',
+            get_string('map_tileattribution', 'datalynx'),
+            get_string('map_tileattribution_desc', 'datalynx'),
+            provider_config::DEFAULT_TILE_ATTRIBUTION,
+            PARAM_RAW_TRIMMED
+        )
+    );
+
+    $settings->add(
+        new admin_setting_configpasswordunmask(
+            'mod_datalynx/map_tilekey',
+            get_string('map_tilekey', 'datalynx'),
+            get_string('map_tilekey_desc', 'datalynx'),
+            ''
+        )
+    );
+
+    $zoomlevels = array_combine(range(1, 20), range(1, 20));
+    $settings->add(
+        new admin_setting_configselect(
+            'mod_datalynx/map_maxzoom',
+            get_string('map_maxzoom', 'datalynx'),
+            get_string('map_maxzoom_desc', 'datalynx'),
+            19,
+            $zoomlevels
+        )
+    );
+
+    $settings->add(
+        new admin_setting_configtext(
+            'mod_datalynx/map_defaultcentre',
+            get_string('map_defaultcentre', 'datalynx'),
+            get_string('map_defaultcentre_desc', 'datalynx'),
+            '',
+            PARAM_RAW_TRIMMED
+        )
+    );
+
+    $settings->add(
+        new admin_setting_configselect(
+            'mod_datalynx/map_defaultzoom',
+            get_string('map_defaultzoom', 'datalynx'),
+            get_string('map_defaultzoom_desc', 'datalynx'),
+            12,
+            $zoomlevels
+        )
+    );
+
+    // Geocoding. Always proxied through this site, never called from the browser.
+    $settings->add(
+        new admin_setting_configselect(
+            'mod_datalynx/geocoder',
+            get_string('geocoder', 'datalynx'),
+            get_string('geocoder_desc', 'datalynx'),
+            provider_config::GEOCODER_PHOTON,
+            provider_config::geocoder_menu()
+        )
+    );
+
+    $settings->add(
+        new admin_setting_configtext(
+            'mod_datalynx/geocoderurl',
+            get_string('geocoderurl', 'datalynx'),
+            get_string('geocoderurl_desc', 'datalynx'),
+            '',
+            PARAM_URL
+        )
+    );
+
+    $settings->add(
+        new admin_setting_configpasswordunmask(
+            'mod_datalynx/geocoderkey',
+            get_string('geocoderkey', 'datalynx'),
+            get_string('geocoderkey_desc', 'datalynx'),
+            ''
+        )
+    );
+
+    $settings->add(
+        new admin_setting_configtext(
+            'mod_datalynx/geocodercountries',
+            get_string('geocodercountries', 'datalynx'),
+            get_string('geocodercountries_desc', 'datalynx'),
+            '',
+            PARAM_RAW_TRIMMED
+        )
+    );
+
+    $settings->add(
+        new admin_setting_configduration(
+            'mod_datalynx/geocodercachettl',
+            get_string('geocodercachettl', 'datalynx'),
+            get_string('geocodercachettl_desc', 'datalynx'),
+            30 * DAYSECS
+        )
+    );
+
+    $settings->add(
+        new admin_setting_configselect(
+            'mod_datalynx/geocoderrate',
+            get_string('geocoderrate', 'datalynx'),
+            get_string('geocoderrate_desc', 'datalynx'),
+            1,
+            [1 => '1', 2 => '2', 5 => '5', 10 => '10', 20 => '20', 50 => '50']
+        )
+    );
+
+    $settings->add(
+        new admin_setting_configtext(
+            'mod_datalynx/map_contactemail',
+            get_string('map_contactemail', 'datalynx'),
+            get_string('map_contactemail_desc', 'datalynx'),
+            '',
+            PARAM_NOTAGS
         )
     );
 }

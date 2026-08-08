@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="mod/datalynx/rule/ridematch/db" VERSION="20260807" COMMENT="XMLDB file for datalynxrule_ridematch"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="datalynx_ride_matches" COMMENT="Ride offer and request pairs whose authors have already been told about each other, so that editing an entry does not notify everyone again.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="ruleid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="offerentryid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="requestentryid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="timenotified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="offerentryid" TYPE="foreign" FIELDS="offerentryid" REFTABLE="datalynx_entries" REFFIELDS="id"/>
+        <KEY NAME="requestentryid" TYPE="foreign" FIELDS="requestentryid" REFTABLE="datalynx_entries" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="rule-offer-request" UNIQUE="true" FIELDS="ruleid, offerentryid, requestentryid" COMMENT="One notification per pair per rule"/>
+      </INDEXES>
+    </TABLE>
+  </TABLES>
+</XMLDB>

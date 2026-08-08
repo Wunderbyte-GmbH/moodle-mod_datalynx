@@ -31,9 +31,13 @@ Typical rule outcomes include:
 | **Event notification** | Sends notifications based on entry events | Alert reviewers when a new submission is added |
 | **Update field** | Automatically writes a fixed value into a field when the rule is triggered | Set a status to “In review” when an entry is submitted |
 | **FTP Sync Data** | Synchronizes data/files to FTP destination workflows | Integrate with external downstream process |
+| **Notify matching ride offers and requests** | Compares the routes of two kinds of entry and notifies both authors when they overlap | Carpooling board — see the [Ridesharing Example](user_guide_ridesharing.md) |
 
 > **Important Note**  
 > Keep rule logic easy to understand. One clear rule per goal is better than one large mixed rule.
+
+> **Timing**  
+> Most rules act immediately when the entry is saved. The ride-match rule is the exception: it searches every counterpart entry, which would slow down each submission, so it runs in the background and its notifications arrive with the next cron run.
 
 ---
 

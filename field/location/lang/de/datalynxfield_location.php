@@ -24,32 +24,51 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'Ort / Standort (Karte & Geocoding)';
-$string['privacy:metadata'] = 'Ortsfelder speichern Adressdaten sowie geografische Koordinaten (Breiten- und Längengrad).';
-
-$string['map_provider'] = 'Karten- & Geocoding-Anbieter';
-$string['map_provider_help'] = 'Wähle den Anbieter für interaktive Karten und Autocomplete-Vorschläge.';
-$string['provider_osm'] = 'OpenStreetMap (Leaflet & Nominatim)';
-$string['provider_google'] = 'Google Maps API';
-
-$string['api_url'] = 'Geocoding API Basis-URL';
-$string['api_url_help'] = 'Basis-URL für Nominatim oder eigene Geocoding-Server.';
+$string['activebasemap'] = 'Grundkarte: {$a->url}';
+$string['activegeocoder'] = 'Adresssuche: {$a->name} über {$a->url}';
+$string['activeservices'] = 'Verwendete Kartendienste';
+$string['address'] = 'Adresse / Ort';
 $string['api_key'] = 'API Schlüssel (Key)';
 $string['api_key_help'] = 'Erforderlich bei der Nutzung der Google Maps API oder spezieller Karten-Tiles.';
-
-$string['default_zoom'] = 'Standard Zoom-Stufe';
-$string['default_radius'] = 'Standard-Suchradius (km)';
-$string['display_format'] = 'Anzeige-Format';
-$string['display_address_only'] = 'Reiner Adress-Text';
-$string['display_map_mini'] = 'Adresse + Interaktive Mini-Karte';
-$string['display_route_link'] = 'Adresse + Klickbarer Routen-Link';
+$string['api_url'] = 'Geocoding API Basis-URL';
+$string['api_url_help'] = 'Basis-URL für Nominatim oder eigene Geocoding-Server.';
+$string['changemapservices'] = 'Kartendienst-Einstellungen der Website ändern';
+$string['clearlocation'] = 'Zurücksetzen';
 $string['country_restriction'] = 'Ländereinschränkung (ISO Codes)';
 $string['country_restriction_help'] = 'Kommagetrennte ISO-Ländercodes zur Einschränkung der Autocomplete-Ergebnisse (z. B. de,at,ch).';
-
-$string['address'] = 'Adresse / Ort';
+$string['default_radius'] = 'Standard-Suchradius (km)';
+$string['default_zoom'] = 'Standard Zoom-Stufe';
+$string['display_address_only'] = 'Reiner Adress-Text';
+$string['display_format'] = 'Anzeige-Format';
+$string['display_map_mini'] = 'Adresse + Interaktive Mini-Karte';
+$string['display_route_link'] = 'Adresse + Klickbarer Routen-Link';
+$string['geolocating'] = 'Standort wird ermittelt…';
+$string['geolocationdenied'] = 'Der Standort konnte nicht ermittelt werden.';
+$string['geolocationunsupported'] = 'Dein Browser gibt den Standort nicht frei.';
 $string['latitude'] = 'Breitengrad';
+$string['locationsettings'] = 'Einstellungen des Ortsfeldes';
 $string['longitude'] = 'Längengrad';
-$string['search_radius_label'] = 'Suchradius (km)';
-$string['use_current_location'] = 'Aktuellen Standort verwenden';
-$string['select_on_map'] = 'Standort auf Karte wählen';
+$string['map_provider'] = 'Karten- & Geocoding-Anbieter';
+$string['map_provider_help'] = 'Wähle den Anbieter für interaktive Karten und Autocomplete-Vorschläge.';
+$string['maploadfailed'] = 'Die Karte konnte nicht geladen werden.';
 $string['no_location_selected'] = 'Kein Standort ausgewählt';
+$string['nosuggestions'] = 'Keine passende Adresse gefunden';
+$string['pickerhint'] = 'Adresse eingeben und einen Vorschlag auswählen oder in die Karte klicken, um die Markierung zu setzen.';
+$string['pickerhintnogeocoder'] = 'Für diese Website ist kein Adresssuchdienst konfiguriert; die Adresse wird daher so gespeichert, wie sie eingegeben wird. Klicke in die Karte, um die Markierung zu setzen.';
+$string['pickerhintsearch'] = 'Adresse eingeben und Eingabetaste drücken oder die Suchschaltfläche verwenden, dann einen Vorschlag auswählen. Du kannst auch in die Karte klicken, um die Markierung zu setzen.';
+$string['pluginname'] = 'Ort / Standort (Karte & Geocoding)';
+$string['privacy:metadata:datalynx_contents'] = 'Werte eines Ortsfeldes, die zu einem Datalynx-Eintrag gespeichert werden.';
+$string['privacy:metadata:datalynx_contents:address'] = 'Der Adresstext des gewählten Standorts.';
+$string['privacy:metadata:datalynx_contents:latitude'] = 'Der Breitengrad des gewählten Standorts.';
+$string['privacy:metadata:datalynx_contents:longitude'] = 'Der Längengrad des gewählten Standorts.';
+$string['privacy:metadata:geocoder'] = 'Um eine Adresse in Kartenkoordinaten umzuwandeln, wird der eingegebene Adresstext an den für diese Website konfigurierten Geocoding-Dienst gesendet. Die Anfrage stellt die Website selbst; deine IP-Adresse wird diesem Dienst daher nicht offengelegt.';
+$string['privacy:metadata:geocoder:address'] = 'Der in ein Ortsfeld eingegebene Adresstext.';
+$string['privacy:metadata:tileserver'] = 'Kartenbilder lädt dein Browser direkt vom für diese Website konfigurierten Grundkartendienst, der dadurch deine IP-Adresse erhält.';
+$string['privacy:metadata:tileserver:ipaddress'] = 'Deine IP-Adresse, wie sie der Grundkartendienst sieht.';
+$string['provider_google'] = 'Google Maps API';
+$string['provider_osm'] = 'OpenStreetMap (Leaflet & Nominatim)';
+$string['radiuskm'] = '{$a} km';
+$string['search_radius_label'] = 'Suchradius (km)';
+$string['searchaddress'] = 'Adresse suchen';
+$string['select_on_map'] = 'Standort auf Karte wählen';
+$string['use_current_location'] = 'Aktuellen Standort verwenden';

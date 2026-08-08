@@ -22,4 +22,24 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-$definitions = ['patterns' => ['mode' => cache_store::MODE_APPLICATION]];
+$definitions = [
+    'patterns' => ['mode' => cache_store::MODE_APPLICATION],
+
+    // Geocoding results, shared site-wide. Caching is not an optimisation here:
+    // the Nominatim usage policy requires results to be cached, and reusing a
+    // lookup is what keeps the site inside the providers' rate limits.
+    // Entries carry their own timestamp so that changing the configured
+    // lifetime takes effect immediately.
+    'geocode' => [
+        'mode' => cache_store::MODE_APPLICATION,
+        'simplekeys' => true,
+        'simpledata' => false,
+    ],
+
+    // Timestamp of the last outbound geocoding request, used to pace requests.
+    'geocodethrottle' => [
+        'mode' => cache_store::MODE_APPLICATION,
+        'simplekeys' => true,
+        'simpledata' => true,
+    ],
+];

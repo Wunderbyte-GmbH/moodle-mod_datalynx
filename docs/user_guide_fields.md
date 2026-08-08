@@ -66,9 +66,14 @@ For most first deployments, begin with:
 | **Datalynx Approve Field** | Approval workflow marker | Teacher approval status |
 | **Datalynx Rating Field** | Scoring/review | Quality rating |
 | **Datalynx Status Field** | Workflow stage display | Draft / Approved |
+| **Location** | A single place, with distance filtering — see [Location Field](user_guide_location_field.md) | Venue address |
+| **Itinerary** | A journey of several stops, with route matching — see [Itinerary Field](user_guide_itinerary_field.md) | Carpool route |
 
 > **Pro-Tip**  
 > Use **Select** and **Radio button** instead of free text whenever consistency is important for filtering and reporting.
+
+> **Note on the map field types**  
+> **Location** and **Itinerary** need map services configured once per site before they work — see [Map Services](user_guide_map_services.md).
 
 ---
 

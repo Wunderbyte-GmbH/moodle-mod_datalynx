@@ -22,6 +22,10 @@ This documentation is written for:
 | Manage entries, search/filter, bulk actions, and import/export | [User Guide — Managing Entries](user_guide_managing_entries.md) |
 | Configure roles, permissions, and approval-safe access | [User Guide — Permissions](user_guide_permissions.md) |
 | Work with patterns, tools, field layouts/behaviors, CSS, and JavaScript | [User Guide — Patterns, Styling, and Tools](user_guide_patterns_and_styling.md) |
+| Store a place on an entry and filter by distance | [User Guide — Location Field](user_guide_location_field.md) |
+| Store a journey with several stops and match routes | [User Guide — Itinerary Field](user_guide_itinerary_field.md) |
+| Build a ridesharing / carpooling board (worked example) | [User Guide — Ridesharing Example](user_guide_ridesharing.md) |
+| **(Administrators)** Choose and configure the map, address-lookup and routing services | [User Guide — Map Services](user_guide_map_services.md) |
 
 ---
 
@@ -35,6 +39,16 @@ This documentation is written for:
 6. Define daily operation in **Managing Entries**.
 7. Finalize governance in **Permissions**.
 8. Optimize UX with **Patterns, Styling, and Tools**.
+
+### Working with maps
+
+The map-based field types have their own short path. An administrator configures
+**Map Services** once for the whole site; after that teachers only pick fields:
+
+1. **Map Services** — administrator only, once per site. Nothing map-related works before this.
+2. **Location Field** for a single place per entry.
+3. **Itinerary Field** for a journey with several stops.
+4. **Ridesharing Example** for a complete build that puts it all together.
 
 > **Pro-Tip**  
 > Build a first version with minimal complexity, test it with real users, then add advanced patterns and styling.

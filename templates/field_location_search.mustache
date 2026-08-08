@@ -1,0 +1,50 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_datalynx/field_location_search
+
+    Configuration marker for the address autocomplete of a location filter.
+
+    Renders nothing visible: mod_datalynx/location finds this element in the
+    filter form and attaches the address lookup to the referenced inputs.
+
+    Context variables required for this template:
+    * fieldid - Location field id, used to attribute geocoding lookups.
+    * addressid - Element id of the address text input.
+    * latid - Element id of the hidden latitude input.
+    * lngid - Element id of the hidden longitude input.
+    * typeahead - Whether the configured service may be queried while typing.
+    * minlength - Shortest query worth sending to the service.
+
+    Example context (json):
+    {
+        "fieldid": 1681,
+        "addressid": "f_0_1681_address",
+        "latid": "f_0_1681_lat",
+        "lngid": "f_0_1681_lng",
+        "typeahead": true,
+        "minlength": 2
+    }
+}}
+<span class="datalynx-location-search"
+      data-region="datalynx-location-search"
+      data-fieldid="{{fieldid}}"
+      data-addressid="{{addressid}}"
+      data-latid="{{latid}}"
+      data-lngid="{{lngid}}"
+      data-typeahead="{{#typeahead}}1{{/typeahead}}{{^typeahead}}0{{/typeahead}}"
+      data-minlength="{{minlength}}"></span>

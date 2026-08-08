@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="mod/datalynx/field/itinerary/db" VERSION="20260807" COMMENT="XMLDB file for datalynxfield_itinerary"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="datalynx_waypoints" COMMENT="Derived query index over itinerary field values. Authoritative data lives in datalynx_contents; this table exists only because lat/lng there are unindexed TEXT columns, and is safe to rebuild at any time.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="entryid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="fieldid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="seq" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Zero based position of this stop in travel order"/>
+        <FIELD NAME="lat" TYPE="number" LENGTH="10" NOTNULL="true" SEQUENCE="false" DECIMALS="6"/>
+        <FIELD NAME="lng" TYPE="number" LENGTH="10" NOTNULL="true" SEQUENCE="false" DECIMALS="6"/>
+        <FIELD NAME="timeplanned" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Planned time at this stop, null when not given"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="entryid" TYPE="foreign" FIELDS="entryid" REFTABLE="datalynx_entries" REFFIELDS="id"/>
+        <KEY NAME="fieldid" TYPE="foreign" FIELDS="fieldid" REFTABLE="datalynx_fields" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="fieldid-lat-lng" UNIQUE="false" FIELDS="fieldid, lat, lng" COMMENT="Bounding box pre-filter for corridor matching"/>
+        <INDEX NAME="entryid-fieldid-seq" UNIQUE="false" FIELDS="entryid, fieldid, seq" COMMENT="Ordered read back and delete on save"/>
+      </INDEXES>
+    </TABLE>
+  </TABLES>
+</XMLDB>

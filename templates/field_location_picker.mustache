@@ -1,0 +1,113 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_datalynx/field_location_picker
+
+    Edit mode map picker of a datalynxfield_location field.
+
+    The address, latitude and longitude inputs stay MoodleQuickForm elements so
+    that the entry form collects them; this template only renders the map chrome
+    around them and references those inputs by id.
+
+    No provider URL or API key appears here. Address lookups go through this
+    site's own web services, so the browser only ever needs to know the field id.
+
+    Context variables required for this template:
+    * fieldid - Location field id, used to attribute geocoding lookups.
+    * addressid - Element id of the address text input.
+    * latid - Element id of the hidden latitude input.
+    * lngid - Element id of the hidden longitude input.
+    * zoom - Zoom level to use once a location is known.
+    * lat - Stored latitude, empty for a new entry.
+    * lng - Stored longitude, empty for a new entry.
+    * defaultlat - Site default map centre latitude, empty for a world view.
+    * defaultlng - Site default map centre longitude, empty for a world view.
+    * defaultzoom - Zoom level for the default centre.
+    * tileurl - Basemap tile URL template.
+    * attribution - Basemap attribution.
+    * maxzoom - Highest zoom level the tile source offers.
+    * hasgeocoder - Whether an address lookup service is configured at all.
+    * typeahead - Whether the configured service may be queried while typing.
+    * minlength - Shortest query worth sending to the service.
+
+    Example context (json):
+    {
+        "fieldid": 1681,
+        "addressid": "field_1681_1645_address",
+        "latid": "field_1681_1645_lat",
+        "lngid": "field_1681_1645_lng",
+        "zoom": 13,
+        "lat": "48.228712",
+        "lng": "16.391983",
+        "defaultlat": "",
+        "defaultlng": "",
+        "defaultzoom": 12,
+        "tileurl": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+        "attribution": "OpenStreetMap contributors",
+        "maxzoom": 19,
+        "hasgeocoder": true,
+        "typeahead": true,
+        "minlength": 2
+    }
+}}
+<div class="datalynx-location-picker"
+     data-region="datalynx-location-picker"
+     data-fieldid="{{fieldid}}"
+     data-addressid="{{addressid}}"
+     data-latid="{{latid}}"
+     data-lngid="{{lngid}}"
+     data-zoom="{{zoom}}"
+     data-lat="{{lat}}"
+     data-lng="{{lng}}"
+     data-defaultlat="{{defaultlat}}"
+     data-defaultlng="{{defaultlng}}"
+     data-defaultzoom="{{defaultzoom}}"
+     data-tileurl="{{tileurl}}"
+     data-attribution="{{attribution}}"
+     data-maxzoom="{{maxzoom}}"
+     data-typeahead="{{#typeahead}}1{{/typeahead}}{{^typeahead}}0{{/typeahead}}"
+     data-minlength="{{minlength}}">
+    <div class="datalynx-location-picker__toolbar">
+        {{#hasgeocoder}}
+            {{^typeahead}}
+                {{! The configured service does not allow querying per keystroke. }}
+                <button type="button" class="btn btn-outline-primary btn-sm" data-action="search">
+                    <i class="icon fa fa-magnifying-glass fa-fw" aria-hidden="true"></i>
+                    {{#str}}searchaddress, datalynxfield_location{{/str}}
+                </button>
+            {{/typeahead}}
+        {{/hasgeocoder}}
+        <button type="button" class="btn btn-outline-primary btn-sm" data-action="geolocate">
+            <i class="icon fa fa-crosshairs fa-fw" aria-hidden="true"></i>
+            {{#str}}use_current_location, datalynxfield_location{{/str}}
+        </button>
+        <button type="button" class="btn btn-outline-secondary btn-sm" data-action="clear">
+            <i class="icon fa fa-xmark fa-fw" aria-hidden="true"></i>
+            {{#str}}clearlocation, datalynxfield_location{{/str}}
+        </button>
+    </div>
+    <div class="datalynx-location-picker__map" data-region="map"></div>
+    <p class="datalynx-location-picker__hint">
+        {{#hasgeocoder}}
+            {{#typeahead}}{{#str}}pickerhint, datalynxfield_location{{/str}}{{/typeahead}}
+            {{^typeahead}}{{#str}}pickerhintsearch, datalynxfield_location{{/str}}{{/typeahead}}
+        {{/hasgeocoder}}
+        {{^hasgeocoder}}
+            {{#str}}pickerhintnogeocoder, datalynxfield_location{{/str}}
+        {{/hasgeocoder}}
+    </p>
+</div>

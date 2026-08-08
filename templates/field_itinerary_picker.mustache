@@ -1,0 +1,137 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_datalynx/field_itinerary_picker
+
+    Edit mode itinerary builder of a datalynxfield_itinerary field.
+
+    The stop rows are created client side from the JSON in the hidden input this
+    region points at, and written back to it on every change. The row template
+    below is inert markup that mod_datalynx/itinerary clones.
+
+    No provider URL or API key appears here: address lookups go through this
+    site's own web services, so the browser only needs the field id.
+
+    Context variables required for this template:
+    * fieldid - Itinerary field id, used to attribute address lookups.
+    * inputid - Element id of the hidden input holding the waypoint JSON.
+    * maxwaypoints - Upper limit on stops.
+    * initialwaypoints - Empty rows to offer when the itinerary is new.
+    * requiretimes - Whether every stop needs a time.
+    * tileurl, attribution, maxzoom - Basemap settings.
+    * defaultlat, defaultlng, defaultzoom - Site default map view.
+    * zoom - Zoom to use once stops are known.
+    * hasgeocoder, typeahead, minlength - Address lookup capabilities.
+
+    Example context (json):
+    {
+        "fieldid": 1700,
+        "inputid": "id_field_1700_5_waypoints",
+        "maxwaypoints": 10,
+        "initialwaypoints": 2,
+        "requiretimes": false,
+        "tileurl": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+        "attribution": "OpenStreetMap contributors",
+        "maxzoom": 19,
+        "defaultlat": "",
+        "defaultlng": "",
+        "defaultzoom": 12,
+        "zoom": 13,
+        "hasgeocoder": true,
+        "typeahead": true,
+        "minlength": 2
+    }
+}}
+<div class="datalynx-itinerary-picker"
+     data-region="datalynx-itinerary-picker"
+     data-fieldid="{{fieldid}}"
+     data-inputid="{{inputid}}"
+     data-maxwaypoints="{{maxwaypoints}}"
+     data-initialwaypoints="{{initialwaypoints}}"
+     data-requiretimes="{{#requiretimes}}1{{/requiretimes}}{{^requiretimes}}0{{/requiretimes}}"
+     data-tileurl="{{tileurl}}"
+     data-attribution="{{attribution}}"
+     data-maxzoom="{{maxzoom}}"
+     data-defaultlat="{{defaultlat}}"
+     data-defaultlng="{{defaultlng}}"
+     data-defaultzoom="{{defaultzoom}}"
+     data-zoom="{{zoom}}"
+     data-typeahead="{{#typeahead}}1{{/typeahead}}{{^typeahead}}0{{/typeahead}}"
+     data-minlength="{{minlength}}">
+
+    <ol class="datalynx-itinerary-picker__stops" data-region="stops"></ol>
+
+    <div class="datalynx-itinerary-picker__toolbar">
+        <button type="button" class="btn btn-outline-primary btn-sm" data-action="add">
+            <i class="icon fa fa-plus fa-fw" aria-hidden="true"></i>
+            {{#str}}addwaypoint, datalynxfield_itinerary{{/str}}
+        </button>
+        <span class="datalynx-itinerary-picker__status" data-region="status" role="status"></span>
+    </div>
+
+    <div class="datalynx-itinerary-picker__map" data-region="map"></div>
+
+    <p class="datalynx-itinerary-picker__hint">
+        {{#hasgeocoder}}
+            {{#typeahead}}{{#str}}pickerhint, datalynxfield_location{{/str}}{{/typeahead}}
+            {{^typeahead}}{{#str}}pickerhintsearch, datalynxfield_location{{/str}}{{/typeahead}}
+        {{/hasgeocoder}}
+        {{^hasgeocoder}}
+            {{#str}}pickerhintnogeocoder, datalynxfield_location{{/str}}
+        {{/hasgeocoder}}
+    </p>
+
+    {{! Cloned by the JS for each stop. Kept out of the document flow so it is
+        never submitted and never focusable. }}
+    <template data-region="stoptemplate">
+        <li class="datalynx-itinerary-stop" data-region="stop">
+            <span class="datalynx-itinerary-stop__seq" data-region="seq"></span>
+            <span class="datalynx-itinerary-stop__address">
+                <input type="text"
+                       class="form-control form-control-sm"
+                       data-region="address"
+                       autocomplete="off"
+                       aria-label="{{#str}}waypointaddress, datalynxfield_itinerary{{/str}}"
+                       placeholder="{{#str}}waypointaddress, datalynxfield_itinerary{{/str}}">
+            </span>
+            <span class="datalynx-itinerary-stop__time">
+                <input type="datetime-local"
+                       class="form-control form-control-sm"
+                       data-region="time"
+                       aria-label="{{#str}}timeatstop, datalynxfield_itinerary{{/str}}"
+                       {{#requiretimes}}required{{/requiretimes}}>
+            </span>
+            <span class="datalynx-itinerary-stop__actions">
+                <button type="button" class="btn btn-link btn-sm" data-action="up"
+                        title="{{#str}}moveup, datalynxfield_itinerary{{/str}}">
+                    <i class="icon fa fa-arrow-up fa-fw" aria-hidden="true"></i>
+                    <span class="sr-only">{{#str}}moveup, datalynxfield_itinerary{{/str}}</span>
+                </button>
+                <button type="button" class="btn btn-link btn-sm" data-action="down"
+                        title="{{#str}}movedown, datalynxfield_itinerary{{/str}}">
+                    <i class="icon fa fa-arrow-down fa-fw" aria-hidden="true"></i>
+                    <span class="sr-only">{{#str}}movedown, datalynxfield_itinerary{{/str}}</span>
+                </button>
+                <button type="button" class="btn btn-link btn-sm text-danger" data-action="remove"
+                        title="{{#str}}dropwaypoint, datalynxfield_itinerary{{/str}}">
+                    <i class="icon fa fa-xmark fa-fw" aria-hidden="true"></i>
+                    <span class="sr-only">{{#str}}dropwaypoint, datalynxfield_itinerary{{/str}}</span>
+                </button>
+            </span>
+        </li>
+    </template>
+</div>

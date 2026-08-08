@@ -124,4 +124,22 @@ $functions = [
                 'capabilities' => 'mod/datalynx:approve',
                 'ajax'        => true,
         ],
+        'mod_datalynx_geocode_search' => [
+                'classname'   => 'mod_datalynx\external\geocode_search',
+                'methodname'  => 'execute',
+                'classpath'   => '',
+                'description' => 'Look up places matching an address query for a location field.',
+                'type'        => 'read',
+                'capabilities' => 'mod/datalynx:viewentry',
+                'ajax'        => true,
+        ],
+        'mod_datalynx_geocode_reverse' => [
+                'classname'   => 'mod_datalynx\external\geocode_reverse',
+                'methodname'  => 'execute',
+                'classpath'   => '',
+                'description' => 'Look up the address of a coordinate pair for a location field.',
+                'type'        => 'read',
+                'capabilities' => 'mod/datalynx:viewentry',
+                'ajax'        => true,
+        ],
 ];

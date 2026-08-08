@@ -16,22 +16,58 @@
 
 namespace datalynxfield_location\privacy;
 
-use core_privacy\local\metadata\null_provider;
+use core_privacy\local\metadata\collection;
+use core_privacy\local\metadata\provider as metadata_provider;
+use mod_datalynx\local\map\provider_config;
 
 /**
  * Privacy provider implementation for datalynxfield_location.
+ *
+ * The field values themselves are stored in datalynx_contents and are exported
+ * and deleted by mod_datalynx. What this provider has to declare is the part
+ * mod_datalynx cannot know about: entering a location sends data to whichever
+ * external map services the site has configured.
  *
  * @package    datalynxfield_location
  * @copyright  2026 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class provider implements null_provider {
+class provider implements metadata_provider {
     /**
-     * Get the language string identifier with the reason why this plugin has no data.
+     * Describe the data this field type handles and where it is sent.
      *
-     * @return string
+     * @param collection $collection
+     * @return collection
      */
-    public static function get_reason(): string {
-        return 'privacy:metadata';
+    public static function get_metadata(collection $collection): collection {
+        $collection->add_database_table(
+            'datalynx_contents',
+            [
+                'content' => 'privacy:metadata:datalynx_contents:address',
+                'content1' => 'privacy:metadata:datalynx_contents:latitude',
+                'content2' => 'privacy:metadata:datalynx_contents:longitude',
+            ],
+            'privacy:metadata:datalynx_contents'
+        );
+
+        // Address lookups are proxied by the site, so the geocoder receives the
+        // text the user typed but not their IP address.
+        if (provider_config::geocoder_engine() !== provider_config::GEOCODER_NONE) {
+            $collection->add_external_location_link(
+                'geocoder',
+                ['address' => 'privacy:metadata:geocoder:address'],
+                'privacy:metadata:geocoder'
+            );
+        }
+
+        // Basemap tiles are the one map service the browser fetches itself, so
+        // the tile operator does see the user's IP address.
+        $collection->add_external_location_link(
+            'tileserver',
+            ['ipaddress' => 'privacy:metadata:tileserver:ipaddress'],
+            'privacy:metadata:tileserver'
+        );
+
+        return $collection;
     }
 }

@@ -12,4 +12,17 @@
       <copyright>Mozilla Foundation</copyright>
     </copyrights>
   </library>
+  <library>
+    <location>leaflet</location>
+    <name>Leaflet</name>
+    <description>Interactive map rendering library for browsers.</description>
+    <version>1.9.4</version>
+    <license>BSD</license>
+    <licenseversion>2-Clause</licenseversion>
+    <repository>https://github.com/Leaflet/Leaflet</repository>
+    <copyrights>
+      <copyright>Volodymyr Agafonkin</copyright>
+      <copyright>CloudMade</copyright>
+    </copyrights>
+  </library>
 </libraries>
