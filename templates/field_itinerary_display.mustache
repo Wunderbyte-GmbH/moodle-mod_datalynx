@@ -30,7 +30,11 @@
     * showmap - Whether to draw the map.
     * showlist - Whether to list the stops.
     * approximate - Whether the coordinates shown are rounded.
-    * lengthlabel - Human readable journey length.
+    * lengthlabel - Human readable straight-line journey length.
+    * hasroute - Whether a routed distance and travel time are known.
+    * routelabel - Human readable road distance.
+    * traveltimelabel - Human readable travel time.
+    * polyline - Encoded route geometry, empty when unrouted.
     * tileurl, attribution, maxzoom, zoom - Basemap settings.
 
     Example context (json):
@@ -44,6 +48,10 @@
         "showlist": true,
         "approximate": true,
         "lengthlabel": "Approximately 145.2 km",
+        "hasroute": true,
+        "routelabel": "195.3 km by road",
+        "traveltimelabel": "Travel time approx. 2 h 10 min",
+        "polyline": "",
         "tileurl": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
         "attribution": "OpenStreetMap contributors",
         "maxzoom": 19,
@@ -64,7 +72,13 @@
             {{/waypoints}}
         </ol>
         <p class="datalynx-itinerary__meta">
-            {{lengthlabel}}
+            {{^hasroute}}{{lengthlabel}}{{/hasroute}}
+            {{#hasroute}}
+                {{routelabel}}
+                <span class="datalynx-itinerary__traveltime">
+                    <i class="icon fa fa-clock fa-fw" aria-hidden="true"></i>{{traveltimelabel}}
+                </span>
+            {{/hasroute}}
             {{#approximate}}
                 <span class="datalynx-itinerary__approx" title="{{#str}}precision_approximate, datalynxfield_itinerary{{/str}}">
                     <i class="icon fa fa-circle-half-stroke fa-fw" aria-hidden="true"></i>
@@ -77,6 +91,7 @@
         <div class="datalynx-itinerary__map"
              data-region="datalynx-itinerary-map"
              data-waypoints="{{waypointsjson}}"
+             data-polyline="{{polyline}}"
              data-zoom="{{zoom}}"
              data-tileurl="{{tileurl}}"
              data-attribution="{{attribution}}"

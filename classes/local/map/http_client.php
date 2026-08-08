@@ -43,6 +43,17 @@ class http_client {
     const THROTTLE_KEY = 'lastrequest';
 
     /**
+     * Constructor.
+     *
+     * @param string $cachename Cache definition results are stored in ('geocode' or 'route').
+     */
+    public function __construct(
+        /** @var string Cache definition results are stored in. */
+        protected string $cachename = 'geocode'
+    ) {
+    }
+
+    /**
      * Fetch and decode a JSON document, reusing a cached copy when allowed.
      *
      * @param string $url Absolute URL without a query string.
@@ -50,7 +61,7 @@ class http_client {
      * @return array|null Decoded response, or null when the service failed.
      */
     public function get_json(string $url, array $params): ?array {
-        $cache = cache::make('mod_datalynx', 'geocode');
+        $cache = cache::make('mod_datalynx', $this->cachename);
         $ttl = provider_config::cache_ttl();
         $key = sha1($url . '?' . http_build_query($params));
 
@@ -79,6 +90,11 @@ class http_client {
      * @return array|null
      */
     protected function request(string $url, array $params): ?array {
+        global $CFG;
+
+        // Web requests have this already; CLI (the seeding script, cron tasks) does not.
+        require_once($CFG->libdir . '/filelib.php');
+
         // Serialise outbound requests across concurrent PHP processes, otherwise
         // the per-second limit is only respected within a single request.
         $factory = lock_config::get_lock_factory('mod_datalynx_geocode');

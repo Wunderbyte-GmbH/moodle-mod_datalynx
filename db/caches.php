@@ -36,6 +36,15 @@ $definitions = [
         'simpledata' => false,
     ],
 
+    // Routing results, shared site-wide. Same reasoning as the geocode cache: the
+    // public routing endpoints are volunteer run, and a journey's route only
+    // changes when its stops do.
+    'route' => [
+        'mode' => cache_store::MODE_APPLICATION,
+        'simplekeys' => true,
+        'simpledata' => false,
+    ],
+
     // Timestamp of the last outbound geocoding request, used to pace requests.
     'geocodethrottle' => [
         'mode' => cache_store::MODE_APPLICATION,

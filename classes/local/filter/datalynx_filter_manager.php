@@ -505,6 +505,8 @@ class datalynx_filter_manager {
 
         $fields = $this->dlx->get_fields();
         $searchfields = [];
+        // Fields whose search value has already been reassembled, keyed fieldid_index.
+        $composites = [];
         foreach ($formdata as $key => $value) {
             $formfieldarray = explode("_", $key);
             if (count($formfieldarray) >= 3) {
@@ -544,7 +546,20 @@ class datalynx_filter_manager {
                     default:
                         if (in_array($fieldname, $customfilterfieldids)) {
                             $type = $fields[$fieldname]->type;
-                            if ($type == "text") {
+                            if ($fields[$fieldname]->has_composite_search()) {
+                                // One criterion spread over several elements (e.g. the itinerary
+                                // corridor: two addresses, four hidden coordinates and a radius).
+                                // Reading them one by one would produce nonsense, so the field
+                                // reassembles its own value from the whole form, once per index.
+                                $i = (int) $formfieldarray[1];
+                                if (isset($composites["{$fieldname}_{$i}"])) {
+                                    break;
+                                }
+                                $composites["{$fieldname}_{$i}"] = true;
+                                if ($parsed = $fields[$fieldname]->parse_search($formdata, $i)) {
+                                    $searchfields[$fieldname]['AND'][] = ['', '', $parsed];
+                                }
+                            } else if ($type == "text") {
                                 if ($value) {
                                     $searchfields[$fieldname]['AND'][] = ['', 'LIKE', $value];
                                 }

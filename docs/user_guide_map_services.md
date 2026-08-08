@@ -29,13 +29,13 @@ company:
 |---|---|---|
 | **Basemap (tiles)** | The map picture itself | The **visitor's browser**, directly |
 | **Geocoding** | Turns a typed place name into coordinates, and back | **Your Moodle server**, on the visitor's behalf |
-| **Routing** | Real road routes and travel times | Not used yet — reserved for a later release |
+| **Routing** | Real road routes and travel times | **Your Moodle server**, on the visitor's behalf |
 
-The split matters for data protection. Because geocoding runs on your server, the geocoding
-service never sees your users' IP addresses — only the place names they typed, sent from your
-site. The basemap is the exception: browsers must fetch map images themselves, so the tile
-operator does see visitors' IP addresses. Both transfers are declared in Moodle's privacy
-registry.
+The split matters for data protection. Because geocoding and routing run on your server, those
+services never see your users' IP addresses — only the place names typed and the coordinates of
+a journey's stops, sent from your site. The basemap is the exception: browsers must fetch map
+images themselves, so the tile operator does see visitors' IP addresses. All three transfers
+are declared in Moodle's privacy registry.
 
 > **Why geocoding cannot run in the browser**
 > It is not a stylistic choice. OpenStreetMap's Nominatim usage policy forbids implementing
@@ -74,6 +74,38 @@ locations by clicking the map instead.
 
 ---
 
+## Choosing a routing service
+
+Routing turns a journey's stops into a **road route**: the real driving distance, the travel
+time, and the line that follows the roads instead of cutting across country. Only the
+[Itinerary field](user_guide_itinerary_field.md) uses it.
+
+| Setting | Meaning |
+|---|---|
+| **Routing service** | Which service works out road routes |
+| **Routing service URL** | Leave empty to use that service's public endpoint; point it at your own installation to remove rate limits |
+| **Routing API key** | Required by Google and by commercial providers. Never sent to the browser |
+
+| Service | API key | Notes |
+|---|---|---|
+| **OSRM** (default) | No | The open-source routing engine for OpenStreetMap data. Self-hostable |
+| **Google Directions API** | Yes | Directions only. As with geocoding, the map itself still renders with the basemap configured below |
+| **None** | — | Journeys fall back to straight-line distance and no travel time |
+
+Choosing **None** is a legitimate configuration, not a degraded one: the Itinerary field worked
+that way before routing existed, and everything except the travel time keeps working. Route
+matching does not depend on routing either — it compares stops, not road geometry.
+
+Routes are cached like address lookups (same lifetime setting) and paced by the same rate
+limit, because a journey's route only changes when its stops do.
+
+> **Where the request happens matters.** A route is worked out **once, while someone is filling
+> in a journey**, and stored with the entry. Browsing a board of fifty rides therefore makes no
+> routing requests at all. If a journey was entered before routing was configured — or by CSV
+> import — it simply shows the straight-line distance until someone edits and re-saves it.
+
+---
+
 ## Choosing a basemap
 
 | Setting | Meaning |
@@ -98,10 +130,14 @@ them. Those endpoints are for evaluation, not production — they carry no avail
 guarantee, and their usage policies do not permit production traffic. While any of them is
 configured, the settings page shows a warning.
 
+This applies to all three services. The routing default, the public OSRM demo server, is the
+clearest case: it is explicitly a demonstration instance with no availability guarantee.
+
 For production, pick one of:
 
-1. **Self-host.** Photon runs from two downloaded files; a self-hosted tile server is more
-   work. Point the URL settings at your own instances and the rate limits disappear.
+1. **Self-host.** Photon runs from two downloaded files; OSRM needs a prepared extract of your
+   region; a self-hosted tile server is the most work of the three. Point the URL settings at
+   your own instances and the rate limits disappear.
 2. **Use a commercial provider.** Set the URL and API key. Check where they process data
    before sending your users' addresses there.
 
@@ -120,6 +156,9 @@ reach you rather than simply blocking you.
 | No address suggestions while typing | Expected with Nominatim and Google: use the **Search address** button or press Enter. With Photon, check the service URL |
 | "No matching address found" for a real place | Check **Restrict to countries** — a country restriction hides everything outside it |
 | Suggestions are slow the first time, instant after | Working as intended: results are cached, and the rate limiter paces the first request |
+| No travel time appears while entering a journey | Routing is set to **None**, or the service is unreachable. Google also needs a key |
+| Some journeys show a travel time and others do not | The others were saved before routing was configured, or imported. Editing and saving them fills it in |
+| Travel time looks wrong for the route shown | The stored route belongs to the stops as they were when saved. Changing the stops discards it and works out a new one |
 
 ---
 

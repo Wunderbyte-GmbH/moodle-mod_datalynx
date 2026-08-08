@@ -217,6 +217,47 @@ final class search_test extends advanced_testcase {
     }
 
     /**
+     * The customfilter search form produces a working corridor criterion.
+     *
+     * The customfilter reads submitted values by splitting the element name on "_",
+     * which sees six separate values here rather than one corridor. The field is
+     * therefore reassembled through parse_search(); this proves that path end to end.
+     */
+    public function test_customfilter_form_produces_a_corridor(): void {
+        $fieldid = (int) $this->field->id();
+        $matching = $this->create_journey(['wien', 'wienerneustadt', 'graz']);
+        $this->create_journey(['wien', 'linz']);
+
+        $customfilter = (object) [
+            'id' => 1,
+            'dataid' => $this->dlx->id(),
+            'fieldlist' => json_encode([$fieldid => ['name' => 'Journey', 'sortable' => 0]]),
+        ];
+        $formdata = (object) [
+            "f_1_{$fieldid}_fromaddress" => 'Wiener Neustadt',
+            "f_1_{$fieldid}_fromlat" => self::PLACES['wienerneustadt'][0],
+            "f_1_{$fieldid}_fromlng" => self::PLACES['wienerneustadt'][1],
+            "f_1_{$fieldid}_toaddress" => 'Graz',
+            "f_1_{$fieldid}_tolat" => self::PLACES['graz'][0],
+            "f_1_{$fieldid}_tolng" => self::PLACES['graz'][1],
+            "f_1_{$fieldid}_radius" => 5,
+        ];
+
+        $filter = new datalynx_filter((object) ['id' => 0, 'dataid' => $this->dlx->id()]);
+        $filter = $this->dlx->get_filter_manager()
+            ->get_filter_from_customfilterform($filter, $formdata, $customfilter);
+
+        $searchfields = unserialize($filter->customsearch);
+        $this->assertCount(1, $searchfields[$fieldid]['AND'], 'The six elements must yield one criterion.');
+        $this->assertSame('', $searchfields[$fieldid]['AND'][0][1], 'The corridor search takes no operator.');
+        $this->assertEquals(5, $searchfields[$fieldid]['AND'][0][2]['radius']);
+
+        $entries = new datalynx_entries($this->dlx, $filter);
+        $entries->set_content();
+        $this->assertEquals([$matching], array_map('intval', array_keys($entries->entries() ?: [])));
+    }
+
+    /**
      * The field returns an entry-id set, not a content-table condition.
      */
     public function test_search_sql_does_not_ask_for_a_content_join(): void {

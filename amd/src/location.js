@@ -343,6 +343,77 @@ export const geocodeReverse = async (fieldid, lat, lng) => {
 };
 
 /**
+ * Ask this site to route a journey through the given stops.
+ *
+ * Same reasoning as the geocoder: the routing service is reached through Moodle so
+ * the request identifies itself, is cached and rate limited site-wide, and any key
+ * stays on the server.
+ *
+ * @param {number} fieldid
+ * @param {Array<{lat: number, lng: number}>} stops Ordered stops, at least two.
+ * @returns {Promise<?{distance: number, duration: number, polyline: string}>} Null when unavailable.
+ */
+export const routeCalculate = async (fieldid, stops) => {
+    if (!Array.isArray(stops) || stops.length < 2) {
+        return null;
+    }
+
+    try {
+        const response = await Ajax.call([{
+            methodname: 'mod_datalynx_route_calculate',
+            args: {fieldid, stops},
+        }])[0];
+
+        return response.found ? response : null;
+    } catch (error) {
+        return null;
+    }
+};
+
+/**
+ * Decode an encoded polyline (precision 5) into coordinate pairs.
+ *
+ * Both supported routing engines return route geometry in this format, which is
+ * an order of magnitude smaller than the equivalent coordinate array.
+ *
+ * @param {string} encoded
+ * @returns {Array<Array<number>>} [lat, lng] pairs.
+ */
+/* eslint-disable no-bitwise */
+export const decodePolyline = (encoded) => {
+    const points = [];
+    let index = 0;
+    let lat = 0;
+    let lng = 0;
+
+    while (index < encoded.length) {
+        let result = 1;
+        let shift = 0;
+        let byte;
+        do {
+            byte = encoded.charCodeAt(index++) - 63 - 1;
+            result += byte << shift;
+            shift += 5;
+        } while (byte >= 0x1f && index < encoded.length);
+        lat += (result & 1) ? ~(result >> 1) : (result >> 1);
+
+        result = 1;
+        shift = 0;
+        do {
+            byte = encoded.charCodeAt(index++) - 63 - 1;
+            result += byte << shift;
+            shift += 5;
+        } while (byte >= 0x1f && index < encoded.length);
+        lng += (result & 1) ? ~(result >> 1) : (result >> 1);
+
+        points.push([lat * 1e-5, lng * 1e-5]);
+    }
+
+    return points;
+};
+/* eslint-enable no-bitwise */
+
+/**
  * Debounce a function so that bursts of calls issue a single request.
  *
  * @param {Function} callback

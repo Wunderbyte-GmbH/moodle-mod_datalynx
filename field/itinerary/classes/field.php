@@ -17,6 +17,7 @@
 namespace datalynxfield_itinerary;
 
 use mod_datalynx\local\field\datalynxfield_base;
+use mod_datalynx\local\map\route_result;
 use mod_datalynx\local\ride\itinerary;
 use mod_datalynx\local\ride\matcher;
 use mod_datalynx\local\ride\waypoint;
@@ -34,7 +35,7 @@ use stdClass;
  * | content1 | bounding box `minlat,minlng,maxlat,maxlng`         |
  * | content2 | straight-line length in km                         |
  * | content3 | earliest planned departure, or empty               |
- * | content4 | reserved for a cached route polyline               |
+ * | content4 | routed distance, duration and polyline as JSON     |
  *
  * A second, derived copy of the coordinates is kept in `datalynx_waypoints`.
  * That table is purely a query index: `datalynx_contents.content1`/`content2` are
@@ -62,7 +63,7 @@ class field extends datalynxfield_base {
      * @return array
      */
     protected function content_names() {
-        return ['waypoints'];
+        return ['waypoints', 'route'];
     }
 
     /**
@@ -71,7 +72,7 @@ class field extends datalynxfield_base {
      * @return array
      */
     public function get_content_parts() {
-        return ['content', 'content1', 'content2', 'content3'];
+        return ['content', 'content1', 'content2', 'content3', 'content4'];
     }
 
     /**
@@ -89,6 +90,24 @@ class field extends datalynxfield_base {
      * @return bool
      */
     public function supports_search() {
+        return true;
+    }
+
+    /**
+     * Offer the corridor search in customfilters, so travellers can search for a ride.
+     *
+     * @return bool
+     */
+    public static function is_customfilterfield() {
+        return true;
+    }
+
+    /**
+     * One corridor search is spread over from/to addresses, four hidden coordinates and a radius.
+     *
+     * @return bool
+     */
+    public function has_composite_search(): bool {
         return true;
     }
 
@@ -144,6 +163,7 @@ class field extends datalynxfield_base {
             $oldcontents[] = $entry->{"c{$fieldid}_content1"} ?? null;
             $oldcontents[] = $entry->{"c{$fieldid}_content2"} ?? null;
             $oldcontents[] = $entry->{"c{$fieldid}_content3"} ?? null;
+            $oldcontents[] = $entry->{"c{$fieldid}_content4"} ?? null;
         }
 
         if (empty($values)) {
@@ -167,8 +187,53 @@ class field extends datalynxfield_base {
         $contents[] = $journey->bbox_string();
         $contents[] = (string) $journey->length_km();
         $contents[] = $departure === null ? '' : (string) $departure;
+        $contents[] = $this->resolve_route($journey, $values, $oldcontents);
 
         return [$contents, $oldcontents];
+    }
+
+    /**
+     * The route summary to store beside the stops.
+     *
+     * The picker sends a freshly routed summary along with the stops. When it does
+     * not - a CSV import, a rule, an older browser - the previous summary is kept
+     * only while the stops are unchanged, because a cached route for a journey that
+     * has been re-routed would be worse than none at all.
+     *
+     * @param itinerary $journey The journey being saved.
+     * @param array $values Submitted values.
+     * @param array $oldcontents Previously stored contents, indexed like get_content_parts().
+     * @return string JSON route summary, or an empty string.
+     */
+    protected function resolve_route(itinerary $journey, array $values, array $oldcontents): string {
+        if (!empty($values['route'])) {
+            $route = route_result::from_json((string) $values['route']);
+            if ($route !== null) {
+                return $route->to_json();
+            }
+        }
+
+        $previousstops = $oldcontents[0] ?? null;
+        if ($previousstops === null || $previousstops === '') {
+            return '';
+        }
+
+        $unchanged = itinerary::from_json($previousstops, $this->get_max_waypoints())->to_json()
+            === $journey->to_json();
+
+        return $unchanged ? (string) ($oldcontents[4] ?? '') : '';
+    }
+
+    /**
+     * The stored route summary of an entry, if it has one.
+     *
+     * @param stdClass $entry
+     * @return route_result|null
+     */
+    public function get_route(stdClass $entry): ?route_result {
+        $fieldid = $this->field->id;
+
+        return route_result::from_json($entry->{"c{$fieldid}_content4"} ?? null);
     }
 
     /**
@@ -359,6 +424,38 @@ class field extends datalynxfield_base {
      */
     public function get_supported_search_operators() {
         return ['' => get_string('matchesroute', 'datalynxfield_itinerary')];
+    }
+
+    /**
+     * Describe a stored corridor criterion for the filter overview.
+     *
+     * The base implementation concatenates the raw value, which is an array here.
+     *
+     * @param array $searchparams [$not, $operator, $value]
+     * @return string
+     */
+    public function format_search_value($searchparams) {
+        [$not, , $value] = $searchparams;
+
+        if (!is_array($value)) {
+            return (string) $value;
+        }
+
+        $describe = function (string $end) use ($value): string {
+            $address = trim((string) ($value["{$end}address"] ?? ''));
+            if ($address !== '') {
+                return $address;
+            }
+
+            return round((float) ($value["{$end}lat"] ?? 0), 4) . ', '
+                . round((float) ($value["{$end}lng"] ?? 0), 4);
+        };
+
+        $radius = !empty($value['radius']) ? (float) $value['radius'] : $this->get_match_radius();
+
+        return trim($not . ' ' . get_string('matchesroute', 'datalynxfield_itinerary'))
+            . ' ' . $describe('from') . ' &rarr; ' . $describe('to')
+            . ' (' . get_string('radiuskm', 'datalynxfield_location', $radius) . ')';
     }
 
     /**

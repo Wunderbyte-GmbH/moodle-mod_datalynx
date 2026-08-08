@@ -171,6 +171,9 @@ Each view has three filter settings, shown when you edit the view:
 > **Pro-Tip**  
 > While a *Permitted filters* list is in force, personal (saved) filters and ad-hoc custom/advanced searches that would *replace* the base filter are blocked, so they cannot be used to widen what a user sees. Quick search and per-entry links still work — they only narrow the results further.
 
+> **Building a search view?**  
+> The same protection is what stops a `##customfilter:NAME##` search form from working, and it fails in two different ways: a locked view hides the form altogether, while a view offering a choice of *Permitted filters* renders the form but ignores what people type into it. A view whose purpose *is* searching therefore needs **Allow all filters** on and **Permitted filters** empty. Its *Default filter* still decides what is listed until somebody searches, so that remains the way to scope the view. (A view with no default filter at all searches fine too — the conflict only arises once a filter is being enforced.)
+
 ### Upgrade note
 
 Existing views are unaffected. After upgrading:

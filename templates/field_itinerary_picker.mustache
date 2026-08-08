@@ -29,6 +29,7 @@
     Context variables required for this template:
     * fieldid - Itinerary field id, used to attribute address lookups.
     * inputid - Element id of the hidden input holding the waypoint JSON.
+    * routeinputid - Element id of the hidden input holding the routed summary, empty when routing is off.
     * maxwaypoints - Upper limit on stops.
     * initialwaypoints - Empty rows to offer when the itinerary is new.
     * requiretimes - Whether every stop needs a time.
@@ -41,6 +42,7 @@
     {
         "fieldid": 1700,
         "inputid": "id_field_1700_5_waypoints",
+        "routeinputid": "id_field_1700_5_route",
         "maxwaypoints": 10,
         "initialwaypoints": 2,
         "requiretimes": false,
@@ -60,6 +62,7 @@
      data-region="datalynx-itinerary-picker"
      data-fieldid="{{fieldid}}"
      data-inputid="{{inputid}}"
+     data-routeinputid="{{routeinputid}}"
      data-maxwaypoints="{{maxwaypoints}}"
      data-initialwaypoints="{{initialwaypoints}}"
      data-requiretimes="{{#requiretimes}}1{{/requiretimes}}{{^requiretimes}}0{{/requiretimes}}"
@@ -81,6 +84,8 @@
             {{#str}}addwaypoint, datalynxfield_itinerary{{/str}}
         </button>
         <span class="datalynx-itinerary-picker__status" data-region="status" role="status"></span>
+        <span class="datalynx-itinerary-picker__route badge bg-light text-dark border"
+              data-region="route" role="status"></span>
     </div>
 
     <div class="datalynx-itinerary-picker__map" data-region="map"></div>

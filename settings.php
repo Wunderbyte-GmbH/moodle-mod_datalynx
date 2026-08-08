@@ -255,6 +255,35 @@ if ($ADMIN->fulltree) {
     );
 
     $settings->add(
+        new admin_setting_configselect(
+            'mod_datalynx/router',
+            get_string('router', 'datalynx'),
+            get_string('router_desc', 'datalynx'),
+            provider_config::ROUTER_OSRM,
+            provider_config::router_menu()
+        )
+    );
+
+    $settings->add(
+        new admin_setting_configtext(
+            'mod_datalynx/routerurl',
+            get_string('routerurl', 'datalynx'),
+            get_string('routerurl_desc', 'datalynx'),
+            '',
+            PARAM_URL
+        )
+    );
+
+    $settings->add(
+        new admin_setting_configpasswordunmask(
+            'mod_datalynx/routerkey',
+            get_string('routerkey', 'datalynx'),
+            get_string('routerkey_desc', 'datalynx'),
+            ''
+        )
+    );
+
+    $settings->add(
         new admin_setting_configtext(
             'mod_datalynx/map_contactemail',
             get_string('map_contactemail', 'datalynx'),

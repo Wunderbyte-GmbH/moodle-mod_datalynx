@@ -871,6 +871,20 @@ abstract class datalynxfield_base {
     }
 
     /**
+     * Whether one search criterion of this field is spread over several form elements.
+     *
+     * Most fields put their whole search value in a single element named
+     * `f_{$i}_{$fieldid}`, so a customfilter can read it straight off the submitted
+     * data. A field that renders several elements (e.g. a from/to pair plus hidden
+     * coordinates) has to be reassembled by its own {@see parse_search()} instead.
+     *
+     * @return bool
+     */
+    public function has_composite_search(): bool {
+        return false;
+    }
+
+    /**
      * Formats the search parameters for display.
      *
      * @param array $searchparams

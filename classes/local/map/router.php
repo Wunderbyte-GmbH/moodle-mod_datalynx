@@ -14,17 +14,32 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace mod_datalynx\local\map;
+
 /**
- * Version details for datalynxfield_itinerary.
+ * Turns an ordered list of stops into a driving route.
  *
- * @package    datalynxfield_itinerary
+ * Like the geocoder, implementations always run on the server: the services want
+ * an identifying User-Agent that fetch() may not set, keys must never reach a
+ * browser, and the results have to be cached to stay inside the usage policies.
+ *
+ * @package    mod_datalynx
  * @copyright  2026 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+interface router {
+    /**
+     * Route through the given stops, in order.
+     *
+     * @param array $stops Ordered list of [$lat, $lng] pairs, at least two.
+     * @return route_result|null Null when the service failed or found no route.
+     */
+    public function route(array $stops): ?route_result;
 
-defined('MOODLE_INTERNAL') || die();
-
-$plugin->component = 'datalynxfield_itinerary';
-$plugin->version   = 2026080800;
-$plugin->requires  = 2024100400;
-$plugin->maturity  = MATURITY_ALPHA;
+    /**
+     * Largest number of stops this service accepts in one request.
+     *
+     * @return int
+     */
+    public function max_stops(): int;
+}

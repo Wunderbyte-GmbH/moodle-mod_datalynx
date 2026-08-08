@@ -86,13 +86,35 @@ A counter reads "2 of at most 10 stops". If a row has text typed but no place ch
 that the stop will not be saved — that row has no coordinates, so there is nothing to store or
 match. Pick a suggestion or click the map to resolve it.
 
-**Reading an entry.** The stops in travel order, with distinct markers for start, intermediate
-stops and destination; the approximate straight-line length; a note when coordinates are shown
-approximately; and a map with the stops joined by a line.
+As soon as two stops have places, a badge appears beside the counter with the road distance and
+the travel time — `195.1 km, approx. 2 h 13 min` — and the map line snakes along the actual
+roads. It updates as stops are added, moved or removed.
 
-> The line is straight between stops, not a road route. Real road geometry and travel times
-> need a routing engine, which is planned but not yet built. The distance is likewise
-> straight-line, so treat it as a lower bound on the driving distance.
+**Reading an entry.** The stops in travel order, with distinct markers for start, intermediate
+stops and destination; the road distance and travel time; a note when coordinates are shown
+approximately; and a map with the route drawn along the roads.
+
+### Where the travel time comes from
+
+The route is worked out **once, while the journey is being filled in**, and saved with the
+entry. Nothing is routed while people browse: a board of fifty rides would otherwise send fifty
+requests to the routing service every time somebody opened it.
+
+Three consequences:
+
+- **Journeys entered before routing was configured show no travel time.** They fall back to the
+  straight-line length. Editing and saving such an entry fills it in.
+- **Changing the stops discards the stored route** and works out a new one. A stale route would
+  be worse than none — better no travel time than a confidently wrong one.
+- **Imported journeys have no travel time** either, for the same reason. CSV import carries
+  stops, not routes.
+
+If your site has **no routing service** configured, the field behaves exactly as it did before
+routing existed: straight-line distance, and a straight line between stops on the map. See
+[Map Services](user_guide_map_services.md) for the setting, which is an administrator's job.
+
+> **Route matching does not use routing.** It compares stops, not road geometry — so it works
+> the same whether or not a routing service is configured.
 
 ---
 
@@ -111,9 +133,22 @@ Grid card without checking first.
 
 ## Searching along a route
 
-Add the field to a filter and the search form offers **Travelling from**, **Travelling to** and
-**Within (km)**. Both places are needed: a corridor has two ends, and a half-filled form is
-ignored rather than guessed at.
+There are two places to search from, and they serve different people:
+
+| Where | Who uses it | How to set it up |
+|---|---|---|
+| **Custom filter** (a search form on the view) | Everyone browsing | **Manage → Custom Filters**, tick the Itinerary field under **User defined fields** |
+| **View filter** (a saved search) | You, when you want a fixed view | **Manage → View Filters**, add a search condition on the field |
+
+Either way the form offers **Travelling from**, **Travelling to** and **Within (km)**, with the
+same address lookup as the entry form. Both places are needed: a corridor has two ends, and a
+half-filled form is ignored rather than guessed at.
+
+> **Setting up a search view — the trap.** A view that *forces* one filter hides its search
+> form, and a **Permitted filters** whitelist blocks ad-hoc searches entirely. If your search
+> form does not appear, or searching seems to have no effect, open the view's settings and turn
+> on **Allow all filters**, leaving **Permitted filters** empty. The view's own filter
+> still decides what is listed before anyone searches.
 
 The match rule, stated precisely:
 
@@ -139,7 +174,8 @@ stops you are genuinely willing to serve.
 ## Notes for administrators
 
 The field stores the journey as one row in `datalynx_contents` (the stops as JSON, plus a
-cached bounding box, length and earliest departure). Alongside it, a derived table
+cached bounding box, straight-line length, earliest departure and — when a routing service is
+configured — the road distance, travel time and route geometry). Alongside it, a derived table
 `datalynx_waypoints` holds one indexed numeric row per stop, used purely to make matching fast.
 
 Nothing authoritative lives in that table — it is rebuilt from the entries — so if you ever

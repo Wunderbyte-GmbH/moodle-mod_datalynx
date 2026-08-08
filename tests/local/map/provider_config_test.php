@@ -132,11 +132,15 @@ final class provider_config_test extends advanced_testcase {
      * Free community endpoints are detected so the admin page can warn about them.
      */
     public function test_shared_endpoint_detection(): void {
-        // Default configuration uses Photon and OSM tiles: both are shared.
+        // Default configuration uses Photon, OSM tiles and the OSRM demo server:
+        // all three are shared community services.
         $this->assertTrue(provider_config::uses_shared_endpoint());
 
         set_config('geocoderurl', 'https://geocode.example.org', 'mod_datalynx');
         set_config('map_tileurl', 'https://tiles.example.org/{z}/{x}/{y}.png', 'mod_datalynx');
+        $this->assertTrue(provider_config::uses_shared_endpoint(), 'The routing default is still shared.');
+
+        set_config('routerurl', 'https://osrm.example.org', 'mod_datalynx');
         $this->assertFalse(provider_config::uses_shared_endpoint());
 
         // A subdomain of a shared host still counts.

@@ -8,6 +8,8 @@ A carpooling board for a course or a whole institution:
   a route of two or more stops.
 - Anyone can search "who can take me from A to B?" and get matches that include drivers passing
   *near* both places, not only those starting and ending exactly there.
+- Each ride shows its **road distance and travel time**, and its route drawn along the roads,
+  provided a routing service is configured for the site.
 - When a new offer and a new request overlap, **both authors are notified automatically** — they
   do not have to keep checking the board.
 - Passengers **claim a seat** on an offer, capacity is enforced, and the driver is notified.
@@ -21,6 +23,17 @@ plugin: you are assembling fields, a view, a filter and two rules.
 > A site administrator must have configured map services once — see
 > [Map Services](user_guide_map_services.md). Nothing on this page works until they have.
 
+> **Shortcut for administrators with shell access**
+> A ready-made build of this design, including a five-step entry form, ships with the plugin:
+> ```bash
+> php mod/datalynx/cli/create_ridesharing_instance.php --course=<id>
+> php mod/datalynx/cli/seed_ridesharing_entries.php --dataid=<id>   # example rides, optional
+> ```
+> It creates the activity, its fields and layouts, the behaviors, the filters, the search form,
+> the match rule and nine views. Use it as a starting point to adapt, or read the rest of this
+> page to build the same thing by hand. `--reset` rebuilds from scratch, deleting the previous
+> activity of that name in the course, so do not point it at one holding real entries.
+
 ---
 
 ## Design overview
@@ -33,7 +46,8 @@ plugin: you are assembling fields, a view, a filter and two rules.
 | Passengers | **Team member select** field | Claiming a seat, with capacity enforced |
 | Notes | **Text area** field | "Non-smoker", "space for a bike", … |
 | Browsing | **Grid** view | One card per ride |
-| Searching | Saved **filter** | "Find a ride from A to B" |
+| Searching | **Custom filter** | "Find a ride from A to B", as a search form on the page |
+| Long forms | A **chain of views** | Splitting posting a ride into steps (optional, step 10) |
 | Match alerts | **Ride match** rule | Notifies both authors when routes overlap |
 | Seat alerts | **Event notification** rule | Notifies the driver when someone joins or leaves |
 
@@ -87,6 +101,13 @@ rename one later, update the rule to match.
 
 Turn times on. Matching uses them to rule out journeys that overlap geographically but happen
 days apart, and without them the rule cannot tell Tuesday from Friday.
+
+> **Unless your board also carries recurring trips.** A commute that runs every Monday and
+> Friday has no single departure timestamp, so requiring a time gives it a meaningless one.
+> Leave times optional in that case and describe the schedule in separate fields (a weekday
+> multi-select and a time-of-day select). The matcher **skips the time check whenever either
+> side has no departure**, so a recurring ride still matches on route alone — which is what you
+> want, since it runs every week anyway.
 
 Leave **Location precision for others** at *Approximate until matched* — see
 [the Itinerary field guide](user_guide_itinerary_field.md#location-precision--read-this-one-before-going-live).
@@ -161,16 +182,36 @@ clicks. That is how pickup points get agreed — see step 9.
 
 ---
 
-## Step 4 — Add the "find a ride" filter
+## Step 4 — Add the "find a ride" search form
 
-**Manage → View Filters → Add a filter.** Name it `Find a ride`.
+Give passengers a search box on the page rather than a fixed saved search.
 
-Add a custom search condition on **Route**. The form gives **Travelling from**, **Travelling to**
-and **Within (km)**. Save it, and it becomes selectable in the **Current filter** menu above the
-entries.
+**Manage → Custom Filters → Add a custom filter.** Name it `Find a ride`, tick **Visible**, and
+under **User defined fields** tick **Route** — plus `Ride type` and anything else worth
+narrowing by. Then put its tag in the browse view's section template:
 
-Optionally add a second filter `Offers only` with a condition `Ride type` = `Offer a ride`, so
-passengers can browse just the offers.
+```
+##customfilter:Find a ride##
+```
+
+The form offers **Travelling from**, **Travelling to** and **Within (km)**, with the same
+address lookup as the entry form.
+
+> **Two view settings decide whether this works at all.** A view that *forces* one filter hides
+> its search form, and a **Permitted filters** whitelist blocks ad-hoc searches outright. In the
+> view's settings turn on **Allow all filters** and leave **Permitted filters** empty. The
+> view's own filter still decides what is listed until somebody searches — so set the view
+> filter to `Offers only` and passengers see offers by default, then search within them.
+
+Also add a saved filter `Offers only` (**Manage → View Filters**, condition `Ride type` =
+`Offer a ride`) to use as that view filter, and a matching `Requests only` if you want a second
+board of people looking for a lift.
+
+> **A search replaces the view's filter, it does not add to it.** Once somebody presses
+> **Search**, what they typed *is* the filter — so an `Offers only` view starts out showing
+> offers, but the results of a route search include requests too. That is why `Ride type`
+> belongs in the search form: it lets people narrow back down to offers themselves. Seeing who
+> else is looking for the same trip is often useful anyway.
 
 **How the route search behaves** — the two properties that surprise people:
 
@@ -213,7 +254,7 @@ This is the piece that makes the board feel alive.
 1. Works out whether the entry offers or requests a ride.
 2. Looks at entries of the **opposite** kind in the same activity — skipping the author's own
    entries, unapproved entries, journeys whose areas do not overlap, and departures outside the
-   tolerance.
+   tolerance. A journey without a departure time skips the time check rather than failing it.
 3. Runs the corridor match on what survives.
 4. For each **new** pair, notifies **both** authors with a link to the other entry.
 
@@ -241,7 +282,7 @@ Nothing arrived? Work down this list:
 | Both entries approved? | Unapproved entries are skipped |
 | Different authors? | Your own entries are never matched against each other |
 | Both routes have **at least two stops**? | One stop is not a journey |
-| Departure times within the tolerance? | 12 hours apart by default; a day apart will not match |
+| Departure times within the tolerance? | 12 hours apart by default; a day apart will not match. Journeys without a time are exempt |
 | Are the two `Ride type` values *different* entries? | Two offers never match each other |
 | Do the rule's offer/request values match the option labels? | A typo here means the rule silently matches nothing |
 | Radius large enough? | Stops must be within it of both search ends |
@@ -304,9 +345,9 @@ Put this in the activity description. It covers the three things users otherwise
 > Add the intermediate stops you are genuinely willing to serve: that is how people along your
 > route find you.
 >
-> **Finding a ride.** Use the *Find a ride* filter with where you are starting and where you
-> are going. You will also be notified automatically when a matching ride is posted, so you do
-> not have to keep checking.
+> **Finding a ride.** Use the *Find a ride* search with where you are starting and where you
+> are going. Post your trip as a request as well: you are then notified automatically when a
+> matching ride appears, so you do not have to keep checking.
 >
 > **Agreeing where to meet.** The board does not store a pickup point. Once you have found each
 > other, click the other person's name to open their profile and send a message, then agree the
@@ -314,13 +355,53 @@ Put this in the activity description. It covers the three things users otherwise
 
 ---
 
+## Step 10 — Optional: split the form into steps
+
+A ride offer with vehicle details, a schedule and cost sharing is a long form. Datalynx has no
+wizard setting; the way to build one is a **chain of views**, and it takes no JavaScript.
+
+Make one Grid view per step, each showing only some of the fields, and in each view's
+**Redirect on submit** settings:
+
+- **Target view** — the next step.
+- **Redirect and continue editing** — on, so the same entry travels to that view in edit mode.
+
+The last step points at your browse view with *continue editing* off, which ends the chain.
+Give every step view a filter of "my entries only" so people only ever see their own.
+
+Two things make the result feel like a real wizard:
+
+- **Put the labels in the field layout, not the view template.** Add a field layout
+  (Manage → Layouts) whose edit template is your label plus `#input`. A field hidden by a
+  behavior condition then takes its label with it, instead of leaving an orphaned caption.
+- **Order the steps so each choice precedes what depends on it.** Conditions are evaluated
+  against the *saved* entry, so a field can react to a choice made on an earlier step, but not
+  to one made two boxes above it on the same step. Ask "offer or request?" in step 1, and the
+  vehicle fields in step 3 then know whether to appear at all.
+
+For navigation back, put a link tag in each step's template:
+
+```
+##viewsesslink:Step 1 – Route;1. Route;editentries=##entryid##|eids=##entryid##;badge bg-success##
+```
+
+On the final step, reference every field with a behavior that nobody may edit — that turns the
+step into a read-only summary, because the layout shows the value instead of an input. Two
+details keep that summary tidy:
+
+- In the field layout, set **When not editable** to *Use display template if content is present,
+  otherwise display nothing*. A field nobody filled in then leaves no empty row behind.
+- Give those read-only behaviors the **same conditions** as their editable twins. Otherwise a
+  request's summary lists the vehicle fields it was never asked for.
+
+---
+
 ## What this build does not do
 
 Stated plainly so you can plan around it:
 
-- **No road routes or travel times.** Map lines are straight between stops and the distance is
-  straight-line — treat it as a lower bound. Real routing is planned.
-- **No detour ranking.** Matches are not ordered by how far a driver would deviate.
+- **No detour ranking.** Matches are not ordered by how far a driver would deviate, even though
+  road routes are now known.
 - **No waitlist or driver approval.** Seats are first-come; a full ride simply cannot be joined.
   Cancellations free a seat but nobody is promoted automatically.
 - **Capacity is per field, not per ride** — see the caveat in step 2.4.
@@ -340,6 +421,7 @@ Stated plainly so you can plan around it:
 - [ ] Cron running — no cron, no match notifications
 - [ ] `mod/datalynx:teamsubscribe` granted to whoever may claim seats
 - [ ] End-to-end test done with two real accounts (step 5)
+- [ ] Search view set to **Allow all filters**, with **Permitted filters** empty (step 4)
 - [ ] Location precision left approximate, unless you decided otherwise deliberately
 - [ ] Activity description explains posting, finding, and agreeing a meeting point
 

@@ -32,10 +32,13 @@ import {
     attachAutocomplete,
     claimRegions,
     createMap,
+    debounce,
+    decodePolyline,
     geocodeReverse,
     getLeaflet,
     readDefaultView,
     readTiles,
+    routeCalculate,
     whenVisible,
     WORLD_VIEW,
 } from 'mod_datalynx/location';
@@ -49,6 +52,27 @@ const SELECTORS = {
 
 /** @type {Object} Leaflet options for the straight-segment route line. */
 const LINE_STYLE = {color: '#0f6cbf', weight: 4, opacity: 0.8};
+
+/** @type {Object} Leaflet options for a real routed line, drawn a little heavier. */
+const ROUTE_STYLE = {color: '#0f6cbf', weight: 5, opacity: 0.85};
+
+/**
+ * Format a duration in seconds as a short "2 h 10 min" style label.
+ *
+ * @param {number} seconds
+ * @returns {Promise<string>}
+ */
+const formatDuration = async (seconds) => {
+    const minutes = Math.round(seconds / 60);
+    if (minutes < 60) {
+        return getString('durationminutes', 'datalynxfield_itinerary', minutes);
+    }
+
+    return getString('durationhours', 'datalynxfield_itinerary', {
+        hours: Math.floor(minutes / 60),
+        minutes: minutes % 60,
+    });
+};
 
 /**
  * Convert a unix timestamp to the value a datetime-local input expects.
@@ -125,7 +149,15 @@ const initDisplayMap = async (element) => {
             doubleClickZoom: false,
         });
 
-        L.polyline(points, LINE_STYLE).addTo(map);
+        // A stored route means the engine's real geometry; without one the stops are
+        // joined by straight segments, which is what the field showed before routing.
+        const routed = element.dataset.polyline ? decodePolyline(element.dataset.polyline) : [];
+        if (routed.length > 1) {
+            L.polyline(routed, ROUTE_STYLE).addTo(map);
+        } else {
+            L.polyline(points, LINE_STYLE).addTo(map);
+        }
+
         stops.forEach((stop, index) => {
             if (!Number.isFinite(stop.lat) || !Number.isFinite(stop.lng)) {
                 return;
@@ -158,10 +190,14 @@ const initDisplayMap = async (element) => {
  */
 const initPicker = async (element) => {
     const input = document.getElementById(element.dataset.inputid);
+    const routeInput = element.dataset.routeinputid
+        ? document.getElementById(element.dataset.routeinputid)
+        : null;
     const list = element.querySelector('[data-region="stops"]');
     const rowTemplate = element.querySelector('[data-region="stoptemplate"]');
     const mapElement = element.querySelector('[data-region="map"]');
     const status = element.querySelector('[data-region="status"]');
+    const routeLabel = element.querySelector('[data-region="route"]');
 
     if (!input || !list || !rowTemplate || !mapElement) {
         return;
@@ -195,6 +231,8 @@ const initPicker = async (element) => {
     let map = null;
     let line = null;
     let markers = [];
+    let routeline = null;
+    let lastroutekey = '';
 
     /**
      * Persist the current state into the hidden input.
@@ -209,7 +247,88 @@ const initPicker = async (element) => {
             lng: stop.lng,
             time: stop.time,
         })));
+        // Every change funnels through here, so this is the one place the route has
+        // to be kept in step with the stops.
+        // eslint-disable-next-line no-use-before-define
+        scheduleRoute();
     };
+
+    /**
+     * Ask the server to route the current stops, and show what it says.
+     *
+     * The summary travels back to the server in its own hidden input, so the entry
+     * stores the distance, the travel time and the geometry alongside the stops and
+     * neither the display nor the browse view has to route anything again.
+     *
+     * @returns {Promise<void>}
+     */
+    const refreshRoute = async () => {
+        if (!routeInput) {
+            return;
+        }
+
+        const located = stops
+            .filter((stop) => stop.lat !== null && stop.lng !== null)
+            .map((stop) => ({lat: stop.lat, lng: stop.lng}));
+
+        const key = JSON.stringify(located);
+        if (key === lastroutekey) {
+            return;
+        }
+        lastroutekey = key;
+
+        // A journey that is not one yet has no route, and neither has the input.
+        if (located.length < 2) {
+            routeInput.value = '';
+            if (routeLabel) {
+                routeLabel.textContent = '';
+            }
+            if (routeline) {
+                routeline.remove();
+                routeline = null;
+            }
+            return;
+        }
+
+        const route = await routeCalculate(fieldid, located);
+        if (key !== lastroutekey) {
+            // The stops moved on while this request was in flight.
+            return;
+        }
+
+        if (!route) {
+            routeInput.value = '';
+            if (routeLabel) {
+                routeLabel.textContent = '';
+            }
+            return;
+        }
+
+        routeInput.value = JSON.stringify({
+            distance: route.distance,
+            duration: route.duration,
+            polyline: route.polyline,
+        });
+
+        if (routeLabel) {
+            routeLabel.textContent = await getString('routesummary', 'datalynxfield_itinerary', {
+                distance: (route.distance / 1000).toFixed(1),
+                duration: await formatDuration(route.duration),
+            });
+        }
+
+        if (map && route.polyline) {
+            const points = decodePolyline(route.polyline);
+            if (routeline) {
+                routeline.remove();
+            }
+            routeline = points.length > 1
+                ? map.datalynxLeaflet.polyline(points, ROUTE_STYLE).addTo(map)
+                : null;
+        }
+    };
+
+    const scheduleRoute = debounce(refreshRoute, 600);
 
     /**
      * Update the status line, warning about rows that cannot be stored.
@@ -249,6 +368,12 @@ const initPicker = async (element) => {
         if (line) {
             line.remove();
             line = null;
+        }
+        // The routed line belongs to the previous set of stops; refreshRoute() draws
+        // the new one as soon as the server answers.
+        if (routeline) {
+            routeline.remove();
+            routeline = null;
         }
 
         const L = map.datalynxLeaflet;

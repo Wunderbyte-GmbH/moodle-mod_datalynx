@@ -65,6 +65,17 @@ class provider implements metadata_provider {
             );
         }
 
+        // The stops of a journey are sent to the routing service to work out the
+        // travel time. As with the geocoder the site makes the request, so the
+        // service never sees the traveller's IP address.
+        if (provider_config::router_engine() !== provider_config::ROUTER_NONE) {
+            $collection->add_external_location_link(
+                'router',
+                ['coordinates' => 'privacy:metadata:router:coordinates'],
+                'privacy:metadata:router'
+            );
+        }
+
         $collection->add_external_location_link(
             'tileserver',
             ['ipaddress' => 'privacy:metadata:tileserver:ipaddress'],

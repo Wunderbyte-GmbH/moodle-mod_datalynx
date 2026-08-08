@@ -142,4 +142,13 @@ $functions = [
                 'capabilities' => 'mod/datalynx:viewentry',
                 'ajax'        => true,
         ],
+        'mod_datalynx_route_calculate' => [
+                'classname'   => 'mod_datalynx\external\route_calculate',
+                'methodname'  => 'execute',
+                'classpath'   => '',
+                'description' => 'Work out distance, travel time and geometry for an itinerary.',
+                'type'        => 'read',
+                'capabilities' => 'mod/datalynx:viewentry',
+                'ajax'        => true,
+        ],
 ];

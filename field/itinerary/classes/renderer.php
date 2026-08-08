@@ -20,6 +20,7 @@ use html_writer;
 use mod_datalynx\local\field\datalynxfield_renderer;
 use mod_datalynx\local\map\geocoder_factory;
 use mod_datalynx\local\map\provider_config;
+use mod_datalynx\local\map\router_factory;
 use mod_datalynx\local\ride\itinerary;
 use MoodleQuickForm;
 use stdClass;
@@ -142,9 +143,21 @@ class renderer extends datalynxfield_renderer {
         $mform->addElement('hidden', $elementname, $journey->to_json(), ['id' => $inputid]);
         $mform->setType($elementname, PARAM_RAW);
 
+        // The routed summary travels in its own hidden input, filled in by the picker
+        // while the traveller edits, so the entry stores the travel time it showed.
+        $routeinputid = '';
+        if (router_factory::instance() !== null) {
+            $routename = "field_{$fieldid}_{$entry->id}_route";
+            $routeinputid = "id_{$routename}";
+            $route = $this->field->get_route($entry);
+            $mform->addElement('hidden', $routename, $route ? $route->to_json() : '', ['id' => $routeinputid]);
+            $mform->setType($routename, PARAM_RAW);
+        }
+
         $context = array_merge($this->get_map_context(), $this->get_geocoder_context(), [
             'fieldid' => $fieldid,
             'inputid' => $inputid,
+            'routeinputid' => $routeinputid,
             'maxwaypoints' => $this->field->get_max_waypoints(),
             'initialwaypoints' => max(2, (int) ($this->field->get('param2') ?: 2)),
             'requiretimes' => !empty($this->field->get('param8')),
@@ -193,9 +206,61 @@ class renderer extends datalynxfield_renderer {
                 'datalynxfield_itinerary',
                 format_float($journey->length_km(), 1)
             ),
-        ]);
+        ], $this->get_route_context($entry));
 
         return $OUTPUT->render_from_template('mod_datalynx/field_itinerary_display', $context);
+    }
+
+    /**
+     * The stored route of an entry as template context.
+     *
+     * Nothing is fetched here: rendering a browse view would otherwise make one
+     * outbound routing request per entry, serialised behind the rate limiter. The
+     * route is computed once, while the journey is being edited, and stored with it.
+     *
+     * @param stdClass $entry
+     * @return array
+     */
+    protected function get_route_context(stdClass $entry): array {
+        $route = $this->field->get_route($entry);
+        if ($route === null) {
+            return ['hasroute' => false, 'polyline' => ''];
+        }
+
+        return [
+            'hasroute' => true,
+            'polyline' => $route->polyline,
+            'routelabel' => get_string(
+                'roaddistance',
+                'datalynxfield_itinerary',
+                format_float($route->distance_km(), 1)
+            ),
+            'traveltimelabel' => get_string(
+                'traveltime',
+                'datalynxfield_itinerary',
+                self::format_duration($route->duration_minutes())
+            ),
+        ];
+    }
+
+    /**
+     * A travel time in whole minutes, as "34 min" or "2 h 25 min".
+     *
+     * Not core's format_time(), which would report a routed duration down to the
+     * second: "2 hours 25 mins 17 secs" claims a precision no routing engine has.
+     *
+     * @param int $minutes
+     * @return string
+     */
+    protected static function format_duration(int $minutes): string {
+        if ($minutes < 60) {
+            return get_string('durationminutes', 'datalynxfield_itinerary', $minutes);
+        }
+
+        return get_string('durationhours', 'datalynxfield_itinerary', (object) [
+            'hours' => intdiv($minutes, 60),
+            'minutes' => $minutes % 60,
+        ]);
     }
 
     /**

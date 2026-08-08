@@ -47,6 +47,21 @@ class provider_config {
     /** @var string Google Geocoding API. Server side only, needs an API key. */
     const GEOCODER_GOOGLE = 'google';
 
+    /** @var string Routing disabled: journeys show straight-line distance only. */
+    const ROUTER_NONE = 'none';
+
+    /** @var string OSRM, the open source routing machine. No API key. */
+    const ROUTER_OSRM = 'osrm';
+
+    /** @var string Google Directions API. Needs an API key. */
+    const ROUTER_GOOGLE = 'google';
+
+    /** @var array Public endpoint of each routing engine, used as the setting default. */
+    const ROUTER_ENDPOINTS = [
+        self::ROUTER_OSRM => 'https://router.project-osrm.org',
+        self::ROUTER_GOOGLE => 'https://maps.googleapis.com/maps/api',
+    ];
+
     /** @var array Public endpoint of each engine, used as the setting default. */
     const PUBLIC_ENDPOINTS = [
         self::GEOCODER_PHOTON => 'https://photon.komoot.io',
@@ -122,6 +137,38 @@ class provider_config {
      */
     public static function geocoder_key(): string {
         return (string) self::setting('geocoderkey');
+    }
+
+    /**
+     * The configured routing engine.
+     *
+     * @return string One of the ROUTER_* constants.
+     */
+    public static function router_engine(): string {
+        $engine = (string) self::setting('router', self::ROUTER_OSRM);
+
+        return array_key_exists($engine, self::ROUTER_ENDPOINTS) ? $engine : self::ROUTER_NONE;
+    }
+
+    /**
+     * Base URL of the routing service, without a trailing slash.
+     *
+     * @return string
+     */
+    public static function router_url(): string {
+        $engine = self::router_engine();
+        $default = self::ROUTER_ENDPOINTS[$engine] ?? '';
+
+        return rtrim((string) self::setting('routerurl', $default), '/');
+    }
+
+    /**
+     * API key for the routing service. Never leaves the server.
+     *
+     * @return string
+     */
+    public static function router_key(): string {
+        return (string) self::setting('routerkey');
     }
 
     /**
@@ -239,7 +286,7 @@ class provider_config {
      * @return bool
      */
     public static function uses_shared_endpoint(): bool {
-        $urls = [self::geocoder_url(), self::tile_config()['tileurl']];
+        $urls = [self::geocoder_url(), self::router_url(), self::tile_config()['tileurl']];
 
         foreach ($urls as $url) {
             $host = strtolower((string) parse_url($url, PHP_URL_HOST));
@@ -264,6 +311,19 @@ class provider_config {
             self::GEOCODER_NOMINATIM => get_string('geocoder_nominatim', 'datalynx'),
             self::GEOCODER_GOOGLE => get_string('geocoder_google', 'datalynx'),
             self::GEOCODER_NONE => get_string('geocoder_none', 'datalynx'),
+        ];
+    }
+
+    /**
+     * Menu of routing engines for the admin settings page.
+     *
+     * @return array
+     */
+    public static function router_menu(): array {
+        return [
+            self::ROUTER_OSRM => get_string('router_osrm', 'datalynx'),
+            self::ROUTER_GOOGLE => get_string('router_google', 'datalynx'),
+            self::ROUTER_NONE => get_string('router_none', 'datalynx'),
         ];
     }
 }
