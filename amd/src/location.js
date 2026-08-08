@@ -446,7 +446,14 @@ export const debounce = (callback, wait) => {
  * @param {Function} config.onSelect Called with the chosen place.
  */
 export const attachAutocomplete = (input, {fieldid, typeahead, minlength, trigger, onSelect}) => {
-    const anchor = input.closest('.felement') || input.parentElement;
+    // The dropdown is positioned against this box, so it has to be one that
+    // actually has the input's width. Moodle's inline element template - used by
+    // the customfilter form, which renders every field with ingroup = true - emits
+    // no .felement and wraps the input in a bare <span>. An absolutely positioned
+    // child of an inline box gets a zero-width containing block in Firefox, which
+    // renders the suggestions as a bare vertical line; Chrome is more forgiving.
+    // .fitem is the block-level wrapper both templates agree on.
+    const anchor = input.closest('.felement') || input.closest('.fitem') || input.parentElement;
     if (!anchor) {
         return;
     }

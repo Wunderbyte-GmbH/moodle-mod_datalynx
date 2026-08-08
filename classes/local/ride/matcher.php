@@ -25,6 +25,11 @@ namespace mod_datalynx\local\ride;
  * what makes the match directional: the same stops travelled the other way round
  * are not a match.
  *
+ * Either end may be left open, which asks the looser question "what departs near
+ * here?" or "what arrives near there?". The direction still holds, because the
+ * stop that matches must have another stop after it (a departure) or before it
+ * (an arrival). See {@see corridor_subquery()}.
+ *
  * Everything runs against `datalynx_waypoints`, the derived index whose numeric
  * lat/lng columns are indexed — the coordinates in `datalynx_contents` are
  * unindexed TEXT and have to be cast, which no index can serve. The bounding box
@@ -99,48 +104,87 @@ class matcher {
     /**
      * Build the entry-id subquery for one corridor match.
      *
+     * Either end may be omitted. With only a pickup the match is "journeys one can
+     * board near here and travel onwards from"; with only a drop-off it is
+     * "journeys that reach here from somewhere earlier". The self-join is what
+     * carries that meaning, so it stays in place for all three shapes: it already
+     * demands a stop strictly later in the route than the one being matched, which
+     * is exactly what makes a lone departure or arrival point travellable rather
+     * than merely nearby. A journey's final stop is therefore not a departure, and
+     * its first stop is not an arrival.
+     *
      * @param int $fieldid Itinerary field the journeys belong to.
-     * @param waypoint $from Where the traveller wants to be picked up.
-     * @param waypoint $to Where the traveller wants to get off.
+     * @param waypoint|null $from Where the traveller wants to be picked up, or null.
+     * @param waypoint|null $to Where the traveller wants to get off, or null.
      * @param float $radiuskm How far from the route either end may be.
      * @param array|null $restrictentryids Only consider these entries; null for all.
      * @return array [$sql, $params] where $sql selects entry ids.
      */
     public static function corridor_subquery(
         int $fieldid,
-        waypoint $from,
-        waypoint $to,
+        ?waypoint $from,
+        ?waypoint $to,
         float $radiuskm,
         ?array $restrictentryids = null
     ): array {
         global $DB;
 
+        if ($from === null && $to === null) {
+            throw new \coding_exception('A corridor match needs at least one end.');
+        }
+
         $suffix = $fieldid . '_' . (++self::$sequence);
         $table = '{' . self::TABLE . '}';
 
-        [$fromdlat, $fromdlng] = self::bounding_deltas($from->lat, $radiuskm);
-        [$todlat, $todlng] = self::bounding_deltas($to->lat, $radiuskm);
+        $params = ["rmfield{$suffix}" => $fieldid];
+        $conditions = [];
 
-        // Each occurrence needs its own placeholder; see distance_expression().
-        $params = [
-            "rmfield{$suffix}" => $fieldid,
-            "rmpradius{$suffix}" => $radiuskm,
-            "rmdradius{$suffix}" => $radiuskm,
-            "rmplata{$suffix}" => $from->lat,
-            "rmplatb{$suffix}" => $from->lat,
-            "rmplng{$suffix}" => $from->lng,
-            "rmdlata{$suffix}" => $to->lat,
-            "rmdlatb{$suffix}" => $to->lat,
-            "rmdlng{$suffix}" => $to->lng,
-            "rmplatmin{$suffix}" => $from->lat - $fromdlat,
-            "rmplatmax{$suffix}" => $from->lat + $fromdlat,
-            "rmplngmin{$suffix}" => $from->lng - $fromdlng,
-            "rmplngmax{$suffix}" => $from->lng + $fromdlng,
-            "rmdlatmin{$suffix}" => $to->lat - $todlat,
-            "rmdlatmax{$suffix}" => $to->lat + $todlat,
-            "rmdlngmin{$suffix}" => $to->lng - $todlng,
-            "rmdlngmax{$suffix}" => $to->lng + $todlng,
-        ];
+        if ($from !== null) {
+            [$dlat, $dlng] = self::bounding_deltas($from->lat, $radiuskm);
+            // Each occurrence needs its own placeholder; see distance_expression().
+            $params += [
+                "rmpradius{$suffix}" => $radiuskm,
+                "rmplata{$suffix}" => $from->lat,
+                "rmplatb{$suffix}" => $from->lat,
+                "rmplng{$suffix}" => $from->lng,
+                "rmplatmin{$suffix}" => $from->lat - $dlat,
+                "rmplatmax{$suffix}" => $from->lat + $dlat,
+                "rmplngmin{$suffix}" => $from->lng - $dlng,
+                "rmplngmax{$suffix}" => $from->lng + $dlng,
+            ];
+            $pickupdistance = self::distance_expression(
+                'pickup',
+                "rmplata{$suffix}",
+                "rmplatb{$suffix}",
+                "rmplng{$suffix}"
+            );
+            $conditions[] = "pickup.lat BETWEEN :rmplatmin{$suffix} AND :rmplatmax{$suffix}";
+            $conditions[] = "pickup.lng BETWEEN :rmplngmin{$suffix} AND :rmplngmax{$suffix}";
+            $conditions[] = "{$pickupdistance} <= :rmpradius{$suffix}";
+        }
+
+        if ($to !== null) {
+            [$dlat, $dlng] = self::bounding_deltas($to->lat, $radiuskm);
+            $params += [
+                "rmdradius{$suffix}" => $radiuskm,
+                "rmdlata{$suffix}" => $to->lat,
+                "rmdlatb{$suffix}" => $to->lat,
+                "rmdlng{$suffix}" => $to->lng,
+                "rmdlatmin{$suffix}" => $to->lat - $dlat,
+                "rmdlatmax{$suffix}" => $to->lat + $dlat,
+                "rmdlngmin{$suffix}" => $to->lng - $dlng,
+                "rmdlngmax{$suffix}" => $to->lng + $dlng,
+            ];
+            $dropoffdistance = self::distance_expression(
+                'dropoff',
+                "rmdlata{$suffix}",
+                "rmdlatb{$suffix}",
+                "rmdlng{$suffix}"
+            );
+            $conditions[] = "dropoff.lat BETWEEN :rmdlatmin{$suffix} AND :rmdlatmax{$suffix}";
+            $conditions[] = "dropoff.lng BETWEEN :rmdlngmin{$suffix} AND :rmdlngmax{$suffix}";
+            $conditions[] = "{$dropoffdistance} <= :rmdradius{$suffix}";
+        }
 
         $restrict = '';
         if ($restrictentryids !== null) {
@@ -157,18 +201,10 @@ class matcher {
             $params += $inparams;
         }
 
-        $pickupdistance = self::distance_expression(
-            'pickup',
-            "rmplata{$suffix}",
-            "rmplatb{$suffix}",
-            "rmplng{$suffix}"
-        );
-        $dropoffdistance = self::distance_expression(
-            'dropoff',
-            "rmdlata{$suffix}",
-            "rmdlatb{$suffix}",
-            "rmdlng{$suffix}"
-        );
+        $criteria = '';
+        foreach ($conditions as $condition) {
+            $criteria .= "\n                   AND {$condition}";
+        }
 
         $sql = "SELECT DISTINCT pickup.entryid
                   FROM {$table} pickup
@@ -177,13 +213,7 @@ class matcher {
                    AND dropoff.fieldid = pickup.fieldid
                    AND dropoff.seq > pickup.seq
                  WHERE pickup.fieldid = :rmfield{$suffix}
-                       {$restrict}
-                   AND pickup.lat BETWEEN :rmplatmin{$suffix} AND :rmplatmax{$suffix}
-                   AND pickup.lng BETWEEN :rmplngmin{$suffix} AND :rmplngmax{$suffix}
-                   AND dropoff.lat BETWEEN :rmdlatmin{$suffix} AND :rmdlatmax{$suffix}
-                   AND dropoff.lng BETWEEN :rmdlngmin{$suffix} AND :rmdlngmax{$suffix}
-                   AND {$pickupdistance} <= :rmpradius{$suffix}
-                   AND {$dropoffdistance} <= :rmdradius{$suffix}";
+                       {$restrict}{$criteria}";
 
         return [$sql, $params];
     }
@@ -192,16 +222,16 @@ class matcher {
      * Entry ids of journeys that can carry a traveller between two places.
      *
      * @param int $fieldid
-     * @param waypoint $from
-     * @param waypoint $to
+     * @param waypoint|null $from
+     * @param waypoint|null $to
      * @param float $radiuskm
      * @param array|null $restrictentryids
      * @return int[]
      */
     public static function find_matching_entries(
         int $fieldid,
-        waypoint $from,
-        waypoint $to,
+        ?waypoint $from,
+        ?waypoint $to,
         float $radiuskm,
         ?array $restrictentryids = null
     ): array {

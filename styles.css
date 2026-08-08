@@ -1299,6 +1299,14 @@ form.mform div.entry div.datalynx-field-wrapper {
     position: relative;
 }
 
+/* If the wrapper is ever an inline element, an absolutely positioned child would
+   resolve left/right against a zero-width inline box - a bare vertical line in
+   Firefox. Giving it a block box restores the intended width everywhere. */
+span.datalynx-location-autocomplete {
+    display: inline-block;
+    width: 100%;
+}
+
 .datalynx-location-suggestions {
     position: absolute;
     top: 100%;

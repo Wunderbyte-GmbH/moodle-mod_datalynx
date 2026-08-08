@@ -378,12 +378,20 @@ class field extends datalynxfield_base {
             'radius' => $read('radius') ?: $this->get_match_radius(),
         ];
 
-        // Only a pair of real coordinate pairs describes a corridor; a half-filled
-        // form is not a search.
-        $complete = is_numeric($search['fromlat']) && is_numeric($search['fromlng'])
-            && is_numeric($search['tolat']) && is_numeric($search['tolng']);
+        // One end is a search in its own right: "where can I get to from here" and
+        // "what comes here" are both worth asking. An end whose coordinates never
+        // arrived - the address was typed but no suggestion picked - is dropped, so
+        // it cannot narrow the search by accident.
+        foreach (['from', 'to'] as $end) {
+            if (!is_numeric($search["{$end}lat"]) || !is_numeric($search["{$end}lng"])) {
+                $search["{$end}lat"] = null;
+                $search["{$end}lng"] = null;
+            }
+        }
 
-        return $complete ? $search : false;
+        $hasend = $search['fromlat'] !== null || $search['tolat'] !== null;
+
+        return $hasend ? $search : false;
     }
 
     /**
@@ -405,7 +413,9 @@ class field extends datalynxfield_base {
 
         $from = waypoint::from_array(['lat' => $value['fromlat'] ?? null, 'lng' => $value['fromlng'] ?? null]);
         $to = waypoint::from_array(['lat' => $value['tolat'] ?? null, 'lng' => $value['tolng'] ?? null]);
-        if ($from === null || $to === null) {
+
+        // Either end alone still describes a search; neither does not.
+        if ($from === null && $to === null) {
             return ['', [], false];
         }
 
@@ -441,20 +451,26 @@ class field extends datalynxfield_base {
             return (string) $value;
         }
 
+        // An end without coordinates is not part of the search, whatever text the
+        // address box still holds, so it is left blank rather than described.
         $describe = function (string $end) use ($value): string {
+            if (!is_numeric($value["{$end}lat"] ?? null) || !is_numeric($value["{$end}lng"] ?? null)) {
+                return '';
+            }
+
             $address = trim((string) ($value["{$end}address"] ?? ''));
             if ($address !== '') {
                 return $address;
             }
 
-            return round((float) ($value["{$end}lat"] ?? 0), 4) . ', '
-                . round((float) ($value["{$end}lng"] ?? 0), 4);
+            return round((float) $value["{$end}lat"], 4) . ', '
+                . round((float) $value["{$end}lng"], 4);
         };
 
         $radius = !empty($value['radius']) ? (float) $value['radius'] : $this->get_match_radius();
 
         return trim($not . ' ' . get_string('matchesroute', 'datalynxfield_itinerary'))
-            . ' ' . $describe('from') . ' &rarr; ' . $describe('to')
+            . ' ' . trim($describe('from') . ' &rarr; ' . $describe('to'))
             . ' (' . get_string('radiuskm', 'datalynxfield_location', $radius) . ')';
     }
 

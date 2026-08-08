@@ -111,18 +111,18 @@ final class search_test extends advanced_testcase {
     /**
      * Run a corridor search through the filter pipeline.
      *
-     * @param string $from
-     * @param string $to
+     * @param string|null $from Place name, or null to leave the departure open.
+     * @param string|null $to Place name, or null to leave the destination open.
      * @param bool $not Negate the condition.
      * @return int[] Matching entry ids.
      */
-    protected function browse(string $from, string $to, bool $not = false): array {
+    protected function browse(?string $from, ?string $to, bool $not = false): array {
         $fieldid = (int) $this->field->id();
         $value = [
-            'fromlat' => self::PLACES[$from][0],
-            'fromlng' => self::PLACES[$from][1],
-            'tolat' => self::PLACES[$to][0],
-            'tolng' => self::PLACES[$to][1],
+            'fromlat' => $from === null ? '' : self::PLACES[$from][0],
+            'fromlng' => $from === null ? '' : self::PLACES[$from][1],
+            'tolat' => $to === null ? '' : self::PLACES[$to][0],
+            'tolng' => $to === null ? '' : self::PLACES[$to][1],
             'radius' => 5,
         ];
 
@@ -171,25 +171,89 @@ final class search_test extends advanced_testcase {
     }
 
     /**
-     * A half-filled search form is not a search and must not filter anything out.
+     * A departure on its own finds every journey leaving from there.
      */
-    public function test_incomplete_search_is_ignored(): void {
+    public function test_departure_only_search(): void {
+        $fromwien = $this->create_journey(['wien', 'graz']);
+        $alsofromwien = $this->create_journey(['wien', 'linz']);
+        $this->create_journey(['graz', 'linz']);
+
+        $found = $this->browse('wien', null);
+        sort($found);
+
+        $this->assertEquals([$fromwien, $alsofromwien], $found);
+    }
+
+    /**
+     * A destination on its own finds every journey arriving there, whatever its origin.
+     */
+    public function test_destination_only_search(): void {
+        $viawien = $this->create_journey(['wien', 'linz']);
+        $fromgraz = $this->create_journey(['graz', 'linz']);
+        $this->create_journey(['wien', 'graz']);
+
+        $found = $this->browse(null, 'linz');
+        sort($found);
+
+        $this->assertEquals([$viawien, $fromgraz], $found);
+    }
+
+    /**
+     * A one-ended search keeps the direction of travel.
+     *
+     * The last stop of a journey is not a place one can depart from, and the first
+     * is not a place one can arrive at.
+     */
+    public function test_one_ended_search_stays_directional(): void {
+        $this->create_journey(['wien', 'graz']);
+
+        $this->assertSame([], $this->browse('graz', null), 'The final stop is not a departure.');
+        $this->assertSame([], $this->browse(null, 'wien'), 'The first stop is not an arrival.');
+    }
+
+    /**
+     * A search with no coordinates at all must not filter anything out.
+     */
+    public function test_search_without_any_end_is_ignored(): void {
         $fieldid = (int) $this->field->id();
 
-        [$sql, $params, $fromcontent] = $this->field->get_search_sql(
-            ['', '', ['fromlat' => 48.1, 'fromlng' => 16.3]]
-        );
+        [$sql, $params, $fromcontent] = $this->field->get_search_sql(['', '', ['radius' => 5]]);
 
         $this->assertSame('', $sql);
         $this->assertSame([], $params);
         $this->assertFalse($fromcontent);
 
-        // And parse_search() refuses to build one in the first place.
+        // An address typed without picking a suggestion carries no coordinates, so
+        // parse_search() refuses to build a criterion from it.
         $formdata = (object) [
-            "f_0_{$fieldid}_fromlat" => 48.1,
-            "f_0_{$fieldid}_fromlng" => 16.3,
+            "f_0_{$fieldid}_fromaddress" => 'Wien',
+            "f_0_{$fieldid}_fromlat" => '',
+            "f_0_{$fieldid}_fromlng" => '',
         ];
         $this->assertFalse($this->field->parse_search($formdata, 0));
+    }
+
+    /**
+     * A form with only one end parses into a one-ended corridor.
+     */
+    public function test_parse_search_accepts_one_end(): void {
+        $fieldid = (int) $this->field->id();
+        $formdata = (object) [
+            "f_0_{$fieldid}_fromaddress" => 'Wien',
+            "f_0_{$fieldid}_fromlat" => 48.1852,
+            "f_0_{$fieldid}_fromlng" => 16.3775,
+            "f_0_{$fieldid}_toaddress" => '',
+            "f_0_{$fieldid}_tolat" => '',
+            "f_0_{$fieldid}_tolng" => '',
+            "f_0_{$fieldid}_radius" => 5,
+        ];
+
+        $parsed = $this->field->parse_search($formdata, 0);
+
+        $this->assertIsArray($parsed);
+        $this->assertEquals(48.1852, $parsed['fromlat']);
+        $this->assertNull($parsed['tolat'], 'An unresolved end must be dropped, not kept as a blank.');
+        $this->assertNull($parsed['tolng']);
     }
 
     /**
