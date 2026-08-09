@@ -335,7 +335,7 @@ foreach ($fielddefs as $key => $def) {
         'displaytemplate' => $display,
         'novaluetemplate' => \mod_datalynx\local\field\datalynxfield_layout::NO_VALUE_SHOW_NOTHING,
         'edittemplate' => $edit,
-        // "Dependent" rather than "as display mode": on the summary step, where every
+        // Dependent rather than "as display mode": on the summary step, where every
         // field is read-only, a field without a value then disappears with its label
         // instead of leaving an empty caption behind.
         'noteditabletemplate' => \mod_datalynx\local\field\datalynxfield_layout::NOT_EDITABLE_SHOW_DEPENDENT,
