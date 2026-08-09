@@ -1,0 +1,74 @@
+{{!
+    This file is part of mod_datalynx for Moodle - http://moodle.org/
+
+    It is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    It is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_datalynx/field_number_slider
+
+    Slider chrome for a number field rendered by a field format with the slider input type.
+
+    The slider steps over the *positions* of the value list, not over the values themselves, so
+    that non-linear scales (Fibonacci, 1-2-5) work with a plain range input. mod_datalynx/numberslider
+    writes the selected value into the number input identified by data-input and hides that input;
+    without JavaScript the number input stays visible and this markup is inert.
+
+    Context variables required for this template:
+    * inputid - element id of the number input carrying the submitted value
+    * values - JSON encoded list of selectable values, ascending
+    * labels - JSON encoded list of the same values formatted for display, including the unit
+    * label - field name, used as the accessible name of the range input
+    * max - highest slider position (count of values minus one)
+    * index - initial slider position
+    * readout - initial readout text
+    * showticks - whether to print the start and end labels under the track
+    * startlabel - lowest value, formatted
+    * endlabel - highest value, formatted
+
+    Example context (json):
+    {
+        "inputid": "id_field_12_34_slidervalue",
+        "values": "[0,1,2,3,5,8,13,21,34]",
+        "labels": "[\"0 km\",\"1 km\",\"2 km\",\"3 km\",\"5 km\",\"8 km\",\"13 km\",\"21 km\",\"34 km\"]",
+        "label": "Detour",
+        "max": 8,
+        "index": 0,
+        "readout": "0 km",
+        "showticks": true,
+        "startlabel": "0 km",
+        "endlabel": "34 km"
+    }
+}}
+<div class="datalynx-number-slider mb-2"
+     data-region="datalynx-number-slider"
+     data-input="{{inputid}}"
+     data-values="{{values}}"
+     data-labels="{{labels}}">
+    <div class="d-flex gap-3 align-items-center">
+        {{! The track and its labels share one column so the labels line up with the ends of the track. }}
+        <div class="flex-grow-1">
+            <input type="range" class="form-range w-100"
+                   min="0" max="{{max}}" step="1" value="{{index}}"
+                   aria-label="{{label}}"
+                   data-region="slider">
+            {{#showticks}}
+                <div class="d-flex justify-content-between small text-muted">
+                    <span>{{startlabel}}</span>
+                    <span>{{endlabel}}</span>
+                </div>
+            {{/showticks}}
+        </div>
+        <output class="badge bg-primary align-self-center" data-region="readout">{{readout}}</output>
+    </div>
+</div>

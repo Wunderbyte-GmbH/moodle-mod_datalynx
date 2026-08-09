@@ -30,30 +30,6 @@ class field_format_form extends \mod_datalynx\form\field_format_base_form {
     protected function format_definition() {
         $mform = &$this->_form;
 
-        $options = [
-            'default' => get_string('fieldformatoptiondefault', 'datalynxfield_radiobutton'),
-            'options' => get_string('fieldformatoptionoptions', 'datalynxfield_radiobutton'),
-            'key'     => get_string('fieldformatoptionkey', 'datalynxfield_radiobutton'),
-            'stepper' => get_string('fieldformatoptionstepper', 'datalynxfield_radiobutton'),
-        ];
-        $mform->addElement(
-            'select',
-            'option',
-            get_string('fieldformatoption', 'mod_datalynx'),
-            $options
-        );
-        $mform->setType('option', PARAM_ALPHA);
-        $mform->addRule('option', get_string('required'), 'required', null, 'client');
-        $mform->addHelpButton('option', 'fieldformatoption', 'datalynxfield_radiobutton');
-
-        $mform->addElement(
-            'text',
-            'stepper_icons',
-            get_string('fieldformatoptionsteppericons', 'datalynxfield_radiobutton'),
-            ['size' => 60]
-        );
-        $mform->setType('stepper_icons', PARAM_TEXT);
-        $mform->addHelpButton('stepper_icons', 'fieldformatoptionsteppericons', 'datalynxfield_radiobutton');
-        $mform->hideIf('stepper_icons', 'option', 'neq', 'stepper');
+        \datalynxfield_radiobutton\field_format::define_elements($mform);
     }
 }

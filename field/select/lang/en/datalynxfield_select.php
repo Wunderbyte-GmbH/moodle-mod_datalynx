@@ -23,10 +23,21 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 $string['fieldformatoption'] = 'Display format';
-$string['fieldformatoption_help'] = 'Controls what is displayed in views. "Label only" shows the human-readable option label. "Key-value pairs" renders label=key. "Key/index" shows only the stored key or index value.';
+$string['fieldformatoption_help'] = 'What is printed in views in place of the tag "[[fieldname:formatname]]".
+
+"The choices" are the options you defined for this field itself, under *Manage > Fields > (your select field) > Options* — one per line. Each option has a position (1 for the first line, 2 for the second, and so on); that position is what an entry actually stores.
+
+Take a field with the options *Draft*, *In review* and *Approved*, in an entry where *In review* is selected:
+
+* **Label only** — "In review". The label of the selected option, which is what you want in almost every view.
+* **Key-value pairs** — "0 Draft,1 In review,0 Approved". Every option in order, each prefixed with 1 if it is the selected one and 0 if it is not, separated by commas. Useful for exports and for CSS or JavaScript that has to know about the options that were *not* chosen.
+* **Key/index** — "2". Only the stored position of the selected option, without the label. Useful for exports and for comparing values across views. Nothing is printed when no option is selected.
+
+Note that the position, not the label, is stored: if you later reorder or rename the options, existing entries keep their number and therefore change meaning.';
 $string['fieldformatoptiondefault'] = 'Label only';
 $string['fieldformatoptionkey'] = 'Selected option key/index';
 $string['fieldformatoptionoptions'] = 'Key-value pairs';
+$string['fieldformatscope'] = 'This format changes how the field is shown <strong>in views (display mode) only</strong>. On the entry form the field is always a dropdown of the options defined for the field — a format cannot change that.';
 $string['matchesmyprofilefield'] = 'Matches my profile field';
 $string['matchesmyprofilefield_help'] = 'Shows only entries whose selected option matches the value of the chosen profile field for the currently logged-in user. The option label is compared with the profile value (case-insensitive). Combine this with an "author is me" criterion to restrict the result to the user\'s own entries.';
 $string['pluginname'] = 'Select';

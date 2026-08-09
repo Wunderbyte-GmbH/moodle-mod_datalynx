@@ -137,15 +137,58 @@ The `entrytime` format applies to three built-in timestamp tags:
 
 ### Number (`number`)
 
-Controls decimal precision for numeric field output.
+Controls decimal precision in views, and optionally turns the entry-form input into a slider.
 
 | Setting | What it configures |
 |---|---|
-| **Decimal places** | Number of decimal digits to display (integer) |
+| **Decimal places** | Number of decimal digits to display (integer). Display mode only. |
+| **Input in edit mode** | *Number input* (the standard text box) or *Slider*. Edit mode only. |
 
 **Example:** Create a format named `2dec` with 2 decimal places, then use `[[Budget:2dec]]`.
 
 > **Legacy migration note:** The old syntax `[[FieldName:2]]` (a plain numeric suffix) is automatically migrated to a format with `decimals = 2`.
+
+#### Slider input
+
+Choosing **Slider** replaces the number box on the entry form with a slider plus a live value
+readout. Views are unaffected — the value is still printed as a plain number with the decimal places
+configured above. Users without JavaScript keep the normal number box, and the value is stored and
+validated exactly as before.
+
+| Setting | What it configures |
+|---|---|
+| **Start value** | Value at the left end of the track. Always selectable. |
+| **End value** | Upper limit at the right end of the track. |
+| **Scale** | Which values the slider can be set to (see below). |
+| **Step size** | Distance between two positions on the *Linear* scale — for example `1`, `5` or `0.5`. Ignored by the other scales. |
+| **Unit** | Text appended to the readout, for example `" km"`. Display aid only; the stored value stays a plain number. |
+| **Show start and end labels** | Prints the first and last value under the ends of the track. |
+
+The slider always snaps to one of the generated values:
+
+| Scale | Values for start `0`, end `50` |
+|---|---|
+| **Linear** (step `1`) | `0, 1, 2, 3, … 50` |
+| **Linear** (step `5`) | `0, 5, 10, … 50` |
+| **Fibonacci** | `0, 1, 2, 3, 5, 8, 13, 21, 34` |
+| **1-2-5 series** | `0, 1, 2, 5, 10, 20, 50` |
+
+The non-linear scales are for values where small differences matter but large ones are estimates —
+a detour of 2 km versus 3 km is a real decision, 34 km versus 35 km is not.
+
+> **Note on the end value**  
+> On the Fibonacci and 1-2-5 scales, **End value** is an upper limit, not necessarily a selectable
+> value: the highest position is the last member of the sequence that does not exceed it. `0…50` on
+> the Fibonacci scale therefore ends at `34`.
+
+> **Note on empty entries**  
+> A slider always has a position, so opening the entry form on a field with no value yet puts the
+> value at the start of the scale. If you need "no value at all" to be distinguishable from the
+> lowest value, keep the number input.
+
+**Example:** Create a format named `detour` with input type *Slider*, start `0`, end `50`, scale
+*Linear*, step `1`, unit `" km"` and start/end labels on. Then use `[[Detour:detour]]` in your entry
+form template.
 
 ---
 
@@ -175,11 +218,23 @@ Same truncation control as the Text field.
 
 ### Select (`select`)
 
-Controls the rendering mode for single-select option fields.
+Controls how a single-select option field is rendered **in views (display mode) only**. The entry
+form always shows a dropdown of the field's options — no format can change that.
 
-| Setting | What it configures |
-|---|---|
-| **Output mode** | How the selected option value is rendered |
+The choices refer to the options defined on the field itself (*Manage → Fields → your field →
+Options*, one per line). Each option has a position — `1` for the first line, `2` for the second —
+and that position is what an entry stores. The examples below assume the options *Draft*, *In
+review*, *Approved* and an entry where *In review* is selected:
+
+| Display format | What it renders | Example output |
+|---|---|---|
+| **Label only** | The label of the selected option | `In review` |
+| **Key-value pairs** | Every option in order, each prefixed with `1` when selected and `0` when not, comma separated. For exports, and for CSS/JS that needs to know the options that were *not* chosen. | `0 Draft,1 In review,0 Approved` |
+| **Key/index** | Only the stored position, without the label. Empty when nothing is selected. | `2` |
+
+> **Warning**  
+> The position is stored, not the label. Reordering or renaming the options later leaves existing
+> entries pointing at the same number — and therefore at a different meaning.
 
 ---
 
@@ -195,20 +250,33 @@ Controls the rendering mode for multiple-selection option fields.
 
 ### Radio Button (`radiobutton`)
 
-Controls rendering for radio button fields, set via the **Display format** option.
+Controls how a radio button field is rendered **in views (display mode) only**, set via the
+**Display format** option. The entry form always shows a group of radio buttons — no format can
+change that, and the stepper in particular is never clickable.
 
-| Display format | What it renders |
-|---|---|
-| **Label only** | The human-readable option label |
-| **Key-value pairs** | The label and stored key together, as `label=key` |
-| **Key/index** | Only the stored key or index value |
-| **Stepper progress** | The options as a horizontal progress *stepper* — a row of numbered (or icon) steps with the selected option highlighted, ideal for showing workflow stages such as approval steps |
+As with Select, the choices refer to the options defined on the field itself (*Manage → Fields →
+your field → Options*, one per line), and an entry stores an option's *position*, not its label. The
+examples assume the options *Draft*, *In review*, *Approved* with *In review* selected:
+
+| Display format | What it renders | Example output |
+|---|---|---|
+| **Label only** | The label of the selected option | `In review` |
+| **Key-value pairs** | Every option in order, each prefixed with `1` when selected and `0` when not, comma separated | `0 Draft,1 In review,0 Approved` |
+| **Key/index** | Only the stored position, without the label. Empty when nothing is selected. | `2` |
+| **Stepper progress** | A horizontal row of steps, one per option, with every step up to and including the selection marked completed | *Draft* ✔ → *In review* ✔ → *Approved* ○ |
+
+Unlike the other three, **Stepper progress** also renders when the entry has no value yet — with no
+step completed.
 
 When **Stepper progress** is selected, an extra setting appears:
 
 | Setting | What it configures |
 |---|---|
-| **Stepper icons** | An optional comma-separated list of FontAwesome icon classes (for example `shopping-cart, cogs, medal, car, home`) shown inside each step’s circle. Leave empty to show step numbers instead. |
+| **Stepper icons** | An optional comma-separated list of FontAwesome icon classes (for example `shopping-cart, cogs, medal, car, home`) shown inside each step’s circle, one per option in the order the options are defined. Leave empty to show step numbers instead. |
+
+> **Warning**  
+> The position is stored, not the label. Reordering or renaming the options later leaves existing
+> entries pointing at the same number — and therefore at a different meaning.
 
 > **Pro-Tip**  
 > The stepper turns a status-like radio field (for example *Draft → In review → Approved*) into a clear visual progress indicator in your views.

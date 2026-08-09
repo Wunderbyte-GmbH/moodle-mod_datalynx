@@ -16,6 +16,8 @@
 
 namespace datalynxfield_number\form;
 
+use datalynxfield_number\field_format;
+
 /**
  * Form class for number field formats.
  *
@@ -30,13 +32,17 @@ class field_format_form extends \mod_datalynx\form\field_format_base_form {
     protected function format_definition() {
         $mform = &$this->_form;
 
-        $mform->addElement(
-            'text',
-            'decimals',
-            get_string('fieldformatdecimals', 'datalynxfield_number'),
-            ['size' => 3]
-        );
-        $mform->setType('decimals', PARAM_INT);
-        $mform->addHelpButton('decimals', 'fieldformatdecimals', 'datalynxfield_number');
+        field_format::define_elements($mform);
+    }
+
+    /**
+     * Validate the slider configuration.
+     *
+     * @param array $data
+     * @param array $files
+     * @return array
+     */
+    protected function format_validation($data, $files) {
+        return field_format::validate_settings($data);
     }
 }

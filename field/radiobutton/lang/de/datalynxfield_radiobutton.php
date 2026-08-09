@@ -22,12 +22,24 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 $string['fieldformatoption'] = 'Anzeigeformat';
-$string['fieldformatoption_help'] = 'Steuert, was in Ansichten angezeigt wird. "Nur Label" zeigt den lesbaren Namen der Option. "Schlüssel-Wert-Paare" rendert Label=Schlüssel. "Schlüssel/Index" zeigt nur den gespeicherten Schlüssel oder Indexwert. "Schrittweiser Fortschritt" zeigt die Optionen als Fortschrittsleiste an.';
+$string['fieldformatoption_help'] = 'Was in Ansichten anstelle des Tags "[[feldname:formatname]]" ausgegeben wird.
+
+Mit "den Auswahlmöglichkeiten" sind die Optionen gemeint, die Sie für dieses Feld selbst festgelegt haben, unter *Verwalten > Felder > (Ihr Auswahlknopf-Feld) > Optionen* — eine pro Zeile. Jede Option hat eine Position (1 für die erste Zeile, 2 für die zweite und so weiter); gespeichert wird in einem Eintrag genau diese Position.
+
+Beispiel: ein Feld mit den Optionen *Entwurf*, *In Prüfung* und *Freigegeben*, in einem Eintrag mit der Auswahl *In Prüfung*:
+
+* **Nur Label** — "In Prüfung". Die Bezeichnung der gewählten Option; das ist in fast allen Ansichten die richtige Wahl.
+* **Schlüssel-Wert-Paare** — "0 Entwurf,1 In Prüfung,0 Freigegeben". Alle Optionen der Reihe nach, jeweils mit 1 davor, wenn sie ausgewählt ist, und mit 0, wenn nicht, getrennt durch Kommas. Nützlich für Exporte und für CSS oder JavaScript, das auch die *nicht* gewählten Optionen kennen muss.
+* **Schlüssel/Index** — "2". Nur die gespeicherte Position der gewählten Option, ohne Bezeichnung. Nützlich für Exporte und zum Vergleich von Werten über mehrere Ansichten hinweg. Ist nichts ausgewählt, wird nichts ausgegeben.
+* **Schrittweiser Fortschritt** — eine waagrechte Reihe von Schritten, einer pro Option, wobei alle Schritte bis einschließlich der Auswahl als erledigt markiert sind: *Entwurf* und *In Prüfung* ausgefüllt, *Freigegeben* noch offen. Macht aus einem Statusfeld eine Fortschrittsanzeige. Anders als die übrigen Möglichkeiten wird diese auch dann angezeigt, wenn der Eintrag noch keinen Wert hat — dann ist kein Schritt erledigt.
+
+Beachten Sie, dass die Position gespeichert wird und nicht die Bezeichnung: Wenn Sie die Optionen später umsortieren oder umbenennen, behalten bestehende Einträge ihre Nummer und ändern damit ihre Bedeutung.';
 $string['fieldformatoptiondefault'] = 'Nur Label';
 $string['fieldformatoptionkey'] = 'Ausgewählter Optionsschlüssel/-index';
 $string['fieldformatoptionoptions'] = 'Schlüssel-Wert-Paare';
 $string['fieldformatoptionstepper'] = 'Schrittweiser Fortschritt';
 $string['fieldformatoptionsteppericons'] = 'Symbole für Schritte';
-$string['fieldformatoptionsteppericons_help'] = 'Eine kommagetrennte Liste von FontAwesome Icon-Klassen (z. B. "shopping-cart, cogs, medal, car, home"), die in den Kreisen der einzelnen Schritte angezeigt werden. Wenn leer, werden Schrittnummern verwendet.';
+$string['fieldformatoptionsteppericons_help'] = 'Eine kommagetrennte Liste von FontAwesome Icon-Klassen (z. B. "shopping-cart, cogs, medal, car, home"), die in den Kreisen der einzelnen Schritte angezeigt werden — eine pro Option, in der Reihenfolge der definierten Optionen. Wenn leer, werden Schrittnummern verwendet.';
+$string['fieldformatscope'] = 'Dieses Format ändert die Darstellung des Feldes <strong>nur in Ansichten (Anzeigemodus)</strong>. Im Eintragsformular ist das Feld immer eine Gruppe von Auswahlknöpfen, einer pro definierter Option — daran kann ein Format nichts ändern, und insbesondere die Fortschrittsanzeige ist nie anklickbar.';
 $string['pluginname'] = 'Auswahlknopf (Radiobutton)';
 $string['privacy:metadata'] = 'Auswahlknöpfe speichern keine personenbezogenen Daten.';

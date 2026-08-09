@@ -30,6 +30,10 @@ use stdClass;
  * Renderer class for the datalynxfield_number field type.
  */
 class renderer extends TextRenderer {
+    // This is a datalynx field renderer, not a core_renderer: $this->page and
+    // $this->output do not exist here.
+    // phpcs:disable moodle.PHP.ForbiddenGlobalUse.BadGlobal
+
     /**
      *
      * {@inheritDoc}
@@ -52,7 +56,20 @@ class renderer extends TextRenderer {
         ) {
             $content = $entry->{"c{$fieldid}_content"};
         }
+
+        // A slider format keeps the text element as the value carrier — validation, submission and
+        // format_content() stay exactly as they are, and without JavaScript the plain number input
+        // is still usable. Only the slider chrome is added on top, and the module hides the input.
+        $slidervalues = [];
+        $fieldformat = $options['field_format'] ?? null;
+        if ($fieldformat instanceof field_format) {
+            $slidervalues = $fieldformat->get_slider_values();
+        }
+
         $fieldattr = [];
+        if ($slidervalues) {
+            $fieldattr['id'] = "id_{$fieldname}_slidervalue";
+        }
         $mform->addElement('text', $fieldname, null, $fieldattr);
         $mform->setType($fieldname, PARAM_RAW);
         $mform->addRule($fieldname, get_string('errnumeric', 'datalynx'), 'numeric', null, 'client');
@@ -60,6 +77,120 @@ class renderer extends TextRenderer {
         if ($required) {
             $mform->addRule($fieldname, null, 'required', null, 'client');
         }
+
+        if ($slidervalues) {
+            $this->add_slider($mform, $fieldformat, $slidervalues, $fieldattr['id'], $content);
+        }
+    }
+
+    /**
+     * Adds the slider chrome for a number field rendered by a slider field format.
+     *
+     * @param MoodleQuickForm $mform The Moodle form instance.
+     * @param field_format $fieldformat The slider format.
+     * @param float[] $values The selectable values.
+     * @param string $inputid Element id of the text input carrying the value.
+     * @param string $content The current value of the entry.
+     * @return void
+     */
+    protected function add_slider(
+        MoodleQuickForm &$mform,
+        field_format $fieldformat,
+        array $values,
+        string $inputid,
+        string $content
+    ): void {
+        global $OUTPUT;
+
+        $this->require_js();
+
+        $unit = (string) $fieldformat->get_setting('sliderunit', '');
+        $index = $this->get_slider_index($values, $content);
+        // The readout labels are built here rather than in the browser so that the live value, the
+        // tick labels and the number the entry stores agree on the language's decimal separator.
+        $labels = [];
+        foreach ($values as $value) {
+            $labels[] = $this->format_slider_label($value, $unit);
+        }
+        $context = [
+            'inputid' => $inputid,
+            'values' => json_encode($values),
+            'labels' => json_encode($labels),
+            'label' => $this->field->name(),
+            'max' => count($values) - 1,
+            'index' => $index,
+            'readout' => $labels[$index],
+            'showticks' => !empty($fieldformat->get_setting('sliderticks')),
+            'startlabel' => reset($labels),
+            'endlabel' => end($labels),
+        ];
+
+        // The slider is plain markup: adding it as a form element would wrap it in another
+        // .fitem grid row.
+        $mform->addElement(
+            'html',
+            $OUTPUT->render_from_template('mod_datalynx/field_number_slider', $context)
+        );
+    }
+
+    /**
+     * Position of the slider for the entry's current value.
+     *
+     * Values that are not on the scale (for instance because the format was reconfigured after the
+     * entry was saved) snap to the closest available position. An empty value starts at the bottom.
+     *
+     * @param float[] $values The selectable values.
+     * @param string $content The current value of the entry.
+     * @return int
+     */
+    protected function get_slider_index(array $values, string $content): int {
+        if (!is_numeric($content)) {
+            return 0;
+        }
+
+        $current = (float) $content;
+        $closest = 0;
+        $distance = null;
+        foreach ($values as $index => $value) {
+            $candidate = abs($value - $current);
+            if ($distance === null || $candidate < $distance) {
+                $distance = $candidate;
+                $closest = $index;
+            }
+        }
+
+        return $closest;
+    }
+
+    /**
+     * Renders one of the tick labels printed under the ends of the slider track.
+     *
+     * @param float $value
+     * @param string $unit
+     * @return string
+     */
+    protected function format_slider_label(float $value, string $unit): string {
+        return format_float($value, -1, true, true) . $unit;
+    }
+
+    /**
+     * Request the client side initialiser for the current page.
+     *
+     * Harmless when the field is rendered inside a web service call: the page requirements of that
+     * request are simply discarded.
+     *
+     * @return void
+     */
+    protected function require_js(): void {
+        global $PAGE;
+
+        static $done = false;
+        if ($done) {
+            return;
+        }
+        $done = true;
+
+        $PAGE->requires->js_call_amd('mod_datalynx/numberslider', 'init');
     }
 
     /**

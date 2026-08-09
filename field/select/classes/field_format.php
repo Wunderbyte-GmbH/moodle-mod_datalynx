@@ -25,19 +25,56 @@ namespace datalynxfield_select;
  */
 class field_format extends \mod_datalynx\local\field_format\base {
     /**
+     * The display formats a select format can choose from.
+     *
+     * @return array Option => human readable name.
+     */
+    public static function get_display_options(): array {
+        return [
+            'default' => get_string('fieldformatoptiondefault', 'datalynxfield_select'),
+            'options' => get_string('fieldformatoptionoptions', 'datalynxfield_select'),
+            'key' => get_string('fieldformatoptionkey', 'datalynxfield_select'),
+        ];
+    }
+
+    /**
      * Defines configuration elements on the form.
      *
      * @param \MoodleQuickForm $mform
      */
     public function config_form(\MoodleQuickForm &$mform) {
-        $options = [
-            'default' => 'Default (Label only)',
-            'options' => 'Key-value pairs',
-            'key' => 'Selected option key/index',
-        ];
-        $mform->addElement('select', 'option', get_string('fieldformatoption', 'mod_datalynx'), $options);
+        self::define_elements($mform);
+    }
+
+    /**
+     * Adds every configuration element of this format to a form.
+     *
+     * Shared by {@see self::config_form()} and
+     * {@see \datalynxfield_select\form\field_format_form::format_definition()} so the definition
+     * rendered by fieldformat/edit.php cannot drift from the one declared by the format class.
+     *
+     * @param \MoodleQuickForm $mform
+     * @return void
+     */
+    public static function define_elements(\MoodleQuickForm &$mform): void {
+        // Which render mode a format applies to differs per field type, so spell it out on the
+        // form rather than leaving it to the help icon.
+        $mform->addElement(
+            'static',
+            'fieldformatscope',
+            '',
+            get_string('fieldformatscope', 'datalynxfield_select')
+        );
+
+        $mform->addElement(
+            'select',
+            'option',
+            get_string('fieldformatoption', 'datalynxfield_select'),
+            self::get_display_options()
+        );
         $mform->setType('option', PARAM_ALPHA);
         $mform->addRule('option', get_string('required'), 'required', null, 'client');
+        $mform->addHelpButton('option', 'fieldformatoption', 'datalynxfield_select');
     }
 
     /**
