@@ -347,7 +347,7 @@ final class get_csv_view_data_test extends advanced_testcase {
         $this->setAdminUser();
 
         [$dlx, $view, $fieldid, $entryone, $entrytwo] = $this->create_csv_multiselect_fixture();
-        $customsearch = serialize([
+        $customsearch = json_encode([
             $fieldid => [
                 'AND' => [['', 'ANY_OF', ['2']]],
             ],
@@ -360,6 +360,33 @@ final class get_csv_view_data_test extends advanced_testcase {
         $this->assertSame($entrytwo, $result['groups'][0]['rows'][0]['id']);
         $this->assertNotSame($entryone, $result['groups'][0]['rows'][0]['id']);
         $this->assertStringContainsString('Entry two', $result['groups'][0]['rows'][0]['cells'][0]['valuehtml']);
+    }
+
+    /**
+     * A PHP-serialized payload in customsort/customsearch must not be unserialized (see issue #238).
+     *
+     * The pre-fix code passed these request parameters straight to unserialize(), an object-injection
+     * sink. They are now JSON-decoded, so a serialized-object blob is invalid input: it is ignored
+     * rather than instantiated, and no filtering is applied.
+     *
+     * @covers ::execute
+     */
+    public function test_execute_ignores_serialized_object_payload(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        [$dlx, $view, $fieldid, $entryone, $entrytwo] = $this->create_csv_multiselect_fixture();
+        // A PHP-serialized object string — the pre-fix code would have unserialized this.
+        $payload = serialize((object) ['injected' => true]);
+
+        $result = get_csv_view_data::execute($dlx->id(), $view->id, 0, 0, 0, '', '', '', '', 0, $payload, $payload);
+        $result = external_api::clean_returnvalue(get_csv_view_data::execute_returns(), $result);
+
+        // The serialized blob is not valid JSON, so both sort and search are ignored: all entries returned.
+        $this->assertCount(2, $result['groups'][0]['rows']);
+        $ids = [$result['groups'][0]['rows'][0]['id'], $result['groups'][0]['rows'][1]['id']];
+        $this->assertContains($entryone, $ids);
+        $this->assertContains($entrytwo, $ids);
     }
 
     /**

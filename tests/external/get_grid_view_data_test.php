@@ -360,7 +360,7 @@ final class get_grid_view_data_test extends advanced_testcase {
         $this->setAdminUser();
 
         [$dlx, $view, $fieldid, $entryone, $entrytwo] = $this->create_grid_multiselect_fixture();
-        $customsearch = serialize([
+        $customsearch = json_encode([
             $fieldid => [
                 'AND' => [['', 'ANY_OF', ['2']]],
             ],

@@ -350,7 +350,7 @@ final class get_pdf_view_data_test extends advanced_testcase {
         $this->setAdminUser();
 
         [$dlx, $view, $fieldid, $entryone, $entrytwo] = $this->create_pdf_multiselect_fixture();
-        $customsearch = serialize([
+        $customsearch = json_encode([
             $fieldid => [
                 'AND' => [['', 'ANY_OF', ['2']]],
             ],

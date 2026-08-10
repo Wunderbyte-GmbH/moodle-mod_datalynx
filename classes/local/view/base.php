@@ -1218,10 +1218,16 @@ abstract class base {
             $args['eids'] = is_array($this->filter->eids) ? implode(',', $this->filter->eids) : (string) $this->filter->eids;
         }
         if (!empty($this->filter->customsort)) {
-            $args['customsort'] = $this->filter->customsort;
+            $customsort = is_array($this->filter->customsort)
+                ? $this->filter->customsort
+                : (unserialize($this->filter->customsort, ['allowed_classes' => false]) ?: []);
+            $args['customsort'] = json_encode($customsort);
         }
         if (!empty($this->filter->customsearch)) {
-            $args['customsearch'] = $this->filter->customsearch;
+            $customsearch = is_array($this->filter->customsearch)
+                ? $this->filter->customsearch
+                : (unserialize($this->filter->customsearch, ['allowed_classes' => false]) ?: []);
+            $args['customsearch'] = json_encode($customsearch);
         }
         if (!empty($this->filter->search)) {
             $args['search'] = (string) $this->filter->search;

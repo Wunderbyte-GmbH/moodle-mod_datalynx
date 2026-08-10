@@ -54,8 +54,8 @@ class get_tabular_view_data extends external_api {
             'groups' => new external_value(PARAM_SEQUENCE, 'Optional group ids filter', VALUE_DEFAULT, ''),
             'groupby' => new external_value(PARAM_RAW, 'Optional group-by field', VALUE_DEFAULT, ''),
             'selection' => new external_value(PARAM_INT, 'Optional selection mode override', VALUE_DEFAULT, 0),
-            'customsort' => new external_value(PARAM_RAW, 'Optional serialized custom sort options', VALUE_DEFAULT, ''),
-            'customsearch' => new external_value(PARAM_RAW, 'Optional serialized custom search options', VALUE_DEFAULT, ''),
+            'customsort' => new external_value(PARAM_RAW, 'Optional JSON-encoded custom sort options', VALUE_DEFAULT, ''),
+            'customsearch' => new external_value(PARAM_RAW, 'Optional JSON-encoded custom search options', VALUE_DEFAULT, ''),
             'search' => new external_value(PARAM_RAW, 'Optional search string', VALUE_DEFAULT, ''),
         ]);
     }
@@ -140,10 +140,12 @@ class get_tabular_view_data extends external_api {
             $filteroptions['selection'] = $params['selection'];
         }
         if (!empty($params['customsort'])) {
-            $filteroptions['customsort'] = unserialize($params['customsort']);
+            $customsort = json_decode($params['customsort'], true);
+            $filteroptions['customsort'] = is_array($customsort) ? $customsort : [];
         }
         if (!empty($params['customsearch'])) {
-            $filteroptions['customsearch'] = unserialize($params['customsearch']);
+            $customsearch = json_decode($params['customsearch'], true);
+            $filteroptions['customsearch'] = is_array($customsearch) ? $customsearch : [];
         }
         if ($params['search'] !== '') {
             $filteroptions['search'] = $params['search'];
