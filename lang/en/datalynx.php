@@ -91,6 +91,7 @@ $string['commentsallow'] = 'Allow comments?';
 $string['commentsaved'] = 'Comment saved';
 $string['commentsn'] = '{$a} comments';
 $string['commentsnone'] = 'No comments';
+$string['completiondetail:entries'] = 'Make entries: {$a}';
 $string['completionentries'] = 'Number of (approved) entries';
 $string['completionentriesgroup'] = 'Require (approved) entries';
 $string['completionentriesgroup_help'] = 'Make sure you enable approval for entries above!<br />

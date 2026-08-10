@@ -89,6 +89,7 @@ $string['commentsallow'] = 'Kommentare zulassen?';
 $string['commentsaved'] = 'Kommentar gespeichert';
 $string['commentsn'] = '{$a} Kommentare';
 $string['commentsnone'] = 'Keine Kommentare';
+$string['completiondetail:entries'] = 'Einträge erstellen: {$a}';
 $string['completionentries'] = 'Anzahl der (zugelassenen) Abgaben';
 $string['completionentriesgroup'] = 'Zulassung der Abgaben fordern';
 $string['completionentriesgroup_help'] = 'Schalten Sie eine obligate Zulassung der Abgaben oben im Formular frei!<br />

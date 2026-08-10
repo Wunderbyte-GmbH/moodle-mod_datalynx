@@ -1424,45 +1424,37 @@ function datalynx_grade_item_delete($data) {
 }
 
 /**
- * Obtains the automatic completion state for this forum based on any conditions
- * in datalynx settings.
+ * Add custom completion rule data to the course-module information.
  *
- * @param stdClass $course
- * @param stdClass $cm
- * @param int $userid
- * @param bool $type
- * @return bool
- * @throws Exception
+ * Populates {@see \mod_datalynx\completion\custom_completion} with the required-entries
+ * threshold so the "completionentries" rule is evaluated on Moodle 4.5+. Replaces the
+ * legacy datalynx_get_completion_state() callback, which core no longer calls.
+ *
+ * @param stdClass $coursemodule
+ * @return cached_cm_info|false
  */
-function datalynx_get_completion_state($course, $cm, $userid, $type) {
+function datalynx_get_coursemodule_info($coursemodule) {
     global $DB;
 
-    if (!($dlx = $DB->get_record('datalynx', ['id' => $cm->instance]))) {
-        throw new Exception("Can't find datalynx {$cm->instance}");
+    $fields = 'id, name, intro, introformat, completionentries';
+    if (!$dlx = $DB->get_record('datalynx', ['id' => $coursemodule->instance], $fields)) {
+        return false;
     }
 
-    if (!isset($dlx->completionentries)) {
-        throw new Exception(
-            "'completionentries' field does not exist in 'datalynx' table! Upgrade your database!"
-        );
+    $result = new cached_cm_info();
+    $result->name = $dlx->name;
+
+    if ($coursemodule->showdescription) {
+        // Convert intro to html. Do not filter cached version, filters run at display time.
+        $result->content = format_module_intro('datalynx', $dlx, $coursemodule->id, false);
     }
 
-    $params = ['userid' => $userid, 'dataid' => $dlx->id];
-    if ($dlx->approval) {
-        $sql = "SELECT COUNT(1)
-              FROM {datalynx_entries} de
-             WHERE de.userid = :userid
-               AND de.dataid = :dataid
-               AND de.approved = 1";
-    } else {
-        $sql = "SELECT COUNT(1)
-              FROM {datalynx_entries} de
-             WHERE de.userid = :userid
-               AND de.dataid = :dataid";
+    // Populate the custom completion rule as a key => value pair, but only for automatic completion.
+    if ($coursemodule->completion == COMPLETION_TRACKING_AUTOMATIC) {
+        $result->customdata['customcompletionrules']['completionentries'] = $dlx->completionentries;
     }
-    $count = $DB->get_field_sql($sql, $params);
 
-    return $count >= $dlx->completionentries;
+    return $result;
 }
 
 /**
