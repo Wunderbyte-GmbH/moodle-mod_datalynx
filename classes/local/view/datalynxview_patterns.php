@@ -26,7 +26,6 @@ namespace mod_datalynx\local\view;
 
 use core_filters\filter_manager;
 use html_writer;
-use mod_datalynx\local\filter\datalynx_filter_manager;
 use moodle_url;
 use paging_bar;
 use single_select;
@@ -1287,13 +1286,9 @@ class datalynxview_patterns {
 
         $baseurl = $baseurl->out_omit_querystring();
         $baseurlparams = ['d' => $dlx->id(), 'sesskey' => sesskey(), 'view' => $view->id(),
-                'filter' => datalynx_filter_manager::USER_FILTER_SET];
+                'filter' => ($filter->id > 0 ? $filter->id : 0)];
 
-        if ($filter->id < 0 && $filter->perpage) {
-            $perpagevalue = $filter->perpage;
-        } else {
-            $perpagevalue = 0;
-        }
+        $perpagevalue = $filter->perpage ?: 0;
 
         $perpage = [1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5, 6 => 6, 7 => 7, 8 => 8, 9 => 9,
                 10 => 10, 15 => 15, 20 => 20, 30 => 30, 40 => 40, 50 => 50, 100 => 100, 200 => 200,

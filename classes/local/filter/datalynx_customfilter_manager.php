@@ -39,9 +39,6 @@ class datalynx_customfilter_manager {
     /** @var int Constant representing a blank filter. */
     const BLANK_FILTER = -1;
 
-    /** @var int Constant representing a user filter set. */
-    const USER_FILTER_SET = -2;
-
     /** @var object The datalynx instance. */
     protected $dlx;
 
@@ -67,7 +64,6 @@ class datalynx_customfilter_manager {
      */
     public function get_filter_from_id($filterid = 0, ?array $options = null) {
         $dlx = $this->dlx;
-        $dlid = $dlx->id();
 
         if ($filterid == self::BLANK_FILTER) {
             $filter = new stdClass();
@@ -78,21 +74,7 @@ class datalynx_customfilter_manager {
         }
 
         if ($filterid < 0) {
-            $view = !empty($options['view']) ? $options['view'] : null;
-            $viewid = $view ? $view->id() : 0;
-
-            if (
-                $filterid != self::USER_FILTER_SET &&
-                    $filter = get_user_preferences(
-                        "datalynxcustomfilter-$dlid-$viewid-$filterid",
-                        null
-                    )
-            ) {
-                $filter = unserialize($filter);
-                $filter->dataid = $dlid;
-                return new datalynx_customfilter($filter);
-            }
-
+            // Custom filters are no longer persisted in user preferences; use the default.
             $filterid = 0;
         }
 
@@ -599,57 +581,6 @@ class datalynx_customfilter_manager {
                     }
                 } else {
                     $options[$option] = $val;
-                }
-            }
-        }
-
-        return $options;
-    }
-
-    /**
-     * Get filter options from user preferences.
-     *
-     * @return array
-     * @throws \coding_exception
-     */
-    public static function get_filter_options_from_userpreferences() {
-        $filteroptions = [ // Left: urlparam-names, right: userpreferences-names.
-        'perpage' => 'uperpage', 'selection' => 'uselection', 'groupby' => 'ugroupby',
-            'customsort' => 'usort', 'customsearch' => 'usearch', 'page' => 'page',
-            'eids' => 'eids', 'users' => 'users', 'groups' => 'groups',
-            'usersearch' => 'usersearch'];
-
-        $options = [];
-
-        $userfilter = false;
-        $filterid = optional_param('filter', 0, PARAM_INT);
-        if ($filterid < 0) {
-            $viewid = optional_param('view', 0, PARAM_INT);
-            $dlid = optional_param('d', 0, PARAM_INT);
-            if ($viewid) {
-                $userfilter = get_user_preferences("datalynxfilter-$dlid-$viewid-$filterid", null);
-                $userfilter = unserialize($userfilter);
-            }
-        }
-
-        if ($userfilter) {
-            // Optional params.
-            foreach ($filteroptions as $option => $name) {
-                if ($val = $userfilter->$name) {
-                    if ($option == 'customsort') {
-                        $options[$option] = datalynx_filter_manager::get_sort_options_from_query($val);
-                    } else if ($option == 'customsearch') {
-                        $searchoptions = datalynx_filter_manager::get_search_options_from_query($val);
-                        if (is_array($searchoptions)) {
-                            $options['customsearch'] = $searchoptions;
-                        } else {
-                            $options['search'] = $searchoptions;
-                        }
-                    } else if ($option == 'usersearch') {
-                        $options['search'] = $val;
-                    } else {
-                        $options[$option] = $val;
-                    }
                 }
             }
         }

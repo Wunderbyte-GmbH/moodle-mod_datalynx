@@ -33,17 +33,11 @@ require_once($CFG->libdir . '/formslib.php');
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class datalynx_filter_manager {
-    /** @var int Maximum number of user-saved filters per view. */
-    const USER_FILTER_MAX_NUM = 5;
-
     /** @var int Sentinel value for a blank (unsaved) filter. */
     const BLANK_FILTER = -1;
 
-    /** @var int Sentinel value indicating a user filter set is active. */
+    /** @var int Sentinel value routing a customfilter form submission. */
     const USER_FILTER_SET = -2;
-
-    /** @var int Starting id for user-created filter ids. */
-    const USER_FILTER_ID_START = -10;
 
     /** @var \mod_datalynx\datalynx The datalynx instance. */
     protected $dlx;
@@ -71,7 +65,6 @@ class datalynx_filter_manager {
     public function get_filter_from_id($filterid = 0, ?array $options = null) {
 
         $dlx = $this->dlx;
-        $dfid = $dlx->id();
 
         // Blank filter.
         if ($filterid == self::BLANK_FILTER) {
@@ -83,30 +76,17 @@ class datalynx_filter_manager {
             return new datalynx_filter($filter);
         }
 
-        // User filter.
+        // Custom filter submission (routed via a negative filter id). User filters are no longer
+        // persisted in user preferences; any other negative id falls through to the default filter.
         if ($filterid < 0) {
-            // For actual user filters we need a view and whether advanced.
             $view = !empty($options['view']) ? $options['view'] : null;
-            $viewid = $view ? $view->id() : 0;
             $customfilter = !empty($options['customfilter']) ? $options['customfilter'] : null;
 
-            // User preferences.
-            if (($filterid == self::USER_FILTER_SET || $customfilter) && $view && $view->is_active()) {
+            if ($customfilter && $view && $view->is_active()) {
                 $filter = $this->set_user_filter($filterid, $view, $customfilter);
                 return new datalynx_filter($filter);
             }
 
-            // Retrieve existing user filter (filter id > blank filter).
-            if (
-                    $filterid != self::USER_FILTER_SET &&
-                    $filter = get_user_preferences("datalynxfilter-$dfid-$viewid-$filterid", null)
-            ) {
-                $filter = unserialize($filter);
-                $filter->dataid = $dfid;
-                return new datalynx_filter($filter);
-            }
-
-            // For all other "negative" cases proceed with defaults.
             $filterid = 0;
         }
 
@@ -1029,26 +1009,6 @@ class datalynx_filter_manager {
     }
 
     /**
-     * Returns the saved user filter menu (id => name) for the given view.
-     *
-     * @param int $viewid
-     * @return array
-     */
-    public function get_user_filters_menu($viewid) {
-        $filters = [];
-
-        $dlx = $this->dlx;
-        $dfid = $dlx->id();
-        if ($filternames = get_user_preferences("datalynxfilter-$dfid-$viewid-userfilters", '')) {
-            foreach (explode(';', $filternames) as $filteridname) {
-                [$filterid, $name] = explode(' ', $filteridname, 2);
-                $filters[$filterid] = $name;
-            }
-        }
-        return $filters;
-    }
-
-    /**
      * Applies the given filter id as the active user filter for the given view.
      *
      * @param int $filterid
@@ -1057,14 +1017,12 @@ class datalynx_filter_manager {
      * @return datalynx_filter
      */
     public function set_user_filter($filterid, \mod_datalynx\local\view\base $view, $customfilter = false) {
-        $dlx = $this->dlx;
-        $dfid = $dlx->id();
-        $viewid = $view->id();
+        global $DB;
+
+        $filter = new datalynx_filter((object) ['id' => $filterid, 'dataid' => $this->dlx->id()]);
 
         // Custom filter form.
         if ($customfilter) {
-            global $DB;
-            $filter = new datalynx_filter((object) ['id' => $filterid, 'dataid' => $dfid]);
             $customfilter = $DB->get_record('datalynx_customfilters', ['id' => $customfilter]);
             $filterform = $this->get_customfilter_frontend_form($filter, $view, $customfilter);
             // Return to form (on reload button press).
@@ -1072,56 +1030,7 @@ class datalynx_filter_manager {
                 return $filter;
             } else if ($formdata = $filterform->get_data()) { // Process validated.
                 $filter = $this->get_filter_from_customfilterform($filter, $formdata, $customfilter);
-                $modifycurrent = !empty($formdata->savebutton);
             }
-        }
-
-        // Quick filters.
-        if (!$customfilter) {
-            if ($filterid >= self::USER_FILTER_ID_START) {
-                $filter = $this->get_filter_from_id($filterid);
-            } else {
-                $filter = $this->get_filter_from_url(null, true);
-            }
-            if (!$filter) {
-                return null;
-            }
-        }
-
-        if (!$customfilter) {
-            // Set user filter.
-            if ($userfilters = $this->get_user_filters_menu($viewid)) {
-                if (empty($modifycurrent) || empty($userfilters[$filterid])) {
-                    $filterid = key($userfilters) - 1;
-                }
-            } else {
-                $filterid = self::USER_FILTER_ID_START;
-            }
-
-            // If max number of user filters pop the last.
-            if (count($userfilters) >= self::USER_FILTER_MAX_NUM) {
-                $fids = array_keys($userfilters);
-                while (count($fids) >= self::USER_FILTER_MAX_NUM) {
-                    $fid = array_pop($fids);
-                    unset($userfilters[$fid]);
-                    unset_user_preference("datalynxfilter-$dfid-$viewid-$fid");
-                }
-            }
-
-            // Save the new filter.
-            $filter->id = $filterid;
-            $filter->dataid = $dfid;
-            if (empty($filter->name)) {
-                $filter->name = get_string('filtermy', 'datalynx') . ' ' . abs($filterid);
-            }
-            set_user_preference("datalynxfilter-$dfid-$viewid-$filterid", serialize($filter));
-
-            // Add the new filter to the beginning of the userfilters.
-            $userfilters = [$filterid => $filter->name] + $userfilters;
-            foreach ($userfilters as $filterid => $name) {
-                $userfilters[$filterid] = "$filterid $name";
-            }
-            set_user_preference("datalynxfilter-$dfid-$viewid-userfilters", implode(';', $userfilters));
         }
 
         return $filter;
@@ -1324,67 +1233,6 @@ class datalynx_filter_manager {
                         }
                     } else {
                         $options[$option] = $val;
-                    }
-                }
-            }
-        }
-
-        return $options;
-    }
-
-    /**
-     * Extracts filter options from stored user preferences.
-     *
-     * @return array
-     */
-    public static function get_filter_options_from_userpreferences() {
-        $filteroptions = [   // Left: urlparam-names, right: userpreferences-names.
-                'perpage' => 'uperpage',
-                'selection' => 'uselection',
-                'groupby' => 'ugroupby',
-                'customsort' => 'usort',
-                'customsearch' => 'usearch',
-                'page' => 'page',
-                'eids' => 'eids',
-                'users' => 'users',
-                'groups' => 'groups',
-                'usersearch' => 'usersearch',
-        ];
-
-        $options = [];
-
-        $userfilter = false;
-        $filterid = optional_param('filter', 0, PARAM_INT);
-        if ($filterid < 0) {
-            $viewid = optional_param('view', 0, PARAM_INT);
-            $dfid = optional_param('d', 0, PARAM_INT);
-            if ($viewid) {
-                $userfilter = get_user_preferences("datalynxfilter-$dfid-$viewid-$filterid", null);
-                $userfilter = unserialize($userfilter);
-            }
-        }
-
-        if ($userfilter) {
-            // Optional params.
-            foreach ($filteroptions as $option => $name) {
-                if ($val = $userfilter->$name) {
-                    if ($option == 'customsort') {
-                        $options[$option] = self::get_sort_options_from_query($val);
-                    } else {
-                        if ($option == 'customsearch') {
-                            $searchoptions = self::get_search_options_from_query($val);
-                            if (is_array($searchoptions)) {
-                                $options['customsearch'] = $searchoptions;
-                            } else {
-                                $options['search'] = $searchoptions;
-                            }
-                        } else {
-                            if ($option == 'usersearch') {
-                                $options['search'] = $val;
-                            } else {
-                                $options[$option] = $val;
-                            }
-                        }
                     }
                 }
             }
