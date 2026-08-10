@@ -365,14 +365,20 @@ class provider implements
 
         [$sql, $params] = $DB->get_in_or_equal($recordstobedeleted, SQL_PARAMS_NAMED);
 
-        // Delete files.
-        get_file_storage()->delete_area_files_select(
-            $context->id,
-            'mod_datalynx',
-            'datalynx_entries',
-            "IN (SELECT dc.id FROM {datalynx_contents} dc WHERE dc.entryid $sql)",
-            $params
-        );
+        // Delete files. Uploaded file/picture content is stored under the 'content' and 'thumb'
+        // fileareas keyed by content id (there is no 'datalynx_entries' filearea), so both must be
+        // cleared for every content row belonging to the entries being removed.
+        $fs = get_file_storage();
+        $itemidtest = "IN (SELECT dc.id FROM {datalynx_contents} dc WHERE dc.entryid $sql)";
+        foreach (['content', 'thumb'] as $filearea) {
+            $fs->delete_area_files_select(
+                $context->id,
+                'mod_datalynx',
+                $filearea,
+                $itemidtest,
+                $params
+            );
+        }
 
         // Delete from datalynx_contents.
         $DB->delete_records_select('datalynx_contents', 'entryid ' . $sql, $params);
