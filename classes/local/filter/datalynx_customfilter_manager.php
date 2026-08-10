@@ -567,9 +567,9 @@ class datalynx_customfilter_manager {
                     [$name, , ] = $args;
                     if ($val = $url->get_param($name)) {
                         if ($option == 'customsort') {
-                            $options[$option] = self::get_sort_options_from_query($val);
+                            $options[$option] = datalynx_filter_manager::get_sort_options_from_query($val);
                         } else if ($option == 'customsearch') {
-                            $searchoptions = self::get_search_options_from_query($val);
+                            $searchoptions = datalynx_filter_manager::get_search_options_from_query($val);
                             if (is_array($searchoptions)) {
                                 $options['customsearch'] = $searchoptions;
                             } else {
@@ -589,9 +589,9 @@ class datalynx_customfilter_manager {
             [$name, $default, $type] = $args;
             if ($val = optional_param($name, $default, $type)) {
                 if ($option == 'customsort') {
-                    $options[$option] = self::get_sort_options_from_query($val);
+                    $options[$option] = datalynx_filter_manager::get_sort_options_from_query($val);
                 } else if ($option == 'customsearch') {
-                    $searchoptions = self::get_search_options_from_query($val);
+                    $searchoptions = datalynx_filter_manager::get_search_options_from_query($val);
                     if (is_array($searchoptions)) {
                         $options['customsearch'] = $searchoptions;
                     } else {
@@ -637,9 +637,9 @@ class datalynx_customfilter_manager {
             foreach ($filteroptions as $option => $name) {
                 if ($val = $userfilter->$name) {
                     if ($option == 'customsort') {
-                        $options[$option] = self::get_sort_options_from_query($val);
+                        $options[$option] = datalynx_filter_manager::get_sort_options_from_query($val);
                     } else if ($option == 'customsearch') {
-                        $searchoptions = self::get_search_options_from_query($val);
+                        $searchoptions = datalynx_filter_manager::get_search_options_from_query($val);
                         if (is_array($searchoptions)) {
                             $options['customsearch'] = $searchoptions;
                         } else {

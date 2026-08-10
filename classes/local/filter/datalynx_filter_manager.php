@@ -1169,13 +1169,33 @@ class datalynx_filter_manager {
     }
 
     /**
-     * Decodes a serialised sort URL query parameter back to an options array.
+     * Decodes a sort URL query parameter back to an options array.
+     *
+     * The query is the plain "fieldid dir" list produced by {@see get_sort_url_query()}
+     * (comma separated). It is parsed with strict typing — never unserialized — so a crafted
+     * value in the usort request parameter cannot trigger PHP object injection.
      *
      * @param string $query
-     * @return array
+     * @return array [fieldid => direction] where direction is 0 (ascending) or 1 (descending)
      */
     public static function get_sort_options_from_query($query) {
-        return unserialize(urldecode($query));
+        $sortoptions = [];
+        foreach (explode(',', urldecode((string) $query)) as $sortpair) {
+            $sortpair = trim($sortpair);
+            if ($sortpair === '') {
+                continue;
+            }
+            $parts = explode(' ', $sortpair);
+            if (count($parts) !== 2) {
+                continue;
+            }
+            [$fieldid, $dir] = $parts;
+            if (!preg_match('/^-?\d+$/', $fieldid)) {
+                continue;
+            }
+            $sortoptions[(int) $fieldid] = ((int) $dir === 1) ? 1 : 0;
+        }
+        return $sortoptions;
     }
 
     /**
