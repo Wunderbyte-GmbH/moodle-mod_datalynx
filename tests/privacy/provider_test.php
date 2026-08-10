@@ -589,4 +589,56 @@ final class provider_test extends advanced_testcase {
         $this->assertNotEmpty($ratings);
         $this->assertSame(4, (int) reset($ratings)->rating);
     }
+
+    /**
+     * An entry with no content row is still fully deleted, along with its comments and ratings.
+     *
+     * @covers ::delete_data_for_all_users_in_context
+     */
+    public function test_content_less_entry_is_deleted_for_all_users(): void {
+        global $DB;
+
+        $course = $this->getDataGenerator()->create_course();
+        $author = $this->getDataGenerator()->create_user();
+        $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
+        $cm = get_coursemodule_from_instance('datalynx', $instance->id, 0, false, MUST_EXIST);
+        $context = context_module::instance($cm->id);
+
+        // An entry with NO datalynx_contents row, but with a comment and a rating.
+        $entryid = $this->create_entry($instance->id, $author->id);
+        $this->add_comment($context->id, $entryid, $author->id);
+        $this->add_rating($context->id, $entryid, $author->id, 'entry');
+
+        provider::delete_data_for_all_users_in_context($context);
+
+        $this->assertFalse($DB->record_exists('datalynx_entries', ['id' => $entryid]));
+        $this->assertSame(0, $DB->count_records('comments', ['itemid' => $entryid, 'commentarea' => 'entry']));
+        $this->assertSame(0, $this->count_ratings_on_entry($context->id, $entryid));
+    }
+
+    /**
+     * A user's content-less entry (and its ratings/comments) is deleted on a per-user request.
+     *
+     * @covers ::delete_data_for_user
+     */
+    public function test_content_less_entry_is_deleted_for_user(): void {
+        global $DB;
+
+        $course = $this->getDataGenerator()->create_course();
+        $author = $this->getDataGenerator()->create_user();
+        $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
+        $cm = get_coursemodule_from_instance('datalynx', $instance->id, 0, false, MUST_EXIST);
+        $context = context_module::instance($cm->id);
+
+        $entryid = $this->create_entry($instance->id, $author->id);
+        $this->add_comment($context->id, $entryid, $author->id);
+        $this->add_rating($context->id, $entryid, $author->id, 'entry');
+
+        $contextlist = new approved_contextlist($author, 'mod_datalynx', [$context->id]);
+        provider::delete_data_for_user($contextlist);
+
+        $this->assertFalse($DB->record_exists('datalynx_entries', ['id' => $entryid]));
+        $this->assertSame(0, $this->count_comments_by_user((int) $author->id));
+        $this->assertSame(0, $this->count_ratings_on_entry($context->id, $entryid));
+    }
 }

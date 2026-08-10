@@ -307,7 +307,7 @@ class provider implements
         }
         $recordstobedeleted = [];
 
-        $sql = "SELECT " . self::sql_fields() . "
+        $sql = "SELECT de.id AS delentryid, " . self::sql_fields() . "
                 FROM {course_modules} cm
                 JOIN {modules} m ON m.id = cm.module AND m.name = :modname
                 JOIN {datalynx} dl ON dl.id = cm.instance
@@ -319,7 +319,7 @@ class provider implements
         $rs = $DB->get_recordset_sql($sql, ['cmid' => $context->instanceid, 'modname' => 'datalynx']);
         foreach ($rs as $row) {
             self::mark_datalynx_contents_for_deletion($context, $row);
-            $recordstobedeleted[$row->entryid] = $row->entryid;
+            $recordstobedeleted[$row->delentryid] = $row->delentryid;
         }
         $rs->close();
 
@@ -345,7 +345,7 @@ class provider implements
         $recordstobedeleted = [];
 
         foreach ($contextlist->get_contexts() as $context) {
-            $sql = "SELECT " . self::sql_fields() . "
+            $sql = "SELECT de.id AS delentryid, " . self::sql_fields() . "
                 FROM {context} ctx
                 JOIN {course_modules} cm ON cm.id = ctx.instanceid
                 JOIN {modules} m ON m.id = cm.module AND m.name = :modname
@@ -359,7 +359,7 @@ class provider implements
                 'modname' => 'datalynx', 'userid' => $user->id]);
             foreach ($rs as $row) {
                 self::mark_datalynx_contents_for_deletion($context, $row);
-                $recordstobedeleted[$row->entryid] = $row->entryid;
+                $recordstobedeleted[$row->delentryid] = $row->delentryid;
             }
             $rs->close();
             self::delete_datalynx_entries($context, $recordstobedeleted);
@@ -390,7 +390,7 @@ class provider implements
         [$usersql, $userparams] = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
         $recordstobedeleted = [];
 
-        $sql = "SELECT " . self::sql_fields() . "
+        $sql = "SELECT de.id AS delentryid, " . self::sql_fields() . "
                 FROM {course_modules} cm
                 JOIN {modules} m ON m.id = cm.module AND m.name = :modname
                 JOIN {datalynx} dl ON dl.id = cm.instance
@@ -403,7 +403,7 @@ class provider implements
         $rs = $DB->get_recordset_sql($sql, $params);
         foreach ($rs as $row) {
             self::mark_datalynx_contents_for_deletion($context, $row);
-            $recordstobedeleted[$row->entryid] = $row->entryid;
+            $recordstobedeleted[$row->delentryid] = $row->delentryid;
         }
         $rs->close();
 
