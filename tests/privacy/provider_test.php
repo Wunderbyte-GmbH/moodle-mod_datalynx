@@ -75,25 +75,8 @@ final class provider_test extends advanced_testcase {
      * @return int the content id (also the file itemid)
      */
     private function create_entry_with_files(int $dataid, int $contextid, int $userid, int $fieldid): int {
-        global $DB;
-
-        $now = time();
-        $entryid = (int) $DB->insert_record('datalynx_entries', (object) [
-            'dataid' => $dataid,
-            'userid' => $userid,
-            'groupid' => 0,
-            'timecreated' => $now,
-            'timemodified' => $now,
-            'approved' => 1,
-            'status' => 0,
-            'timesubmitted' => 0,
-            'assessed' => 0,
-        ]);
-        $contentid = (int) $DB->insert_record('datalynx_contents', (object) [
-            'fieldid' => $fieldid,
-            'entryid' => $entryid,
-            'content' => 'attachment.txt',
-        ]);
+        $entryid = $this->create_entry($dataid, $userid);
+        $contentid = $this->create_content($entryid, $fieldid, 'attachment.txt');
 
         $fs = get_file_storage();
         foreach (['content', 'thumb'] as $filearea) {
@@ -108,6 +91,80 @@ final class provider_test extends advanced_testcase {
         }
 
         return $contentid;
+    }
+
+    /**
+     * Insert a datalynx entry and return its id.
+     *
+     * @param int $dataid
+     * @param int $userid
+     * @return int entry id
+     */
+    private function create_entry(int $dataid, int $userid): int {
+        global $DB;
+        $now = time();
+        return (int) $DB->insert_record('datalynx_entries', (object) [
+            'dataid' => $dataid,
+            'userid' => $userid,
+            'groupid' => 0,
+            'timecreated' => $now,
+            'timemodified' => $now,
+            'approved' => 1,
+            'status' => 0,
+            'timesubmitted' => 0,
+            'assessed' => 0,
+        ]);
+    }
+
+    /**
+     * Insert a content row and return its id.
+     *
+     * @param int $entryid
+     * @param int $fieldid
+     * @param string $content
+     * @return int content id
+     */
+    private function create_content(int $entryid, int $fieldid, string $content = 'x'): int {
+        global $DB;
+        return (int) $DB->insert_record('datalynx_contents', (object) [
+            'fieldid' => $fieldid,
+            'entryid' => $entryid,
+            'content' => $content,
+        ]);
+    }
+
+    /**
+     * Post a comment on an entry.
+     *
+     * @param int $contextid
+     * @param int $entryid
+     * @param int $userid
+     * @param string $content
+     * @return int comment id
+     */
+    private function add_comment(int $contextid, int $entryid, int $userid, string $content = 'A comment'): int {
+        global $DB;
+        return (int) $DB->insert_record('comments', (object) [
+            'contextid' => $contextid,
+            'component' => 'mod_datalynx',
+            'commentarea' => 'entry',
+            'itemid' => $entryid,
+            'content' => $content,
+            'format' => FORMAT_PLAIN,
+            'userid' => $userid,
+            'timecreated' => time(),
+        ]);
+    }
+
+    /**
+     * Count comments made by a user in the datalynx entry area.
+     *
+     * @param int $userid
+     * @return int
+     */
+    private function count_comments_by_user(int $userid): int {
+        global $DB;
+        return $DB->count_records('comments', ['component' => 'mod_datalynx', 'commentarea' => 'entry', 'userid' => $userid]);
     }
 
     /**
@@ -237,5 +294,139 @@ final class provider_test extends advanced_testcase {
         $this->assertSame(2, $this->count_entry_files($context->id, $contenttwo));
         $this->assertTrue($DB->record_exists('datalynx_contents', ['id' => $contenttwo]));
         $this->assertSame(1, $DB->count_records('datalynx_entries', ['dataid' => $instance->id]));
+    }
+
+    /**
+     * A user who only commented (never authored an entry) is discovered in the context and by userid.
+     *
+     * @covers ::get_users_in_context
+     * @covers ::get_contexts_for_userid
+     */
+    public function test_commenter_is_discovered(): void {
+        $course = $this->getDataGenerator()->create_course();
+        $author = $this->getDataGenerator()->create_user();
+        $commenter = $this->getDataGenerator()->create_user();
+        $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
+        $cm = get_coursemodule_from_instance('datalynx', $instance->id, 0, false, MUST_EXIST);
+        $context = context_module::instance($cm->id);
+
+        $entryid = $this->create_entry($instance->id, $author->id);
+        $this->add_comment($context->id, $entryid, $commenter->id);
+
+        $userlist = new userlist($context, 'mod_datalynx');
+        provider::get_users_in_context($userlist);
+        $userids = $userlist->get_userids();
+        $this->assertContains((int) $author->id, $userids);
+        $this->assertContains((int) $commenter->id, $userids);
+
+        // The commenter, who authored nothing, still has this context in their list.
+        $contextlist = provider::get_contexts_for_userid($commenter->id);
+        $this->assertEqualsCanonicalizing([$context->id], $contextlist->get_contextids());
+    }
+
+    /**
+     * delete_data_for_all_users_in_context() removes all comments in the context.
+     *
+     * @covers ::delete_data_for_all_users_in_context
+     */
+    public function test_delete_for_all_users_removes_comments(): void {
+        global $DB;
+
+        $course = $this->getDataGenerator()->create_course();
+        $author = $this->getDataGenerator()->create_user();
+        $commenter = $this->getDataGenerator()->create_user();
+        $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
+        $cm = get_coursemodule_from_instance('datalynx', $instance->id, 0, false, MUST_EXIST);
+        $context = context_module::instance($cm->id);
+
+        $entryid = $this->create_entry($instance->id, $author->id);
+        $this->add_comment($context->id, $entryid, $author->id);
+        $this->add_comment($context->id, $entryid, $commenter->id);
+        $this->assertSame(2, $DB->count_records('comments', ['contextid' => $context->id, 'commentarea' => 'entry']));
+
+        provider::delete_data_for_all_users_in_context($context);
+
+        $this->assertSame(0, $DB->count_records('comments', ['contextid' => $context->id, 'commentarea' => 'entry']));
+    }
+
+    /**
+     * delete_data_for_user() removes that user's comments, leaving others' comments.
+     *
+     * @covers ::delete_data_for_user
+     */
+    public function test_delete_for_user_removes_own_comments(): void {
+        $course = $this->getDataGenerator()->create_course();
+        $author = $this->getDataGenerator()->create_user();
+        $commenter = $this->getDataGenerator()->create_user();
+        $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
+        $cm = get_coursemodule_from_instance('datalynx', $instance->id, 0, false, MUST_EXIST);
+        $context = context_module::instance($cm->id);
+
+        $entryid = $this->create_entry($instance->id, $author->id);
+        $this->add_comment($context->id, $entryid, $author->id);
+        $this->add_comment($context->id, $entryid, $commenter->id);
+
+        $contextlist = new approved_contextlist($commenter, 'mod_datalynx', [$context->id]);
+        provider::delete_data_for_user($contextlist);
+
+        $this->assertSame(0, $this->count_comments_by_user($commenter->id));
+        $this->assertSame(1, $this->count_comments_by_user($author->id));
+    }
+
+    /**
+     * delete_data_for_users() removes only the approved users' comments.
+     *
+     * @covers ::delete_data_for_users
+     */
+    public function test_delete_for_users_removes_selected_comments(): void {
+        $course = $this->getDataGenerator()->create_course();
+        $author = $this->getDataGenerator()->create_user();
+        $commenterone = $this->getDataGenerator()->create_user();
+        $commentertwo = $this->getDataGenerator()->create_user();
+        $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
+        $cm = get_coursemodule_from_instance('datalynx', $instance->id, 0, false, MUST_EXIST);
+        $context = context_module::instance($cm->id);
+
+        $entryid = $this->create_entry($instance->id, $author->id);
+        $this->add_comment($context->id, $entryid, $commenterone->id);
+        $this->add_comment($context->id, $entryid, $commentertwo->id);
+
+        $approved = new approved_userlist($context, 'mod_datalynx', [$commenterone->id]);
+        provider::delete_data_for_users($approved);
+
+        $this->assertSame(0, $this->count_comments_by_user($commenterone->id));
+        $this->assertSame(1, $this->count_comments_by_user($commentertwo->id));
+    }
+
+    /**
+     * A user's comment is included in their exported data.
+     *
+     * @covers ::export_user_data
+     */
+    public function test_export_includes_user_comments(): void {
+        $course = $this->getDataGenerator()->create_course();
+        $author = $this->getDataGenerator()->create_user();
+        $commenter = $this->getDataGenerator()->create_user();
+        $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
+        $cm = get_coursemodule_from_instance('datalynx', $instance->id, 0, false, MUST_EXIST);
+        $context = context_module::instance($cm->id);
+
+        // The entry needs a content row to appear in the export query.
+        $fieldid = $this->create_file_field($instance->id);
+        $entryid = $this->create_entry($instance->id, $author->id);
+        $this->create_content($entryid, $fieldid, 'entry body');
+        $this->add_comment($context->id, $entryid, $commenter->id, 'Hello from the commenter');
+
+        // The real export runs as the requesting user (the task sets its userid), and
+        // core_comment::export_comments() filters "only this user's" comments by $USER.
+        $this->setUser($commenter);
+        $contextlist = new approved_contextlist($commenter, 'mod_datalynx', [$context->id]);
+        provider::export_user_data($contextlist);
+
+        $writer = \core_privacy\local\request\writer::with_context($context);
+        $this->assertTrue($writer->has_any_data());
+        $data = $writer->get_data([$entryid, get_string('commentsubcontext', 'core_comment')]);
+        $this->assertNotEmpty($data->comments);
+        $this->assertSame('Hello from the commenter', reset($data->comments)->content);
     }
 }

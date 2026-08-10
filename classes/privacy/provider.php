@@ -99,6 +99,7 @@ class provider implements
 
         // Subsystems used.
         $collection->link_subsystem('core_files', 'privacy:metadata:filepurpose');
+        $collection->link_subsystem('core_comment', 'privacy:metadata:commentpurpose');
 
         return $collection;
     }
@@ -128,6 +129,24 @@ class provider implements
         $contextlist = new contextlist();
         $contextlist->add_from_sql($sql, $params);
 
+        // Fetch contexts where the user commented on an entry (their own or someone else's).
+        $commentsql = "SELECT c.id
+            FROM {context} c
+            INNER JOIN {course_modules} cm ON cm.id = c.instanceid AND c.contextlevel = :contextlevel
+            INNER JOIN {modules} m ON m.id = cm.module AND m.name = :modname
+            INNER JOIN {datalynx} dl ON dl.id = cm.instance
+            INNER JOIN {datalynx_entries} de ON de.dataid = dl.id
+            INNER JOIN {comments} com ON com.itemid = de.id
+                AND com.component = :component AND com.commentarea = :commentarea
+            WHERE com.userid = :userid";
+        $contextlist->add_from_sql($commentsql, [
+            'modname'      => 'datalynx',
+            'contextlevel' => CONTEXT_MODULE,
+            'component'    => 'mod_datalynx',
+            'commentarea'  => 'entry',
+            'userid'       => $userid,
+        ]);
+
         return $contextlist;
     }
 
@@ -150,6 +169,15 @@ class provider implements
                   JOIN {datalynx_entries} de ON de.dataid = dl.id
                  WHERE cm.id = :cmid";
         $userlist->add_from_sql('userid', $sql, ['cmid' => $context->instanceid, 'modname' => 'datalynx']);
+
+        // Users who commented on an entry in this instance.
+        \core_comment\privacy\provider::get_users_in_context_from_sql(
+            $userlist,
+            'com',
+            'mod_datalynx',
+            'entry',
+            $context->id
+        );
     }
 
     /**
@@ -176,10 +204,14 @@ class provider implements
                 JOIN {datalynx_contents} dc ON dc.entryid = de.id
                 JOIN {datalynx_fields} df ON df.id = dc.fieldid
                 WHERE ctx.id {$contextsql} AND ctx.contextlevel = :contextlevel
-                AND de.userid = :userid
+                AND (de.userid = :userid
+                     OR EXISTS (SELECT 1 FROM {comments} com
+                                 WHERE com.itemid = de.id AND com.component = :ccomponent
+                                   AND com.commentarea = :ccommentarea AND com.userid = :cuserid))
                 ORDER BY cm.id, de.id, dc.fieldid";
         $rs = $DB->get_recordset_sql($sql, $contextparams + ['contextlevel' => CONTEXT_MODULE,
-                'modname' => 'datalynx', 'userid' => $user->id, 'moddata' => 'mod_datalynx']);
+                'modname' => 'datalynx', 'userid' => $user->id, 'moddata' => 'mod_datalynx',
+                'ccomponent' => 'mod_datalynx', 'ccommentarea' => 'entry', 'cuserid' => $user->id]);
 
         $context = null;
         $recordobj = null;
@@ -242,6 +274,9 @@ class provider implements
         $rs->close();
 
         self::delete_datalynx_entries($context, $recordstobedeleted);
+
+        // Delete every comment posted on entries in this context.
+        \core_comment\privacy\provider::delete_comments_for_all_users($context, 'mod_datalynx', 'entry');
     }
 
     /**
@@ -279,6 +314,9 @@ class provider implements
             $rs->close();
             self::delete_datalynx_entries($context, $recordstobedeleted);
         }
+
+        // Delete this user's comments across the approved contexts.
+        \core_comment\privacy\provider::delete_comments_for_user($contextlist, 'mod_datalynx', 'entry');
     }
 
     /**
@@ -320,6 +358,9 @@ class provider implements
         $rs->close();
 
         self::delete_datalynx_entries($context, $recordstobedeleted);
+
+        // Delete the approved users' comments in this context.
+        \core_comment\privacy\provider::delete_comments_for_users($userlist, 'mod_datalynx', 'entry');
     }
 
     /**
@@ -353,6 +394,16 @@ class provider implements
             'mod_datalynx',
             'datalynx_entries',
             $recordobj->id
+        );
+        // Export comments. For entries not authored by this user export only this user's comments;
+        // for the user's own entries export the comments made by everybody.
+        \core_comment\privacy\provider::export_comments(
+            $context,
+            'mod_datalynx',
+            'entry',
+            $recordobj->id,
+            [$recordobj->id],
+            $recordobj->userid != $user->id
         );
     }
 
@@ -516,6 +567,7 @@ class provider implements
                   dc.content3 AS contentcontent3, dc.content4 AS contentcontent4,
                   dc.entryid, de.timecreated AS entrytimecreated,
                   de.timemodified AS entrytimemodified,
+                  de.timesubmitted AS entrytimesubmitted,
                   de.status AS entrystatus,
                   de.assessed AS entryassessed,
                   de.approved AS entryapproved, de.groupid AS entrygroupid, de.userid AS entryuserid';

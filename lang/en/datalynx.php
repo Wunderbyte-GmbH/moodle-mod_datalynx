@@ -758,6 +758,7 @@ $string['presetsharesuccess'] = 'Saved successfully. Your preset will now be ava
 $string['presetsource'] = 'Preset source';
 $string['presetusestandard'] = 'Use a preset';
 $string['previewempty'] = 'nothing shown';
+$string['privacy:metadata:commentpurpose'] = 'Comments posted on datalynx entries.';
 $string['privacy:metadata:datalynx_contents'] = 'Represents content of one field that was written in a datalynx instance.';
 $string['privacy:metadata:datalynx_contents:content'] = 'Content';
 $string['privacy:metadata:datalynx_contents:content1'] = 'Additional content 1';

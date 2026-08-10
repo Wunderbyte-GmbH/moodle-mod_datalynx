@@ -730,6 +730,7 @@ $string['presetsharesuccess'] = 'Speichern erfolgreich. Ihre Vorlage wird nun au
 $string['presetsource'] = 'Vorlagen Quelle';
 $string['presetusestandard'] = 'Vorlage verwenden';
 $string['previewempty'] = 'nichts angezeigt';
+$string['privacy:metadata:commentpurpose'] = 'Kommentare zu datalynx-Einträgen.';
 $string['privacy:metadata:datalynx_contents'] = 'Inhalte die in ein Feld in einer datalynx Instanz abgelegt wurden.';
 $string['privacy:metadata:datalynx_contents:content'] = 'Content';
 $string['privacy:metadata:datalynx_contents:content1'] = 'Zusätzlicher content 1';
