@@ -168,6 +168,44 @@ final class provider_test extends advanced_testcase {
     }
 
     /**
+     * Add a rating on an entry.
+     *
+     * @param int $contextid
+     * @param int $entryid
+     * @param int $userid
+     * @param string $ratingarea
+     * @param int $rating
+     * @return int rating id
+     */
+    private function add_rating(int $contextid, int $entryid, int $userid, string $ratingarea = 'entry', int $rating = 3): int {
+        global $DB;
+        $now = time();
+        return (int) $DB->insert_record('rating', (object) [
+            'contextid' => $contextid,
+            'component' => 'mod_datalynx',
+            'ratingarea' => $ratingarea,
+            'itemid' => $entryid,
+            'scaleid' => 5,
+            'rating' => $rating,
+            'userid' => $userid,
+            'timecreated' => $now,
+            'timemodified' => $now,
+        ]);
+    }
+
+    /**
+     * Count ratings on an entry.
+     *
+     * @param int $contextid
+     * @param int $entryid
+     * @return int
+     */
+    private function count_ratings_on_entry(int $contextid, int $entryid): int {
+        global $DB;
+        return $DB->count_records('rating', ['contextid' => $contextid, 'component' => 'mod_datalynx', 'itemid' => $entryid]);
+    }
+
+    /**
      * Count stored files (excluding directories) in the content and thumb areas for an item.
      *
      * @param int $contextid
@@ -428,5 +466,127 @@ final class provider_test extends advanced_testcase {
         $data = $writer->get_data([$entryid, get_string('commentsubcontext', 'core_comment')]);
         $this->assertNotEmpty($data->comments);
         $this->assertSame('Hello from the commenter', reset($data->comments)->content);
+    }
+
+    /**
+     * A user who only rated an entry (never authored one) is discovered in the context and by userid.
+     *
+     * @covers ::get_users_in_context
+     * @covers ::get_contexts_for_userid
+     */
+    public function test_rater_is_discovered(): void {
+        $course = $this->getDataGenerator()->create_course();
+        $author = $this->getDataGenerator()->create_user();
+        $rater = $this->getDataGenerator()->create_user();
+        $activityrater = $this->getDataGenerator()->create_user();
+        $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
+        $cm = get_coursemodule_from_instance('datalynx', $instance->id, 0, false, MUST_EXIST);
+        $context = context_module::instance($cm->id);
+
+        $entryid = $this->create_entry($instance->id, $author->id);
+        $this->add_rating($context->id, $entryid, $rater->id, 'entry');
+        $this->add_rating($context->id, $entryid, $activityrater->id, 'activity');
+
+        $userlist = new userlist($context, 'mod_datalynx');
+        provider::get_users_in_context($userlist);
+        $userids = $userlist->get_userids();
+        $this->assertContains((int) $author->id, $userids);
+        $this->assertContains((int) $rater->id, $userids);
+        $this->assertContains((int) $activityrater->id, $userids);
+
+        // Each rater, who authored nothing, still has this context in their list.
+        $this->assertEqualsCanonicalizing(
+            [$context->id],
+            provider::get_contexts_for_userid($rater->id)->get_contextids()
+        );
+        $this->assertEqualsCanonicalizing(
+            [$context->id],
+            provider::get_contexts_for_userid($activityrater->id)->get_contextids()
+        );
+    }
+
+    /**
+     * delete_data_for_all_users_in_context() removes all ratings in the context.
+     *
+     * @covers ::delete_data_for_all_users_in_context
+     */
+    public function test_delete_for_all_users_removes_ratings(): void {
+        $course = $this->getDataGenerator()->create_course();
+        $author = $this->getDataGenerator()->create_user();
+        $rater = $this->getDataGenerator()->create_user();
+        $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
+        $cm = get_coursemodule_from_instance('datalynx', $instance->id, 0, false, MUST_EXIST);
+        $context = context_module::instance($cm->id);
+
+        $fieldid = $this->create_file_field($instance->id);
+        $entryid = $this->create_entry($instance->id, $author->id);
+        $this->create_content($entryid, $fieldid);
+        $this->add_rating($context->id, $entryid, $rater->id, 'entry');
+        $this->add_rating($context->id, $entryid, $rater->id, 'activity');
+        $this->assertSame(2, $this->count_ratings_on_entry($context->id, $entryid));
+
+        provider::delete_data_for_all_users_in_context($context);
+
+        $this->assertSame(0, $this->count_ratings_on_entry($context->id, $entryid));
+    }
+
+    /**
+     * Deleting a user removes ratings on that user's (now deleted) entries, but not the ratings the
+     * user gave on surviving entries — core_rating never removes ratings per user, only per item.
+     *
+     * @covers ::delete_data_for_user
+     */
+    public function test_delete_for_user_removes_ratings_on_deleted_entries_only(): void {
+        $course = $this->getDataGenerator()->create_course();
+        $authorone = $this->getDataGenerator()->create_user();
+        $authortwo = $this->getDataGenerator()->create_user();
+        $rater = $this->getDataGenerator()->create_user();
+        $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
+        $cm = get_coursemodule_from_instance('datalynx', $instance->id, 0, false, MUST_EXIST);
+        $context = context_module::instance($cm->id);
+
+        // Author one owns entry one (rated by a third user). Author one also rated author two's entry.
+        $fieldid = $this->create_file_field($instance->id);
+        $entryone = $this->create_entry($instance->id, $authorone->id);
+        $this->create_content($entryone, $fieldid);
+        $entrytwo = $this->create_entry($instance->id, $authortwo->id);
+        $this->add_rating($context->id, $entryone, $rater->id, 'entry');
+        $this->add_rating($context->id, $entrytwo, $authorone->id, 'entry');
+
+        $contextlist = new approved_contextlist($authorone, 'mod_datalynx', [$context->id]);
+        provider::delete_data_for_user($contextlist);
+
+        // Entry one is deleted, so the rating on it is gone.
+        $this->assertSame(0, $this->count_ratings_on_entry($context->id, $entryone));
+        // Author one's rating on author two's surviving entry stays (it counts toward a grade).
+        $this->assertSame(1, $this->count_ratings_on_entry($context->id, $entrytwo));
+    }
+
+    /**
+     * A user's rating is included in their exported data.
+     *
+     * @covers ::export_user_data
+     */
+    public function test_export_includes_user_ratings(): void {
+        $course = $this->getDataGenerator()->create_course();
+        $author = $this->getDataGenerator()->create_user();
+        $rater = $this->getDataGenerator()->create_user();
+        $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
+        $cm = get_coursemodule_from_instance('datalynx', $instance->id, 0, false, MUST_EXIST);
+        $context = context_module::instance($cm->id);
+
+        $fieldid = $this->create_file_field($instance->id);
+        $entryid = $this->create_entry($instance->id, $author->id);
+        $this->create_content($entryid, $fieldid, 'entry body');
+        $this->add_rating($context->id, $entryid, $rater->id, 'entry', 4);
+
+        $this->setUser($rater);
+        $contextlist = new approved_contextlist($rater, 'mod_datalynx', [$context->id]);
+        provider::export_user_data($contextlist);
+
+        $writer = \core_privacy\local\request\writer::with_context($context);
+        $ratings = $writer->get_related_data([$entryid], 'rating');
+        $this->assertNotEmpty($ratings);
+        $this->assertSame(4, (int) reset($ratings)->rating);
     }
 }

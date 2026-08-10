@@ -100,6 +100,7 @@ class provider implements
         // Subsystems used.
         $collection->link_subsystem('core_files', 'privacy:metadata:filepurpose');
         $collection->link_subsystem('core_comment', 'privacy:metadata:commentpurpose');
+        $collection->link_subsystem('core_rating', 'privacy:metadata:ratingpurpose');
 
         return $collection;
     }
@@ -147,6 +148,23 @@ class provider implements
             'userid'       => $userid,
         ]);
 
+        // Fetch contexts where the user rated an entry, in either rating area.
+        foreach (['entry', 'activity'] as $ratingarea) {
+            $ratingquery = \core_rating\privacy\provider::get_sql_join('r', 'mod_datalynx', $ratingarea, 'de.id', $userid, true);
+            $ratingsql = "SELECT c.id
+                FROM {context} c
+                INNER JOIN {course_modules} cm ON cm.id = c.instanceid AND c.contextlevel = :contextlevel
+                INNER JOIN {modules} m ON m.id = cm.module AND m.name = :modname
+                INNER JOIN {datalynx} dl ON dl.id = cm.instance
+                INNER JOIN {datalynx_entries} de ON de.dataid = dl.id
+                {$ratingquery->join}
+                WHERE {$ratingquery->userwhere}";
+            $contextlist->add_from_sql($ratingsql, [
+                'modname'      => 'datalynx',
+                'contextlevel' => CONTEXT_MODULE,
+            ] + $ratingquery->params);
+        }
+
         return $contextlist;
     }
 
@@ -178,6 +196,31 @@ class provider implements
             'entry',
             $context->id
         );
+
+        // Users who rated an entry in this instance, in either rating area.
+        $itemsql = "SELECT de.id
+                      FROM {course_modules} cm
+                      JOIN {modules} m ON m.id = cm.module AND m.name = :modname
+                      JOIN {datalynx} dl ON dl.id = cm.instance
+                      JOIN {datalynx_entries} de ON de.dataid = dl.id
+                     WHERE cm.id = :cmid";
+        $itemparams = ['cmid' => $context->instanceid, 'modname' => 'datalynx'];
+        \core_rating\privacy\provider::get_users_in_context_from_sql(
+            $userlist,
+            'raten',
+            'mod_datalynx',
+            'entry',
+            $itemsql,
+            $itemparams
+        );
+        \core_rating\privacy\provider::get_users_in_context_from_sql(
+            $userlist,
+            'ratac',
+            'mod_datalynx',
+            'activity',
+            $itemsql,
+            $itemparams
+        );
     }
 
     /**
@@ -207,11 +250,18 @@ class provider implements
                 AND (de.userid = :userid
                      OR EXISTS (SELECT 1 FROM {comments} com
                                  WHERE com.itemid = de.id AND com.component = :ccomponent
-                                   AND com.commentarea = :ccommentarea AND com.userid = :cuserid))
+                                   AND com.commentarea = :ccommentarea AND com.userid = :cuserid)
+                     OR EXISTS (SELECT 1 FROM {rating} rat
+                                 WHERE rat.itemid = de.id AND rat.contextid = ctx.id
+                                   AND rat.component = :rcomponent
+                                   AND rat.ratingarea IN (:rareaentry, :rareaactivity)
+                                   AND rat.userid = :ruserid))
                 ORDER BY cm.id, de.id, dc.fieldid";
         $rs = $DB->get_recordset_sql($sql, $contextparams + ['contextlevel' => CONTEXT_MODULE,
                 'modname' => 'datalynx', 'userid' => $user->id, 'moddata' => 'mod_datalynx',
-                'ccomponent' => 'mod_datalynx', 'ccommentarea' => 'entry', 'cuserid' => $user->id]);
+                'ccomponent' => 'mod_datalynx', 'ccommentarea' => 'entry', 'cuserid' => $user->id,
+                'rcomponent' => 'mod_datalynx', 'rareaentry' => 'entry', 'rareaactivity' => 'activity',
+                'ruserid' => $user->id]);
 
         $context = null;
         $recordobj = null;
@@ -405,6 +455,27 @@ class provider implements
             [$recordobj->id],
             $recordobj->userid != $user->id
         );
+        // Export ratings for both rating areas. For the user's own entries export everybody's
+        // ratings; for others' entries export only this user's ratings. The activity-area ratings
+        // are nested under their own subcontext so they cannot collide with the entry-area ratings.
+        \core_rating\privacy\provider::export_area_ratings(
+            $user->id,
+            $context,
+            [$recordobj->id],
+            'mod_datalynx',
+            'entry',
+            $recordobj->id,
+            $recordobj->userid != $user->id
+        );
+        \core_rating\privacy\provider::export_area_ratings(
+            $user->id,
+            $context,
+            [$recordobj->id, get_string('activity')],
+            'mod_datalynx',
+            'activity',
+            $recordobj->id,
+            $recordobj->userid != $user->id
+        );
     }
 
     /**
@@ -496,6 +567,13 @@ class provider implements
                 $itemidtest,
                 $params
             );
+        }
+
+        // Delete ratings on these entries, in both rating areas. Ratings are keyed by entry id, and
+        // per core_rating they are removed only when the rated item itself is deleted (never
+        // per-user, as that would affect grades) — which is exactly what is happening here.
+        foreach (['entry', 'activity'] as $ratingarea) {
+            \core_rating\privacy\provider::delete_ratings_select($context, 'mod_datalynx', $ratingarea, $sql, $params);
         }
 
         // Delete from datalynx_contents.
