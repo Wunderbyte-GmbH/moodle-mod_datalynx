@@ -417,17 +417,26 @@ cli_writeln('Created ' . count($created['offers']) . ' offers and ' . count($cre
 // Run the matching sweep, exactly as the ad-hoc task does after a real save.
 
 if (empty($options['nomatch'])) {
-    $rule = $DB->get_record('datalynx_rules', ['dataid' => $dataid, 'type' => 'ridematch'], '*', IGNORE_MULTIPLE);
-    if (!$rule) {
-        cli_writeln('No ridematch rule configured, skipping the sweep.');
+    $rules = $DB->get_records_select(
+        'datalynx_rules',
+        "dataid = :dataid AND type = 'eventnotification' AND " . $DB->sql_like('param9', ':key'),
+        ['dataid' => $dataid, 'key' => '%_matchcriteria%']
+    );
+    if (!$rules) {
+        cli_writeln('No matching rule configured, skipping the sweep.');
     } else {
-        $service = \datalynxrule_ridematch\matcher_service::create($dataid, (int) $rule->id);
-        $total = 0;
+        $dlx = new \mod_datalynx\datalynx($dataid);
         foreach ($created['requests'] as $entryid) {
-            $found = $service->process_entry($entryid);
-            $total += $found;
-            cli_writeln("Gesuch #$entryid: $found neue Übereinstimmung(en).");
+            foreach ($rules as $record) {
+                $rule = new \datalynxrule_eventnotification\rule($dlx, $record);
+                $rule->run_matching([
+                    'eventname' => 'entry_created',
+                    'entryid' => $entryid,
+                    'objectid' => $entryid,
+                    'teamfieldid' => 0,
+                ]);
+            }
         }
-        cli_writeln("Insgesamt $total Übereinstimmungen angekündigt.");
+        cli_writeln('Ran the matching sweep for ' . count($created['requests']) . ' Gesuche.');
     }
 }

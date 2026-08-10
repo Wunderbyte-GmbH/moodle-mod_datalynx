@@ -25,7 +25,7 @@
     the renderer when the viewer is not a participant.
 
     Context variables required for this template:
-    * waypoints - Ordered stops, each with address, lat, lng, time, seq, isfirst, islast.
+    * waypoints - Ordered stops, each with address, lat, lng, seq, isfirst, islast.
     * waypointsjson - The same stops as a JSON string, for the map.
     * showmap - Whether to draw the map.
     * showlist - Whether to list the stops.
@@ -65,9 +65,6 @@
                 <li class="datalynx-itinerary__stop{{#isfirst}} datalynx-itinerary__stop--start{{/isfirst}}{{#islast}} datalynx-itinerary__stop--end{{/islast}}">
                     <i class="icon fa fa-fw {{#isfirst}}fa-circle-dot{{/isfirst}}{{^isfirst}}{{#islast}}fa-flag-checkered{{/islast}}{{^islast}}fa-circle{{/islast}}{{/isfirst}}" aria-hidden="true"></i>
                     <span class="datalynx-itinerary__address">{{address}}</span>
-                    {{#time}}
-                        <span class="datalynx-itinerary__time">{{#userdate}}{{time}}, {{#str}}strftimedatetimeshort, core_langconfig{{/str}}{{/userdate}}</span>
-                    {{/time}}
                 </li>
             {{/waypoints}}
         </ol>

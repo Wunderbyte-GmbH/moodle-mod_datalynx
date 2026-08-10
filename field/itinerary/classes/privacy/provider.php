@@ -50,7 +50,6 @@ class provider implements metadata_provider {
             [
                 'lat' => 'privacy:metadata:datalynx_waypoints:lat',
                 'lng' => 'privacy:metadata:datalynx_waypoints:lng',
-                'timeplanned' => 'privacy:metadata:datalynx_waypoints:timeplanned',
             ],
             'privacy:metadata:datalynx_waypoints'
         );

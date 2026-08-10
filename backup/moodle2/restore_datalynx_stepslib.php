@@ -460,6 +460,32 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
     }
 
     /**
+     * Remap the field ids inside a counterpart matching configuration.
+     *
+     * Everything else in the configuration - the relation, the tolerance, the radius, the
+     * direction, the dedupe scope - is independent of the ids of this course.
+     *
+     * @param mixed $config the decoded configuration stored under the reserved matching key
+     * @return array
+     */
+    protected function remap_match_criteria($config): array {
+        $config = (array) $config;
+        if (empty($config['criteria'])) {
+            return $config;
+        }
+
+        foreach ((array) $config['criteria'] as $key => $criterion) {
+            $criterion = (array) $criterion;
+            if (!empty($criterion['fieldid']) && is_numeric($criterion['fieldid'])) {
+                $criterion['fieldid'] = $this->get_mappingid('datalynx_field', (int) $criterion['fieldid']);
+            }
+            $config['criteria'][$key] = $criterion;
+        }
+
+        return $config;
+    }
+
+    /**
      * Process a datalynx_rule element from backup data.
      *
      * @param array $data Backup element data.
@@ -517,6 +543,11 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
             foreach ($old as $fieldid => $options) {
                 if ($fieldid === \mod_datalynx\local\rule\base::ONCHANGE_KEY) {
                     $new[$fieldid] = $this->remap_rule_fieldids($options);
+                } else if ($fieldid === \mod_datalynx\local\rule\base::MATCH_KEY) {
+                    // The counterpart matching configuration: each criterion names a field. The
+                    // dedupe scope is a free token by design and needs no remapping - a rule id
+                    // would be stale here, which is why it is not one.
+                    $new[$fieldid] = $this->remap_match_criteria($options);
                 } else if (is_numeric($fieldid) && (int) $fieldid > 0) {
                     $new[$this->get_mappingid('datalynx_field', (int) $fieldid)] = $options;
                 } else {

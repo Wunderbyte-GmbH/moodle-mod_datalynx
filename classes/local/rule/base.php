@@ -46,6 +46,17 @@ abstract class base {
     const ONCHANGE_KEY = '_onlyonchangefields';
 
     /**
+     * Reserved param9 key holding the counterpart matching configuration.
+     *
+     * Kept beside the condition rows for the same reason as {@see self::ONCHANGE_KEY}: it is not
+     * a condition on the triggering entry but a separate setting, and param9 is the one rule
+     * param whose field ids the backup and restore code already walks.
+     *
+     * @var string
+     */
+    const MATCH_KEY = '_matchcriteria';
+
+    /**
      * Subclasses must override the type with their name.
      * @var string
      */
@@ -188,8 +199,9 @@ abstract class base {
         if (!is_array($decoded)) {
             return [];
         }
-        // The on-change field list lives under a reserved key, not a condition row.
-        unset($decoded[self::ONCHANGE_KEY]);
+        // The on-change field list and the matching configuration live under reserved keys, not
+        // condition rows.
+        unset($decoded[self::ONCHANGE_KEY], $decoded[self::MATCH_KEY]);
         return $decoded;
     }
 
@@ -211,16 +223,8 @@ abstract class base {
             return false;
         }
 
-        $dlx = $this->dlx();
-        $fields = $dlx->get_fields();
-
-        $filter = new \mod_datalynx\local\filter\datalynx_filter(
-            (object) ['dataid' => $dlx->id(), 'customsearch' => $conditions]
-        );
-        $filter->init_filter_sql();
-        [$tables, $where, $params] = $filter->get_search_sql($fields);
-
-        $params['conddataid'] = $dlx->id();
+        [$tables, $where, $params] = $this->conditions_sql($conditions);
+        $params['conddataid'] = $this->dlx()->id();
         $params['condeid'] = $entryid;
         // The $where fragment is already of the form " AND (...)" (or empty).
         $sql = "SELECT e.id
@@ -229,6 +233,71 @@ abstract class base {
                        $tables
                  WHERE e.dataid = :conddataid AND e.id = :condeid $where";
         return $DB->record_exists_sql($sql, $params);
+    }
+
+    /**
+     * Build the search SQL for a customsearch through the saved-filter engine.
+     *
+     * @param array $conditions customsearch aggregated by field id
+     * @return array [$tables, $where, $params]
+     */
+    private function conditions_sql(array $conditions): array {
+        $dlx = $this->dlx();
+
+        $filter = new \mod_datalynx\local\filter\datalynx_filter(
+            (object) ['dataid' => $dlx->id(), 'customsearch' => $conditions]
+        );
+        $filter->init_filter_sql();
+
+        return $filter->get_search_sql($dlx->get_fields());
+    }
+
+    /**
+     * Entries other than the given one that match the conditions.
+     *
+     * The counterpart of {@see self::entry_matches_conditions()}: the same criteria, evaluated by
+     * the same engine, but asking which other entries satisfy them rather than whether one
+     * particular entry does.
+     *
+     * @param int $subjectentryid the entry to search around, always excluded from the result
+     * @param array $conditions customsearch aggregated by field id
+     * @param array $options 'excludeownauthor' (default true) drops the entries of the subject's
+     *                       author, 'requireapproved' (default true) drops unapproved entries,
+     *                       'limit' caps the number of results (0 for no cap)
+     * @return int[] entry ids
+     */
+    protected function find_matching_entries(int $subjectentryid, array $conditions, array $options = []): array {
+        global $DB;
+
+        if (!$subjectentryid) {
+            return [];
+        }
+
+        [$tables, $where, $params] = $this->conditions_sql($conditions);
+        $params['conddataid'] = $this->dlx()->id();
+        $params['condeid'] = $subjectentryid;
+
+        $extra = '';
+        if ($options['excludeownauthor'] ?? true) {
+            $params['condauthor'] = (int) $DB->get_field('datalynx_entries', 'userid', ['id' => $subjectentryid]);
+            $extra .= ' AND e.userid <> :condauthor';
+        }
+        if ($options['requireapproved'] ?? true) {
+            $extra .= ' AND e.approved = 1';
+        }
+
+        // DISTINCT because the content joins are LEFT JOINs and a field used inside a fieldgroup
+        // has one content record per repetition, which would otherwise return the entry once per
+        // record. entry_matches_conditions() does not need it: it only asks whether a row exists.
+        $sql = "SELECT DISTINCT e.id
+                  FROM {datalynx_entries} e
+                  JOIN {user} u ON u.id = e.userid
+                       $tables
+                 WHERE e.dataid = :conddataid AND e.id <> :condeid $extra $where";
+
+        $records = $DB->get_records_sql($sql, $params, 0, (int) ($options['limit'] ?? 0));
+
+        return array_map('intval', array_keys($records));
     }
 
     /**

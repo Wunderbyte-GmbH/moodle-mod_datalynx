@@ -24,12 +24,49 @@
 
 namespace mod_datalynx\local\field;
 
+use mod_datalynx\local\rule\match_compiler;
 use stdClass;
 
 /**
  * Base class for Datalynx field types that offer a set of options with single choice
  */
 class datalynxfield_option_single extends datalynxfield_option {
+    /**
+     * A single-choice option can be the same as, or different from, another entry's choice.
+     *
+     * The exact-value operator this field type offers is ANY_OF rather than '=', so the default
+     * implementation, which keys off '=', would report no relation at all.
+     *
+     * @return string[]
+     */
+    public function supported_relative_criteria(): array {
+        return [match_compiler::OP_SAME, match_compiler::OP_DIFFERENT];
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * What an entry stores is the 1-based position of the chosen option, which is exactly what
+     * ANY_OF expects - no resolution of option labels is involved.
+     *
+     * @param string $relation
+     * @param string $storedvalue
+     * @param array $options
+     * @return array|null
+     * @see datalynxfield_base::compile_relative_criterion()
+     */
+    public function compile_relative_criterion(string $relation, string $storedvalue, array $options = []): ?array {
+        if (!in_array($relation, $this->supported_relative_criteria(), true)) {
+            return null;
+        }
+        $position = trim($storedvalue);
+        if ($position === '' || !ctype_digit($position) || (int) $position < 1) {
+            return null;
+        }
+
+        return [$relation === match_compiler::OP_DIFFERENT ? 'NOT' : '', 'ANY_OF', [(int) $position]];
+    }
+
     /**
      *
      * {@inheritDoc}
@@ -202,7 +239,7 @@ class datalynxfield_option_single extends datalynxfield_option {
             }
             // No entry holds the excluded value, so the NOT criterion matches every entry:
             // contribute no condition and let all entries through.
-            return ['', '', ''];
+            return ['', [], false];
         }
 
         return [$sql, $params, $usecontent];

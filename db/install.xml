@@ -265,5 +265,24 @@
         <KEY NAME="dataid" TYPE="foreign" FIELDS="dataid" REFTABLE="datalynx" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
+    <TABLE NAME="datalynx_rule_matches" COMMENT="Entry pairs whose authors a rule has already told about each other, so that saving an entry again does not notify everyone a second time.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="dataid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="scope" TYPE="char" LENGTH="64" NOTNULL="true" SEQUENCE="false" COMMENT="Free token naming the announcement scope, so that several rules can share one ledger"/>
+        <FIELD NAME="entrylow" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Lower of the two entry ids, so a pair has one representation"/>
+        <FIELD NAME="entryhigh" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Higher of the two entry ids"/>
+        <FIELD NAME="timenotified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="dataid" TYPE="foreign" FIELDS="dataid" REFTABLE="datalynx" REFFIELDS="id"/>
+        <KEY NAME="entrylow" TYPE="foreign" FIELDS="entrylow" REFTABLE="datalynx_entries" REFFIELDS="id"/>
+        <KEY NAME="entryhigh" TYPE="foreign" FIELDS="entryhigh" REFTABLE="datalynx_entries" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="dataid-scope-entrylow-entryhigh" UNIQUE="true" FIELDS="dataid, scope, entrylow, entryhigh" COMMENT="One announcement per pair per scope"/>
+      </INDEXES>
+    </TABLE>
   </TABLES>
 </XMLDB>

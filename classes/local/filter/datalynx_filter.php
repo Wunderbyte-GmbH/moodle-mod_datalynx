@@ -270,22 +270,28 @@ class datalynx_filter {
                     foreach ($searchfield['OR'] as $option) {
                         if ($fieldsqloptions = $field->get_search_sql($option)) {
                             [$fieldsql, $fieldparams, $fromcontent] = $fieldsqloptions;
-                            // See the AND branch above: only qualify with c$fieldid.fieldid when the
-                            // field's SQL references the joined content table ($fromcontent).
-                            if (is_numeric($fieldid) && $fromcontent && $this->add_fieldid($option, $field)) {
-                                $whereor[] = " ( " . $fieldsql . " AND c$fieldid.fieldid = $fieldid )";
-                            } else {
-                                $whereor[] = $fieldsql;
-                            }
-                            $searchparams = array_merge($searchparams, $fieldparams);
+                            // A criterion that resolves to nothing yields an empty fragment (a NOT
+                            // criterion no entry meets, for instance). Adding it would produce
+                            // "( OR ... )" and merge a non-array parameter set, so it is skipped
+                            // here exactly as in the AND branch above.
+                            if ($fieldsql) {
+                                // See the AND branch above: only qualify with c$fieldid.fieldid when the
+                                // field's SQL references the joined content table ($fromcontent).
+                                if (is_numeric($fieldid) && $fromcontent && $this->add_fieldid($option, $field)) {
+                                    $whereor[] = " ( " . $fieldsql . " AND c$fieldid.fieldid = $fieldid )";
+                                } else {
+                                    $whereor[] = $fieldsql;
+                                }
+                                $searchparams = array_merge($searchparams, $fieldparams);
 
-                            // Add searchfrom (JOIN) only for search in datalynx content or external.
-                            // tables or fields inherited from datalynxfield_no_content_can_join.
+                                // Add searchfrom (JOIN) only for search in datalynx content or external.
+                                // tables or fields inherited from datalynxfield_no_content_can_join.
 
-                            $fieldshouldaddjoin = !$internalfield || $field instanceof datalynxfield_no_content_can_join;
+                                $fieldshouldaddjoin = !$internalfield || $field instanceof datalynxfield_no_content_can_join;
 
-                            if ($fieldshouldaddjoin && $fromcontent) {
-                                $searchfrom[$fieldid] = $fieldid;
+                                if ($fieldshouldaddjoin && $fromcontent) {
+                                    $searchfrom[$fieldid] = $fieldid;
+                                }
                             }
                         }
                     }

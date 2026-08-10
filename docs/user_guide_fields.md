@@ -49,6 +49,7 @@ For most first deployments, begin with:
 | **Text area with editor** | Rich formatted content | Detailed report with formatting |
 | **Number** | Numeric input | Budget, score, quantity |
 | **Time** | Date/time values | Event start time |
+| **Schedule** | One date, or a weekday pattern with a time and a period | "Every Monday 18:00, until January" |
 | **Duration** | Length values | Session duration |
 | **File** | File uploads | Attachments or documents |
 | **Media files** | Image/media-based evidence | Portfolio screenshots |

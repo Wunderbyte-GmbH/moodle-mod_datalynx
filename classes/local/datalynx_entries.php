@@ -1143,11 +1143,16 @@ class datalynx_entries {
                     case 'delete':
                         $completiontype = COMPLETION_INCOMPLETE;
                         // Deletable entries should be filtered above.
+                        $ledger = new \mod_datalynx\local\rule\match_ledger($dlx->id(), '');
                         foreach ($entries as $entry) {
                             $fields = $dlx->get_fields();
                             foreach ($fields as $field) {
                                 $field->delete_content($entry->id);
                             }
+
+                            // Entry ids are reused, so a pair naming a deleted entry has to go
+                            // here rather than only when a rule happens to listen for deletions.
+                            $ledger->forget_entry((int) $entry->id);
 
                             $DB->delete_records('datalynx_entries', ['id' => $entry->id]);
                             $processed[$entry->id] = $entry;

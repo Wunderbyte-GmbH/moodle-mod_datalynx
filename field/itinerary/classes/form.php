@@ -97,12 +97,6 @@ class form extends datalynxfield_form {
         $mform->addElement('text', 'param7', get_string('country_restriction', 'datalynxfield_location'), ['size' => 30]);
         $mform->setType('param7', PARAM_TEXT);
         $mform->addHelpButton('param7', 'country_restriction', 'datalynxfield_location');
-
-        // Param8: require a time on every stop.
-        $mform->addElement('selectyesno', 'param8', get_string('requiretimes', 'datalynxfield_itinerary'));
-        $mform->setType('param8', PARAM_INT);
-        $mform->setDefault('param8', 0);
-        $mform->addHelpButton('param8', 'requiretimes', 'datalynxfield_itinerary');
     }
 
     /**

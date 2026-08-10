@@ -1509,3 +1509,26 @@ span.datalynx-location-autocomplete {
 .datalynx-itinerary__approx {
     margin-left: 0.5rem;
 }
+
+/* --- Number field slider (datalynxfield_number slider format) --- */
+
+/*
+ * The two tick cells take an equal share of the width the readout leaves over, which keeps the
+ * readout centred on the track however long the start and end labels are. The flex basis has to be
+ * 0 for that: Bootstrap's .flex-fill keeps each label's own width in the calculation and would push
+ * the readout off centre whenever the two labels differ in length.
+ */
+.datalynx-number-slider__tick {
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+/*
+ * The readout sits in the same muted row as the tick labels, but at the page's normal font size
+ * rather than the row's .small, so that the value the user is picking stays the most readable of
+ * the three labels. Padding keeps it clear of the ticks when the scale is wide.
+ */
+.datalynx-number-slider__readout {
+    font-size: 1rem;
+    padding: 0 0.5rem;
+}

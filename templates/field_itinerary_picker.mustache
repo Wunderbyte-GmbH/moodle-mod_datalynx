@@ -32,7 +32,6 @@
     * routeinputid - Element id of the hidden input holding the routed summary, empty when routing is off.
     * maxwaypoints - Upper limit on stops.
     * initialwaypoints - Empty rows to offer when the itinerary is new.
-    * requiretimes - Whether every stop needs a time.
     * tileurl, attribution, maxzoom - Basemap settings.
     * defaultlat, defaultlng, defaultzoom - Site default map view.
     * zoom - Zoom to use once stops are known.
@@ -45,7 +44,6 @@
         "routeinputid": "id_field_1700_5_route",
         "maxwaypoints": 10,
         "initialwaypoints": 2,
-        "requiretimes": false,
         "tileurl": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
         "attribution": "OpenStreetMap contributors",
         "maxzoom": 19,
@@ -65,7 +63,6 @@
      data-routeinputid="{{routeinputid}}"
      data-maxwaypoints="{{maxwaypoints}}"
      data-initialwaypoints="{{initialwaypoints}}"
-     data-requiretimes="{{#requiretimes}}1{{/requiretimes}}{{^requiretimes}}0{{/requiretimes}}"
      data-tileurl="{{tileurl}}"
      data-attribution="{{attribution}}"
      data-maxzoom="{{maxzoom}}"
@@ -112,13 +109,6 @@
                        autocomplete="off"
                        aria-label="{{#str}}waypointaddress, datalynxfield_itinerary{{/str}}"
                        placeholder="{{#str}}waypointaddress, datalynxfield_itinerary{{/str}}">
-            </span>
-            <span class="datalynx-itinerary-stop__time">
-                <input type="datetime-local"
-                       class="form-control form-control-sm"
-                       data-region="time"
-                       aria-label="{{#str}}timeatstop, datalynxfield_itinerary{{/str}}"
-                       {{#requiretimes}}required{{/requiretimes}}>
             </span>
             <span class="datalynx-itinerary-stop__actions">
                 <button type="button" class="btn btn-link btn-sm" data-action="up"

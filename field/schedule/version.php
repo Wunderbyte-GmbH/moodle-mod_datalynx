@@ -15,16 +15,14 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version details for datalynxrule_ridematch.
+ * Version details for the schedule field type.
  *
- * @package    datalynxrule_ridematch
- * @copyright  2026 Wunderbyte GmbH
+ * @package    datalynxfield_schedule
+ * @copyright  2026 David Bogner
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'datalynxrule_ridematch';
-$plugin->version   = 2026080700;
-$plugin->requires  = 2024100400;
-$plugin->maturity  = MATURITY_ALPHA;
+$plugin->component = 'datalynxfield_schedule';
+$plugin->version = 2026081000;
+$plugin->requires = 2024100400;

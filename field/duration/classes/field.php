@@ -26,6 +26,7 @@
 namespace datalynxfield_duration;
 
 use mod_datalynx\local\field\datalynxfield_base;
+use mod_datalynx\local\rule\match_compiler;
 
 /**
  * Duration field class for datalynx.
@@ -177,6 +178,44 @@ class field extends datalynxfield_base {
     }
 
     /**
+     * A duration can also be matched within a tolerance of another entry's duration.
+     *
+     * @return string[]
+     */
+    public function supported_relative_criteria(): array {
+        return [match_compiler::OP_SAME, match_compiler::OP_DIFFERENT, match_compiler::OP_WITHIN];
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * Durations are stored and searched in seconds, and the search values of this field type are
+     * arrays - get_search_sql() reads $value[0].
+     *
+     * @param string $relation
+     * @param string $storedvalue
+     * @param array $options
+     * @return array|null
+     * @see datalynxfield_base::compile_relative_criterion()
+     */
+    public function compile_relative_criterion(string $relation, string $storedvalue, array $options = []): ?array {
+        if (!in_array($relation, $this->supported_relative_criteria(), true) || !is_numeric(trim($storedvalue))) {
+            return null;
+        }
+        $value = (float) trim($storedvalue);
+
+        if ($relation === match_compiler::OP_WITHIN) {
+            $tolerance = (float) ($options['tolerance'] ?? 0);
+            if ($tolerance <= 0) {
+                return null;
+            }
+            return ['', 'BETWEEN', $this->tolerance_bounds($value, $tolerance)];
+        }
+
+        return [$relation === match_compiler::OP_DIFFERENT ? 'NOT' : '', '=', [$value]];
+    }
+
+    /**
      * {@inheritDoc}
      * @param array $search Search parameters array [not, operator, value].
      * @return array SQL fragment, params, and join flag.
@@ -202,6 +241,10 @@ class field extends datalynxfield_base {
             $varcharcontent = $this->get_sql_compare_text();
         }
 
+        // The fragment below always states the criterion positively. A NOT criterion is realised
+        // by the $excludeentries branch further down, which looks up the entries meeting the
+        // positive criterion and excludes them - negating here as well would cancel that out and
+        // return exactly the entries the criterion was meant to exclude.
         $params = [];
         switch ($operator) {
             case '=':
@@ -211,13 +254,13 @@ class field extends datalynxfield_base {
             case '<=':
                 $paramname = "{$name}_$i";
                 $params[$paramname] = trim($value[0]);
-                $sql = "$not $varcharcontent $operator :$paramname ";
+                $sql = " $varcharcontent $operator :$paramname ";
                 break;
             case 'BETWEEN':
                 $paramname = "{$name}_$i";
                 $params["{$paramname}_l"] = floatval(trim($value[0]));
                 $params["{$paramname}_u"] = floatval(trim($value[1]));
-                $sql = "$not ($varcharcontent > :{$paramname}_l AND $varcharcontent < :{$paramname}_u) ";
+                $sql = " ($varcharcontent > :{$paramname}_l AND $varcharcontent < :{$paramname}_u) ";
                 break;
             default:
                 $sql = " 1 = 1 ";
@@ -237,7 +280,7 @@ class field extends datalynxfield_base {
                 $sql = " e.id $notinids ";
                 return [$sql, $params, false];
             } else {
-                return ['', '', ''];
+                return ['', [], false];
             }
         } else {
             return [$sql, $params, true];

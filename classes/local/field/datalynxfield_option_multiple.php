@@ -15,6 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace mod_datalynx\local\field;
+
+use mod_datalynx\local\rule\match_compiler;
 use stdClass;
 
 /**
@@ -25,6 +27,43 @@ use stdClass;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class datalynxfield_option_multiple extends datalynxfield_option {
+    /**
+     * A multiple-choice option set can be the same as, or different from, another entry's set.
+     *
+     * "Same" means the identical set of options, which is what the EXACTLY operator expresses.
+     *
+     * @return string[]
+     */
+    public function supported_relative_criteria(): array {
+        return [match_compiler::OP_SAME, match_compiler::OP_DIFFERENT];
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * An entry stores its selection as "#1#,#3#", while EXACTLY expects the bare option positions
+     * [1, 3]. Handing the stored string over unchanged would search for the literal "##1#,#3##"
+     * and never match anything.
+     *
+     * @param string $relation
+     * @param string $storedvalue
+     * @param array $options
+     * @return array|null
+     * @see datalynxfield_base::compile_relative_criterion()
+     */
+    public function compile_relative_criterion(string $relation, string $storedvalue, array $options = []): ?array {
+        if (!in_array($relation, $this->supported_relative_criteria(), true)) {
+            return null;
+        }
+        if (!preg_match_all('/#(\d+)#/', $storedvalue, $matches)) {
+            return null;
+        }
+        $selected = array_values(array_unique(array_map('intval', $matches[1])));
+        sort($selected);
+
+        return [$relation === match_compiler::OP_DIFFERENT ? 'NOT' : '', 'EXACTLY', $selected];
+    }
+
     /**
      * Update the selected options in the entries. The field value of an entry saves the selected
      * line numbers in a multiselect field. When an option is deleted, a line is deleted. Example:
@@ -136,7 +175,6 @@ class datalynxfield_option_multiple extends datalynxfield_option {
         $sql = '';
         $params = [];
         $conditions = [];
-        $notinidsequal = false;
 
         // For all NOT criteria except NOT Empty, exclude entries.
         // Which don't meet the positive criterion.
@@ -248,6 +286,12 @@ class datalynxfield_option_multiple extends datalynxfield_option {
         }
 
         if ($excludeentries && $operator !== '' && $operator !== 'EXACTLY') {
+            // Realise the NOT purely as an entry-id exclusion instead of negating the condition on
+            // the joined content table. The join is a LEFT JOIN that the filter qualifies with
+            // "c<fieldid>.fieldid = <fieldid>", so an entry with no content record for this field
+            // fails that qualifier and would be dropped - although a NOT criterion should return
+            // exactly such an entry. Reporting no content join ($usecontent = false) is what keeps
+            // the qualifier off the fragment.
             $sqlnot = str_replace($content, 'content', $sql);
             $sqlnot = str_replace('NOT (', '(', $sqlnot);
             if ($eids = $this->get_entry_ids_for_content($sqlnot, $params)) {
@@ -256,11 +300,13 @@ class datalynxfield_option_multiple extends datalynxfield_option {
                     $eids,
                     SQL_PARAMS_NAMED,
                     "df_{$fieldid}_x_",
-                    $notinidsequal
+                    false
                 );
-                $params = array_merge($params, $paramsnot);
-                $sql = " ($sql OR e.id $notinids) ";
+                return [" e.id $notinids ", $paramsnot, false];
             }
+            // No entry meets the positive criterion, so the NOT criterion matches every entry:
+            // contribute no condition and let all entries through.
+            return ['', [], false];
         }
 
         return [$sql, $params, $usecontent];

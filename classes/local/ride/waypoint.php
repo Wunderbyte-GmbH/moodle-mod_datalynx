@@ -47,7 +47,6 @@ class waypoint {
      * @param string $address Human readable label for the stop.
      * @param float $lat Latitude in degrees.
      * @param float $lng Longitude in degrees.
-     * @param int|null $time Planned time at this stop, null when not given.
      */
     public function __construct(
         /** @var string Human readable label for the stop. */
@@ -55,9 +54,7 @@ class waypoint {
         /** @var float Latitude in degrees. */
         public readonly float $lat,
         /** @var float Longitude in degrees. */
-        public readonly float $lng,
-        /** @var int|null Planned time at this stop, null when not given. */
-        public readonly ?int $time = null
+        public readonly float $lng
     ) {
     }
 
@@ -87,14 +84,12 @@ class waypoint {
             return null;
         }
 
-        $time = $data['time'] ?? null;
-        $time = ($time === null || $time === '') ? null : (int) $time;
-
+        // Stops used to carry a planned time. When a journey happens is a schedule field's
+        // business now, so a "time" key in older stored JSON is simply ignored.
         return new self(
             clean_param((string) ($data['address'] ?? ''), PARAM_TEXT),
             $lat,
-            $lng,
-            ($time !== null && $time > 0) ? $time : null
+            $lng
         );
     }
 
@@ -111,7 +106,6 @@ class waypoint {
             'address' => $this->address,
             'lat' => round($this->lat, $places),
             'lng' => round($this->lng, $places),
-            'time' => $this->time,
         ];
     }
 

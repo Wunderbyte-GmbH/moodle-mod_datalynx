@@ -180,6 +180,11 @@ function datalynx_delete_instance($id) {
     $sql = "SELECT e.id FROM {datalynx_entries} e WHERE e.dataid = ?";
     $DB->delete_records_select('datalynx_contents', "entryid IN ($sql)", [$id]);
 
+    // The derived waypoint index and the ledger of announced entry pairs are keyed by entry, so
+    // they have to go before the entries themselves do.
+    $DB->delete_records_select('datalynx_waypoints', "entryid IN ($sql)", [$id]);
+    $DB->delete_records('datalynx_rule_matches', ['dataid' => $id]);
+
     // Delete fields views filters entries.
     $DB->delete_records('datalynx_fields', ['dataid' => $id]);
     $DB->delete_records('datalynx_views', ['dataid' => $id]);

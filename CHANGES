@@ -1,6 +1,59 @@
 mod_datalynx changes
 ====================
 
+2026-08-11
+----------
+
+- Fields: added the **Schedule** field type. One field holds either a single date
+  and time or a weekly pattern - weekdays, a time of day and the period it runs -
+  and knows which of the two it is. Because a one-off carries the weekday of its
+  own date, one query serves both: searching for a date finds the ride booked that
+  day *and* every commute that runs on that weekday, and a rule can match a one-off
+  request against a recurring offer. Searching and matching are day-granular by
+  default; a narrower tolerance is a per-field setting.
+- Itinerary: stops no longer carry a planned time, and the field no longer offers
+  "require a time for every stop". A route says where a journey goes, not when: a
+  date on a stop could not describe a ride that runs every Monday, and a ride
+  entered without one was invisible to the time check and so matched every route it
+  overlapped. Use a Schedule field beside the route instead. The unread
+  `timeplanned` column is dropped from the derived waypoint index.
+- Rules: the itinerary "within tolerance" relation is gone with it; the same
+  relation on a Schedule field replaces it, and as an ordinary search criterion
+  rather than a post-filter, so it narrows before the match limit applies.
+- Ridesharing: `cli/migrate_ridesharing_schedule.php` converts an existing board -
+  its pattern radio button, weekday multi-select, time select and the dates on its
+  routes - onto one Schedule field, and rewires the views, the matching rules and
+  the search form. It reports every entry whose old fields contradicted each other
+  rather than guessing silently.
+
+2026-08-10
+----------
+
+- Rules: the **Event notification** rule can now look for other entries that match
+  the one an event touched, and notify the people behind both. Each row of the new
+  **Matching entries** block compares one field against the value the triggering
+  entry holds for it: the same value, a different value, within a tolerance of it
+  (time, number and duration fields, and an itinerary's departure), or a route that
+  can carry it. New recipients "authors of matching entries" and "this entry's
+  author, once per matching entry" go with it, along with an optional record of
+  announced pairs so nobody is introduced twice, shareable between rules.
+- Rules: the **Notify matching ride offers and requests** rule type is gone; it is
+  an ordinary event notification now. Existing rules are migrated automatically
+  into a pair of event-notification rules that share one record of announced pairs
+  (one per side of the ride-type field), and the pairs already announced are carried
+  over. The upgrade also finishes the removal - its table, message provider, version
+  record and queued ad-hoc tasks - so no manual uninstall is needed and cron is not
+  left suspended on a missing plugin.
+- Email views: added the `##notificationotherentryurl##` and
+  `##notificationotherentrylink##` patterns. When a notification is about a pair of
+  entries they point at the counterpart of the one being rendered, so a message can
+  show the ride that was found and still link back to the reader's own entry.
+- Filters: fixed four defects in the "NOT" search path that also affected ordinary
+  filters — an OR criterion matching nothing broke the query, a negated duration
+  returned exactly the entries it was meant to exclude, a negated time excluded the
+  entries that hold no time at all and negated a range only in part, and a negated
+  multi-select dropped the entries with no value for the field.
+
 2026-06-29
 ----------
 

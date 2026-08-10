@@ -180,10 +180,10 @@ class field extends datalynxfield_option_multiple {
 
         // If we only see the andor and no value just skip.
         if (is_array($search[2]) && count($search[2]) == 0) {
-            return ['', '', ''];
+            return ['', [], false];
         }
         if (is_array($search[2]) && count($search[2]) == 1 && isset($search[2]['andor'])) {
-            return ['', '', ''];
+            return ['', [], false];
         }
 
         return parent::get_search_sql($search);

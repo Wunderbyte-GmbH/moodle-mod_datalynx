@@ -40,6 +40,10 @@ class view_patterns extends base_patterns {
         $patterns['##notificationentrylink##'] = [true, $cat];
         $patterns['##notificationdatalynxurl##'] = [true, $cat];
         $patterns['##notificationdatalynxlink##'] = [true, $cat];
+        // Set when the notification is about a pair of entries: the counterpart of the one being
+        // rendered, so the message can name both sides.
+        $patterns['##notificationotherentryurl##'] = [true, $cat];
+        $patterns['##notificationotherentrylink##'] = [true, $cat];
 
         return $patterns;
     }
@@ -62,6 +66,10 @@ class view_patterns extends base_patterns {
                 return $options['notificationdatalynxurl'] ?? '';
             case '##notificationdatalynxlink##':
                 return $options['notificationdatalynxlink'] ?? '';
+            case '##notificationotherentryurl##':
+                return $options['notificationotherentryurl'] ?? '';
+            case '##notificationotherentrylink##':
+                return $options['notificationotherentrylink'] ?? '';
             default:
                 return parent::get_ref_replacements($tag, $entry, $options);
         }

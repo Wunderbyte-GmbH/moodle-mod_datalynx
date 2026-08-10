@@ -17,6 +17,7 @@
 namespace mod_datalynx\form;
 
 use coding_exception;
+use mod_datalynx\local\rule\base as rule_base;
 use mod_datalynx\local\rule\manager;
 use core_form\dynamic_form;
 use stdClass;
@@ -280,8 +281,9 @@ class rule_form extends dynamic_form {
         if (!is_array($decoded)) {
             return [];
         }
-        // The on-change field list is stored under a reserved key, not as a condition row.
-        unset($decoded['_onlyonchangefields']);
+        // The on-change field list and the matching configuration are stored under reserved keys,
+        // not as condition rows.
+        unset($decoded[rule_base::ONCHANGE_KEY], $decoded[rule_base::MATCH_KEY]);
         return $decoded;
     }
 

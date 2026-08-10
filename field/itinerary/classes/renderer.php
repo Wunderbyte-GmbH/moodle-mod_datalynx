@@ -160,7 +160,6 @@ class renderer extends datalynxfield_renderer {
             'routeinputid' => $routeinputid,
             'maxwaypoints' => $this->field->get_max_waypoints(),
             'initialwaypoints' => max(2, (int) ($this->field->get('param2') ?: 2)),
-            'requiretimes' => !empty($this->field->get('param8')),
             'required' => !empty($options['required']),
         ]);
 
@@ -381,8 +380,6 @@ class renderer extends datalynxfield_renderer {
         // because it cannot describe a journey.
         if ($journey->count() === 1) {
             $errors[$elementname] = get_string('needtworoutepoints', 'datalynxfield_itinerary');
-        } else if ($journey->is_route() && !empty($this->field->get('param8')) && !$journey->has_all_times()) {
-            $errors[$elementname] = get_string('requiretimes', 'datalynxfield_itinerary');
         }
 
         return $errors;

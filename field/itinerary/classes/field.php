@@ -21,6 +21,7 @@ use mod_datalynx\local\map\route_result;
 use mod_datalynx\local\ride\itinerary;
 use mod_datalynx\local\ride\matcher;
 use mod_datalynx\local\ride\waypoint;
+use mod_datalynx\local\rule\match_compiler;
 use stdClass;
 
 /**
@@ -34,7 +35,7 @@ use stdClass;
  * | content  | ordered waypoints as JSON                         |
  * | content1 | bounding box `minlat,minlng,maxlat,maxlng`         |
  * | content2 | straight-line length in km                         |
- * | content3 | earliest planned departure, or empty               |
+ * | content3 | unused; a schedule field says when a ride happens   |
  * | content4 | routed distance, duration and polyline as JSON     |
  *
  * A second, derived copy of the coordinates is kept in `datalynx_waypoints`.
@@ -181,12 +182,13 @@ class field extends datalynxfield_base {
             return [$contents, $oldcontents];
         }
 
-        $departure = $journey->earliest_departure();
-
         $contents[] = $journey->to_json();
         $contents[] = $journey->bbox_string();
         $contents[] = (string) $journey->length_km();
-        $contents[] = $departure === null ? '' : (string) $departure;
+        // This column held the earliest stop time back when a journey carried its own dates.
+        // When a ride happens is a schedule field's business now - a date on a stop could not
+        // describe a commute that runs every Monday, and left one that did unconstrained in time.
+        $contents[] = '';
         $contents[] = $this->resolve_route($journey, $values, $oldcontents);
 
         return [$contents, $oldcontents];
@@ -305,7 +307,6 @@ class field extends datalynxfield_base {
                 'seq' => $seq,
                 'lat' => $waypoint->lat,
                 'lng' => $waypoint->lng,
-                'timeplanned' => $waypoint->time,
             ];
         }
 
@@ -349,6 +350,34 @@ class field extends datalynxfield_base {
         $radius = (float) ($this->field->param5 ?? 0);
 
         return $radius > 0 ? $radius : 5.0;
+    }
+
+    /**
+     * An itinerary can be matched against another entry's route.
+     *
+     * @return string[]
+     */
+    public function supported_relative_criteria(): array {
+        return [match_compiler::OP_ROUTE];
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * A corridor match does not become a search criterion. It has to be able to run in both
+     * directions - does their route carry me, or does mine carry them - and the filter engine
+     * combines criteria as one flat AND group with one flat OR group, so it cannot hold that
+     * alternative. It is applied by {@see \mod_datalynx\local\rule\match_compiler} as a
+     * post-filter over the candidates the searchable criteria produced.
+     *
+     * @param string $relation
+     * @param string $storedvalue
+     * @param array $options
+     * @return array|null always null
+     * @see datalynxfield_base::compile_relative_criterion()
+     */
+    public function compile_relative_criterion(string $relation, string $storedvalue, array $options = []): ?array {
+        return null;
     }
 
     /**

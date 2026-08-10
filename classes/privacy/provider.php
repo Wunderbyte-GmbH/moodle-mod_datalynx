@@ -81,6 +81,16 @@ class provider implements
             ],
             'privacy:metadata:datalynx_contents'
         );
+        // Table datalynx_rule_matches.
+        $collection->add_database_table(
+            'datalynx_rule_matches',
+            [
+                'entrylow' => 'privacy:metadata:datalynx_rule_matches:entrylow',
+                'entryhigh' => 'privacy:metadata:datalynx_rule_matches:entryhigh',
+                'timenotified' => 'privacy:metadata:datalynx_rule_matches:timenotified',
+            ],
+            'privacy:metadata:datalynx_rule_matches'
+        );
 
         // Subsystems used.
         $collection->link_subsystem('core_files', 'privacy:metadata:filepurpose');
@@ -366,6 +376,17 @@ class provider implements
 
         // Delete from datalynx_contents.
         $DB->delete_records_select('datalynx_contents', 'entryid ' . $sql, $params);
+        // Delete the derived waypoint index and the record of which entry pairs were announced,
+        // both of which name entries that are about to disappear. The ledger names an entry in
+        // either of two columns, and a named placeholder may occur only once per statement, so
+        // the id list is bound a second time under its own prefix.
+        $DB->delete_records_select('datalynx_waypoints', 'entryid ' . $sql, $params);
+        [$highsql, $highparams] = $DB->get_in_or_equal($recordstobedeleted, SQL_PARAMS_NAMED, 'dlxhigh');
+        $DB->delete_records_select(
+            'datalynx_rule_matches',
+            "entrylow $sql OR entryhigh $highsql",
+            $params + $highparams
+        );
         // Delete from datalynx_entries.
         $DB->delete_records_select('datalynx_entries', 'id ' . $sql, $params);
         // Note: Keep the space after entryid and id.

@@ -3,7 +3,7 @@
 ## What it is
 
 The **Itinerary** field stores a *journey*: an ordered list of two or more stops, each with a
-place name, coordinates and an optional time. Where the [Location field](user_guide_location_field.md)
+place name and coordinates. Where the [Location field](user_guide_location_field.md)
 answers "where is this?", the Itinerary field answers "where does this go, via where, and when?"
 
 Use it for carpooling and ridesharing, excursion and field-trip planning, delivery or
@@ -44,7 +44,6 @@ administration page if you have the rights to change them.
 | **Default match radius (km)** | Pre-filled radius in the search form; searchers can change it | `5` |
 | **Location precision for others** | Exact, or approximate until matched | Approximate |
 | **Country restrictions** | Overrides the site-wide country restriction for this field's address lookup | empty |
-| **Require a time for every stop** | Forces a time on each stop | No, unless you match on time |
 
 ### Location precision — read this one before going live
 
@@ -64,17 +63,20 @@ Two points worth understanding:
 
 ### Times
 
-Times are optional by default. Turn on **Require a time for every stop** when you intend to
-match journeys against each other: without times, two routes that overlap geographically but
-happen a week apart look like a match. See the
-[ridesharing example](user_guide_ridesharing.md) for how the tolerance works.
+**A route says where, not when.** A stop carries a place, not a date: a journey that runs every
+Monday has no single date to put on one, and one entered with a date was invisible to the time
+check, so it matched every route it overlapped.
+
+When something happens belongs to a **Schedule** field beside the route, which holds either a date
+or a weekday pattern and can compare the two. See the
+[ridesharing example](user_guide_ridesharing.md) for how it is set up.
 
 ---
 
 ## What users see
 
-**Filling in the form.** A numbered list of stops, each with a place box and an optional time,
-plus one shared map. Users can:
+**Filling in the form.** A numbered list of stops, each with a place box, plus one shared map.
+Users can:
 
 - type a place and pick a suggestion (or press Enter / use **Search address**, depending on the
   configured geocoding service);
@@ -174,7 +176,7 @@ stops you are genuinely willing to serve.
 ## Notes for administrators
 
 The field stores the journey as one row in `datalynx_contents` (the stops as JSON, plus a
-cached bounding box, straight-line length, earliest departure and — when a routing service is
+cached bounding box, straight-line length and — when a routing service is
 configured — the road distance, travel time and route geometry). Alongside it, a derived table
 `datalynx_waypoints` holds one indexed numeric row per stop, used purely to make matching fast.
 

@@ -12,7 +12,6 @@
         <FIELD NAME="seq" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Zero based position of this stop in travel order"/>
         <FIELD NAME="lat" TYPE="number" LENGTH="10" NOTNULL="true" SEQUENCE="false" DECIMALS="6"/>
         <FIELD NAME="lng" TYPE="number" LENGTH="10" NOTNULL="true" SEQUENCE="false" DECIMALS="6"/>
-        <FIELD NAME="timeplanned" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Planned time at this stop, null when not given"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

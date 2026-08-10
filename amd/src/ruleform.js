@@ -110,15 +110,22 @@ const openRuleModal = async(params) => {
         window.location.assign(window.location.pathname + '?d=' + params.d);
     });
 
-    // When a trigger-condition field or AND/OR selector changes, reload the rows via AJAX
-    // so the right operator and value inputs are rendered for the chosen field.
+    // Which controls a row needs depends on what has been chosen in it, so changing the field or
+    // the relation reloads the rows via AJAX. The trigger conditions and the matching criteria are
+    // two independent blocks with a reload button each; the changed element decides which one runs.
+    const reloadButtons = [
+        {pattern: /^(searchfield|searchandor)\d+$/, button: 'addsearchsettings'},
+        {pattern: /^(matchfield|matchrel)\d+$/, button: 'addmatchsettings'},
+    ];
+
     modal.addEventListener('change', (e) => {
         const name = e.target.name || '';
-        if (!/^(searchfield|searchandor)\d+$/.test(name)) {
+        const match = reloadButtons.find((candidate) => candidate.pattern.test(name));
+        if (!match) {
             return;
         }
         const form = e.target.closest('form');
-        const button = form && form.querySelector('[name="addsearchsettings"]');
+        const button = form && form.querySelector('[name="' + match.button + '"]');
         if (button) {
             window.skipClientValidation = true;
             modal.processNoSubmitButton(button);

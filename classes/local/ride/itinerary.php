@@ -20,9 +20,9 @@ namespace mod_datalynx\local\ride;
  * An ordered journey: the value of one itinerary field.
  *
  * Owns the JSON representation stored in `datalynx_contents.content` and the
- * derived values cached beside it — the bounding box, the straight-line length
- * and the earliest departure — which is what lets matching pre-filter cheaply
- * before doing any distance maths.
+ * derived values cached beside it — the bounding box and the straight-line
+ * length — which is what lets matching pre-filter cheaply before doing any
+ * distance maths.
  *
  * @package    mod_datalynx
  * @copyright  2026 Wunderbyte GmbH
@@ -214,37 +214,6 @@ class itinerary {
         }
 
         return round($total, 3);
-    }
-
-    /**
-     * Earliest planned time across the stops, or null when none carry a time.
-     *
-     * @return int|null
-     */
-    public function earliest_departure(): ?int {
-        $times = [];
-        foreach ($this->waypoints as $waypoint) {
-            if ($waypoint->time !== null) {
-                $times[] = $waypoint->time;
-            }
-        }
-
-        return $times ? min($times) : null;
-    }
-
-    /**
-     * Whether every stop carries a planned time.
-     *
-     * @return bool
-     */
-    public function has_all_times(): bool {
-        foreach ($this->waypoints as $waypoint) {
-            if ($waypoint->time === null) {
-                return false;
-            }
-        }
-
-        return (bool) $this->waypoints;
     }
 
     /**

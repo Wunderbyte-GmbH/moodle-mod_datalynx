@@ -1517,7 +1517,182 @@ function xmldb_datalynx_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2026063000, 'datalynx');
     }
 
+    if ($oldversion < 2026081000) {
+        // Ledger of the entry pairs a rule has already announced, so that saving an entry again
+        // does not notify both authors a second time.
+        $table = new xmldb_table('datalynx_rule_matches');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('dataid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('scope', XMLDB_TYPE_CHAR, '64', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('entrylow', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('entryhigh', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('timenotified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('dataid', XMLDB_KEY_FOREIGN, ['dataid'], 'datalynx', ['id']);
+        $table->add_key('entrylow', XMLDB_KEY_FOREIGN, ['entrylow'], 'datalynx_entries', ['id']);
+        $table->add_key('entryhigh', XMLDB_KEY_FOREIGN, ['entryhigh'], 'datalynx_entries', ['id']);
+        $table->add_index(
+            'dataid-scope-entrylow-entryhigh',
+            XMLDB_INDEX_UNIQUE,
+            ['dataid', 'scope', 'entrylow', 'entryhigh']
+        );
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        upgrade_mod_savepoint(true, 2026081000, 'datalynx');
+    }
+
+    if ($oldversion < 2026081001) {
+        // The ride matching rule is gone; the event notification rule can now look for the
+        // entries matching the one an event touched, which is all that rule ever did on top.
+        mod_datalynx_migrate_ridematch_rules();
+
+        upgrade_mod_savepoint(true, 2026081001, 'datalynx');
+    }
+
+    if ($oldversion < 2026081002) {
+        // Finish removing the ride matching subplugin. Its directory is gone, so Moodle reports it
+        // as missing and suspends cron until somebody uninstalls it by hand - and its queued
+        // ad-hoc tasks name a class that no longer exists, which cron would fatal on. Since the
+        // directory is gone the standard uninstaller cannot drop its table either, so the whole
+        // clean-up happens here.
+        $DB->delete_records('task_adhoc', ['component' => 'datalynxrule_ridematch']);
+
+        $table = new xmldb_table('datalynx_ride_matches');
+        if ($dbman->table_exists($table)) {
+            // The pairs it recorded were carried into datalynx_rule_matches by the migration above.
+            $dbman->drop_table($table);
+        }
+
+        // The message provider and the version record that make Moodle believe it is still there.
+        $DB->delete_records('message_providers', ['component' => 'datalynxrule_ridematch']);
+        $DB->delete_records_select(
+            'user_preferences',
+            $DB->sql_like('name', ':name'),
+            ['name' => 'message_provider_datalynxrule_ridematch%']
+        );
+        $DB->delete_records('config_plugins', ['plugin' => 'datalynxrule_ridematch']);
+
+        upgrade_mod_savepoint(true, 2026081002, 'datalynx');
+    }
+
     return true;
+}
+
+/**
+ * Turn every ride matching rule into a pair of event notification rules.
+ *
+ * The old rule matched one journey against the journeys of the entries on the other side of a
+ * ride-type field, and told both authors. That is now an ordinary event notification: the ride
+ * type has to differ, the routes have to be able to carry one another, and the departures have to
+ * be close enough. Two rules are needed because the rule that fires from the offer side tests the
+ * corridor the other way round from the one that fires from the request side; they share one
+ * record of announced pairs so a pair is still announced once.
+ *
+ * @return void
+ */
+function mod_datalynx_migrate_ridematch_rules() {
+    global $DB;
+
+    $oldrules = $DB->get_records('datalynx_rules', ['type' => 'ridematch']);
+    foreach ($oldrules as $old) {
+        $itineraryfieldid = (int) $old->param2;
+        $typefieldid = (int) $old->param3;
+        $radius = (float) $old->param6;
+        $tolerance = (float) $old->param7;
+        $scope = 'ridematch' . $old->id;
+
+        if (!$itineraryfieldid || !$typefieldid) {
+            // Never fully configured, so there is nothing to carry over.
+            $DB->delete_records('datalynx_rules', ['id' => $old->id]);
+            continue;
+        }
+
+        // The old settings hold the labels an administrator typed; an entry stores the position
+        // of the chosen option. This is the last place that translation is needed - the matching
+        // criteria read the value the triggering entry actually stores.
+        $positions = [];
+        $field = $DB->get_record('datalynx_fields', ['id' => $typefieldid], 'id, param1', IGNORE_MISSING);
+        if ($field) {
+            foreach (explode("\n", (string) $field->param1) as $index => $label) {
+                $label = trim($label);
+                if ($label !== '') {
+                    $positions[core_text::strtolower($label)] = $index + 1;
+                }
+            }
+        }
+        $resolve = static function ($configured) use ($positions) {
+            $configured = trim((string) $configured);
+            return (string) ($positions[core_text::strtolower($configured)] ?? $configured);
+        };
+
+        $criteria = [
+            ['fieldid' => $typefieldid, 'op' => 'different'],
+            ['fieldid' => $itineraryfieldid, 'op' => 'route', 'radius' => $radius, 'direction' => ''],
+            ['fieldid' => $itineraryfieldid, 'op' => 'within',
+                'tolerance' => $tolerance > 0 ? $tolerance : 24.0, 'unit' => HOURSECS],
+        ];
+
+        // One rule per side. The offer side carries the requests it finds, so its corridor runs
+        // the other way round from the request side, which looks for a route that carries it.
+        $sides = [
+            ['value' => $resolve($old->param4), 'direction' => 'reverse', 'suffix' => ' (1)'],
+            ['value' => $resolve($old->param5), 'direction' => 'forward', 'suffix' => ' (2)'],
+        ];
+        foreach ($sides as $side) {
+            $sidecriteria = $criteria;
+            $sidecriteria[1]['direction'] = $side['direction'];
+
+            $param9 = [];
+            if ($side['value'] !== '') {
+                // Only fire for the entries on this side of the ride-type field.
+                $param9[$typefieldid] = ['AND' => [['', 'ANY_OF', [$side['value']]]]];
+            }
+            $param9[\mod_datalynx\local\rule\base::MATCH_KEY] = [
+                'criteria' => $sidecriteria,
+                'requireapproved' => 1,
+                'dedupe' => $scope,
+                'forgetstale' => 1,
+                'maxmatches' => \datalynxrule_eventnotification\rule::DEFAULT_MAX_MATCHES,
+            ];
+
+            $DB->insert_record('datalynx_rules', (object) [
+                'dataid' => $old->dataid,
+                'type' => 'eventnotification',
+                'name' => $old->name . $side['suffix'],
+                'description' => $old->description,
+                'enabled' => $old->enabled,
+                'param1' => $old->param1,
+                'param2' => \datalynxrule_eventnotification\rule::FROM_AUTHOR,
+                'param3' => json_encode(['matchauthors' => 1, 'subjectauthorpermatch' => 1]),
+                'param4' => json_encode([]),
+                'param7' => json_encode([]),
+                'param8' => (int) $old->param8,
+                'param9' => json_encode($param9),
+            ]);
+        }
+
+        // Carry the pairs already announced across, so nobody is told twice by the migration.
+        if ($DB->get_manager()->table_exists('datalynx_ride_matches')) {
+            $announced = $DB->get_records('datalynx_ride_matches', ['ruleid' => $old->id]);
+            foreach ($announced as $pair) {
+                $low = min((int) $pair->offerentryid, (int) $pair->requestentryid);
+                $high = max((int) $pair->offerentryid, (int) $pair->requestentryid);
+                $key = ['dataid' => $old->dataid, 'scope' => $scope, 'entrylow' => $low, 'entryhigh' => $high];
+                if (!$DB->record_exists('datalynx_rule_matches', $key)) {
+                    $DB->insert_record(
+                        'datalynx_rule_matches',
+                        (object) ($key + ['timenotified' => (int) $pair->timenotified])
+                    );
+                }
+            }
+        }
+
+        // The subplugin is gone, so a leftover row of this type would make the rule manager throw
+        // on the rule index page.
+        $DB->delete_records('datalynx_rules', ['id' => $old->id]);
+    }
 }
 
 /**

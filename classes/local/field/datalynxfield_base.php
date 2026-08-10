@@ -19,6 +19,7 @@ use coding_exception;
 use dml_exception;
 use mod_datalynx;
 use mod_datalynx\datalynx;
+use mod_datalynx\local\rule\match_compiler;
 use moodle_exception;
 use moodle_url;
 use stdClass;
@@ -833,7 +834,7 @@ abstract class datalynxfield_base {
                 $sql = " e.id $notinids ";
                 return [$sql, $params, false];
             } else {
-                return ['', '', ''];
+                return ['', [], false];
             }
         } else {
             return [$sql, $params, true];
@@ -962,6 +963,60 @@ abstract class datalynxfield_base {
      */
     public function get_supported_search_operators() {
         return []; // If search is not supported, offer no operators.
+    }
+
+    /**
+     * Relations this field can express against the value another entry holds for it.
+     *
+     * A rule that looks for entries matching the one an event just touched compares field by
+     * field: same value, different value, or - for anything ordered - within a tolerance of it.
+     * A field that cannot be searched for an exact value can express none of these.
+     *
+     * @return string[] any of match_compiler::OP_SAME, OP_DIFFERENT, OP_WITHIN, OP_ROUTE
+     */
+    public function supported_relative_criteria(): array {
+        return array_key_exists('=', $this->get_supported_search_operators())
+            ? [match_compiler::OP_SAME, match_compiler::OP_DIFFERENT]
+            : [];
+    }
+
+    /**
+     * Turn a relation against another entry's value into an ordinary search criterion.
+     *
+     * The value the other entry holds is known by the time a rule fires, so a relative criterion
+     * can be stated as a plain search and evaluated by the normal filter engine. What each field
+     * stores in datalynx_contents is not always what its get_search_sql() expects to receive,
+     * which is why the conversion belongs to the field rather than to the caller.
+     *
+     * @param string $relation one of match_compiler::OP_*
+     * @param string $storedvalue the other entry's raw datalynx_contents.content for this field
+     * @param array $options ['tolerance' => float] in the field's own unit, for OP_WITHIN
+     * @return array|null [$not, $operator, $value] search criterion, or null when this field
+     *                    cannot express the relation or the value it was given is unusable
+     */
+    public function compile_relative_criterion(string $relation, string $storedvalue, array $options = []): ?array {
+        if (!in_array($relation, $this->supported_relative_criteria(), true) || trim($storedvalue) === '') {
+            return null;
+        }
+
+        return [$relation === match_compiler::OP_DIFFERENT ? 'NOT' : '', '=', trim($storedvalue)];
+    }
+
+    /**
+     * Bounds of a tolerance window around a numeric value, widened so that a value sitting exactly
+     * on a bound is inside it.
+     *
+     * The BETWEEN operator is exclusive on at least one side in every field type that offers it,
+     * so "within one hour" would otherwise drop a counterpart exactly one hour away.
+     *
+     * @param float $value centre of the window
+     * @param float $tolerance half width of the window, in the same unit as $value
+     * @return array [$lower, $upper]
+     */
+    protected function tolerance_bounds(float $value, float $tolerance): array {
+        $epsilon = max(1e-6, abs($value) * 1e-9);
+
+        return [$value - $tolerance - $epsilon, $value + $tolerance + $epsilon];
     }
 
     /**

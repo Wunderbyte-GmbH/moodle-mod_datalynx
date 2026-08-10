@@ -75,42 +75,6 @@ const formatDuration = async (seconds) => {
 };
 
 /**
- * Convert a unix timestamp to the value a datetime-local input expects.
- *
- * The input is naive local time, so this uses the browser's timezone rather than
- * the user's Moodle timezone. The two usually agree; where they do not, the stop
- * time is what the traveller typed on their own device, which is the intent.
- *
- * @param {?number} timestamp
- * @returns {string}
- */
-const toLocalInput = (timestamp) => {
-    if (!timestamp) {
-        return '';
-    }
-    const date = new Date(timestamp * 1000);
-    const pad = (value) => String(value).padStart(2, '0');
-
-    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
-        + `T${pad(date.getHours())}:${pad(date.getMinutes())}`;
-};
-
-/**
- * Convert a datetime-local value back to a unix timestamp.
- *
- * @param {string} value
- * @returns {?number}
- */
-const fromLocalInput = (value) => {
-    if (!value) {
-        return null;
-    }
-    const parsed = Date.parse(value);
-
-    return Number.isNaN(parsed) ? null : Math.floor(parsed / 1000);
-};
-
-/**
  * Draw a read-only route: a marker per stop joined by straight segments.
  *
  * @param {HTMLElement} element
@@ -206,18 +170,16 @@ const initPicker = async (element) => {
     const fieldid = parseInt(element.dataset.fieldid, 10);
     const maxstops = parseInt(element.dataset.maxwaypoints, 10) || 10;
     const initialstops = parseInt(element.dataset.initialwaypoints, 10) || 2;
-    const requiretimes = element.dataset.requiretimes === '1';
     const typeahead = element.dataset.typeahead === '1';
     const minlength = parseInt(element.dataset.minlength, 10) || 3;
 
-    /** @type {Array<{address: string, lat: ?number, lng: ?number, time: ?number}>} */
+    /** @type {Array<{address: string, lat: ?number, lng: ?number}>} */
     let stops = [];
     try {
         stops = (JSON.parse(input.value || '[]') || []).map((stop) => ({
             address: stop.address || '',
             lat: Number.isFinite(stop.lat) ? stop.lat : null,
             lng: Number.isFinite(stop.lng) ? stop.lng : null,
-            time: stop.time || null,
         }));
     } catch (error) {
         stops = [];
@@ -225,7 +187,7 @@ const initPicker = async (element) => {
 
     // A new itinerary starts with empty rows so there is something to type into.
     while (stops.length < Math.min(initialstops, maxstops)) {
-        stops.push({address: '', lat: null, lng: null, time: null});
+        stops.push({address: '', lat: null, lng: null});
     }
 
     let map = null;
@@ -245,7 +207,6 @@ const initPicker = async (element) => {
             address: stop.address,
             lat: stop.lat,
             lng: stop.lng,
-            time: stop.time,
         })));
         // Every change funnels through here, so this is the one place the route has
         // to be kept in step with the stops.
@@ -465,13 +426,6 @@ const initPicker = async (element) => {
                 },
             });
 
-            const time = row.querySelector('[data-region="time"]');
-            time.value = toLocalInput(stop.time);
-            time.addEventListener('change', () => {
-                stops[index].time = fromLocalInput(time.value);
-                save();
-            });
-
             row.querySelector('[data-action="up"]').addEventListener('click', () => {
                 move(index, index - 1);
                 save();
@@ -511,16 +465,13 @@ const initPicker = async (element) => {
                 }
                 return;
             }
-            stops.push({address: '', lat: null, lng: null, time: null});
+            stops.push({address: '', lat: null, lng: null});
             save();
             renderRows();
             list.querySelector('[data-region="stop"]:last-child [data-region="address"]')?.focus();
         });
     }
 
-    if (requiretimes) {
-        element.classList.add('datalynx-itinerary-picker--times');
-    }
 
     save();
     renderRows();
@@ -545,7 +496,7 @@ const initPicker = async (element) => {
             }
             const {lat, lng} = event.latlng;
             const address = await geocodeReverse(fieldid, lat, lng);
-            stops.push({address: address || '', lat, lng, time: null});
+            stops.push({address: address || '', lat, lng});
             save();
             renderRows();
             redrawMap();

@@ -31,7 +31,7 @@
     * label - field name, used as the accessible name of the range input
     * max - highest slider position (count of values minus one)
     * index - initial slider position
-    * readout - initial readout text
+    * readout - initial readout text, printed centred under the track
     * showticks - whether to print the start and end labels under the track
     * startlabel - lowest value, formatted
     * endlabel - highest value, formatted
@@ -55,20 +55,19 @@
      data-input="{{inputid}}"
      data-values="{{values}}"
      data-labels="{{labels}}">
-    <div class="d-flex gap-3 align-items-center">
-        {{! The track and its labels share one column so the labels line up with the ends of the track. }}
-        <div class="flex-grow-1">
-            <input type="range" class="form-range w-100"
-                   min="0" max="{{max}}" step="1" value="{{index}}"
-                   aria-label="{{label}}"
-                   data-region="slider">
-            {{#showticks}}
-                <div class="d-flex justify-content-between small text-muted">
-                    <span>{{startlabel}}</span>
-                    <span>{{endlabel}}</span>
-                </div>
-            {{/showticks}}
-        </div>
-        <output class="badge bg-primary align-self-center" data-region="readout">{{readout}}</output>
+    <input type="range" class="form-range w-100"
+           min="0" max="{{max}}" step="1" value="{{index}}"
+           aria-label="{{label}}"
+           data-region="slider">
+    {{! The tick labels and the readout share one row under the track, so that the readout is
+        centred on the track and the ticks line up with its ends. The two tick cells take an
+        equal share of the leftover width, which keeps the readout centred even when the start
+        and end labels are of different lengths — and when the ticks are switched off. }}
+    <div class="d-flex align-items-center small text-muted">
+        <span class="datalynx-number-slider__tick text-start">{{#showticks}}{{startlabel}}{{/showticks}}</span>
+        {{! Plain text in the tick row's own colour, only bold and a size up, so that the selected
+            value reads as one of the three labels under the track rather than as chrome. }}
+        <output class="datalynx-number-slider__readout font-weight-bold" data-region="readout">{{readout}}</output>
+        <span class="datalynx-number-slider__tick text-end">{{#showticks}}{{endlabel}}{{/showticks}}</span>
     </div>
 </div>

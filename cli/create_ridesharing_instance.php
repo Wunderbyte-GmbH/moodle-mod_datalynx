@@ -774,23 +774,43 @@ $DB->insert_record('datalynx_customfilters', (object) [
 ]);
 cli_writeln('Created the search form.');
 
-// The ride matching rule.
+// The ride matching rules: one fires when an offer is saved and looks for the requests its route
+// can carry, the other fires when a request is saved and looks for the offers that can carry it.
+// They differ only in which side they fire for and which way round the corridor is tested, and
+// they share one record of announced pairs so a pair is introduced once between them.
 
-$ruleid = $DB->insert_record('datalynx_rules', (object) [
-    'dataid' => $dataid,
-    'type' => 'ridematch',
-    'name' => 'Passende Fahrt gefunden',
-    'description' => 'Benachrichtigt beide Seiten, sobald ein Angebot und ein Gesuch zusammenpassen.',
-    'enabled' => 1,
-    'param1' => json_encode(['entry_created', 'entry_updated']),
-    'param2' => $fieldids['route'],
-    'param3' => $fieldids['fahrttyp'],
-    'param4' => $offerlabel,
-    'param5' => $requestlabel,
-    'param6' => 10,
-    'param7' => 24,
-]);
-cli_writeln("Created the ride matching rule ($ruleid).");
+$matchcriteria = static function (string $direction) use ($fieldids): array {
+    return [
+        ['fieldid' => $fieldids['fahrttyp'], 'op' => 'different'],
+        ['fieldid' => $fieldids['route'], 'op' => 'route', 'radius' => 10, 'direction' => $direction],
+        ['fieldid' => $fieldids['route'], 'op' => 'within', 'tolerance' => 24, 'unit' => HOURSECS],
+    ];
+};
+
+foreach ([['Angebote', '1', 'reverse'], ['Gesuche', '2', 'forward']] as [$side, $position, $direction]) {
+    $ruleid = $DB->insert_record('datalynx_rules', (object) [
+        'dataid' => $dataid,
+        'type' => 'eventnotification',
+        'name' => "Passende Fahrt gefunden ($side)",
+        'description' => 'Benachrichtigt beide Seiten, sobald ein Angebot und ein Gesuch zusammenpassen.',
+        'enabled' => 1,
+        'param1' => json_encode(['entry_created', 'entry_updated', 'entry_deleted']),
+        'param2' => 0,
+        'param3' => json_encode(['matchauthors' => 1, 'subjectauthorpermatch' => 1]),
+        'param9' => json_encode([
+            // Only fire for the entries on this side of the ride-type field.
+            $fieldids['fahrttyp'] => ['AND' => [['', 'ANY_OF', [$position]]]],
+            '_matchcriteria' => [
+                'criteria' => $matchcriteria($direction),
+                'requireapproved' => 1,
+                'dedupe' => 'rideshare',
+                'forgetstale' => 1,
+                'maxmatches' => 200,
+            ],
+        ]),
+    ]);
+    cli_writeln("Created the ride matching rule for $side ($ruleid).");
+}
 
 // Activity level CSS and JS: the detour field becomes a slider.
 

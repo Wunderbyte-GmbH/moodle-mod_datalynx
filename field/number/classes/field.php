@@ -27,6 +27,7 @@ namespace datalynxfield_number;
 
 use datalynxfield_text\field as TextField;
 use mod_datalynx\local\field\datalynxfield_base;
+use mod_datalynx\local\rule\match_compiler;
 use stdClass;
 
 /**
@@ -43,6 +44,44 @@ class field extends TextField {
      * @var bool
      */
     protected $forfieldgroup = true;
+
+    /**
+     * A number can also be matched within a tolerance of another entry's number.
+     *
+     * @return string[]
+     */
+    public function supported_relative_criteria(): array {
+        return [match_compiler::OP_SAME, match_compiler::OP_DIFFERENT, match_compiler::OP_WITHIN];
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * The search values of this field type are arrays - get_search_sql() reads $value[0] - so a
+     * bare string would be read one character at a time.
+     *
+     * @param string $relation
+     * @param string $storedvalue
+     * @param array $options
+     * @return array|null
+     * @see datalynxfield_base::compile_relative_criterion()
+     */
+    public function compile_relative_criterion(string $relation, string $storedvalue, array $options = []): ?array {
+        if (!in_array($relation, $this->supported_relative_criteria(), true) || !is_numeric(trim($storedvalue))) {
+            return null;
+        }
+        $value = (float) trim($storedvalue);
+
+        if ($relation === match_compiler::OP_WITHIN) {
+            $tolerance = (float) ($options['tolerance'] ?? 0);
+            if ($tolerance <= 0) {
+                return null;
+            }
+            return ['', 'BETWEEN', $this->tolerance_bounds($value, $tolerance)];
+        }
+
+        return [$relation === match_compiler::OP_DIFFERENT ? 'NOT' : '', '=', [$value]];
+    }
 
     /**
      *
@@ -105,7 +144,7 @@ class field extends TextField {
                 $sql = " e.id $notinids ";
                 return [$sql, $params, false];
             } else {
-                return ['', '', ''];
+                return ['', [], false];
             }
         } else {
             return [$sql, $params, true];

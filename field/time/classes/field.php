@@ -26,6 +26,7 @@
 namespace datalynxfield_time;
 
 use mod_datalynx\local\field\datalynxfield_base;
+use mod_datalynx\local\rule\match_compiler;
 use stdClass;
 use IntlDateFormatter;
 
@@ -164,6 +165,50 @@ class field extends datalynxfield_base {
     }
 
     /**
+     * A time can also be matched within a tolerance of another entry's time.
+     *
+     * @return string[]
+     */
+    public function supported_relative_criteria(): array {
+        return [match_compiler::OP_SAME, match_compiler::OP_DIFFERENT, match_compiler::OP_WITHIN];
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * Times are stored as unix timestamps, and the search values of this field type are arrays of
+     * [from, to] - get_search_sql() reads $value[0] and $value[1]. A tolerance is therefore
+     * expressed as an ordinary range around the other entry's timestamp.
+     *
+     * @param string $relation
+     * @param string $storedvalue
+     * @param array $options ['tolerance' => float] in seconds
+     * @return array|null
+     * @see datalynxfield_base::compile_relative_criterion()
+     */
+    public function compile_relative_criterion(string $relation, string $storedvalue, array $options = []): ?array {
+        if (!in_array($relation, $this->supported_relative_criteria(), true) || !is_numeric(trim($storedvalue))) {
+            return null;
+        }
+        $value = (float) trim($storedvalue);
+        if ($value <= 0) {
+            // A time field stores nothing (or 0) when the value is disabled; there is nothing to
+            // compare against.
+            return null;
+        }
+
+        if ($relation === match_compiler::OP_WITHIN) {
+            $tolerance = (float) ($options['tolerance'] ?? 0);
+            if ($tolerance <= 0) {
+                return null;
+            }
+            return ['', 'BETWEEN', $this->tolerance_bounds($value, $tolerance)];
+        }
+
+        return [$relation === match_compiler::OP_DIFFERENT ? 'NOT' : '', '=', [$value, 0]];
+    }
+
+    /**
      * Returns the sql for selecting entries which match the given criterion for this field
      * Possible criterions: BETWEEN, equal(=), after(>), before(<), IS EMPTY, IS NOT EMPTY
      * {@inheritDoc}
@@ -172,6 +217,8 @@ class field extends datalynxfield_base {
      * @return array SQL fragment, params, and join flag.
      */
     public function get_search_sql(array $search): array {
+        global $DB;
+
         [$not, $operator, $value] = $search;
 
         if (is_array($value)) {
@@ -184,12 +231,28 @@ class field extends datalynxfield_base {
 
         static $i = 0;
         $i++;
-        $namefrom = "df_{$this->field->id}_{$i}_from";
-        $nameto = "df_{$this->field->id}_{$i}_to";
-        $varcharcontent = $this->get_sql_compare_text();
-        $params = [];
+        $fieldid = $this->field->id;
+        $namefrom = "df_{$fieldid}_{$i}_from";
+        $nameto = "df_{$fieldid}_{$i}_to";
 
+        // For all NOT criteria except NOT Empty, look up the entries meeting the positive
+        // criterion and exclude those, rather than negating the condition on the joined content
+        // table: an entry with no content record for this field cannot satisfy such a condition
+        // and would be dropped from a NOT search although it belongs in the result. Same contract
+        // as datalynxfield_base::get_search_sql().
+        $excludeentries = (($not && $operator !== '') || (!$not && $operator === ''));
+
+        // The exclusion lookup queries datalynx_contents directly, where the column is not aliased.
+        $varcharcontent = $excludeentries ? $DB->sql_compare_text('content') : $this->get_sql_compare_text();
+
+        $params = [];
         switch ($operator) {
+            case '':
+                // Empty: state it positively as "holds a value" and let the exclusion above
+                // turn it into "holds none", which also covers entries with no content record.
+                [$sql, $params] = $DB->get_in_or_equal('', SQL_PARAMS_NAMED, "df_{$fieldid}_", false);
+                $sql = " $varcharcontent $sql ";
+                break;
             case '=':
                 if ($this->dateonly) {
                     $fromdate = date("Y-m-d", $from);
@@ -199,17 +262,28 @@ class field extends datalynxfield_base {
             case '<':
             case '>':
                 $params[$namefrom] = $from;
-                $return = [" $not $varcharcontent $operator :$namefrom ", $params, true];
+                $sql = " $varcharcontent $operator :$namefrom ";
                 break;
             default:
                 $params[$namefrom] = $from;
                 $params[$nameto] = $to;
-                $return = [" ($not $varcharcontent >= :$namefrom AND $varcharcontent < :$nameto) ",
-                        $params, true];
+                // Parenthesised as one unit so that an enclosing NOT applies to the whole range.
+                $sql = " ($varcharcontent >= :$namefrom AND $varcharcontent < :$nameto) ";
                 break;
         } // End switch.
 
-        return $return;
+        if (!$excludeentries) {
+            return [$sql, $params, true];
+        }
+
+        if (!$eids = $this->get_entry_ids_for_content($sql, $params)) {
+            // No entry meets the positive criterion, so the NOT criterion matches every entry:
+            // contribute no condition and let all entries through.
+            return ['', [], false];
+        }
+        [$notinids, $params] = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED, "df_{$fieldid}_", false);
+
+        return [" e.id $notinids ", $params, false];
     }
 
     /**
