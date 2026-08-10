@@ -27,6 +27,8 @@ namespace mod_datalynx\privacy;
 use advanced_testcase;
 use context_module;
 use core_privacy\local\request\approved_contextlist;
+use core_privacy\local\request\approved_userlist;
+use core_privacy\local\request\userlist;
 
 /**
  * Tests that GDPR deletion removes uploaded entry files (see issue #241).
@@ -174,5 +176,66 @@ final class provider_test extends advanced_testcase {
 
         $this->assertSame(0, $this->count_entry_files($context->id, $contentid));
         $this->assertFalse($DB->record_exists('datalynx_contents', ['id' => $contentid]));
+    }
+
+    /**
+     * get_users_in_context() must return every entry author in the context.
+     *
+     * @covers ::get_users_in_context
+     */
+    public function test_get_users_in_context(): void {
+        $course = $this->getDataGenerator()->create_course();
+        $userone = $this->getDataGenerator()->create_user();
+        $usertwo = $this->getDataGenerator()->create_user();
+        $stranger = $this->getDataGenerator()->create_user();
+        $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
+        $cm = get_coursemodule_from_instance('datalynx', $instance->id, 0, false, MUST_EXIST);
+        $context = context_module::instance($cm->id);
+
+        $fieldid = $this->create_file_field($instance->id);
+        $this->create_entry_with_files($instance->id, $context->id, $userone->id, $fieldid);
+        $this->create_entry_with_files($instance->id, $context->id, $usertwo->id, $fieldid);
+
+        $userlist = new userlist($context, 'mod_datalynx');
+        provider::get_users_in_context($userlist);
+        $userids = $userlist->get_userids();
+
+        $this->assertCount(2, $userids);
+        $this->assertContains((int) $userone->id, $userids);
+        $this->assertContains((int) $usertwo->id, $userids);
+        $this->assertNotContains((int) $stranger->id, $userids);
+    }
+
+    /**
+     * delete_data_for_users() must delete only the approved users' data and files.
+     *
+     * @covers ::delete_data_for_users
+     */
+    public function test_delete_data_for_users_only_deletes_selected(): void {
+        global $DB;
+
+        $course = $this->getDataGenerator()->create_course();
+        $userone = $this->getDataGenerator()->create_user();
+        $usertwo = $this->getDataGenerator()->create_user();
+        $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
+        $cm = get_coursemodule_from_instance('datalynx', $instance->id, 0, false, MUST_EXIST);
+        $context = context_module::instance($cm->id);
+
+        $fieldid = $this->create_file_field($instance->id);
+        $contentone = $this->create_entry_with_files($instance->id, $context->id, $userone->id, $fieldid);
+        $contenttwo = $this->create_entry_with_files($instance->id, $context->id, $usertwo->id, $fieldid);
+
+        // Approve deletion of user one only.
+        $approved = new approved_userlist($context, 'mod_datalynx', [$userone->id]);
+        provider::delete_data_for_users($approved);
+
+        // User one is erased (entry, content and both file areas).
+        $this->assertSame(0, $this->count_entry_files($context->id, $contentone));
+        $this->assertFalse($DB->record_exists('datalynx_contents', ['id' => $contentone]));
+
+        // User two is untouched.
+        $this->assertSame(2, $this->count_entry_files($context->id, $contenttwo));
+        $this->assertTrue($DB->record_exists('datalynx_contents', ['id' => $contenttwo]));
+        $this->assertSame(1, $DB->count_records('datalynx_entries', ['dataid' => $instance->id]));
     }
 }

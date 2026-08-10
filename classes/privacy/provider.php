@@ -27,9 +27,11 @@ namespace mod_datalynx\privacy;
 // TODO: MDL-0000 Which are needed?
 use core_privacy\local\metadata\collection;
 use core_privacy\local\request\approved_contextlist;
+use core_privacy\local\request\approved_userlist;
 use core_privacy\local\request\contextlist;
 use core_privacy\local\request\helper;
 use core_privacy\local\request\transform;
+use core_privacy\local\request\userlist;
 use core_privacy\local\request\writer;
 use core_privacy\manager;
 
@@ -42,6 +44,9 @@ class provider implements
 
     // This plugin stores personal data.
     \core_privacy\local\metadata\provider,
+
+    // This plugin can determine and delete the users who have data in a given context.
+    \core_privacy\local\request\core_userlist_provider,
 
     // This plugin is a core_user_data_provider.
     \core_privacy\local\request\plugin\provider {
@@ -124,6 +129,27 @@ class provider implements
         $contextlist->add_from_sql($sql, $params);
 
         return $contextlist;
+    }
+
+    /**
+     * Get the list of users who have data within a context.
+     *
+     * @param userlist $userlist the userlist containing the list of users who have data in this context/plugin combination.
+     */
+    public static function get_users_in_context(userlist $userlist) {
+        $context = $userlist->get_context();
+        if (!$context instanceof \context_module) {
+            return;
+        }
+
+        // Users who authored an entry in this datalynx instance.
+        $sql = "SELECT de.userid
+                  FROM {course_modules} cm
+                  JOIN {modules} m ON m.id = cm.module AND m.name = :modname
+                  JOIN {datalynx} dl ON dl.id = cm.instance
+                  JOIN {datalynx_entries} de ON de.dataid = dl.id
+                 WHERE cm.id = :cmid";
+        $userlist->add_from_sql('userid', $sql, ['cmid' => $context->instanceid, 'modname' => 'datalynx']);
     }
 
     /**
@@ -253,6 +279,47 @@ class provider implements
             $rs->close();
             self::delete_datalynx_entries($context, $recordstobedeleted);
         }
+    }
+
+    /**
+     * Delete multiple users' data within a single context.
+     *
+     * @param approved_userlist $userlist the approved context and user information to delete information for.
+     */
+    public static function delete_data_for_users(approved_userlist $userlist) {
+        global $DB;
+
+        $context = $userlist->get_context();
+        if (!$context instanceof \context_module) {
+            return;
+        }
+
+        $userids = $userlist->get_userids();
+        if (empty($userids)) {
+            return;
+        }
+
+        [$usersql, $userparams] = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
+        $recordstobedeleted = [];
+
+        $sql = "SELECT " . self::sql_fields() . "
+                FROM {course_modules} cm
+                JOIN {modules} m ON m.id = cm.module AND m.name = :modname
+                JOIN {datalynx} dl ON dl.id = cm.instance
+                JOIN {datalynx_entries} de ON de.dataid = dl.id AND de.userid $usersql
+                LEFT JOIN {datalynx_contents} dc ON dc.entryid = de.id
+                LEFT JOIN {datalynx_fields} df ON df.id = dc.fieldid
+                WHERE cm.id = :cmid
+                ORDER BY de.id";
+        $params = ['cmid' => $context->instanceid, 'modname' => 'datalynx'] + $userparams;
+        $rs = $DB->get_recordset_sql($sql, $params);
+        foreach ($rs as $row) {
+            self::mark_datalynx_contents_for_deletion($context, $row);
+            $recordstobedeleted[$row->entryid] = $row->entryid;
+        }
+        $rs->close();
+
+        self::delete_datalynx_entries($context, $recordstobedeleted);
     }
 
     /**
