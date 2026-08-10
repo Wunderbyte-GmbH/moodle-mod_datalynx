@@ -814,8 +814,18 @@ abstract class datalynxfield_base {
                         $params = [$name => "%$value%"];
                         $sql = $DB->sql_like($varcharcontent, ":$name", false);
                     } else {
-                        $params = [$name => "'$value'"];
-                        $sql = " $varcharcontent $operator :$name ";
+                        // The operator originates from the usearch request parameter. Only ever
+                        // build SQL from a vetted literal from this allowlist; any other value is
+                        // treated as an impossible criterion (empty fragment, skipped by the
+                        // caller) so it can never be concatenated into the query.
+                        $allowedoperators = ['=', '!=', '<>', '<', '<=', '>', '>='];
+                        $operatorkey = array_search($operator, $allowedoperators, true);
+                        if ($operatorkey === false) {
+                            return ['', [], false];
+                        }
+                        $safeoperator = $allowedoperators[$operatorkey];
+                        $params = [$name => $value];
+                        $sql = " $varcharcontent $safeoperator :$name ";
                     }
                 }
             }
