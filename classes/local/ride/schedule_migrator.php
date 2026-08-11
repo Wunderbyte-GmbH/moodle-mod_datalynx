@@ -17,7 +17,6 @@
 namespace mod_datalynx\local\ride;
 
 use mod_datalynx\datalynx;
-use stdClass;
 
 /**
  * Turns a ride board's four "when" fields into one schedule value.
@@ -85,7 +84,7 @@ class schedule_migrator {
     /**
      * The schedule an entry's old fields describe.
      *
-     * @param stdClass $values the entry's stored values, keyed by field id
+     * @param array $values the entry's stored values, keyed by field id
      * @param int $timecreated used as the start of a recurring pattern's validity
      * @return schedule|null null when the entry says nothing about when it happens
      */
