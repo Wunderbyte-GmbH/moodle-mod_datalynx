@@ -250,6 +250,37 @@ class datalynx {
     }
 
     /**
+     * Check whether a line from an "include" setting (cssincludes / jsincludes) is
+     * an actual URL/path reference rather than source code.
+     *
+     * These settings expect one URL or path per line, each of which is emitted as a
+     * <link rel="stylesheet"> or <script src> tag. If CSS or JS source code is pasted
+     * into such a field by mistake, every single line is turned into a broken tag,
+     * causing the browser to fire one 404 request per line and effectively flooding
+     * the server. This guard rejects lines that contain characters which only occur
+     * in source code (braces, semicolons, comment markers) or internal whitespace,
+     * so such content is never treated as an include.
+     *
+     * @param string $line A single line from an includes setting.
+     * @return bool True if the line looks like a URL/path reference.
+     */
+    public static function is_valid_include_url(string $line): bool {
+        $line = trim($line);
+        if ($line === '') {
+            return false;
+        }
+        // A URL or path never contains internal whitespace.
+        if (preg_match('~\\s~', $line)) {
+            return false;
+        }
+        // These characters only appear in CSS source code, never in a stylesheet URL.
+        if (preg_match('~[{};]|/\\*|\\*/~', $line)) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * Get datalynx table id. Not cmid.
      *
      * @return mixed
@@ -631,7 +662,11 @@ class datalynx {
             if ($this->data->cssincludes) {
                 foreach (explode("\n", $this->data->cssincludes) as $cssinclude) {
                     $cssinclude = trim($cssinclude);
-                    if ($cssinclude) {
+                    // Only emit a <link> for lines that are genuine stylesheet
+                    // references. This prevents CSS source code accidentally pasted
+                    // into the cssincludes setting from producing one broken <link>
+                    // (and one 404 request) per line.
+                    if (self::is_valid_include_url($cssinclude)) {
                         $cssurls[] = new moodle_url($cssinclude);
                     }
                 }
@@ -678,7 +713,11 @@ class datalynx {
             if ($this->data->jsincludes) {
                 foreach (explode("\n", $this->data->jsincludes) as $jsinclude) {
                     $jsinclude = trim($jsinclude);
-                    if ($jsinclude) {
+                    // Only emit a <script src> for lines that are genuine URL/path
+                    // references. This prevents JS source code accidentally pasted
+                    // into the jsincludes setting from producing one broken tag
+                    // (and one 404 request) per line.
+                    if (self::is_valid_include_url($jsinclude)) {
                         $jsurls[] = new moodle_url($jsinclude);
                     }
                 }

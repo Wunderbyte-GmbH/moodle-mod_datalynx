@@ -83,6 +83,32 @@ if ($urlparams->cssedit) {
             // Buttons.
             $this->add_action_buttons(true);
         }
+
+        /**
+         * Validate that the "Include external CSS" field contains stylesheet
+         * references (one URL/path per line) and not CSS source code. Pasting CSS
+         * code here turns every line into a broken <link>, flooding the server with
+         * 404 requests, so such input is rejected with a helpful message.
+         *
+         * @param array $data
+         * @param array $files
+         * @return array
+         */
+        public function validation($data, $files) {
+            $errors = parent::validation($data, $files);
+            if (!empty($data['cssincludes'])) {
+                foreach (explode("\n", $data['cssincludes']) as $line) {
+                    if (trim($line) === '') {
+                        continue;
+                    }
+                    if (!\mod_datalynx\datalynx::is_valid_include_url($line)) {
+                        $errors['cssincludes'] = get_string('cssincludesinvalid', 'datalynx');
+                        break;
+                    }
+                }
+            }
+            return $errors;
+        }
     }
 
     // Set a datalynx object.
