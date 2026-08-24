@@ -26,6 +26,25 @@ defined('MOODLE_INTERNAL') || die();
 use mod_datalynx\local\map\provider_config;
 
 if ($ADMIN->fulltree) {
+    // Acknowledgement that this major upgrade has been tested on a staging/test site.
+    // Shown to site admins on every Datalynx view page until checked; see view.php.
+    $settings->add(
+        new admin_setting_heading(
+            'mod_datalynx/stagingtesthdr',
+            get_string('stagingtesthdr', 'datalynx'),
+            get_string('stagingtesthdr_desc', 'datalynx')
+        )
+    );
+
+    $settings->add(
+        new admin_setting_configcheckbox(
+            'mod_datalynx/stagingtestacknowledged',
+            get_string('stagingtestacknowledged', 'datalynx'),
+            get_string('stagingtestacknowledged_desc', 'datalynx'),
+            0
+        )
+    );
+
     // Enable rss feeds.
     if (empty($CFG->enablerssfeeds)) {
         $options = [0 => get_string('rssglobaldisabled', 'admin')];
