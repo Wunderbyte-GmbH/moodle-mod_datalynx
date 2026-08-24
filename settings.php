@@ -24,6 +24,25 @@
 defined('MOODLE_INTERNAL') || die();
 
 if ($ADMIN->fulltree) {
+    // Announcement of the upcoming major release. Shown to site admins on Datalynx view pages
+    // until dismissed here; see view.php.
+    $settings->add(
+        new admin_setting_heading(
+            'mod_datalynx/upcomingreleasehdr',
+            get_string('upcomingreleasehdr', 'datalynx'),
+            get_string('upcomingreleasehdr_desc', 'datalynx')
+        )
+    );
+
+    $settings->add(
+        new admin_setting_configcheckbox(
+            'mod_datalynx/upcomingreleasedismissed',
+            get_string('upcomingreleasedismissed', 'datalynx'),
+            get_string('upcomingreleasedismissed_desc', 'datalynx'),
+            0
+        )
+    );
+
     // Enable rss feeds.
     if (empty($CFG->enablerssfeeds)) {
         $options = [0 => get_string('rssglobaldisabled', 'admin')];

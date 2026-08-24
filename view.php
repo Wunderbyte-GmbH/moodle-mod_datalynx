@@ -51,6 +51,28 @@ $headerparams = ['heading' => 'true', 'tab' => 'browse', 'groups' => true, 'urlp
 
 $datalynx->print_header($headerparams);
 
+// Announce the upcoming major release to site admins until dismissed in the plugin settings.
+// Informational only - does not block the page. Other users are unaffected.
+if (
+    is_siteadmin() &&
+    empty(get_config('mod_datalynx', 'upcomingreleasedismissed')) &&
+    !defined('BEHAT_SITE_RUNNING')
+) {
+    $settingsurl = new moodle_url(
+        '/admin/settings.php',
+        ['section' => 'modsettingdatalynx'],
+        'admin-upcomingreleasedismissed'
+    );
+    echo $OUTPUT->notification(
+        get_string('upcomingreleaseannouncement', 'datalynx', (object) [
+            'downloadurl' => 'https://github.com/Wunderbyte-GmbH/moodle-mod_datalynx/archive/refs/heads/develop.zip',
+            'settingsurl' => $settingsurl->out(),
+        ]),
+        \core\output\notification::NOTIFY_INFO,
+        false
+    );
+}
+
 $datalynx->display();
 
 $datalynx->print_footer();
