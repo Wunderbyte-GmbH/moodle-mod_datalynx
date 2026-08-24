@@ -91,6 +91,32 @@ if ($urlparams->jsedit) {
             // Buttons.
             $this->add_action_buttons(true);
         }
+
+        /**
+         * Validate that the "Include external JS" field contains script references
+         * (one URL/path per line) and not JavaScript source code. Pasting JS code
+         * here turns every line into a broken <script src>, flooding the server with
+         * 404 requests, so such input is rejected with a helpful message.
+         *
+         * @param array $data
+         * @param array $files
+         * @return array
+         */
+        public function validation($data, $files) {
+            $errors = parent::validation($data, $files);
+            if (!empty($data['jsincludes'])) {
+                foreach (explode("\n", $data['jsincludes']) as $line) {
+                    if (trim($line) === '') {
+                        continue;
+                    }
+                    if (!\mod_datalynx\datalynx::is_valid_include_url($line)) {
+                        $errors['jsincludes'] = get_string('jsincludesinvalid', 'datalynx');
+                        break;
+                    }
+                }
+            }
+            return $errors;
+        }
     }
 
     require_capability('mod/datalynx:managetemplates', $df->context);
