@@ -43,30 +43,6 @@ $pageparams = ['js' => true, 'css' => true, 'rss' => true, 'modjs' => true,
 require_login($dlx->data->course, false, $dlx->cm);
 
 $dlx->set_page('view', $pageparams);
-
-// This release contains extensive changes. Block site admins here until they confirm they have
-// tested the upgrade on a staging/test site first; see settings.php and lang string
-// 'stagingtestwarning'. Other users are unaffected.
-if (
-    is_siteadmin() &&
-    empty(get_config('mod_datalynx', 'stagingtestacknowledged')) &&
-    !defined('BEHAT_SITE_RUNNING')
-) {
-    $settingsurl = new moodle_url(
-        '/admin/settings.php',
-        ['section' => 'modsettingdatalynx'],
-        'admin-stagingtestacknowledged'
-    );
-    echo $OUTPUT->header();
-    echo $OUTPUT->notification(
-        get_string('stagingtestwarning', 'datalynx', $settingsurl->out()),
-        \core\output\notification::NOTIFY_WARNING,
-        false
-    );
-    echo $OUTPUT->footer();
-    exit;
-}
-
 $dlx->set_content();
 
 require_capability('mod/datalynx:viewentry', $dlx->context);
