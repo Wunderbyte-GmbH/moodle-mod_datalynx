@@ -27,7 +27,6 @@ use advanced_testcase;
  * @covers \mod_datalynx\datalynx::is_valid_include_url
  */
 final class include_url_validation_test extends advanced_testcase {
-
     /**
      * Data provider: [line, expected].
      *
@@ -50,6 +49,8 @@ final class include_url_validation_test extends advanced_testcase {
     }
 
     /**
+     * Tests datalynx::is_valid_include_url() with various input lines.
+     *
      * @dataProvider include_url_provider
      * @param string $line
      * @param bool $expected
