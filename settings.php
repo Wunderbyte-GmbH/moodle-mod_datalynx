@@ -25,12 +25,28 @@ defined('MOODLE_INTERNAL') || die();
 
 if ($ADMIN->fulltree) {
     // Announcement of the upcoming major release. Shown to site admins on Datalynx view pages
-    // until dismissed here; see view.php.
+    // until dismissed here; see view.php. The full explanation lives on this settings page (in
+    // the warning box below) so that admins who never open a Datalynx activity still understand
+    // what happens on 1 October 2026.
     $settings->add(
         new admin_setting_heading(
             'mod_datalynx/upcomingreleasehdr',
             get_string('upcomingreleasehdr', 'datalynx'),
-            get_string('upcomingreleasehdr_desc', 'datalynx')
+            ''
+        )
+    );
+
+    $settings->add(
+        new admin_setting_description(
+            'mod_datalynx/upcomingreleasewarning',
+            '',
+            $OUTPUT->notification(
+                get_string('upcomingreleasehdr_desc', 'datalynx', (object) [
+                    'downloadurl' => 'https://github.com/Wunderbyte-GmbH/moodle-mod_datalynx/archive/refs/heads/develop.zip',
+                ]),
+                \core\output\notification::NOTIFY_WARNING,
+                false
+            )
         )
     );
 
