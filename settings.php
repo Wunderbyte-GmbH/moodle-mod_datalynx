@@ -27,7 +27,7 @@ if ($ADMIN->fulltree) {
     // Announcement of the upcoming major release. Shown to site admins on Datalynx view pages
     // until dismissed here; see view.php. The full explanation lives on this settings page (in
     // the warning box below) so that admins who never open a Datalynx activity still understand
-    // what happens on 1 October 2026.
+    // what happens on 1 November 2026.
     $settings->add(
         new admin_setting_heading(
             'mod_datalynx/upcomingreleasehdr',
