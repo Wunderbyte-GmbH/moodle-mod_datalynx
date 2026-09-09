@@ -25,9 +25,9 @@ defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'mod_datalynx';
 $plugin->supported = [405, 502];
-$plugin->version = 2026081700;
+$plugin->version = 2026090800;
 // Release: Highest supported Moodle, followed by internal version, followed by dataword.
-$plugin->release = 'v502.1-DataDream';
+$plugin->release = 'v502.3-DataDream';
 $plugin->requires = 2024100700;
 $plugin->maturity = MATURITY_STABLE;
 $plugin->dependencies = [
