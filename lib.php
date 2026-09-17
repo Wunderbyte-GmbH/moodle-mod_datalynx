@@ -312,6 +312,13 @@ function datalynx_reset_userdata($data) {
             "itemid IN ($allrecordssql) AND commentarea='entry'",
             [$data->courseid]
         );
+        // Tag instances are keyed by content id, so they have to go before the contents do.
+        $DB->delete_records_select(
+            'tag_instance',
+            "component = ? AND itemtype = ? AND itemid IN (
+                SELECT c.id FROM {datalynx_contents} c WHERE c.entryid IN ($allrecordssql))",
+            ['mod_datalynx', 'datalynx_contents', $data->courseid]
+        );
         $DB->delete_records_select(
             'datalynx_contents',
             "entryid IN ($allrecordssql)",
@@ -373,6 +380,13 @@ function datalynx_reset_userdata($data) {
                 $rm->delete_ratings($ratingdeloptions);
 
                 $DB->delete_records('comments', ['itemid' => $record->id, 'commentarea' => 'entry']);
+                // Tag instances are keyed by content id, so they have to go before the contents do.
+                $DB->delete_records_select(
+                    'tag_instance',
+                    "component = ? AND itemtype = ? AND itemid IN (
+                        SELECT c.id FROM {datalynx_contents} c WHERE c.entryid = ?)",
+                    ['mod_datalynx', 'datalynx_contents', $record->id]
+                );
                 $DB->delete_records('datalynx_contents', ['entryid' => $record->id]);
                 $DB->delete_records('datalynx_entries', ['id' => $record->id]);
                 // HACK: this is ugly - the entryid should be before the fieldid!

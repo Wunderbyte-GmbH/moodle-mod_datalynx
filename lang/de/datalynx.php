@@ -754,6 +754,7 @@ $string['privacy:metadata:datalynx_rule_matches:entrylow'] = 'Ein Eintrag des Pa
 $string['privacy:metadata:datalynx_rule_matches:timenotified'] = 'Zeitpunkt, zu dem die Verfasser/innen voneinander erfahren haben';
 $string['privacy:metadata:filepurpose'] = 'Datei oder Bild zur datalynx Instanz.';
 $string['privacy:metadata:ratingpurpose'] = 'Bewertungen von datalynx-Einträgen.';
+$string['privacy:metadata:tagpurpose'] = 'Schlagwörter zu datalynx-Einträgen.';
 $string['random'] = 'Zufällig';
 $string['randomone'] = 'Eine/r zufällig';
 $string['range'] = 'Umfang';

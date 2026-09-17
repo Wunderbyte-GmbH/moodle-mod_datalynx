@@ -101,6 +101,7 @@ class provider implements
         $collection->link_subsystem('core_files', 'privacy:metadata:filepurpose');
         $collection->link_subsystem('core_comment', 'privacy:metadata:commentpurpose');
         $collection->link_subsystem('core_rating', 'privacy:metadata:ratingpurpose');
+        $collection->link_subsystem('core_tag', 'privacy:metadata:tagpurpose');
 
         return $collection;
     }
@@ -287,7 +288,7 @@ class provider implements
                 'content',
                 ['fieldid' => $fieldobj->id, 'entryid' => $recordobj->id]
             );
-            self::export_datalynx_content($context, $recordobj, $fieldobj, $contentobj);
+            self::export_datalynx_content($context, $user, $recordobj, $fieldobj, $contentobj);
         }
         $rs->close();
         self::export_datalynx_entry($context, $user, $recordobj);
@@ -436,15 +437,6 @@ class provider implements
         ];
         // Data about the record.
         writer::with_context($context)->export_data([$recordobj->id], (object)$data);
-        // Related tags.
-        \core_tag\privacy\provider::export_item_tags(
-            $user->id,
-            $context,
-            [$recordobj->id],
-            'mod_datalynx',
-            'datalynx_entries',
-            $recordobj->id
-        );
         // Export comments. For entries not authored by this user export only this user's comments;
         // for the user's own entries export the comments made by everybody.
         \core_comment\privacy\provider::export_comments(
@@ -569,6 +561,16 @@ class provider implements
             );
         }
 
+        // Delete tag instances. Like files, they are keyed by content id, so this has to happen
+        // while the content rows still exist.
+        \core_tag\privacy\provider::delete_item_tags_select(
+            $context,
+            'mod_datalynx',
+            'datalynx_contents',
+            $itemidtest,
+            $params
+        );
+
         // Delete ratings on these entries, in both rating areas. Ratings are keyed by entry id, and
         // per core_rating they are removed only when the rated item itself is deleted (never
         // per-user, as that would affect grades) — which is exactly what is happening here.
@@ -598,11 +600,12 @@ class provider implements
      * Export one field answer in a record in database activity module
      *
      * @param \context $context
+     * @param \stdClass $user the user whose data is exported
      * @param \stdClass $recordobj record from DB table {data_records}
      * @param \stdClass $fieldobj record from DB table {data_fields}
      * @param \stdClass $contentobj record from DB table {data_content}
      */
-    protected static function export_datalynx_content($context, $recordobj, $fieldobj, $contentobj) {
+    protected static function export_datalynx_content($context, $user, $recordobj, $fieldobj, $contentobj) {
         $value = (object)[
             'field' => [
                 // Name and description are displayed in mod_data without applying format_string().
@@ -625,6 +628,15 @@ class provider implements
             [$recordobj->id, $contentobj->id],
             'mod_datalynx',
             'content',
+            $contentobj->id
+        );
+        // Tags are attached to the content row of a tag field, never to the entry itself.
+        \core_tag\privacy\provider::export_item_tags(
+            $user->id,
+            $context,
+            [$recordobj->id, $contentobj->id],
+            'mod_datalynx',
+            'datalynx_contents',
             $contentobj->id
         );
     }

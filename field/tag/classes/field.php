@@ -109,6 +109,28 @@ class field extends datalynxfield_option_multiple {
     }
 
     /**
+     * Remove the tag instances attached to the content rows before the rows themselves go.
+     *
+     * @param int $entryid Entry to delete the content of, or 0 for all content of this field.
+     * @return bool
+     * @see datalynxfield_base::delete_content()
+     */
+    public function delete_content($entryid = 0) {
+        global $DB;
+
+        $params = ['fieldid' => $this->field->id];
+        if ($entryid) {
+            $params['entryid'] = $entryid;
+        }
+        $contents = $DB->get_records('datalynx_contents', $params, '', 'id');
+        foreach (array_keys($contents) as $contentid) {
+            core_tag_tag::remove_all_item_tags('mod_datalynx', 'datalynx_contents', $contentid);
+        }
+
+        return parent::delete_content($entryid);
+    }
+
+    /**
      * This is exact copy of parent::parent, because I can not access parent::parent::set_field();
      * {@inheritDoc}
      *

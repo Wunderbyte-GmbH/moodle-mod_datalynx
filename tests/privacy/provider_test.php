@@ -641,4 +641,199 @@ final class provider_test extends advanced_testcase {
         $this->assertSame(0, $this->count_comments_by_user((int) $author->id));
         $this->assertSame(0, $this->count_ratings_on_entry($context->id, $entryid));
     }
+
+    /**
+     * Insert a tag field.
+     *
+     * @param int $dataid
+     * @return int field id
+     */
+    private function create_tag_field(int $dataid): int {
+        global $DB;
+        return (int) $DB->insert_record('datalynx_fields', (object) [
+            'dataid' => $dataid,
+            'type' => 'tag',
+            'name' => 'Tags',
+            'description' => '',
+        ]);
+    }
+
+    /**
+     * Create an entry with a tagged content row, the way the tag field stores it.
+     *
+     * @param int $dataid
+     * @param context_module $context
+     * @param int $userid
+     * @param int $fieldid
+     * @param string[] $tags
+     * @return int[] entry id and content id
+     */
+    private function create_tagged_entry(int $dataid, context_module $context, int $userid, int $fieldid, array $tags): array {
+        $entryid = $this->create_entry($dataid, $userid);
+        $contentid = $this->create_content($entryid, $fieldid, implode(',', $tags));
+        \core_tag_tag::set_item_tags('mod_datalynx', 'datalynx_contents', $contentid, $context, $tags);
+        return [$entryid, $contentid];
+    }
+
+    /**
+     * Count the tag instances attached to a content row.
+     *
+     * @param int $contentid
+     * @return int
+     */
+    private function count_tag_instances(int $contentid): int {
+        global $DB;
+        return $DB->count_records('tag_instance', [
+            'component' => 'mod_datalynx',
+            'itemtype' => 'datalynx_contents',
+            'itemid' => $contentid,
+        ]);
+    }
+
+    /**
+     * The tag subsystem is declared in the metadata.
+     *
+     * @covers ::get_metadata
+     */
+    public function test_metadata_links_tag_subsystem(): void {
+        $collection = provider::get_metadata(new \core_privacy\local\metadata\collection('mod_datalynx'));
+        $names = array_map(fn($item) => $item->get_name(), $collection->get_collection());
+        $this->assertContains('core_tag', $names);
+    }
+
+    /**
+     * Tags of a tag field are exported below the content row they belong to.
+     *
+     * @covers ::export_user_data
+     */
+    public function test_export_includes_tags(): void {
+        $course = $this->getDataGenerator()->create_course();
+        $author = $this->getDataGenerator()->create_user();
+        $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
+        $cm = get_coursemodule_from_instance('datalynx', $instance->id, 0, false, MUST_EXIST);
+        $context = context_module::instance($cm->id);
+
+        $fieldid = $this->create_tag_field($instance->id);
+        [$entryid, $contentid] = $this->create_tagged_entry($instance->id, $context, $author->id, $fieldid, ['alpha', 'beta']);
+
+        $this->setUser($author);
+        provider::export_user_data(new approved_contextlist($author, 'mod_datalynx', [$context->id]));
+
+        $writer = \core_privacy\local\request\writer::with_context($context);
+        $tags = $writer->get_related_data([$entryid, $contentid], 'tags');
+        $this->assertEqualsCanonicalizing(['alpha', 'beta'], array_values((array) $tags));
+    }
+
+    /**
+     * Deleting a whole context leaves no tag instances behind.
+     *
+     * @covers ::delete_data_for_all_users_in_context
+     */
+    public function test_delete_for_all_users_removes_tag_instances(): void {
+        $course = $this->getDataGenerator()->create_course();
+        $author = $this->getDataGenerator()->create_user();
+        $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
+        $cm = get_coursemodule_from_instance('datalynx', $instance->id, 0, false, MUST_EXIST);
+        $context = context_module::instance($cm->id);
+
+        $fieldid = $this->create_tag_field($instance->id);
+        [, $contentid] = $this->create_tagged_entry($instance->id, $context, $author->id, $fieldid, ['alpha', 'beta']);
+        $this->assertSame(2, $this->count_tag_instances($contentid));
+
+        provider::delete_data_for_all_users_in_context($context);
+
+        $this->assertSame(0, $this->count_tag_instances($contentid));
+    }
+
+    /**
+     * A per-user deletion removes the tag instances of that user's entries only.
+     *
+     * @covers ::delete_data_for_user
+     */
+    public function test_delete_for_user_removes_own_tag_instances_only(): void {
+        $course = $this->getDataGenerator()->create_course();
+        $author = $this->getDataGenerator()->create_user();
+        $other = $this->getDataGenerator()->create_user();
+        $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
+        $cm = get_coursemodule_from_instance('datalynx', $instance->id, 0, false, MUST_EXIST);
+        $context = context_module::instance($cm->id);
+
+        $fieldid = $this->create_tag_field($instance->id);
+        [, $contentid] = $this->create_tagged_entry($instance->id, $context, $author->id, $fieldid, ['alpha', 'beta']);
+        [, $othercontentid] = $this->create_tagged_entry($instance->id, $context, $other->id, $fieldid, ['alpha']);
+
+        provider::delete_data_for_user(new approved_contextlist($author, 'mod_datalynx', [$context->id]));
+
+        $this->assertSame(0, $this->count_tag_instances($contentid));
+        $this->assertSame(1, $this->count_tag_instances($othercontentid));
+    }
+
+    /**
+     * A multi-user deletion removes the tag instances of the selected users' entries only.
+     *
+     * @covers ::delete_data_for_users
+     */
+    public function test_delete_for_users_removes_selected_tag_instances_only(): void {
+        $course = $this->getDataGenerator()->create_course();
+        $author = $this->getDataGenerator()->create_user();
+        $other = $this->getDataGenerator()->create_user();
+        $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
+        $cm = get_coursemodule_from_instance('datalynx', $instance->id, 0, false, MUST_EXIST);
+        $context = context_module::instance($cm->id);
+
+        $fieldid = $this->create_tag_field($instance->id);
+        [, $contentid] = $this->create_tagged_entry($instance->id, $context, $author->id, $fieldid, ['alpha', 'beta']);
+        [, $othercontentid] = $this->create_tagged_entry($instance->id, $context, $other->id, $fieldid, ['alpha']);
+
+        provider::delete_data_for_users(new approved_userlist($context, 'mod_datalynx', [$author->id]));
+
+        $this->assertSame(0, $this->count_tag_instances($contentid));
+        $this->assertSame(1, $this->count_tag_instances($othercontentid));
+    }
+
+    /**
+     * Deleting the content of a tag field through the field API removes its tag instances.
+     *
+     * @covers \datalynxfield_tag\field::delete_content
+     */
+    public function test_tag_field_delete_content_removes_tag_instances(): void {
+        $course = $this->getDataGenerator()->create_course();
+        $author = $this->getDataGenerator()->create_user();
+        $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
+        $cm = get_coursemodule_from_instance('datalynx', $instance->id, 0, false, MUST_EXIST);
+        $context = context_module::instance($cm->id);
+
+        $fieldid = $this->create_tag_field($instance->id);
+        [$entryid, $contentid] = $this->create_tagged_entry($instance->id, $context, $author->id, $fieldid, ['alpha', 'beta']);
+        [, $keptcontentid] = $this->create_tagged_entry($instance->id, $context, $author->id, $fieldid, ['alpha']);
+
+        $dlx = new \mod_datalynx\datalynx($instance->id);
+        $dlx->get_field_from_id($fieldid)->delete_content($entryid);
+
+        $this->assertSame(0, $this->count_tag_instances($contentid));
+        $this->assertSame(1, $this->count_tag_instances($keptcontentid));
+    }
+
+    /**
+     * A course reset that deletes all entries removes their tag instances.
+     *
+     * @covers ::datalynx_reset_userdata
+     */
+    public function test_course_reset_removes_tag_instances(): void {
+        global $CFG;
+        require_once($CFG->dirroot . '/mod/datalynx/lib.php');
+
+        $course = $this->getDataGenerator()->create_course();
+        $author = $this->getDataGenerator()->create_user();
+        $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
+        $cm = get_coursemodule_from_instance('datalynx', $instance->id, 0, false, MUST_EXIST);
+        $context = context_module::instance($cm->id);
+
+        $fieldid = $this->create_tag_field($instance->id);
+        [, $contentid] = $this->create_tagged_entry($instance->id, $context, $author->id, $fieldid, ['alpha', 'beta']);
+
+        datalynx_reset_userdata((object) ['courseid' => $course->id, 'reset_datalynx_data' => 1, 'timeshift' => 0]);
+
+        $this->assertSame(0, $this->count_tag_instances($contentid));
+    }
 }

@@ -782,6 +782,7 @@ $string['privacy:metadata:datalynx_rule_matches:entrylow'] = 'One entry of the p
 $string['privacy:metadata:datalynx_rule_matches:timenotified'] = 'Time when the authors were told about each other';
 $string['privacy:metadata:filepurpose'] = 'File or picture attached to a datalynx instance.';
 $string['privacy:metadata:ratingpurpose'] = 'Ratings given to datalynx entries.';
+$string['privacy:metadata:tagpurpose'] = 'Tags added to datalynx entries.';
 $string['random'] = 'Random';
 $string['randomone'] = 'One random';
 $string['range'] = 'Range';
