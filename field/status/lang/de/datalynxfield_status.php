@@ -25,3 +25,4 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'Datalynx Status-Feld';
+$string['privacy:metadata'] = 'Das Statusfeld speichert selbst keine Daten. Der Status ist Teil des Eintrags, den mod_datalynx exportiert und löscht.';

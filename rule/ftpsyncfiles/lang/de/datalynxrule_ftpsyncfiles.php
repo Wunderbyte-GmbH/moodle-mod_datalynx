@@ -27,6 +27,7 @@ $string['identifier'] = 'Im Dateinamen verwendetes Identifikationsmerkmal, um di
 $string['manager'] = 'Der User, der die Einträge verwaltet';
 $string['matchfields'] = 'Importierte Daten entsprechend den Formularfeldern zuordnen';
 $string['pluginname'] = 'FTP Sync Data';
+$string['privacy:metadata'] = 'Die FTP-Sync-Regel speichert selbst keine personenbezogenen Daten. Die erzeugten Einträge und Dateien werden von mod_datalynx gespeichert, exportiert und gelöscht.';
 $string['regex'] = 'Regulärer Ausdruck, der verwendet wird, um die Kennung aus dem Dateinamen zu extrahieren.
 Wenn leer gelassen, wird standardmäßig /^(\d+)_/ verwendet.';
 $string['sftppassword'] = 'STFP Passwort';

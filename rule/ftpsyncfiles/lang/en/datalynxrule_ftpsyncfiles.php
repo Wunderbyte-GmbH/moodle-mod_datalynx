@@ -27,6 +27,7 @@ $string['identifier'] = 'Identifier used in the filename to match a specific use
 $string['manager'] = 'User who manages all entries';
 $string['matchfields'] = 'Match imported data to the matching form fields';
 $string['pluginname'] = 'FTP Sync Data';
+$string['privacy:metadata'] = 'The FTP sync rule stores no personal data of its own. The entries and files it creates are stored, exported and deleted by mod_datalynx.';
 $string['regex'] = 'Regular expression used to extract the identifier from the filename.
 If left empty it defaults to /^(\d+)_/.';
 $string['sftppassword'] = 'STFP Password';

@@ -43,3 +43,4 @@ $string['fieldformatdateformatexamples'] = '<details class="mt-2 mb-3">
   </table>
 </details>';
 $string['pluginname'] = 'Datalynx Time Field';
+$string['privacy:metadata'] = 'The entry time field stores no data of its own. The entry timestamps are part of the entry, which mod_datalynx exports and deletes.';

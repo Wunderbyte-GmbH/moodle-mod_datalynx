@@ -22,3 +22,4 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 $string['pluginname'] = 'Datalynx Status Field';
+$string['privacy:metadata'] = 'The status field stores no data of its own. The status is part of the entry, which mod_datalynx exports and deletes.';

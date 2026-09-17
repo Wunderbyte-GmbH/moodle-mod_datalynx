@@ -18,6 +18,7 @@ namespace datalynxfield_itinerary\privacy;
 
 use core_privacy\local\metadata\collection;
 use core_privacy\local\metadata\provider as metadata_provider;
+use core_privacy\local\request\plugin\subplugin_provider;
 use mod_datalynx\local\map\provider_config;
 
 /**
@@ -31,7 +32,10 @@ use mod_datalynx\local\map\provider_config;
  * @copyright  2026 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class provider implements metadata_provider {
+class provider implements
+    metadata_provider,
+    // The data requests themselves are served by mod_datalynx, which owns the tables.
+    subplugin_provider {
     /**
      * Describe the data this field type handles and where it is sent.
      *

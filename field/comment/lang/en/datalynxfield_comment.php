@@ -24,3 +24,4 @@
  */
 $string['fieldformat_desc'] = 'Controls comments display. Type one of the following options as the format Name: count, inline, add.';
 $string['pluginname'] = 'Datalynx Comment Field';
+$string['privacy:metadata'] = 'The comment field stores no data of its own. Comments are stored by the comment subsystem, and mod_datalynx exports and deletes them.';

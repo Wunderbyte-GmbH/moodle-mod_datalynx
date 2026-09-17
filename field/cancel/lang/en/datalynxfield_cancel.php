@@ -28,6 +28,7 @@ $string['buttontext'] = 'Button text';
 $string['cancel'] = 'Cancel';
 $string['cssclasses'] = 'CSS classes';
 $string['pluginname'] = 'Cancel button';
+$string['privacy:metadata'] = 'The cancel field only renders a button and stores no data.';
 $string['returntoorigin'] = 'Return to originating page';
 $string['returntoorigin_help'] = 'When enabled, cancelling returns the user to the page they came from (the view where they clicked the edit or add link). If the originating page cannot be determined, the user is sent to the default view.';
 $string['showarrow'] = 'Show arrow';

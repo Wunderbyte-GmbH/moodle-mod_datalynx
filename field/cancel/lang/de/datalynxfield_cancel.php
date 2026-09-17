@@ -28,6 +28,7 @@ $string['buttontext'] = 'Beschriftung der Schaltfläche';
 $string['cancel'] = 'Abbrechen';
 $string['cssclasses'] = 'CSS-Klassen';
 $string['pluginname'] = 'Abbrechen-Schaltfläche';
+$string['privacy:metadata'] = 'Das Abbrechen-Feld zeigt nur eine Schaltfläche an und speichert keine Daten.';
 $string['returntoorigin'] = 'Zur Ausgangsseite zurückkehren';
 $string['returntoorigin_help'] = 'Wenn aktiviert, kehrt der Benutzer beim Abbrechen zu der Seite zurück, von der er gekommen ist (die Ansicht, in der er den Bearbeiten- oder Hinzufügen-Link angeklickt hat). Kann die Ausgangsseite nicht ermittelt werden, wird der Benutzer zur Standardansicht weitergeleitet.';
 $string['showarrow'] = 'Pfeil anzeigen';

@@ -836,4 +836,175 @@ final class provider_test extends advanced_testcase {
 
         $this->assertSame(0, $this->count_tag_instances($contentid));
     }
+
+    /**
+     * Insert a team member select field.
+     *
+     * @param int $dataid
+     * @return int field id
+     */
+    private function create_team_field(int $dataid): int {
+        global $DB;
+        return (int) $DB->insert_record('datalynx_fields', (object) [
+            'dataid' => $dataid,
+            'type' => 'teammemberselect',
+            'name' => 'Team',
+            'description' => '',
+        ]);
+    }
+
+    /**
+     * Read the stored member list of a team member select content row.
+     *
+     * @param int $contentid
+     * @return array
+     */
+    private function get_team(int $contentid): array {
+        global $DB;
+        return json_decode($DB->get_field('datalynx_contents', 'content', ['id' => $contentid]), true);
+    }
+
+    /**
+     * A user who is only named as a team member of somebody else's entry is discovered, in both
+     * the integer and the legacy string storage format, and a user whose id is merely a substring
+     * of a member's id is not.
+     *
+     * @covers ::get_users_in_context
+     * @covers ::get_contexts_for_userid
+     */
+    public function test_team_member_is_discovered(): void {
+        $course = $this->getDataGenerator()->create_course();
+        $author = $this->getDataGenerator()->create_user();
+        $member = $this->getDataGenerator()->create_user();
+        $legacymember = $this->getDataGenerator()->create_user();
+        $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
+        $cm = get_coursemodule_from_instance('datalynx', $instance->id, 0, false, MUST_EXIST);
+        $context = context_module::instance($cm->id);
+
+        $fieldid = $this->create_team_field($instance->id);
+        $entryid = $this->create_entry($instance->id, $author->id);
+        $this->create_content($entryid, $fieldid, json_encode([(int) $member->id]));
+        $legacyentryid = $this->create_entry($instance->id, $author->id);
+        $this->create_content($legacyentryid, $fieldid, json_encode([(string) $legacymember->id]));
+        // An id that contains the member's id as a substring must not match the member.
+        $substringentryid = $this->create_entry($instance->id, $author->id);
+        $this->create_content($substringentryid, $fieldid, json_encode([(int) ($member->id . '0' . $member->id)]));
+
+        $userlist = new userlist($context, 'mod_datalynx');
+        provider::get_users_in_context($userlist);
+        $this->assertContains((int) $member->id, $userlist->get_userids());
+        $this->assertContains((int) $legacymember->id, $userlist->get_userids());
+
+        foreach ([$member, $legacymember] as $user) {
+            $contextids = provider::get_contexts_for_userid($user->id)->get_contextids();
+            $this->assertEquals([$context->id], array_values($contextids));
+        }
+
+        $stranger = $this->getDataGenerator()->create_user();
+        $this->assertEmpty(provider::get_contexts_for_userid($stranger->id)->get_contextids());
+    }
+
+    /**
+     * An entry naming the user as a team member is part of the user's export.
+     *
+     * @covers ::export_user_data
+     */
+    public function test_export_includes_entries_with_user_as_team_member(): void {
+        $course = $this->getDataGenerator()->create_course();
+        $author = $this->getDataGenerator()->create_user();
+        $member = $this->getDataGenerator()->create_user();
+        $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
+        $cm = get_coursemodule_from_instance('datalynx', $instance->id, 0, false, MUST_EXIST);
+        $context = context_module::instance($cm->id);
+
+        $fieldid = $this->create_team_field($instance->id);
+        $entryid = $this->create_entry($instance->id, $author->id);
+        $contentid = $this->create_content($entryid, $fieldid, json_encode([(int) $member->id]));
+        $otherentryid = $this->create_entry($instance->id, $author->id);
+        $othercontentid = $this->create_content($otherentryid, $fieldid, json_encode([(int) $author->id]));
+
+        $this->setUser($member);
+        provider::export_user_data(new approved_contextlist($member, 'mod_datalynx', [$context->id]));
+
+        $writer = \core_privacy\local\request\writer::with_context($context);
+        $data = $writer->get_data([$entryid, $contentid]);
+        $this->assertSame(json_encode([(int) $member->id]), $data->content);
+        $this->assertEmpty($writer->get_data([$otherentryid, $othercontentid]));
+    }
+
+    /**
+     * A per-user deletion removes the user from the team of somebody else's entry, keeping the
+     * entry and its other team members.
+     *
+     * @covers ::delete_data_for_user
+     */
+    public function test_delete_for_user_removes_team_membership(): void {
+        global $DB;
+
+        $course = $this->getDataGenerator()->create_course();
+        $author = $this->getDataGenerator()->create_user();
+        $member = $this->getDataGenerator()->create_user();
+        $othermember = $this->getDataGenerator()->create_user();
+        $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
+        $cm = get_coursemodule_from_instance('datalynx', $instance->id, 0, false, MUST_EXIST);
+        $context = context_module::instance($cm->id);
+
+        $fieldid = $this->create_team_field($instance->id);
+        $entryid = $this->create_entry($instance->id, $author->id);
+        $contentid = $this->create_content($entryid, $fieldid, json_encode([(int) $member->id, (int) $othermember->id]));
+
+        provider::delete_data_for_user(new approved_contextlist($member, 'mod_datalynx', [$context->id]));
+
+        $this->assertTrue($DB->record_exists('datalynx_entries', ['id' => $entryid]));
+        $this->assertSame([(int) $othermember->id], $this->get_team($contentid));
+    }
+
+    /**
+     * A multi-user deletion removes the selected users from the teams of remaining entries, also
+     * from legacy string storage, and leaves other contexts alone.
+     *
+     * @covers ::delete_data_for_users
+     */
+    public function test_delete_for_users_removes_team_memberships(): void {
+        $course = $this->getDataGenerator()->create_course();
+        $author = $this->getDataGenerator()->create_user();
+        $member = $this->getDataGenerator()->create_user();
+        $othermember = $this->getDataGenerator()->create_user();
+        $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
+        $cm = get_coursemodule_from_instance('datalynx', $instance->id, 0, false, MUST_EXIST);
+        $context = context_module::instance($cm->id);
+        $otherinstance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
+
+        $fieldid = $this->create_team_field($instance->id);
+        $entryid = $this->create_entry($instance->id, $author->id);
+        $contentid = $this->create_content($entryid, $fieldid, json_encode([(string) $member->id, (string) $othermember->id]));
+        $otherfieldid = $this->create_team_field($otherinstance->id);
+        $otherentryid = $this->create_entry($otherinstance->id, $author->id);
+        $othercontentid = $this->create_content($otherentryid, $otherfieldid, json_encode([(int) $member->id]));
+
+        provider::delete_data_for_users(new approved_userlist($context, 'mod_datalynx', [$member->id]));
+
+        $this->assertSame([(int) $othermember->id], $this->get_team($contentid));
+        $this->assertSame([(int) $member->id], $this->get_team($othercontentid));
+    }
+
+    /**
+     * Every datalynx subplugin ships a privacy provider, so the registry shows them as compliant.
+     *
+     * @coversNothing
+     */
+    public function test_all_subplugins_are_privacy_compliant(): void {
+        $manager = new \core_privacy\manager();
+        foreach (['datalynxfield', 'datalynxview', 'datalynxrule'] as $plugintype) {
+            foreach (array_keys(\core_component::get_plugin_list($plugintype)) as $name) {
+                $component = "{$plugintype}_{$name}";
+                $this->assertTrue($manager->component_is_compliant($component), "$component has no privacy provider");
+                if (!is_subclass_of("\\{$component}\\privacy\\provider", \core_privacy\local\metadata\null_provider::class)) {
+                    continue;
+                }
+                $reason = $manager->get_null_provider_reason($component);
+                $this->assertTrue(get_string_manager()->string_exists($reason, $component), "$component lacks its reason string");
+            }
+        }
+    }
 }

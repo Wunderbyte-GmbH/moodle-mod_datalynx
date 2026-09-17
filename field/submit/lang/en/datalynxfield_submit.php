@@ -27,5 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 $string['buttontext'] = 'Button text';
 $string['cssclasses'] = 'CSS classes';
 $string['pluginname'] = 'Submit button';
+$string['privacy:metadata'] = 'The submit field only renders the form buttons and stores no data.';
 $string['showarrow'] = 'Show arrow';
 $string['submit'] = 'Submit';

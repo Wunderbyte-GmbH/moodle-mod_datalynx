@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Privacy provider implementation for datalynxfield_checkbox.
+ * Privacy provider implementation for datalynxfield_teammemberselect.
  *
  * @package datalynxfield_teammemberselect
  * @subpackage teammemberselect
@@ -31,7 +31,7 @@ namespace datalynxfield_teammemberselect\privacy;
  * @package datalynxfield_teammemberselect
  */
 class provider implements
-    // This plugin does not store any personal user data.
+    // The selected user ids live in datalynx_contents, which mod_datalynx discovers, exports and redacts.
     \core_privacy\local\metadata\null_provider {
     /**
      * Get the language string identifier with the component's language

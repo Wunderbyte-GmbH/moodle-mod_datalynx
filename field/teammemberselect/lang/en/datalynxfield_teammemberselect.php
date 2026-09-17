@@ -22,4 +22,4 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 $string['pluginname'] = 'Team member select';
-$string['privacy:metadata'] = 'Team member select does not store personal data.';
+$string['privacy:metadata'] = 'The team member select field stores no data of its own. The user IDs of the selected team members are part of the entry content, which mod_datalynx discovers, exports and removes.';

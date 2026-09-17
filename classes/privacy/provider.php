@@ -113,6 +113,7 @@ class provider implements
      * @return contextlist the list of contexts containing user info for the user.
      */
     public static function get_contexts_for_userid(int $userid): contextlist {
+        global $DB;
 
         // Fetch all entries in datalynx created by the user.
         $sql = "SELECT c.id
@@ -164,6 +165,13 @@ class provider implements
                 'modname'      => 'datalynx',
                 'contextlevel' => CONTEXT_MODULE,
             ] + $ratingquery->params);
+        }
+
+        // Fetch contexts where the user is named as a team member of an entry, their own or not.
+        $contextids = array_unique(array_column(self::get_team_memberships([$userid]), 'contextid'));
+        if ($contextids) {
+            [$insql, $inparams] = $DB->get_in_or_equal($contextids, SQL_PARAMS_NAMED);
+            $contextlist->add_from_sql("SELECT c.id FROM {context} c WHERE c.id $insql", $inparams);
         }
 
         return $contextlist;
@@ -222,6 +230,15 @@ class provider implements
             $itemsql,
             $itemparams
         );
+
+        // Users named as team members of an entry in this instance.
+        $memberids = [];
+        foreach (self::get_team_memberships(null, $context) as $membership) {
+            $memberids = array_merge($memberids, $membership->members);
+        }
+        if ($memberids) {
+            $userlist->add_users(array_unique($memberids));
+        }
     }
 
     /**
@@ -239,6 +256,20 @@ class provider implements
         $user = $contextlist->get_user();
 
         [$contextsql, $contextparams] = $DB->get_in_or_equal($contextlist->get_contextids(), SQL_PARAMS_NAMED);
+
+        // Entries naming the user as a team member are exported like the user's own entries.
+        $teamsql = '';
+        $teamparams = [];
+        $teamentryids = [];
+        foreach (self::get_team_memberships([$user->id]) as $membership) {
+            if (in_array($membership->contextid, $contextlist->get_contextids())) {
+                $teamentryids[$membership->entryid] = $membership->entryid;
+            }
+        }
+        if ($teamentryids) {
+            [$teaminsql, $teamparams] = $DB->get_in_or_equal($teamentryids, SQL_PARAMS_NAMED, 'dlxteam');
+            $teamsql = "OR de.id $teaminsql";
+        }
         $sql = "SELECT cm.id AS cmid, dl.name AS dataname, cm.course AS courseid, " . self::sql_fields() . "
                 FROM {context} ctx
                 JOIN {course_modules} cm ON cm.id = ctx.instanceid
@@ -249,6 +280,7 @@ class provider implements
                 JOIN {datalynx_fields} df ON df.id = dc.fieldid
                 WHERE ctx.id {$contextsql} AND ctx.contextlevel = :contextlevel
                 AND (de.userid = :userid
+                     $teamsql
                      OR EXISTS (SELECT 1 FROM {comments} com
                                  WHERE com.itemid = de.id AND com.component = :ccomponent
                                    AND com.commentarea = :ccommentarea AND com.userid = :cuserid)
@@ -258,7 +290,7 @@ class provider implements
                                    AND rat.ratingarea IN (:rareaentry, :rareaactivity)
                                    AND rat.userid = :ruserid))
                 ORDER BY cm.id, de.id, dc.fieldid";
-        $rs = $DB->get_recordset_sql($sql, $contextparams + ['contextlevel' => CONTEXT_MODULE,
+        $rs = $DB->get_recordset_sql($sql, $contextparams + $teamparams + ['contextlevel' => CONTEXT_MODULE,
                 'modname' => 'datalynx', 'userid' => $user->id, 'moddata' => 'mod_datalynx',
                 'ccomponent' => 'mod_datalynx', 'ccommentarea' => 'entry', 'cuserid' => $user->id,
                 'rcomponent' => 'mod_datalynx', 'rareaentry' => 'entry', 'rareaactivity' => 'activity',
@@ -364,6 +396,9 @@ class provider implements
             }
             $rs->close();
             self::delete_datalynx_entries($context, $recordstobedeleted);
+
+            // The user may still be named as a team member of somebody else's entry.
+            self::remove_team_members($context, [$user->id]);
         }
 
         // Delete this user's comments across the approved contexts.
@@ -410,8 +445,87 @@ class provider implements
 
         self::delete_datalynx_entries($context, $recordstobedeleted);
 
+        // The users may still be named as team members of somebody else's entry.
+        self::remove_team_members($context, $userids);
+
         // Delete the approved users' comments in this context.
         \core_comment\privacy\provider::delete_comments_for_users($userlist, 'mod_datalynx', 'entry');
+    }
+
+    /**
+     * Find the team member select contents that name users as team members.
+     *
+     * The member list is a JSON array inside the content column, holding integers or (in legacy
+     * rows) numeric strings, so it cannot be matched reliably in SQL. A LIKE narrows the rows
+     * down and the list itself is decoded and checked here.
+     *
+     * @param int[]|null $userids only return contents naming one of these users, null for any user
+     * @param \context|null $context restrict to this module context, null for all contexts
+     * @return \stdClass[] contents with id, entryid, contextid and members (int[]), keyed by content id
+     */
+    protected static function get_team_memberships(?array $userids = null, ?\context $context = null): array {
+        global $DB;
+
+        $sql = "SELECT dc.id, dc.entryid, dc.content, ctx.id AS contextid
+                  FROM {datalynx_contents} dc
+                  JOIN {datalynx_fields} df ON df.id = dc.fieldid AND df.type = :fieldtype
+                  JOIN {datalynx_entries} de ON de.id = dc.entryid
+                  JOIN {course_modules} cm ON cm.instance = de.dataid
+                  JOIN {modules} m ON m.id = cm.module AND m.name = :modname
+                  JOIN {context} ctx ON ctx.instanceid = cm.id AND ctx.contextlevel = :contextlevel
+                 WHERE 1 = 1";
+        $params = ['fieldtype' => 'teammemberselect', 'modname' => 'datalynx', 'contextlevel' => CONTEXT_MODULE];
+        if ($context) {
+            $sql .= " AND ctx.id = :contextid";
+            $params['contextid'] = $context->id;
+        }
+        if ($userids !== null) {
+            $likes = [];
+            foreach (array_values($userids) as $i => $userid) {
+                $likes[] = $DB->sql_like('dc.content', ":like$i");
+                $params["like$i"] = '%' . $DB->sql_like_escape((string) (int) $userid) . '%';
+            }
+            if (!$likes) {
+                return [];
+            }
+            $sql .= " AND (" . implode(' OR ', $likes) . ")";
+        }
+
+        $memberships = [];
+        $rs = $DB->get_recordset_sql($sql, $params);
+        foreach ($rs as $row) {
+            $members = json_decode((string) $row->content, true);
+            if (!is_array($members)) {
+                continue;
+            }
+            $members = array_map('intval', array_filter($members, 'is_numeric'));
+            if ($userids !== null && !array_intersect($members, $userids)) {
+                continue;
+            }
+            if ($members) {
+                $row->members = array_values($members);
+                $memberships[$row->id] = $row;
+            }
+        }
+        $rs->close();
+
+        return $memberships;
+    }
+
+    /**
+     * Remove users from the team member lists of the entries that remain in a context.
+     *
+     * @param \context $context
+     * @param int[] $userids
+     */
+    protected static function remove_team_members(\context $context, array $userids): void {
+        global $DB;
+
+        $userids = array_map('intval', $userids);
+        foreach (self::get_team_memberships($userids, $context) as $membership) {
+            $remaining = array_values(array_diff($membership->members, $userids));
+            $DB->set_field('datalynx_contents', 'content', json_encode($remaining), ['id' => $membership->id]);
+        }
     }
 
     /**
