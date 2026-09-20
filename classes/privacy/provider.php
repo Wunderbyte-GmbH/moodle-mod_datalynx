@@ -519,12 +519,9 @@ class provider implements
      * @param int[] $userids
      */
     protected static function remove_team_members(\context $context, array $userids): void {
-        global $DB;
-
-        $userids = array_map('intval', $userids);
-        foreach (self::get_team_memberships($userids, $context) as $membership) {
-            $remaining = array_values(array_diff($membership->members, $userids));
-            $DB->set_field('datalynx_contents', 'content', json_encode($remaining), ['id' => $membership->id]);
+        $cm = get_coursemodule_from_id('datalynx', $context->instanceid);
+        if ($cm) {
+            \datalynxfield_teammemberselect\field::remove_users_from_teams($userids, (int) $cm->instance);
         }
     }
 

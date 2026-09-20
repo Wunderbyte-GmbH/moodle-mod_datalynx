@@ -1543,6 +1543,14 @@ function xmldb_datalynx_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2026081000, 'datalynx');
     }
 
+    if ($oldversion < 2026092000) {
+        // Users deleted before the user_deleted observer existed are still named in the member
+        // lists of team member select fields. Remove them once; the observer keeps it that way.
+        \datalynxfield_teammemberselect\field::remove_users_from_teams(null);
+
+        upgrade_mod_savepoint(true, 2026092000, 'datalynx');
+    }
+
     return true;
 }
 

@@ -669,6 +669,76 @@ class field extends datalynxfield_base {
     }
 
     /**
+     * Remove users from the stored member lists, e.g. because their accounts were deleted.
+     *
+     * Works directly on the content rows: nobody is to be notified about this and no rule must
+     * fire, so the entry API is bypassed on purpose. The member list is decoded here because it
+     * holds integers or (in legacy rows) numeric strings and cannot be matched reliably in SQL.
+     *
+     * @param int[]|null $userids Users to remove, or null to remove every user whose account is deleted.
+     * @param int|null $dataid Restrict to one datalynx instance, or null for all instances.
+     * @return int Number of content rows updated.
+     */
+    public static function remove_users_from_teams(?array $userids, ?int $dataid = null): int {
+        global $DB;
+
+        $params = [];
+        $sql = "SELECT c.id, c.content
+                  FROM {datalynx_contents} c
+                  JOIN {datalynx_fields} f ON f.id = c.fieldid
+                 WHERE f.type = 'teammemberselect'";
+        if ($dataid !== null) {
+            $sql .= " AND f.dataid = :dataid";
+            $params['dataid'] = $dataid;
+        }
+        if ($userids !== null) {
+            $userids = array_map('intval', $userids);
+            if (!$userids) {
+                return 0;
+            }
+            // Narrow the rows down; the decoded list below decides.
+            $likes = [];
+            foreach (array_values($userids) as $i => $userid) {
+                $likes[] = $DB->sql_like('c.content', ":like$i");
+                $params["like$i"] = '%' . $userid . '%';
+            }
+            $sql .= " AND (" . implode(' OR ', $likes) . ")";
+        }
+
+        $rs = $DB->get_recordset_sql($sql, $params);
+        $rows = [];
+        foreach ($rs as $row) {
+            $members = json_decode((string) $row->content, true);
+            if (is_array($members) && $members) {
+                $rows[$row->id] = array_map('intval', array_filter($members, 'is_numeric'));
+            }
+        }
+        $rs->close();
+
+        if ($userids === null) {
+            $allmembers = array_unique(array_merge([], ...array_values($rows)));
+            $userids = [];
+            foreach (array_chunk($allmembers, 1000) as $chunk) {
+                [$insql, $inparams] = $DB->get_in_or_equal($chunk);
+                // Members without a user record at all are gone just the same.
+                $existing = $DB->get_fieldset_select('user', 'id', "deleted = 0 AND id $insql", $inparams);
+                $userids = array_merge($userids, array_diff($chunk, $existing));
+            }
+        }
+
+        $updated = 0;
+        foreach ($rows as $contentid => $members) {
+            $remaining = array_values(array_diff($members, $userids));
+            if (count($remaining) !== count($members)) {
+                $DB->set_field('datalynx_contents', 'content', json_encode($remaining), ['id' => $contentid]);
+                $updated++;
+            }
+        }
+
+        return $updated;
+    }
+
+    /**
      * Return all user ids of the field across all entries in the specific datalynx instance.
      *
      * @param string $insql to be used with: AND entryid $insql
