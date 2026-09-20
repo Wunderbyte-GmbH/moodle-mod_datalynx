@@ -708,6 +708,7 @@ $string['pagingnextslide'] = 'Next slide';
 $string['pagingpreviousslide'] = 'Previous slide';
 $string['participants'] = 'Participants';
 $string['period'] = 'Period';
+$string['picture'] = 'Picture';
 $string['picturelarge'] = 'Picture (large)';
 $string['pleaseaddsome'] = 'Please create some below or {$a} to get started.';
 $string['pluginadministration'] = 'Datalynx activity administration';

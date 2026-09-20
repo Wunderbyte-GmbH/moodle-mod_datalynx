@@ -22,4 +22,9 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$string['buttontext'] = 'Text der Schaltfläche';
+$string['cssclasses'] = 'CSS-Klassen';
+$string['pluginname'] = 'Absenden-Schaltfläche';
 $string['privacy:metadata'] = 'Das Absenden-Feld zeigt nur die Formularschaltflächen an und speichert keine Daten.';
+$string['showarrow'] = 'Pfeil anzeigen';
+$string['submit'] = 'Absenden';

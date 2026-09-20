@@ -116,32 +116,19 @@ class field_format extends \mod_datalynx\local\field_format\base {
         global $DB;
 
         $options = [
-            'name' => get_string_manager()->string_exists('fullname', 'moodle') ?
-                get_string('fullname', 'moodle') : 'Full name',
-            'firstname' => get_string_manager()->string_exists('firstname', 'moodle') ?
-                get_string('firstname', 'moodle') : 'First name',
-            'lastname' => get_string_manager()->string_exists('lastname', 'moodle') ?
-                get_string('lastname', 'moodle') : 'Last name',
-            'username' => get_string_manager()->string_exists('username', 'moodle') ?
-                get_string('username', 'moodle') : 'Username',
-            'id' => get_string_manager()->string_exists('userid', 'mod_datalynx') ?
-                get_string('userid', 'mod_datalynx') : 'User ID',
-            'idnumber' => get_string_manager()->string_exists('idnumber', 'moodle') ?
-                get_string('idnumber', 'moodle') : 'ID number',
-            'picture' => get_string_manager()->string_exists('picture', 'mod_datalynx') ?
-                get_string('picture', 'mod_datalynx') : 'Picture',
-            'picturelarge' => get_string_manager()->string_exists('picturelarge', 'mod_datalynx') ?
-                get_string('picturelarge', 'mod_datalynx') : 'Picture large',
-            'email' => get_string_manager()->string_exists('email', 'moodle') ?
-                get_string('email', 'moodle') : 'Email',
-            'institution' => get_string_manager()->string_exists('institution', 'moodle') ?
-                get_string('institution', 'moodle') : 'Institution',
-            'department' => get_string_manager()->string_exists('department', 'moodle') ?
-                get_string('department', 'moodle') : 'Department',
-            'badges' => get_string_manager()->string_exists('badges', 'mod_datalynx') ?
-                get_string('badges', 'mod_datalynx') : 'Badges',
-            'edit' => get_string_manager()->string_exists('edit', 'moodle') ?
-                get_string('edit', 'moodle') : 'Edit',
+            'name' => get_string('fullname', 'moodle'),
+            'firstname' => get_string('firstname', 'moodle'),
+            'lastname' => get_string('lastname', 'moodle'),
+            'username' => get_string('username', 'moodle'),
+            'id' => get_string('userid', 'mod_datalynx'),
+            'idnumber' => get_string('idnumber', 'moodle'),
+            'picture' => get_string('picture', 'mod_datalynx'),
+            'picturelarge' => get_string('picturelarge', 'mod_datalynx'),
+            'email' => get_string('email', 'moodle'),
+            'institution' => get_string('institution', 'moodle'),
+            'department' => get_string('department', 'moodle'),
+            'badges' => get_string('badges', 'mod_datalynx'),
+            'edit' => get_string('edit', 'moodle'),
         ];
 
         // Retrieve custom user profile fields from the database.

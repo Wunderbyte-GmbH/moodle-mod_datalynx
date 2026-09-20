@@ -22,4 +22,5 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$string['pluginname'] = 'Datalynx Eintrags-Feld';
 $string['privacy:metadata'] = 'Das Eintragsfeld zeigt nur Eintragsaktionen an und speichert keine Daten.';

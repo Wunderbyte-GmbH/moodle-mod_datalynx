@@ -22,8 +22,8 @@
  * @copyright based on the work by 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-$string['coursenotfound'] = 'Course id {a} not found';
-$string['groupnotfound'] = 'Group id {a} not found';
+$string['coursenotfound'] = 'Course id {$a} not found';
+$string['groupnotfound'] = 'Group id {$a} not found';
 $string['member'] = 'Membership';
 $string['pluginname'] = 'Course group';
 $string['privacy:metadata'] = 'Coursegroups do not store personal data.';

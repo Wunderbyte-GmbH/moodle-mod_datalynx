@@ -22,4 +22,5 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$string['pluginname'] = 'Teammitglieder-Auswahl';
 $string['privacy:metadata'] = 'Das Feld Teammitglieder-Auswahl speichert selbst keine Daten. Die Nutzer-IDs der ausgewählten Teammitglieder sind Teil des Eintragsinhalts, den mod_datalynx auffindet, exportiert und entfernt.';

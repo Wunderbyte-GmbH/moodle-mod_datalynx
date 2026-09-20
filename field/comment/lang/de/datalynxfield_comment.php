@@ -22,4 +22,6 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$string['fieldformat_desc'] = 'Steuert die Anzeige der Kommentare. Geben Sie eine der folgenden Optionen als Formatnamen ein: count, inline, add.';
+$string['pluginname'] = 'Datalynx Kommentar-Feld';
 $string['privacy:metadata'] = 'Das Kommentarfeld speichert selbst keine Daten. Kommentare werden vom Kommentarsystem gespeichert und von mod_datalynx exportiert und gelöscht.';

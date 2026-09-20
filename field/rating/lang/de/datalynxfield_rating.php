@@ -22,4 +22,6 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$string['fieldformat_desc'] = 'Steuert die Anzeige der Bewertung. Geben Sie eine der folgenden Optionen als Formatnamen ein: rate, view, viewurl, viewinline, avg, count, max, min, sum.';
+$string['pluginname'] = 'Datalynx Bewertungs-Feld';
 $string['privacy:metadata'] = 'Das Bewertungsfeld speichert selbst keine Daten. Bewertungen werden vom Bewertungssystem gespeichert und von mod_datalynx exportiert und gelöscht.';

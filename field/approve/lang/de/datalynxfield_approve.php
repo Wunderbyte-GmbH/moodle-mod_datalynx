@@ -22,4 +22,5 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$string['pluginname'] = 'Datalynx Freigabe-Feld';
 $string['privacy:metadata'] = 'Das Freigabefeld speichert selbst keine Daten. Der Freigabestatus ist Teil des Eintrags, den mod_datalynx exportiert und löscht.';
