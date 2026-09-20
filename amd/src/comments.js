@@ -150,7 +150,7 @@ const initialiseCommentWidget = (widget) => {
     const options = getCommentOptions(widget);
 
     const promise = new Promise((resolve) => {
-        YUI.use('moodle-core-comment', (Y) => {
+        YUI.use('core_comment', (Y) => {
             M.core_comment.init(Y, options);
             widget.dataset.commentInitialized = '1';
             delete widget.dataset.commentInitializing;

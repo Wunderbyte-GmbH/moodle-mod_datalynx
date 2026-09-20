@@ -883,66 +883,6 @@ function datalynx_extend_settings_navigation(settings_navigation $settings, navi
 // Info.
 
 /**
- * returns a list of participants of this datalynx
- *
- * @param int $dataid Datalynx instance ID.
- * @return array Array of user records.
- */
-function datalynx_get_participants($dataid) {
-    global $DB;
-
-    $params = ['dataid' => $dataid];
-
-    $sql = "SELECT DISTINCT u.id
-              FROM {user} u,
-                   {datalynx_entries} e
-             WHERE e.dataid = :dataid AND
-                   u.id = e.userid";
-    $entries = $DB->get_records_sql($sql, $params);
-
-    $sql = "SELECT DISTINCT u.id
-              FROM {user} u,
-                   {datalynx_entries} e,
-                   {comments} c
-             WHERE e.dataid = ? AND
-                   u.id = e.userid AND
-                   e.id = c.itemid AND
-                   c.commentarea = 'entry'";
-    $comments = $DB->get_records_sql($sql, $params);
-
-    $sql = "SELECT DISTINCT u.id
-              FROM {user} u,
-                   {datalynx_entries} e,
-                   {ratings} r
-             WHERE e.dataid = ? AND
-                   u.id = e.userid AND
-                   e.id = r.itemid AND
-                   r.component = 'mod_datalynx' AND
-                   (r.ratingarea = 'entry' OR
-                   r.ratingarea = 'activity')";
-    $ratings = $DB->get_records_sql($sql, $params);
-
-    $participants = [];
-
-    if ($entries) {
-        foreach ($entries as $entry) {
-            $participants[$entry->id] = $entry;
-        }
-    }
-    if ($comments) {
-        foreach ($comments as $comment) {
-            $participants[$comment->id] = $comment;
-        }
-    }
-    if ($ratings) {
-        foreach ($ratings as $rating) {
-            $participants[$rating->id] = $rating;
-        }
-    }
-    return $participants;
-}
-
-/**
  * returns a summary of datalynx activity of this user
  *
  * @param stdClass $course Course object.

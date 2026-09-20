@@ -38,7 +38,6 @@ use moodle_exception;
 use moodle_page;
 use moodle_url;
 use stdClass;
-use user_picture;
 
 /**
  * Class datalynx
@@ -552,17 +551,9 @@ class datalynx {
         if (!empty($params->comments)) {
             require_once("$CFG->dirroot/comment/lib.php");
             comment::init();
-            $PAGE->requires->js_init_call('M.core_comment.init', [(object) [
-                'client_id' => 'datalynx-comment-loader',
-                'commentarea' => 'entry',
-                'itemid' => 0,
-                'page' => 0,
-                'courseid' => $this->course->id,
-                'contextid' => $this->context->id,
-                'component' => 'mod_datalynx',
-                'notoggle' => true,
-                'autostart' => false,
-            ]], true);
+            // Make core's comment module known to the YUI loader; mod_datalynx/comments loads it
+            // on demand and initialises every widget itself.
+            $PAGE->requires->js_module('core_comment');
             $PAGE->requires->js_call_amd('mod_datalynx/comments', 'init');
         }
 
@@ -2439,7 +2430,7 @@ class datalynx {
                     $gradebookroles,
                     $this->context,
                     true,
-                    user_picture::fields('u'),
+                    \core_user\fields::for_userpic()->get_sql('u', false, '', '', false)->selects,
                     'u.lastname ASC',
                     true,
                     $this->currentgroup,

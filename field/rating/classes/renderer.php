@@ -295,7 +295,7 @@ class renderer extends datalynxfield_renderer {
                 $maxrating = $rating->settings->scale->max;
 
                 foreach ($rating->records as $raterecord) {
-                    // Undo the aliasing of the user id column from user_picture::fields().
+                    // Undo the aliasing of the user id column in the ratings query.
                     // We could clone the rating object or preserve the rating id if we needed it again.
                     // But we don't.
                     $raterecord->id = $raterecord->userid;

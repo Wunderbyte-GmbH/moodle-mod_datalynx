@@ -33,7 +33,6 @@ namespace mod_datalynx;
 use coding_exception;
 use rating_manager;
 use stdClass;
-use user_picture;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -221,10 +220,11 @@ class datalynx_rating_manager extends rating_manager {
             $params = array_merge($params, $paramitems);
         }
 
+        $userfields = \core_user\fields::for_userpic()->including('idnumber', 'username')
+            ->get_sql('u', false, '', 'uid', false)->selects;
         $sql = "SELECT r.id, r.itemid, r.component, r.ratingarea, r.contextid, r.scaleid,
-                       r.rating, r.userid, r.timecreated, r.timemodified, " .
-                user_picture::fields('u', ['idnumber', 'username',
-                ], 'uid ') . " FROM {rating} r
+                       r.rating, r.userid, r.timecreated, r.timemodified, $userfields
+                   FROM {rating} r
                     JOIN {user} u ON u.id = r.userid
                 WHERE r.contextid = :contextid
                         AND r.component = :component

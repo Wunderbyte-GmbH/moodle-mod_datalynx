@@ -17,16 +17,12 @@
 namespace mod_datalynx\external;
 
 use context_module;
-use external_api;
-use external_function_parameters;
-use external_single_structure;
-use external_value;
+use core_external\external_api;
+use core_external\external_function_parameters;
+use core_external\external_single_structure;
+use core_external\external_value;
 use invalid_parameter_exception;
 use mod_datalynx\local\field\datalynxfield_behavior;
-
-defined('MOODLE_INTERNAL') || die();
-
-require_once($CFG->libdir . '/externallib.php');
 
 /**
  * Web service to toggle behavior settings in the behavior management table.
