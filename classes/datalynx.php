@@ -547,6 +547,11 @@ class datalynx {
             rss_add_http_header($this->context, 'mod_datalynx', $this->data, $rsstitle);
         }
 
+        // Bulk selection/actions and the repeated form buttons are wired up by data attributes,
+        // on every datalynx page (management lists as well as views).
+        $PAGE->requires->js_call_amd('mod_datalynx/bulkactions', 'init');
+        $PAGE->requires->js_call_amd('mod_datalynx/delegatebuttons', 'init');
+
         // COMMENTS.
         if (!empty($params->comments)) {
             require_once("$CFG->dirroot/comment/lib.php");

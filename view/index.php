@@ -171,21 +171,25 @@ if (!empty($views)) {
         null,
         false,
         null,
-        ['onclick' => 'select_allnone(\'view\'&#44;this.checked)']
+        ['data-datalynx-selectall' => 'view']
     );
     $multiactionurl = new moodle_url($actionbaseurl, $linkparams);
     $multidelete = html_writer::tag(
         'button',
         $OUTPUT->pix_icon('t/delete', get_string('multidelete', 'datalynx')),
         ['name' => 'multidelete',
-                    'onclick' => 'bulk_action(\'view\'&#44; \'' . $multiactionurl->out(false) . '\'&#44; \'delete\')',
+                    'data-datalynx-bulkgroup' => 'view',
+                    'data-datalynx-bulkaction' => 'delete',
+                    'data-datalynx-bulkurl' => $multiactionurl->out(false),
         ]
     );
     $multiduplicate = html_writer::tag(
         'button',
         $OUTPUT->pix_icon('t/copy', get_string('multiduplicate', 'datalynx')),
         ['type' => 'button', 'name' => 'multiduplicate',
-                    'onclick' => 'bulk_action(\'view\'&#44; \'' . $multiactionurl->out(false) . '\'&#44; \'duplicate\')',
+                    'data-datalynx-bulkgroup' => 'view',
+                    'data-datalynx-bulkaction' => 'duplicate',
+                    'data-datalynx-bulkurl' => $multiactionurl->out(false),
         ]
     );
 

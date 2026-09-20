@@ -767,15 +767,15 @@ class datalynx_filter_manager {
             null,
             false,
             null,
-            ['onclick' => 'select_allnone(\'filter\'&#44;this.checked)']
+            ['data-datalynx-selectall' => 'filter']
         );
         $multidelete = html_writer::tag(
             'button',
             $OUTPUT->pix_icon('t/delete', get_string('multidelete', 'datalynx')),
             ['name' => 'multidelete',
-                        'onclick' => 'bulk_action(\'filter\'&#44; \'' .
-                                htmlspecialchars_decode(new moodle_url($filterbaseurl, $linkparams)) .
-                                '\'&#44; \'delete\')']
+                        'data-datalynx-bulkgroup' => 'filter',
+                        'data-datalynx-bulkaction' => 'delete',
+                        'data-datalynx-bulkurl' => htmlspecialchars_decode(new moodle_url($filterbaseurl, $linkparams))]
         );
 
         $table = new html_table();

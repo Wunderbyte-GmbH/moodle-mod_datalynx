@@ -182,7 +182,6 @@ class view extends base {
         ]));
 
         $PAGE->requires->js_call_amd('mod_datalynx/approve', 'init');
-        $PAGE->requires->js_call_amd('mod_datalynx/bulkactions', 'init');
         $PAGE->requires->js_call_amd('mod_datalynx/tabularbulkedit', 'init');
         if ($browsemode) {
             $this->initialise_view_browser(

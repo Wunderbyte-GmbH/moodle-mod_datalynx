@@ -86,5 +86,12 @@ export default {
                 refresh(region, options);
             }
         });
+
+        // The controls form only hosts the selectors; it must never be submitted (e.g. by Enter).
+        region.addEventListener('submit', (event) => {
+            if (event.target.closest('[data-region="report-controls"]')) {
+                event.preventDefault();
+            }
+        });
     }
 };

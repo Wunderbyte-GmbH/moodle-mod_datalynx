@@ -120,15 +120,16 @@ class datalynx_preset_manager {
                 null,
                 false,
                 null,
-                ['onclick' => 'select_allnone(\'preset\'&#44;this.checked)']
+                ['data-datalynx-selectall' => 'preset']
             );
 
             $multidownload = html_writer::tag(
                 'button',
                 $OUTPUT->pix_icon('t/download', get_string('multidownload', 'datalynx')),
                 ['name' => 'multidownload',
-                            'onclick' => 'bulk_action(\'preset\'&#44; \'' . $actionurl .
-                                    '\'&#44; \'download\')',
+                            'data-datalynx-bulkgroup' => 'preset',
+                            'data-datalynx-bulkaction' => 'download',
+                            'data-datalynx-bulkurl' => $actionurl,
                 ]
             );
 
@@ -136,8 +137,9 @@ class datalynx_preset_manager {
                 'button',
                 $OUTPUT->pix_icon('t/delete', get_string('multidelete', 'datalynx')),
                 ['name' => 'multidelete',
-                            'onclick' => 'bulk_action(\'preset\'&#44; \'' . $actionurl .
-                                    '\'&#44; \'delete\')',
+                            'data-datalynx-bulkgroup' => 'preset',
+                            'data-datalynx-bulkaction' => 'delete',
+                            'data-datalynx-bulkurl' => $actionurl,
                 ]
             );
 
@@ -145,8 +147,9 @@ class datalynx_preset_manager {
                 'button',
                 $OUTPUT->pix_icon('i/group', get_string('multishare', 'datalynx')),
                 ['name' => 'multishare',
-                            'onclick' => 'bulk_action(\'preset\'&#44; \'' . $actionurl .
-                                    '\'&#44; \'share\')',
+                            'data-datalynx-bulkgroup' => 'preset',
+                            'data-datalynx-bulkaction' => 'share',
+                            'data-datalynx-bulkurl' => $actionurl,
                 ]
             );
 

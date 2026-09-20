@@ -77,7 +77,7 @@ class datalynxview_entries_form extends moodleform {
             'delegate_save',
             '',
             '<button type="button" class="btn btn-primary" id="id_delegate_save" name="delegate_save" ' .
-            'onclick="document.getElementById(\'id_submitbutton\').click(); return false;">' .
+            'data-datalynx-delegate-click="id_submitbutton">' .
             get_string('savechanges') . '</button>'
         );
 
@@ -87,7 +87,7 @@ class datalynxview_entries_form extends moodleform {
             'delegate_cancel',
             '',
             '<button type="button" class="btn btn-secondary" id="id_delegate_cancel" name="delegate_cancel" ' .
-            'onclick="document.getElementById(\'id_cancel\').click(); return false;">' .
+            'data-datalynx-delegate-click="id_cancel">' .
             get_string('cancel') . '</button>'
         );
 

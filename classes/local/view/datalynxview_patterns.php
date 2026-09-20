@@ -544,8 +544,9 @@ class datalynxview_patterns {
                     'input',
                     ['type' => 'button', 'name' => 'multiduplicate',
                                 'value' => get_string('multiduplicate', 'datalynx'),
-                                'onclick' => 'bulk_action(\'entry\'&#44; \'' . $baseurl->out(false) .
-                                        '\'&#44; \'duplicate\')',
+                                'data-datalynx-bulkgroup' => 'entry',
+                                'data-datalynx-bulkaction' => 'duplicate',
+                                'data-datalynx-bulkurl' => $baseurl->out(false),
                         ]
                 );
                 break;
@@ -556,8 +557,9 @@ class datalynxview_patterns {
                         'button',
                         $OUTPUT->pix_icon('t/copy', get_string('multiduplicate', 'datalynx')),
                         ['type' => 'button', 'name' => 'multiduplicate',
-                                    'onclick' => 'bulk_action(\'entry\'&#44; \'' . $baseurl->out(false) .
-                                            '\'&#44; \'duplicate\')',
+                                    'data-datalynx-bulkgroup' => 'entry',
+                                    'data-datalynx-bulkaction' => 'duplicate',
+                                    'data-datalynx-bulkurl' => $baseurl->out(false),
                             ]
                     );
                 }
@@ -571,8 +573,9 @@ class datalynxview_patterns {
                         'input',
                         ['type' => 'button', 'name' => 'multiedit',
                                     'value' => get_string('multiedit', 'datalynx'),
-                                    'onclick' => 'bulk_action(\'entry\'&#44; \'' . $baseurl->out(false) .
-                                            '\'&#44; \'editentries\')',
+                                    'data-datalynx-bulkgroup' => 'entry',
+                                    'data-datalynx-bulkaction' => 'editentries',
+                                    'data-datalynx-bulkurl' => $baseurl->out(false),
                             ]
                     );
                 }
@@ -586,8 +589,9 @@ class datalynxview_patterns {
                         'button',
                         $OUTPUT->pix_icon('t/edit', get_string('multiedit', 'datalynx')),
                         ['type' => 'button', 'name' => 'multiedit',
-                                    'onclick' => 'bulk_action(\'entry\'&#44; \'' . $baseurl->out(false) .
-                                            '\'&#44; \'editentries\')',
+                                    'data-datalynx-bulkgroup' => 'entry',
+                                    'data-datalynx-bulkaction' => 'editentries',
+                                    'data-datalynx-bulkurl' => $baseurl->out(false),
                             ]
                     );
                 }
@@ -599,8 +603,9 @@ class datalynxview_patterns {
                         'input',
                         ['type' => 'button', 'name' => 'multidelete',
                                     'value' => get_string('multidelete', 'datalynx'),
-                                    'onclick' => 'bulk_action(\'entry\'&#44; \'' . $baseurl->out(false) .
-                                            '\'&#44; \'delete\')',
+                                    'data-datalynx-bulkgroup' => 'entry',
+                                    'data-datalynx-bulkaction' => 'delete',
+                                    'data-datalynx-bulkurl' => $baseurl->out(false),
                             ]
                     );
                 }
@@ -612,8 +617,9 @@ class datalynxview_patterns {
                         'button',
                         $OUTPUT->pix_icon('t/delete', get_string('multidelete', 'datalynx')),
                         ['type' => 'button', 'name' => 'multidelete',
-                                    'onclick' => 'bulk_action(\'entry\'&#44; \'' . $baseurl->out(false) .
-                                            '\'&#44; \'delete\')',
+                                    'data-datalynx-bulkgroup' => 'entry',
+                                    'data-datalynx-bulkaction' => 'delete',
+                                    'data-datalynx-bulkurl' => $baseurl->out(false),
                             ]
                     );
                 }
@@ -627,8 +633,9 @@ class datalynxview_patterns {
                             'input',
                             ['type' => 'button', 'name' => 'multiapprove',
                                         'value' => get_string('multiapprove', 'datalynx'),
-                                        'onclick' => 'bulk_action(\'entry\'&#44; \'' .
-                                                $baseurl->out(false) . '\'&#44; \'approve\')',
+                                        'data-datalynx-bulkgroup' => 'entry',
+                                        'data-datalynx-bulkaction' => 'approve',
+                                        'data-datalynx-bulkurl' => $baseurl->out(false),
                                 ]
                         );
                     } else {
@@ -640,8 +647,9 @@ class datalynxview_patterns {
                             ),
                             ['type' => 'button', 'name' => 'multiapprove',
                                         'title' => trim(get_string('multiapprove', 'datalynx')),
-                                        'onclick' => 'bulk_action(\'entry\'&#44; \'' .
-                                                $baseurl->out(false) . '\'&#44; \'approve\')',
+                                        'data-datalynx-bulkgroup' => 'entry',
+                                        'data-datalynx-bulkaction' => 'approve',
+                                        'data-datalynx-bulkurl' => $baseurl->out(false),
                                 ]
                         );
                     }
@@ -665,8 +673,9 @@ class datalynxview_patterns {
                         'button',
                         $buttonval,
                         ['type' => 'button', 'name' => 'multiexport',
-                                    'onclick' => 'bulk_action(\'entry\'&#44; \'' . $baseurl->out(false) .
-                                            '\'&#44; \'export\'&#44;-1)',
+                                    'data-datalynx-bulkgroup' => 'entry',
+                                    'data-datalynx-bulkaction' => 'export',
+                                    'data-datalynx-bulkurl' => $baseurl->out(false),
                             ]
                     );
                 }
@@ -678,7 +687,7 @@ class datalynxview_patterns {
                     null,
                     false,
                     null,
-                    ['onclick' => 'select_allnone(\'entry\'&#44;this.checked)',
+                    ['data-datalynx-selectall' => 'entry',
                                 'title' => get_string('multiselect', 'datalynx'),
                                 'id' => 'datalynx-selectallnone',
                         ]
