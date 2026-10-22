@@ -1785,29 +1785,13 @@ class datalynx {
     }
 
     /**
-     * TODO there is no need to instantiate all views!!!
-     * this function creates an instance of the particular subtemplate class *
+     * Returns the requested view, or the default view if the requested one is not available to the user.
      *
      * @param int $viewid
-     * @return base|false
+     * @return base|false false if neither view is available
      */
     public function get_view_from_id(int $viewid = 0): base|false {
-        // Get views visible to user.
-        $views = $this->get_view_records();
-        if (!empty($views)) {
-            if ($viewid && isset($views[$viewid])) {
-                $view = $views[$viewid];
-                // If can't find the requested, try the default.
-            } else {
-                if ($viewid = $this->data->defaultview && isset($views[$viewid])) {
-                    $view = $views[$viewid];
-                } else {
-                    return false;
-                }
-            }
-            return $this->get_view($view->type, $view);
-        }
-        return false;
+        return $this->get_current_view_from_id($viewid);
     }
 
     /**

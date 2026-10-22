@@ -74,6 +74,10 @@ navigation_node::override_active_url(
 // Import.
 if ($urlparams->vid && confirm_sesskey()) {
     $view = $dlx->get_view_from_id($urlparams->vid);
+    // Do not fall back to the default view: only the requested import view can import.
+    if (!$view || $view->id() != $urlparams->vid || $view->type() !== 'csv') {
+        throw new moodle_exception('invalidrecord', 'error', '', 'datalynx_views');
+    }
 
     // Process import.
     if ($urlparams->import && confirm_sesskey()) {
