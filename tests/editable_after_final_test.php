@@ -288,9 +288,9 @@ final class editable_after_final_test extends advanced_testcase {
      *
      * @param int $fieldid
      * @param int $entryid
-     * @return string|false
+     * @return string|false|null
      */
-    private function content(int $fieldid, int $entryid) {
+    private function content(int $fieldid, int $entryid): string|false|null {
         global $DB;
         return $DB->get_field(
             'datalynx_contents',

@@ -123,7 +123,7 @@ class renderer extends datalynxfield_renderer {
      *        false)
      * @return array (int) statusid => (string) label
      */
-    private function menu_status($shownotset = false) {
+    private function menu_status($shownotset = false): array {
         if ($shownotset) {
             return [
                     field::STATUS_NOT_SET => get_string('statusnotcreated', 'datalynx'),
@@ -149,9 +149,9 @@ class renderer extends datalynxfield_renderer {
      *
      * @param datalynx_entry $entry an entry
      * @param array $params unused
-     * @return string HTML representation
+     * @return string|null HTML representation
      */
-    protected function display_browse($entry, $params = []) {
+    protected function display_browse($entry, $params = []): ?string {
         $menu = $this->menu_status(true);
         if (isset($entry) && isset($entry->status)) {
             return $menu[$entry->status];

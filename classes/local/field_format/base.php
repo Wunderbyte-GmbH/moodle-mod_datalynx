@@ -72,7 +72,7 @@ abstract class base {
      * @param string $elementname The name of the element.
      * @param \stdClass $entry The database entry.
      */
-    public function format_edit(\MoodleQuickForm &$mform, string $elementname, \stdClass $entry) {
+    public function format_edit(\MoodleQuickForm &$mform, string $elementname, \stdClass $entry): void {
         // Default does nothing.
     }
 

@@ -1559,7 +1559,7 @@ function xmldb_datalynx_upgrade($oldversion) {
  *
  * @return void
  */
-function mod_datalynx_upgrade_behaviors() {
+function mod_datalynx_upgrade_behaviors(): void {
     global $DB;
     $allbehaviorids = $DB->get_fieldset_select('datalynx_behaviors', 'id', 'id > 0');
     if (!empty($allbehaviorids)) {
@@ -1588,7 +1588,7 @@ function mod_datalynx_upgrade_behaviors() {
  *
  * @return void
  */
-function mod_datalynx_replace_field_rules() {
+function mod_datalynx_replace_field_rules(): void {
     global $DB;
 
     $defaultbehavior = (object) ['name' => '', 'description' => '',
@@ -1675,7 +1675,7 @@ function mod_datalynx_replace_field_rules() {
  *
  * @return void
  */
-function mod_datalynx_replace_field_labels() {
+function mod_datalynx_replace_field_labels(): void {
     global $DB;
 
     $defaultrenderer = (object) ['id' => 0, 'name' => '', 'description' => '',
@@ -1728,7 +1728,7 @@ function mod_datalynx_replace_field_labels() {
  * @return void
  * @throws dml_exception
  */
-function mod_datalynx_fix_behavior_in_template() {
+function mod_datalynx_fix_behavior_in_template(): void {
     global $DB;
 
     $dataids = $DB->get_fieldset_select('datalynx', 'id', "id IS NOT NULL");

@@ -60,9 +60,9 @@ class datalynx_customfilter_manager {
      *
      * @param int $filterid
      * @param ?array $options
-     * @return mixed|datalynx_customfilter
+     * @return datalynx_customfilter|stdClass
      */
-    public function get_filter_from_id($filterid = 0, ?array $options = null) {
+    public function get_filter_from_id($filterid = 0, ?array $options = null): datalynx_customfilter|stdClass {
         $dlx = $this->dlx;
 
         if ($filterid == self::BLANK_FILTER) {
@@ -104,9 +104,9 @@ class datalynx_customfilter_manager {
      *
      * @param string $url
      * @param bool $raw
-     * @return ?datalynx_customfilter
+     * @return datalynx_customfilter|stdClass|null
      */
-    public function get_filter_from_url($url, $raw = false) {
+    public function get_filter_from_url($url, $raw = false): datalynx_customfilter|stdClass|null {
 
         $dlx = $this->dlx;
         $dlid = $dlx->id();
@@ -130,9 +130,9 @@ class datalynx_customfilter_manager {
      * @param null $exclude
      * @param bool $menu
      * @param bool $forceget
-     * @return array|bool
+     * @return array|false
      */
-    public function get_filters($exclude = null, $menu = false, $forceget = false) {
+    public function get_filters($exclude = null, $menu = false, $forceget = false): array|false {
         global $DB;
         if (!$this->customfilters || $forceget) {
             $this->customfilters = [];
@@ -176,9 +176,9 @@ class datalynx_customfilter_manager {
      * @param string $action
      * @param array $fids
      * @param bool $confirmed
-     * @return array|bool
+     * @return array|false
      */
-    public function process_filters($action, $fids, $confirmed = false) {
+    public function process_filters($action, $fids, $confirmed = false): array|false {
         global $DB, $OUTPUT;
 
         $dlx = $this->dlx;
@@ -390,9 +390,9 @@ class datalynx_customfilter_manager {
      *
      * @param datalynx_customfilter $filter
      * @param stdClass $formdata
-     * @return \mod_datalynx\local\filter\datalynx_customfilter
+     * @return datalynx_customfilter|stdClass
      */
-    public function get_filter_from_form($filter, $formdata) {
+    public function get_filter_from_form($filter, $formdata): datalynx_customfilter|stdClass {
         $filter->name = $formdata->name;
         $filter->description = !empty($formdata->description) ? $formdata->description : '';
         $filter->visible = !isset($formdata->visible) ? 0 : $formdata->visible;

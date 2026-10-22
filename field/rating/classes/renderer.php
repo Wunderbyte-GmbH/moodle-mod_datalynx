@@ -228,9 +228,9 @@ class renderer extends datalynxfield_renderer {
      *
      * @param object $entry The entry object.
      * @param string $tag The tag pattern being rendered.
-     * @return string HTML string.
+     * @return \moodle_url|string HTML string.
      */
-    protected function display_view($entry, $tag) {
+    protected function display_view($entry, $tag): \moodle_url|string {
         global $OUTPUT;
 
         if (isset($entry->rating)) {
@@ -271,7 +271,7 @@ class renderer extends datalynxfield_renderer {
      * @param object $entry The entry object.
      * @return string HTML string.
      */
-    protected function display_view_inline($entry) {
+    protected function display_view_inline($entry): string {
         global $OUTPUT, $DB;
 
         if (isset($entry->rating)) {
@@ -333,7 +333,7 @@ class renderer extends datalynxfield_renderer {
      * @param mixed $value The rating value to display.
      * @return string HTML string.
      */
-    protected function display_bar($entry, $value) {
+    protected function display_bar($entry, $value): string {
         if (isset($entry->rating) && $value) {
             $rating = $entry->rating;
 
@@ -357,7 +357,7 @@ class renderer extends datalynxfield_renderer {
      * @param mixed $value The current rating value.
      * @return string HTML string.
      */
-    protected function display_star($entry, $value) {
+    protected function display_star($entry, $value): string {
 
         if (isset($entry->rating)) {
             $rating = $entry->rating;

@@ -82,7 +82,7 @@ class field extends datalynxfield_base {
      * @param stdClass $entry The entry object.
      * @return string
      */
-    protected function generate_identifier_key($entry) {
+    protected function generate_identifier_key($entry): string {
         $identifierkey = $this->get_hash_string($entry);
         $uniqueness = !empty($this->field->param4) ? $this->field->param4 : false;
         if ($uniqueness) {
@@ -154,7 +154,7 @@ class field extends datalynxfield_base {
      * @param string $key The key to check.
      * @return bool
      */
-    protected function is_unique_key($key) {
+    protected function is_unique_key($key): bool {
         global $DB;
 
         return $DB->record_exists(

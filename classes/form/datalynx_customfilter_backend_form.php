@@ -196,9 +196,9 @@ class datalynx_customfilter_backend_form extends datalynx_customfilter_base_form
      * Get a customfilter record from the database by id.
      *
      * @param int $filterid The customfilter record ID.
-     * @return mixed
+     * @return stdClass|false
      */
-    protected function get_customfilter($filterid) {
+    protected function get_customfilter($filterid): stdClass|false {
         global $DB;
         return $DB->get_record('datalynx_customfilters', ['id' => $filterid]);
     }
@@ -231,7 +231,7 @@ class datalynx_customfilter_backend_form extends datalynx_customfilter_base_form
      *
      * @return string
      */
-    public function html() {
+    public function html(): string {
         return $this->_form->toHtml();
     }
 

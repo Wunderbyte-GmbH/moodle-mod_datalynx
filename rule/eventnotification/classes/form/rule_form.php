@@ -183,7 +183,7 @@ class rule_form extends base_rule_form {
      * though - the stored rows, three blank ones and a reload button that rebuilds the form
      * against what has been chosen so far.
      */
-    protected function match_definition() {
+    protected function match_definition(): void {
         $mform = &$this->_form;
 
         $fieldoptions = match_compiler::eligible_fields($this->dlx);
@@ -512,7 +512,7 @@ class rule_form extends base_rule_form {
      *
      * @return array
      */
-    protected function get_datalynx_team_fields() {
+    protected function get_datalynx_team_fields(): array {
         global $DB;
         $sql = "SELECT id, name
                   FROM {datalynx_fields}

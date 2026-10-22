@@ -167,9 +167,9 @@ class renderer extends datalynxfield_renderer {
      *
      * @param stdClass $entry The current entry object.
      * @param ?string $type The display type (course, group, courseid, groupid, or empty).
-     * @return string The rendered output.
+     * @return int|string The rendered output.
      */
-    protected function display_browse($entry, $type = null) {
+    protected function display_browse($entry, $type = null): int|string {
         global $DB;
 
         $field = $this->field;

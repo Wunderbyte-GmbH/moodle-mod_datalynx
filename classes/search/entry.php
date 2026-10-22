@@ -209,7 +209,7 @@ class entry extends base_mod {
      * @param int $entryid
      * @return stdClass
      */
-    protected function get_entry($entryid) {
+    protected function get_entry($entryid): stdClass {
         global $DB;
 
         if (empty($this->entriesdata[$entryid])) {

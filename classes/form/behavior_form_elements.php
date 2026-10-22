@@ -44,7 +44,7 @@ trait behavior_form_elements {
      * @param bool $new Whether this is a new (unsaved) behavior.
      * @return void
      */
-    protected function behavior_definition(bool $new) {
+    protected function behavior_definition(bool $new): void {
         $mform = &$this->_form;
 
         $mform->addElement('hidden', 'id', 0);
@@ -258,7 +258,7 @@ trait behavior_form_elements {
      * @param bool $addactionbuttons Whether to append the standard Save/Cancel buttons (legacy form only).
      * @return void
      */
-    protected function behavior_definition_after_data(bool $addactionbuttons) {
+    protected function behavior_definition_after_data(bool $addactionbuttons): void {
         $mform = &$this->_form;
         $dlx = $this->get_dlx();
 
@@ -327,7 +327,7 @@ trait behavior_form_elements {
      * @param \stdClass $data Validated form data from parent::get_data().
      * @return \stdClass
      */
-    protected function transform_behavior_data($data) {
+    protected function transform_behavior_data($data): \stdClass {
         $dlx = $this->get_dlx();
         $permissions = [1, 2, 4, 8, 16, 32];
 
@@ -397,7 +397,7 @@ trait behavior_form_elements {
      * @param array|\stdClass $data
      * @return void
      */
-    protected function prepare_behavior_data($data) {
+    protected function prepare_behavior_data($data): void {
         if (!isset($data->visibletopermission)) {
             $data->visibletopermission = [];
         }
@@ -554,7 +554,7 @@ trait behavior_form_elements {
         $value,
         $iscapability = true,
         $desc = ''
-    ) {
+    ): void {
         if ($iscapability) {
             $allowedroles = $this->get_allowed_role_names($capability);
 

@@ -54,9 +54,9 @@ class restore_datalynx_activity_task extends restore_activity_task {
     /**
      * Get the owner id for this restore task.
      *
-     * @return int
+     * @return int|string
      */
-    public function get_ownerid() {
+    public function get_ownerid(): int|string {
         return $this->ownerid;
     }
 

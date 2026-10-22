@@ -170,7 +170,7 @@ class datalynxview_entries_form extends moodleform {
      *
      * @return string HTML version of the form
      */
-    public function html() {
+    public function html(): string {
         return $this->_form->toHtml();
     }
 }

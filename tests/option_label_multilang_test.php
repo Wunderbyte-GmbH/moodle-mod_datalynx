@@ -69,9 +69,9 @@ final class option_label_multilang_test extends advanced_testcase {
      * Create a choice field whose first option carries multilang markup.
      *
      * @param string $type One of select, radiobutton, multiselect, checkbox.
-     * @return \mod_datalynx\local\field\datalynxfield_base
+     * @return \mod_datalynx\local\field\datalynxfield_base|false
      */
-    private function make_field(string $type) {
+    private function make_field(string $type): \mod_datalynx\local\field\datalynxfield_base|false {
         global $DB;
 
         $fieldid = (int) $DB->insert_record('datalynx_fields', (object) [

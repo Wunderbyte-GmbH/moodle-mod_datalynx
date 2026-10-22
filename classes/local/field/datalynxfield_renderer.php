@@ -271,7 +271,7 @@ abstract class datalynxfield_renderer {
      * @param string $tag
      * @return array
      */
-    protected function process_tag($tag) {
+    protected function process_tag($tag): array {
         $pattern = '/\[\[([^\|\]]+)(?:\|([^\|\]]*))?(?:\|([^\|\]]*))?\]\]/';
         $matches = [];
 
@@ -354,7 +354,7 @@ abstract class datalynxfield_renderer {
         MoodleQuickForm &$mform,
         stdClass $entry,
         array $options
-    ) {
+    ): void {
         if ($options['editable']) {
             $hascustomtemplate = isset($options['template'])
                 && strpos($options['template'], '#input') !== false;
@@ -461,7 +461,7 @@ abstract class datalynxfield_renderer {
      * @param bool $showall Whether to show all patterns.
      * @return array
      */
-    final public function get_menu($showall = false) {
+    final public function get_menu($showall = false): array {
         // The default menu category for fields.
         $patternsmenu = [];
         foreach ($this->patterns() as $tag => $pattern) {

@@ -268,8 +268,10 @@ class datalynxview_base_form extends moodleform {
 
     /**
      * Get the view menu for redirect settings.
+     *
+     * @return array
      */
-    public function get_view_menu() {
+    public function get_view_menu(): array {
         global $DB;
         $viewid = $this->view->view->id;
         $dataid = $this->dlx->id();
@@ -302,7 +304,7 @@ class datalynxview_base_form extends moodleform {
      * To be used by a specific view
      * Settings that apply before the "view template"
      */
-    public function view_definition_before_gps() {
+    public function view_definition_before_gps(): void {
     }
 
     /**
@@ -542,7 +544,7 @@ class datalynxview_base_form extends moodleform {
      * @param string $capability
      * @param int $value
      */
-    protected function add_visibility_checkbox($mform, $elementname, $label, $capability, $value) {
+    protected function add_visibility_checkbox($mform, $elementname, $label, $capability, $value): void {
         $allowedroles = $this->get_allowed_role_names($capability);
 
         $html = '<div class="d-inline-block align-middle ml-2">';

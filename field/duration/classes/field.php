@@ -55,7 +55,7 @@ class field extends datalynxfield_base {
      *
      * @return array unit length in seconds => string unit name.
      */
-    public function get_units() {
+    public function get_units(): array {
         if (is_null($this->units)) {
             $this->units = [604800 => get_string('weeks'), 86400 => get_string('days'),
                     3600 => get_string('hours'), 60 => get_string('minutes'), 1 => get_string('seconds'),

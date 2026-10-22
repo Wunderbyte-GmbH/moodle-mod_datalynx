@@ -122,7 +122,7 @@ class renderer extends datalynxfield_renderer {
      * @param bool   $href  If true returns the URL string instead of a link element.
      * @return string
      */
-    protected function display_more($entry, $href = false) {
+    protected function display_more($entry, $href = false): string {
         global $OUTPUT;
 
         $field = $this->field;
@@ -146,7 +146,7 @@ class renderer extends datalynxfield_renderer {
      * @param object $entry The current entry.
      * @return string
      */
-    protected function display_edit($entry) {
+    protected function display_edit($entry): string {
         global $OUTPUT;
 
         $field = $this->field;
@@ -182,7 +182,7 @@ class renderer extends datalynxfield_renderer {
      * @param object $entry The current entry.
      * @return string
      */
-    protected function display_duplicate($entry) {
+    protected function display_duplicate($entry): string {
         global $OUTPUT;
 
         $field = $this->field;
@@ -202,7 +202,7 @@ class renderer extends datalynxfield_renderer {
      * @param object $entry The current entry.
      * @return string
      */
-    protected function display_delete($entry) {
+    protected function display_delete($entry): string {
         global $OUTPUT;
 
         $field = $this->field;
@@ -231,7 +231,7 @@ class renderer extends datalynxfield_renderer {
      * @param array  $options Rendering options (e.g. 'edit' when shown inside the edit form).
      * @return string
      */
-    protected function display_reset($entry, array $options = []) {
+    protected function display_reset($entry, array $options = []): string {
         global $OUTPUT;
 
         // Capture the exact URL the user is viewing so we can return there once the reset completes.
@@ -263,7 +263,7 @@ class renderer extends datalynxfield_renderer {
      * @param object $entry The current entry.
      * @return string
      */
-    protected function display_export($entry) {
+    protected function display_export($entry): string {
         global $OUTPUT, $CFG;
 
         if (!$CFG->enableportfolios) {

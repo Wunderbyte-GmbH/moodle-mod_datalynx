@@ -41,7 +41,7 @@ final class field_search_operator_test extends advanced_testcase {
      *
      * @return \mod_datalynx\local\field\datalynxfield_base
      */
-    private function create_text_field() {
+    private function create_text_field(): \mod_datalynx\local\field\datalynxfield_base {
         global $DB;
 
         $course = $this->getDataGenerator()->create_course();

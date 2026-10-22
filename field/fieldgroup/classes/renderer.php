@@ -378,7 +378,7 @@ class renderer extends datalynxfield_renderer {
      *
      * @return array
      */
-    public function get_subfields() {
+    public function get_subfields(): array {
         if (empty($this->subfields)) {
             // We want to display these fields.
             $fieldids = $this->field->fieldids;
@@ -457,9 +457,9 @@ class renderer extends datalynxfield_renderer {
      * @param number $subfieldid
      * @param number $line defines what line we want to pass here.
      * @param number $lastlinewithcontent stores where we still see content entries.
-     * @return number $lastlinewithcontent the last line we want to show.
+     * @return int $lastlinewithcontent the last line we want to show.
      */
-    public static function renderer_split_content($entry, $subfieldid, $line, $lastlinewithcontent) {
+    public static function renderer_split_content($entry, $subfieldid, $line, $lastlinewithcontent): int {
         // Retrieve only relevant part of content and hand it over.
 
         // Loop through all possible contents. content, content1, ...
@@ -513,7 +513,7 @@ class renderer extends datalynxfield_renderer {
      * @param array $patterns Current set of patterns as collected from the view.
      * @return array Appended field patterns with all fieldgroup patterns.
      */
-    public function get_fieldgroup_patterns($patterns) {
+    public function get_fieldgroup_patterns($patterns): array {
         foreach ($this->get_subfields() as $fieldid => $subfield) {
             $fieldname = $subfield->field->name;
             $patterns[$fieldid][0] = "[[$fieldname]]";

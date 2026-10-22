@@ -73,7 +73,7 @@ class datalynxview_csv_import_form extends moodleform {
      *
      * @return string
      */
-    public function html() {
+    public function html(): string {
         return $this->_form->toHtml();
     }
 
@@ -97,7 +97,7 @@ class datalynxview_csv_import_form extends moodleform {
     /**
      * Field settings.
      */
-    protected function field_settings() {
+    protected function field_settings(): void {
         $view = $this->view;
         $dlx = $view->get_dlx();
         $mform = &$this->_form;
@@ -137,7 +137,7 @@ class datalynxview_csv_import_form extends moodleform {
     /**
      * CSV settings.
      */
-    protected function csv_settings() {
+    protected function csv_settings(): void {
         $view = $this->view;
         $mform = &$this->_form;
 

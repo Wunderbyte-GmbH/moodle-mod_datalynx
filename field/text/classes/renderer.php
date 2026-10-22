@@ -331,7 +331,7 @@ class renderer extends datalynxfield_renderer {
      * @param string $value The value to check.
      * @return string|null Error message if invalid, null if valid.
      */
-    protected function validate_format($format, $value) {
+    protected function validate_format($format, $value): ?string {
         switch ($format) {
             case 'alphanumeric':
                 if (!preg_match('/^[a-zA-Z0-9]+$/', $value)) {

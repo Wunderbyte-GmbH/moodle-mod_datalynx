@@ -215,7 +215,7 @@ class field extends datalynxfield_no_content_can_join {
      * @param bool $not
      * @return array
      */
-    private function get_users_with_profile_field_value($profilefieldname, $operator, $value, $not) {
+    private function get_users_with_profile_field_value($profilefieldname, $operator, $value, $not): array {
         global $DB, $USER;
 
         $sql = $not ?

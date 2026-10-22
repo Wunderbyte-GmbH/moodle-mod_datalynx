@@ -128,7 +128,7 @@ class renderer extends datalynxfield_renderer {
      * @param ?array $params Optional display parameters.
      * @return string
      */
-    protected function display_browse($entry, $params = null) {
+    protected function display_browse($entry, $params = null): string {
         global $PAGE;
 
         $field = $this->field;

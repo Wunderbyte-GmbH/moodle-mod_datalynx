@@ -282,18 +282,18 @@ class datalynx {
     /**
      * Get datalynx table id. Not cmid.
      *
-     * @return mixed
+     * @return int|string
      */
-    public function id() {
+    public function id(): int|string {
         return $this->data->id;
     }
 
     /**
      * Get name of datalynx instance.
      *
-     * @return mixed
+     * @return string
      */
-    public function name() {
+    public function name(): string {
         return $this->data->name;
     }
 
@@ -302,7 +302,7 @@ class datalynx {
      *
      * @return string
      */
-    public function pagefile() {
+    public function pagefile(): string {
         return $this->pagefile;
     }
 
@@ -327,16 +327,16 @@ class datalynx {
      *
      * @return array
      */
-    public function internal_group_modes() {
+    public function internal_group_modes(): array {
         return $this->internalgroupmodes;
     }
 
     /**
      * Get current view.
      *
-     * @return ?object view object
+     * @return base|false|null view object
      */
-    public function get_current_view() {
+    public function get_current_view(): base|false|null {
         return $this->currentview;
     }
 
@@ -356,9 +356,9 @@ class datalynx {
     /**
      * Get filter manager.
      *
-     * @return ?datalynx_filter_manager
+     * @return datalynx_filter_manager
      */
-    public function get_filter_manager() {
+    public function get_filter_manager(): datalynx_filter_manager {
         // Set filters manager.
         if (!$this->filtermanager) {
             $this->filtermanager = new datalynx_filter_manager($this);
@@ -369,9 +369,9 @@ class datalynx {
     /**
      * Get custom filter manager.
      *
-     * @return ?\mod_datalynx\local\filter\datalynx_customfilter_manager
+     * @return \mod_datalynx\local\filter\datalynx_customfilter_manager
      */
-    public function get_customfilter_manager() {
+    public function get_customfilter_manager(): \mod_datalynx\local\filter\datalynx_customfilter_manager {
         if (!$this->customfiltermanager) {
             $this->customfiltermanager = new local\filter\datalynx_customfilter_manager($this);
         }
@@ -381,9 +381,9 @@ class datalynx {
     /**
      * Get rule manager.
      *
-     * @return ?manager
+     * @return manager
      */
-    public function get_rule_manager() {
+    public function get_rule_manager(): manager {
         // Set rules manager.
         if (!$this->rulemanager) {
             $this->rulemanager = new manager($this);
@@ -394,9 +394,9 @@ class datalynx {
     /**
      * Get preset manager.
      *
-     * @return ?datalynx_preset_manager
+     * @return datalynx_preset_manager
      */
-    public function get_preset_manager() {
+    public function get_preset_manager(): datalynx_preset_manager {
         global $CFG;
         // Set preset manager.
         if (!$this->presetmanager) {
@@ -414,7 +414,7 @@ class datalynx {
      * @return int|string
      * @throws \dml_exception
      */
-    public function get_entriescount($type, $user = 0) {
+    public function get_entriescount($type, $user = 0): int|string {
         global $DB;
 
         switch ($type) {
@@ -1038,7 +1038,7 @@ class datalynx {
      *
      * @return array of strings
      */
-    public function get_customfilterfieldtypes() {
+    public function get_customfilterfieldtypes(): array {
         if (!$this->customfilterfields) {
             $this->customfilterfields = [];
             // Collate customfilter fields.
@@ -1063,9 +1063,9 @@ class datalynx {
      *
      * @param int $fieldid
      * @param bool $forceget
-     * @return \datalynxfield_base|bool
+     * @return \mod_datalynx\local\field\datalynxfield_base|false
      */
-    public function get_field_from_id($fieldid, $forceget = false) {
+    public function get_field_from_id($fieldid, $forceget = false): \mod_datalynx\local\field\datalynxfield_base|false {
         $fields = $this->get_fields(null, false, $forceget);
 
         if (empty($fields[$fieldid])) {
@@ -1101,9 +1101,9 @@ class datalynx {
      * Given a field name returns the field object from get_fields
      *
      * @param string $name
-     * @return \datalynxfield_base|bool
+     * @return \mod_datalynx\local\field\datalynxfield_base|false
      */
-    public function get_field_by_name($name) {
+    public function get_field_by_name($name): \mod_datalynx\local\field\datalynxfield_base|false {
         foreach ($this->get_fields() as $field) {
             if ($field->name() === $name) {
                 return $field;
@@ -1118,9 +1118,9 @@ class datalynx {
      * input: $param $field record from db, or field type
      *
      * @param mixed $key
-     * @return bool|\datalynxfield_base
+     * @return \mod_datalynx\local\field\datalynxfield_base|false
      */
-    public function get_field($key) {
+    public function get_field($key): \mod_datalynx\local\field\datalynxfield_base|false {
         if ($key) {
             if (is_object($key)) {
                 $type = $key->type;
@@ -1141,9 +1141,9 @@ class datalynx {
      * used to invoke plugin methods
      *
      * @param mixed $key
-     * @return bool|\datalynxfield_base
+     * @return \mod_datalynx\local\field\datalynxfield_base|false
      */
-    public function get_fieldname($key) {
+    public function get_fieldname($key): \mod_datalynx\local\field\datalynxfield_base|false {
         if ($key) {
             if (is_object($key)) {
                 $type = $key->type;
@@ -1233,7 +1233,7 @@ class datalynx {
      * @return array
      * @throws \dml_exception
      */
-    private function find_filters_using_fields($fields) {
+    private function find_filters_using_fields($fields): array {
         global $DB;
         $filters = $DB->get_records('datalynx_filters', ['dataid' => $this->id()]);
         $usedfilters = [];
@@ -1258,7 +1258,7 @@ class datalynx {
      * @param array $fields
      * @return array
      */
-    private function find_fieldgroups_using_fields($fields) {
+    private function find_fieldgroups_using_fields($fields): array {
         $fieldgroups = $this->get_fields_by_type('fieldgroup');
         $usedfieldgroups = [];
         $fieldids = array_keys($fields);
@@ -1278,7 +1278,7 @@ class datalynx {
      * @param array $fields
      * @return array
      */
-    private function find_customfilters_using_fields($fields) {
+    private function find_customfilters_using_fields($fields): array {
         global $DB;
         $customfilters = $DB->get_records('datalynx_customfilters', ['dataid' => $this->id()]);
         $usedcustomfilters = [];
@@ -1314,9 +1314,9 @@ class datalynx {
      * @param string $action
      * @param string $fids (comma separated numbers of field ids)
      * @param boolean $confirmed
-     * @return array|bool
+     * @return array|false
      */
-    public function process_fields($action, $fids, $confirmed = false) {
+    public function process_fields($action, $fids, $confirmed = false): array|false {
         global $OUTPUT, $DB;
 
         if (!has_capability('mod/datalynx:managetemplates', $this->context)) {
@@ -1714,7 +1714,7 @@ class datalynx {
      *
      * @return array of view objects indexed by view id, empty array if no views are found
      */
-    public function get_all_views() {
+    public function get_all_views(): array {
         global $DB;
         $views = [];
         if (!$views = $DB->get_records('datalynx_views', ['dataid' => $this->id()])) {
@@ -1765,9 +1765,9 @@ class datalynx {
      * this function creates an instance of the particular subtemplate class
      *
      * @param int $viewid
-     * @return \mod_datalynx\local\view\base|bool
+     * @return base|false
      */
-    public function get_current_view_from_id(int $viewid = 0) {
+    public function get_current_view_from_id(int $viewid = 0): base|false {
         if ($views = $this->get_view_records()) {
             if ($viewid && isset($views[$viewid])) {
                 $view = $views[$viewid];
@@ -1789,9 +1789,9 @@ class datalynx {
      * this function creates an instance of the particular subtemplate class *
      *
      * @param int $viewid
-     * @return \mod_datalynx\local\view\base|bool
+     * @return base|false
      */
-    public function get_view_from_id(int $viewid = 0) {
+    public function get_view_from_id(int $viewid = 0): base|false {
         // Get views visible to user.
         $views = $this->get_view_records();
         if (!empty($views)) {
@@ -1857,9 +1857,9 @@ class datalynx {
      *
      * @param string $type
      * @param bool $forceget
-     * @return array|bool
+     * @return array|false
      */
-    public function get_views_by_type($type, $forceget = false) {
+    public function get_views_by_type($type, $forceget = false): array|false {
         $views = $this->get_view_records($forceget);
         if (empty($views)) {
             return false;
@@ -2047,9 +2047,9 @@ class datalynx {
     /**
      * Returns the default view id for this datalynx instance.
      *
-     * @return int
+     * @return int|string
      */
-    public function get_default_view_id() {
+    public function get_default_view_id(): int|string {
         return $this->data->defaultview;
     }
 
@@ -2163,14 +2163,14 @@ class datalynx {
      * @param string $action
      * @param string $vids viewids comma separated
      * @param bool $confirmed
-     * @return array|bool
+     * @return array|false
      * @throws \coding_exception
      * @throws \dml_exception
      * @throws \file_exception
      * @throws \stored_file_creation_exception
      * @throws moodle_exception
      */
-    public function process_views($action, $vids, $confirmed = false) {
+    public function process_views($action, $vids, $confirmed = false): array|false {
         global $DB, $OUTPUT;
 
         if (!has_capability('mod/datalynx:managetemplates', $this->context)) {
@@ -2399,11 +2399,11 @@ class datalynx {
      * Returns users that appear in the gradebook for this datalynx instance.
      *
      * @param ?array $userids
-     * @return ?array
+     * @return array|null
      * @throws \coding_exception
      * @throws \dml_exception
      */
-    public function get_gradebook_users(?array $userids = null) {
+    public function get_gradebook_users(?array $userids = null): ?array {
         global $DB, $CFG;
 
         // Get the list of users by gradebook roles.
@@ -2709,7 +2709,7 @@ class datalynx {
      * @return int
      * @throws \dml_exception
      */
-    public function user_num_entries($perinterval = false) {
+    public function user_num_entries($perinterval = false): int {
         global $USER, $DB;
 
         static $numentries = null;
@@ -2978,7 +2978,7 @@ class datalynx {
      * @param int $id Entry id to exclude (0 for new entries).
      * @return bool True if the name exists.
      */
-    public function name_exists($table, $name, $id = 0) {
+    public function name_exists($table, $name, $id = 0): bool {
         global $DB;
 
         $params = [$this->id(), $name, $id];
@@ -2990,7 +2990,7 @@ class datalynx {
     /**
      * // TODO.
      */
-    public function settings_navigation() {
+    public function settings_navigation(): void {
     }
 
     /**
@@ -3080,7 +3080,7 @@ class datalynx {
      *
      * @return moodle_url
      */
-    public function get_baseurl() {
+    public function get_baseurl(): moodle_url {
         // Base url params.
         $baseurlparams = [];
         $baseurlparams['d'] = $this->id();

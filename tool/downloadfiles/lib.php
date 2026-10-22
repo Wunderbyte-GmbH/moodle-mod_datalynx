@@ -79,10 +79,10 @@ class datalynxtool_downloadfiles {
      * @param array $filesforzipping - array of files to pass into archive_to_pathname.
      *                                 This array is indexed by the final file name and each
      *                                 element in the array is an instance of a stored_file object.
-     * @return string path of temp file - note this returned file does
+     * @return string|false path of temp file - note this returned file does
      *         not have a .zip extension - it is a temp file.
      */
-    protected static function pack_files($filesforzipping) {
+    protected static function pack_files($filesforzipping): string|false {
         global $CFG;
         // Create path for new zip file.
         $tempzip = tempnam($CFG->tempdir . '/', 'datalynx_');

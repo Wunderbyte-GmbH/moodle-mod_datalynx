@@ -45,7 +45,7 @@ class datalynxfield_behavior_dynamic_form extends dynamic_form {
      *
      * @return datalynx
      */
-    protected function get_dlx() {
+    protected function get_dlx(): datalynx {
         if ($this->dlx === null) {
             $d = (int) $this->optional_param('d', 0, PARAM_INT);
             $cmid = (int) $this->optional_param('cmid', 0, PARAM_INT);

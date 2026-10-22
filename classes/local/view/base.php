@@ -370,7 +370,7 @@ abstract class base {
      *
      * @param stdClass $data form data
      */
-    protected function set_view($data) {
+    protected function set_view($data): void {
         $this->view->name = $data->name;
         $this->view->description = !empty($data->description) ? $data->description : '';
         $this->view->patterns = !empty($data->patterns) ? $data->patterns : null;
@@ -394,9 +394,9 @@ abstract class base {
     /**
      * Return default settings for a newly created view.
      *
-     * @return object
+     * @return stdClass
      */
-    public function get_default_view_settings() {
+    public function get_default_view_settings(): stdClass {
         return (object) ['description' => '', 'visible' => 7, 'perpage' => 3, 'groupby' => '', 'filter' => 0];
     }
 
@@ -405,7 +405,7 @@ abstract class base {
      *
      * @param ?stdClass $data Submitted form data.
      */
-    protected function set__editors($data = null) {
+    protected function set__editors($data = null): void {
         $text = '';
         foreach ($this->editors as $editor) { // New view or from DB so add editor fields.
             if (is_null($data)) {
@@ -499,7 +499,7 @@ abstract class base {
      * @param bool $filteroptions
      * @param bool $ignoreurl true, if URL filter options should be ignored
      */
-    public function set_filter($filteroptions = true, $ignoreurl = false) {
+    public function set_filter($filteroptions = true, $ignoreurl = false): void {
         $fm = $this->dlx->get_filter_manager($this);
         $urlparams = $fm::get_filter_options_from_url();
         $urloptions = [];
@@ -604,7 +604,7 @@ abstract class base {
      * @param stdClass $data View data.
      * @return int|false New view id or false on failure.
      */
-    public function add($data) {
+    public function add($data): int|false {
         global $DB, $OUTPUT;
 
         $this->set_view($data);
@@ -624,7 +624,7 @@ abstract class base {
      * @param ?stdClass $data View data.
      * @return bool True on success, false on failure.
      */
-    public function update($data = null) {
+    public function update($data = null): bool {
         global $DB, $OUTPUT;
         // Invalidate patterns in the view.
         $DB->set_field('datalynx_views', 'patterns', null, ['id' => $this->view->id]);
@@ -644,9 +644,9 @@ abstract class base {
     /**
      * Delete a view from the database
      *
-     * @return true
+     * @return bool
      */
-    public function delete() {
+    public function delete(): bool {
         global $DB;
 
         if (!empty($this->view->id)) {
@@ -669,7 +669,7 @@ abstract class base {
      *
      * @return moodleform instance of the form for editing the view settings
      */
-    public function get_form() {
+    public function get_form(): moodleform {
         global $CFG;
 
         $formclass = 'datalynxview_' . $this->type . '\\form';
@@ -712,7 +712,7 @@ abstract class base {
      * @param stdClass $data View data.
      * @return stdClass
      */
-    public function prepare_view_editors($data) {
+    public function prepare_view_editors($data): stdClass {
         $editors = $this->editors();
 
         foreach ($data as $key => $value) {
@@ -756,7 +756,7 @@ abstract class base {
      * @param stdClass $data Form data.
      * @return stdClass
      */
-    public function update_view_editors($data) {
+    public function update_view_editors($data): stdClass {
         $format = FORMAT_HTML;
         $trust = 1;
         $editors = $this->editors();
@@ -852,7 +852,7 @@ abstract class base {
      * @param string $newfieldname New field name.
      * @return void
      */
-    public function replace_field_in_view($searchfieldname, $newfieldname) {
+    public function replace_field_in_view($searchfieldname, $newfieldname): void {
         $this->replace_pattern_in_view(function ($text) use ($searchfieldname, $newfieldname) {
             return self::replace_field_tag($text, $searchfieldname, $newfieldname);
         });
@@ -989,7 +989,7 @@ abstract class base {
      * @param int $viewid View id.
      * @return bool
      */
-    public function name_exists($name, $viewid) {
+    public function name_exists($name, $viewid): bool {
         return $this->dlx->name_exists('views', $name, $viewid);
     }
 
@@ -1074,7 +1074,7 @@ abstract class base {
      * @param array $options
      * @return void
      */
-    public function set_content(array $options = []) {
+    public function set_content(array $options = []): void {
         // Options: added for datalynxview_field calling external view.
         // Possible options values: filter, users, groups, eids.
         if ($this->returntoentriesform) {
@@ -1286,7 +1286,7 @@ abstract class base {
      *
      * @return string notifications
      */
-    protected function print_notifications() {
+    protected function print_notifications(): string {
         global $OUTPUT;
         $notifications = '';
         foreach ($this->notifications['good'] as $notification) {
@@ -1303,7 +1303,7 @@ abstract class base {
      *
      * @return string message why no entries are shown in this view
      */
-    protected function display_no_entries() {
+    protected function display_no_entries(): string {
         global $OUTPUT, $DB;
 
         if ($this->view->filter > 0) { // This view has a forced filter set.
@@ -1409,9 +1409,9 @@ abstract class base {
      * used for the subsequent content substitution.
      *
      * @param string $text a string with tags to mask
-     * @return $text HTML with masked tags
+     * @return string|null HTML with masked tags
      */
-    public function mask_tags($text) {
+    public function mask_tags($text): ?string {
         $matches = [];
         $find = [];
         $replace = [];
@@ -1445,9 +1445,9 @@ abstract class base {
      * restoring the original tag strings verbatim.
      *
      * @param string $text a string with masked tags
-     * @return $text HTML with unmasked tags
+     * @return string HTML with unmasked tags
      */
-    public function unmask_tags($text) {
+    public function unmask_tags($text): string {
         if (!empty($this->maskedtags)) {
             $text = str_replace(array_keys($this->maskedtags), array_values($this->maskedtags), $text);
         }
@@ -1460,7 +1460,7 @@ abstract class base {
      *
      * @return array of field ids
      */
-    public function get_view_fields() {
+    public function get_view_fields(): array {
         $viewfields = [];
 
         if (!empty($this->tags['field'])) {
@@ -1608,7 +1608,7 @@ abstract class base {
      *
      * @return array
      */
-    public function editors() {
+    public function editors(): array {
         $editors = [];
 
         $options = ['trusttext' => true, 'noclean' => true, 'subdirs' => false,
@@ -1660,9 +1660,9 @@ abstract class base {
      * Get either all tags ($set = null) or field tags ($set = field) as an array.
      *
      * @param ?string $set Current: field or view.
-     * @return array
+     * @return array|null
      */
-    public function get__patterns($set = null) {
+    public function get__patterns($set = null): ?array {
         if (is_null($set)) {
             return $this->tags;
         }
@@ -1682,9 +1682,9 @@ abstract class base {
      * Resolve the field id associated with a pattern.
      *
      * @param string $pattern Pattern token.
-     * @return ?int
+     * @return int|string|null
      */
-    public function get_pattern_fieldid($pattern) {
+    public function get_pattern_fieldid($pattern): int|string|null {
         if (!empty($this->tags['field'])) {
             foreach ($this->tags['field'] as $fieldid => $patterns) {
                 if (in_array($pattern, $patterns)) {
@@ -1701,7 +1701,7 @@ abstract class base {
      * @param ?string $set Restrict to view or field set.
      * @return array
      */
-    public function get_embedded_files($set = null) {
+    public function get_embedded_files($set = null): array {
         $files = [];
         $fs = get_file_storage();
 
@@ -1839,9 +1839,9 @@ abstract class base {
      *
      * @param array $patterns Array of pattern strings.
      * @param string $subject Template string to split.
-     * @return array
+     * @return array|false
      */
-    protected function split_template_by_tags($patterns, $subject) {
+    protected function split_template_by_tags($patterns, $subject): array|false {
         foreach ($patterns as $id => $pattern) {
             $patterns[$id] = preg_quote($pattern, '/');
         }
@@ -1884,7 +1884,7 @@ abstract class base {
      * TODO: MDL-00000 this needs to be moved to the filter itself!!!
      * Set sort and search criteria for grouping by
      */
-    protected function set_groupby_per_page() {
+    protected function set_groupby_per_page(): void {
 
         // Get the group by fieldid.
         if (empty($this->filter->groupby)) {
@@ -1937,7 +1937,7 @@ abstract class base {
      *
      * @return ?stdClass
      */
-    protected function is_rating() {
+    protected function is_rating(): ?stdClass {
         global $USER;
         if (
             !$this->dlx->data->rating || empty(
@@ -1965,9 +1965,9 @@ abstract class base {
      * Return configured scale id for a grading area.
      *
      * @param string $area Either entry or activity.
-     * @return int
+     * @return int|string
      */
-    public function get_scaleid($area) {
+    public function get_scaleid($area): int|string {
         if ($area == 'entry' && $this->dlx->data->rating) {
             return $this->dlx->data->rating;
         } else {
@@ -1983,7 +1983,7 @@ abstract class base {
      *
      * @return bool
      */
-    protected function is_grading() {
+    protected function is_grading(): bool {
         if (!$this->dlx->data->grade) {
             // Grading is disabled in this datalynx.
             return false;
@@ -2002,7 +2002,7 @@ abstract class base {
      *
      * @return ?stdClass
      */
-    protected function get_grading_options() {
+    protected function get_grading_options(): ?stdClass {
         global $USER;
 
         if (!$this->dlx->data->grade) {
@@ -2106,7 +2106,7 @@ abstract class base {
      *
      * @return string html
      */
-    public function definition_to_html() {
+    public function definition_to_html(): string {
         $html = '';
         $elements = $this->get_entries_definition();
         foreach ($elements as $element) {
@@ -2123,7 +2123,7 @@ abstract class base {
      * @param HTML_QuickForm $mform Target form.
      * @return void
      */
-    public function definition_to_form(HTML_QuickForm &$mform) {
+    public function definition_to_form(HTML_QuickForm &$mform): void {
         $elements = $this->get_entries_definition();
 
         foreach ($elements as $element) {
@@ -2182,7 +2182,7 @@ abstract class base {
      *
      * @return array
      */
-    public function get_entries_definition() {
+    public function get_entries_definition(): array {
         $displaydefinition = $this->displaydefinition;
         $groupedelements = [];
         foreach ($displaydefinition as $name => $entriesset) {
@@ -2238,7 +2238,7 @@ abstract class base {
      * @param array $options Rendering options.
      * @return array
      */
-    protected function get_entry_tag_replacements($entry, $options) {
+    protected function get_entry_tag_replacements($entry, $options): array {
         $fields = $this->dlx->get_fields();
         $entry->baseurl = $this->navigationurl;
         if (empty($options['viewid'])) {
@@ -2289,7 +2289,7 @@ abstract class base {
      * @return bool
      * @throws coding_exception
      */
-    public function set_display_definition(?array $options = null) {
+    public function set_display_definition(?array $options = null): bool {
         $this->displaydefinition = [];
         // Indicate if there are managable entries in the display for the current user.
         // In which case edit/delete action.
@@ -2423,36 +2423,46 @@ abstract class base {
 
     /**
      * Returns the type of the view
+     *
+     * @return int|string
      */
-    public function id() {
+    public function id(): int|string {
         return $this->view->id;
     }
 
     /**
      * Returns the type of the view
+     *
+     * @return string
      */
-    public function type() {
+    public function type(): string {
         return $this->type;
     }
 
     /**
      * Returns the type name of the view
+     *
+     * @return string
      */
-    public function typename() {
+    public function typename(): string {
         return get_string('pluginname', "datalynxview_{$this->type}");
     }
 
     /**
      * Returns the name/type of the view
+     *
+     * @return string
      */
-    public function name() {
+    public function name(): string {
         return $this->view->name;
     }
 
     /**
      * Returns the parent datalynx
+     *
+     * @return ?datalynx
      */
-    public function get_dlx() {
+    public function get_dlx(): ?datalynx {
         return $this->dlx;
     }
 
@@ -2461,7 +2471,7 @@ abstract class base {
      *
      * @return ?datalynx_filter
      */
-    public function get_filter() {
+    public function get_filter(): ?datalynx_filter {
         return $this->filter;
     }
 
@@ -2494,7 +2504,7 @@ abstract class base {
      *
      * @return bool
      */
-    public function is_active() {
+    public function is_active(): bool {
         return (optional_param('view', 0, PARAM_INT) == $this->id());
     }
 
@@ -2503,7 +2513,7 @@ abstract class base {
      *
      * @return bool
      */
-    public function is_caching() {
+    public function is_caching(): bool {
         return false;
     }
 
@@ -2555,9 +2565,9 @@ abstract class base {
     /**
      * Indicate whether this view forces a predefined filter.
      *
-     * @return bool|int
+     * @return int|string|false
      */
-    public function is_forcing_filter() {
+    public function is_forcing_filter(): int|string|false {
 
         // If "allow all filters" (override) is selected we don't force filters.
         if ($this->view->param5) {
@@ -2586,9 +2596,9 @@ abstract class base {
     /**
      * Process the submitted data of entries
      *
-     * @return array|bool
+     * @return array|false
      */
-    public function process_entries_data() {
+    public function process_entries_data(): array|false {
         $illegalaction = false;
 
         // Check first if returning from form.
@@ -2878,7 +2888,7 @@ abstract class base {
      * @param array $fields Array of field objects.
      * @return array
      */
-    public function remove_duplicates($fields) {
+    public function remove_duplicates($fields): array {
         foreach ($fields as $field) {
             if ($field->type == 'fieldgroup') {
                 foreach ($field->fieldids as $fieldwithin) {

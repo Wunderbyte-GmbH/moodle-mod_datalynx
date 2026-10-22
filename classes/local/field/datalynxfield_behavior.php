@@ -131,7 +131,7 @@ class datalynxfield_behavior {
      * @throws dml_exception
      * @throws moodle_exception
      */
-    public static function from_name($name, $dataid) {
+    public static function from_name($name, $dataid): datalynxfield_behavior|false {
         global $DB;
         $record = $DB->get_record('datalynx_behaviors', ['name' => $name, 'dataid' => $dataid]);
         if ($record) {
@@ -147,7 +147,7 @@ class datalynxfield_behavior {
      * @param int $id The behavior record ID.
      * @return datalynxfield_behavior|false
      */
-    public static function from_id($id) {
+    public static function from_id($id): datalynxfield_behavior|false {
         global $DB;
         $record = $DB->get_record('datalynx_behaviors', ['id' => $id]);
         if ($record) {
@@ -385,10 +385,10 @@ class datalynxfield_behavior {
      * Prepare formdata and write prepared data to db.
      *
      * @param stdClass $formdata
-     * @return bool|int
+     * @return int
      * @throws dml_exception
      */
-    public static function insert_behavior(stdClass $formdata) {
+    public static function insert_behavior(stdClass $formdata): int {
         global $DB;
         $record = self::form_to_db($formdata);
         return $DB->insert_record('datalynx_behaviors', $record);
@@ -411,11 +411,11 @@ class datalynxfield_behavior {
      * Duplicate a behavior instance.
      *
      * @param int $behaviorid The behavior record ID.
-     * @return bool|int
+     * @return int
      * @throws coding_exception
      * @throws dml_exception
      */
-    public static function duplicate_behavior($behaviorid) {
+    public static function duplicate_behavior($behaviorid): int {
         global $DB;
         $object = self::get_behavior($behaviorid);
         $i = 0;
@@ -431,10 +431,10 @@ class datalynxfield_behavior {
      * Write new formdata to existing behavior.
      *
      * @param stdClass $formdata The submitted form data.
-     * @return mixed
+     * @return int|string
      * @throws dml_exception
      */
-    public static function update_behavior($formdata) {
+    public static function update_behavior($formdata): int|string {
         global $DB;
         $record = self::form_to_db($formdata);
         $oldname = $DB->get_field('datalynx_behaviors', 'name', ['id' => $record->id]);
@@ -452,7 +452,7 @@ class datalynxfield_behavior {
      * @return bool
      * @throws dml_exception
      */
-    public static function delete_behavior($behaviorid) {
+    public static function delete_behavior($behaviorid): bool {
         global $DB;
         self::update_behavior_pattern($behaviorid);
         return $DB->delete_records('datalynx_behaviors', ['id' => $behaviorid]);
@@ -662,10 +662,10 @@ class datalynxfield_behavior {
      *
      * @param datalynx $dlx The datalynx instance.
      * @param array $rule A rule: ['sourcefieldid' => int, 'not' => string, 'operator' => string, 'value' => mixed].
-     * @return array|true Array of matching entry ids, or true when the rule imposes no constraint
+     * @return array|bool Array of matching entry ids, or true when the rule imposes no constraint
      *                    (i.e. every entry matches).
      */
-    public static function matching_entryids(mod_datalynx\datalynx $dlx, array $rule) {
+    public static function matching_entryids(mod_datalynx\datalynx $dlx, array $rule): array|bool {
         global $DB;
 
         $cachekey = $dlx->id() . ':' . json_encode($rule);

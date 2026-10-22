@@ -77,9 +77,9 @@ class rule_form extends dynamic_form {
     /**
      * Lazily get rule instance.
      *
-     * @return \mod_datalynx\local\rule\base
+     * @return \mod_datalynx\local\rule\base|false|null
      */
-    protected function get_rule() {
+    protected function get_rule(): \mod_datalynx\local\rule\base|false|null {
         if ($this->rule === null) {
             if (isset($this->_customdata['rule'])) {
                 $this->rule = $this->_customdata['rule'];

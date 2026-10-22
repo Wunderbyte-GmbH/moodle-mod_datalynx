@@ -474,7 +474,7 @@ class view extends base {
      *
      * @return ?bool
      */
-    public function process_import() {
+    public function process_import(): ?bool {
         $mform = $this->get_import_form();
 
         if ($mform->is_cancelled()) {
@@ -559,9 +559,9 @@ class view extends base {
      * @param array $data
      * @param string $csvcontent
      * @param null|array $options associative delimiter,enclosure,encoding,updateexisting,settings
-     * @return mixed
+     * @return stdClass
      */
-    public function process_csv(&$data, $csvcontent, $options = null) {
+    public function process_csv(&$data, $csvcontent, $options = null): stdClass {
         global $CFG;
 
         require_once("$CFG->libdir/csvlib.class.php");

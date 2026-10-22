@@ -193,7 +193,7 @@ class field extends datalynxfield_option_single {
      * @param mixed $value The stored operand: the profile field shortname.
      * @return int|false The matching option key, or false if there is no match.
      */
-    protected function resolve_my_profile_option_key($value) {
+    protected function resolve_my_profile_option_key($value): int|false {
         global $USER;
 
         $shortname = is_array($value) ? reset($value) : $value;
@@ -214,7 +214,7 @@ class field extends datalynxfield_option_single {
      * @param string|null $value The value to look up against this field's option labels.
      * @return int|false The matching option key, or false if there is no match.
      */
-    public function get_option_key_for_value(?string $value) {
+    public function get_option_key_for_value(?string $value): int|false {
         if ($value === null || trim($value) === '') {
             return false;
         }

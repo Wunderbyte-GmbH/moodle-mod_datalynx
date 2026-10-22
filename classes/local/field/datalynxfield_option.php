@@ -34,9 +34,9 @@ abstract class datalynxfield_option extends datalynxfield_base {
     /**
      * TODO: see if this can be changed or merged with function below
      *
-     * @return mixed
+     * @return array
      */
-    public function get_options() {
+    public function get_options(): array {
         if (!$this->options) {
             if (!empty($this->field->param1)) {
                 $rawoptions = explode("\n", $this->field->param1);
@@ -55,9 +55,9 @@ abstract class datalynxfield_option extends datalynxfield_base {
      *
      * @param boolean $forceget
      * @param bool $addnoselection Whether to prepend a "no selection" option.
-     * @return mixed
+     * @return array
      */
-    public function options_menu($forceget = false, $addnoselection = false) {
+    public function options_menu($forceget = false, $addnoselection = false): array {
         if (!$this->options || $forceget) {
             if (!empty($this->field->param1)) {
                 if ($addnoselection) {

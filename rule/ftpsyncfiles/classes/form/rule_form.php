@@ -182,7 +182,7 @@ class rule_form extends base_rule_form {
      * @param object $data
      * @return void
      */
-    public function data_preprocessing(&$data) {
+    public function data_preprocessing(&$data): void {
     }
 
     /**

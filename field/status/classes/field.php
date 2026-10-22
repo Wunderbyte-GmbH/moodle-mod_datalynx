@@ -93,7 +93,7 @@ class field extends datalynxfield_no_content {
      *
      * @return string
      */
-    public function get_internalname() {
+    public function get_internalname(): string {
         return $this->field->internalname;
     }
 

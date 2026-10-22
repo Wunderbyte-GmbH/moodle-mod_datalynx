@@ -134,9 +134,9 @@ abstract class datalynxfield_base {
      * Insert a new field in the database
      *
      * @param ?stdClass $fromform Form data.
-     * @return bool|int
+     * @return int|false
      */
-    public function insert_field($fromform = null) {
+    public function insert_field($fromform = null): int|false {
         global $DB, $OUTPUT;
 
         if (!empty($fromform)) {
@@ -212,29 +212,37 @@ abstract class datalynxfield_base {
 
     /**
      * Returns the field id
+     *
+     * @return int|string
      */
-    public function id() {
+    public function id(): int|string {
         return $this->field->id;
     }
 
     /**
      * Returns the field type
+     *
+     * @return string
      */
-    public function type() {
+    public function type(): string {
         return $this->type;
     }
 
     /**
      * Returns the name of the field
+     *
+     * @return string
      */
-    public function name() {
+    public function name(): string {
         return $this->field->name;
     }
 
     /**
      * Returns the type name of the field
+     *
+     * @return string
      */
-    public function typename() {
+    public function typename(): string {
         return get_string('pluginname', "datalynxfield_{$this->type}");
     }
 
@@ -243,7 +251,7 @@ abstract class datalynxfield_base {
      *
      * @return string HTML for the icon
      */
-    public function image() {
+    public function image(): string {
         $iconmap = [
             'approve'                      => 'fa-solid fa-circle-check',
             'checkbox'                     => 'fa-solid fa-square-check',
@@ -285,16 +293,16 @@ abstract class datalynxfield_base {
      *
      * @return datalynx
      */
-    public function dlx() {
+    public function dlx(): datalynx {
         return $this->dlx;
     }
 
     /**
      * Returns the edit form for this field type.
      *
-     * @return moodleform
+     * @return \mod_datalynx\form\datalynxfield_form
      */
-    public function get_form() {
+    public function get_form(): \mod_datalynx\form\datalynxfield_form {
         if (class_exists('datalynxfield_' . $this->type . '\form')) {
             $formclass = 'datalynxfield_' . $this->type . '\form';
         } else {
@@ -310,9 +318,9 @@ abstract class datalynxfield_base {
     /**
      * Is this field available for fieldgroups?
      *
-     * @return boolean
+     * @return bool
      */
-    public function for_use_in_fieldgroup() {
+    public function for_use_in_fieldgroup(): bool {
         return $this->forfieldgroup;
     }
 
@@ -321,7 +329,7 @@ abstract class datalynxfield_base {
      *
      * @return stdClass
      */
-    public function to_form() {
+    public function to_form(): stdClass {
         return $this->field;
     }
 
@@ -329,7 +337,7 @@ abstract class datalynxfield_base {
      *
      * @return datalynxfield_renderer
      */
-    public function renderer() {
+    public function renderer(): datalynxfield_renderer {
         if (!$this->renderer) {
             $rendererclass = "datalynxfield_{$this->type}\\renderer";
             $this->renderer = new $rendererclass($this);
@@ -352,9 +360,9 @@ abstract class datalynxfield_base {
      * @param array $tags
      * @param stdClass $entry
      * @param array $options
-     * @return array
+     * @return array|null
      */
-    public function get_definitions($tags, $entry, array $options) {
+    public function get_definitions($tags, $entry, array $options): ?array {
         return $this->renderer()->replacements(
             $tags,
             $entry,
@@ -542,7 +550,7 @@ abstract class datalynxfield_base {
      * @param stdClass $data submitted form data
      * @return array with
      */
-    public function get_content_from_data($entryid, $data) {
+    public function get_content_from_data($entryid, $data): array {
         $fieldid = $this->field->id;
         $content = [];
         $fieldgroups = [];

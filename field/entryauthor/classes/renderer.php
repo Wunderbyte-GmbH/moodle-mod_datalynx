@@ -202,7 +202,7 @@ class renderer extends datalynxfield_renderer {
      * @throws dml_exception
      * @throws moodle_exception
      */
-    public function display_name($entry) {
+    public function display_name($entry): string {
         global $USER, $DB;
 
         if ($entry->id < 0) { // New entry.
@@ -228,7 +228,7 @@ class renderer extends datalynxfield_renderer {
      * @param stdClass $entry The entry object.
      * @return string HTML: avatar image + fullname, both wrapped in a profile link.
      */
-    public function display_namewithpicture($entry) {
+    public function display_namewithpicture($entry): string {
         global $OUTPUT, $USER, $DB;
 
         if ($entry->id < 0) { // New entry.
@@ -250,9 +250,9 @@ class renderer extends datalynxfield_renderer {
      * Display firstname.
      *
      * @param stdClass $entry The entry object.
-     * @return string firstname
+     * @return string|null firstname
      */
-    public function display_firstname($entry) {
+    public function display_firstname($entry): ?string {
         global $USER;
 
         if ($entry->id < 0) { // New entry.
@@ -266,9 +266,9 @@ class renderer extends datalynxfield_renderer {
      * Display lastname.
      *
      * @param stdClass $entry The entry object.
-     * @return string lastname
+     * @return string|null lastname
      */
-    public function display_lastname($entry) {
+    public function display_lastname($entry): ?string {
         global $USER;
 
         if ($entry->id < 0) { // New entry.
@@ -282,9 +282,9 @@ class renderer extends datalynxfield_renderer {
      * Display username.
      *
      * @param stdClass $entry The entry object.
-     * @return string username
+     * @return string|null username
      */
-    public function display_username($entry) {
+    public function display_username($entry): ?string {
         global $USER;
 
         if ($entry->id < 0) { // New entry.
@@ -298,9 +298,9 @@ class renderer extends datalynxfield_renderer {
      * Display user id.
      *
      * @param stdClass $entry The entry object.
-     * @return integer id
+     * @return int|string id
      */
-    public function display_id($entry) {
+    public function display_id($entry): int|string {
         global $USER;
 
         if ($entry->id < 0) { // New entry.
@@ -314,9 +314,9 @@ class renderer extends datalynxfield_renderer {
      * Display user idnumber (not user id!).
      *
      * @param stdClass $entry The entry object.
-     * @return integer idnumber
+     * @return string|null idnumber
      */
-    public function display_idnumber($entry) {
+    public function display_idnumber($entry): ?string {
         global $USER;
 
         if ($entry->id < 0) { // New entry.
@@ -332,9 +332,9 @@ class renderer extends datalynxfield_renderer {
      *
      * @param stdClass $entry The entry object.
      * @param bool $large
-     * @return mixed
+     * @return string
      */
-    public function display_picture($entry, $large = false) {
+    public function display_picture($entry, $large = false): string {
         global $OUTPUT, $USER;
 
         if ($entry->id < 0) { // New entry.
@@ -363,9 +363,9 @@ class renderer extends datalynxfield_renderer {
      * Display email.
      *
      * @param stdClass $entry The entry object.
-     * @return string email
+     * @return string|null email
      */
-    public function display_email($entry) {
+    public function display_email($entry): ?string {
         global $USER;
 
         if ($entry->id < 0) { // New entry.
@@ -379,9 +379,9 @@ class renderer extends datalynxfield_renderer {
      * Display the institution of user profile.
      *
      * @param stdClass $entry The entry object.
-     * @return mixed
+     * @return string|null
      */
-    public function display_institution($entry) {
+    public function display_institution($entry): ?string {
         global $USER;
 
         if ($entry->id < 0) { // New entry.
@@ -395,9 +395,9 @@ class renderer extends datalynxfield_renderer {
      * Display the department of user profile.
      *
      * @param stdClass $entry The entry object.
-     * @return mixed
+     * @return string|null
      */
-    public function display_department($entry) {
+    public function display_department($entry): ?string {
         global $USER;
 
         if ($entry->id < 0) { // New entry.
@@ -414,7 +414,7 @@ class renderer extends datalynxfield_renderer {
      * @param stdClass $entry The entry object.
      * @return string
      */
-    public function display_badges($entry) {
+    public function display_badges($entry): string {
         global $USER, $PAGE;
 
         if ($entry->id < 0) { // New entry.

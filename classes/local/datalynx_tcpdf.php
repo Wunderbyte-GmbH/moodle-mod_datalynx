@@ -74,7 +74,7 @@ class datalynx_tcpdf extends setasign\Fpdi\Tcpdf\Fpdi {
      * @param string $text
      * @return string
      */
-    protected function set_page_numbers($text) {
+    protected function set_page_numbers($text): string {
         $replacements = ['##pagenumber##' => $this->getAliasNumPage(),
                 '##totalpages##' => $this->getAliasNbPages()];
         $text = str_replace(array_keys($replacements), $replacements, $text);

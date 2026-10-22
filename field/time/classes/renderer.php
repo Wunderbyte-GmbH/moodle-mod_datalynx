@@ -182,7 +182,7 @@ class renderer extends datalynxfield_renderer {
         $content,
         $includetime = true,
         array $options = []
-    ) {
+    ): void {
         $field = $this->field;
         $fieldid = $field->id();
         $entryid = $entry->id;
@@ -224,7 +224,7 @@ class renderer extends datalynxfield_renderer {
         $content,
         $includetime = true,
         array $options = []
-    ) {
+    ): void {
         $field = $this->field;
         $entryid = $entry->id;
         $fieldid = $field->id();

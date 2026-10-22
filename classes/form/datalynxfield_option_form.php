@@ -56,7 +56,7 @@ class datalynxfield_option_form extends datalynxfield_form {
      *
      * @return void
      */
-    protected function add_option_dialog() {
+    protected function add_option_dialog(): void {
         $mform = &$this->_form;
         $options = $this->field->get_options();
         if (!empty($options)) {

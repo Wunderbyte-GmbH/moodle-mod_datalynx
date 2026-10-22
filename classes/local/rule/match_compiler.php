@@ -247,16 +247,14 @@ class match_compiler {
      * @param array $criterion
      * @param string $relation
      * @param int $subjectentryid
-     * @return stdClass|false|null the post-filter, false when the criterion does not apply to this
-     *                             entry and should simply be dropped, null when the entry cannot
-     *                             match anything at all
+     * @return stdClass|null the post-filter, null when the entry cannot match anything at all
      */
     private function compile_itinerary(
         datalynxfield_base $field,
         array $criterion,
         string $relation,
         int $subjectentryid
-    ) {
+    ): ?stdClass {
         $fieldid = (int) $field->id();
 
         $journey = itinerary::from_json((string) $this->subject_value($fieldid, $subjectentryid));

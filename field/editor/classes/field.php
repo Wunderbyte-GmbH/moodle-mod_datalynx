@@ -95,8 +95,10 @@ class field extends datalynxfield_base {
 
     /**
      * Returns the editor options array.
+     *
+     * @return array
      */
-    public function editor_options() {
+    public function editor_options(): array {
         return $this->editoroptions;
     }
 

@@ -75,7 +75,7 @@ abstract class datalynx_filter_base_form extends moodleform {
      *
      * @return string
      */
-    public function html() {
+    public function html(): string {
         return $this->_form->toHtml();
     }
 }

@@ -365,7 +365,7 @@ class view extends base {
      *
      * @return stdClass
      */
-    public function get_pdf_settings() {
+    public function get_pdf_settings(): stdClass {
         return $this->settings;
     }
 
@@ -681,7 +681,7 @@ class view extends base {
      * @param string $pagecontent
      * @return string
      */
-    protected function set_page_bookmarks($pdf, $pagecontent) {
+    protected function set_page_bookmarks($pdf, $pagecontent): string {
         $settings = $this->settings;
         static $bookmarkgroup = '';
 
@@ -723,7 +723,7 @@ class view extends base {
      *
      * @param datalynx_tcpdf $pdf
      */
-    protected function set_frame($pdf) {
+    protected function set_frame($pdf): void {
         // Add to pdf frame image if any.
         $fs = get_file_storage();
         if (
@@ -771,7 +771,7 @@ class view extends base {
      *
      * @param datalynx_tcpdf $pdf
      */
-    protected function set_watermark($pdf) {
+    protected function set_watermark($pdf): void {
         // Add to pdf watermark image if any.
         $fs = get_file_storage();
         if (
@@ -815,7 +815,7 @@ class view extends base {
      *
      * @param datalynx_tcpdf $pdf
      */
-    protected function set_signature($pdf) {
+    protected function set_signature($pdf): void {
         $fs = get_file_storage();
         if (
             $cert = $fs->get_area_files(
@@ -854,7 +854,7 @@ class view extends base {
      *
      * @param datalynx_tcpdf $pdf
      */
-    protected function set_header($pdf) {
+    protected function set_header($pdf): void {
         if (empty($this->view->eparam3)) {
             return;
         }
@@ -884,7 +884,7 @@ class view extends base {
      *
      * @param datalynx_tcpdf $pdf
      */
-    protected function set_footer($pdf) {
+    protected function set_footer($pdf): void {
         if (empty($this->view->eparam4)) {
             return;
         }
@@ -909,7 +909,7 @@ class view extends base {
      * @param string $content
      * @return string
      */
-    protected function process_content_images($content) {
+    protected function process_content_images($content): string {
         global $CFG;
 
         $replacements = [];
@@ -949,7 +949,7 @@ class view extends base {
      * @param datalynx_tcpdf $pdf
      * @param string $content
      */
-    protected function write_html($pdf, $content) {
+    protected function write_html($pdf, $content): void {
 
         // Add the Datalynx css to content.
         if ($this->dlx->data->css) {
@@ -1001,7 +1001,7 @@ class view extends base {
      * @param int $pagecount Current page count.
      * @return int Updated page count.
      */
-    protected function mergepdfs($pdf, $pagecount) {
+    protected function mergepdfs($pdf, $pagecount): int {
         global $CFG;
 
         // Check what fields are file class.

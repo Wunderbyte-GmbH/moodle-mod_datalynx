@@ -60,9 +60,9 @@ class datalynx_filter_manager {
      *
      * @param int $filterid
      * @param ?array $options
-     * @return datalynx_filter
+     * @return datalynx_filter|stdClass
      */
-    public function get_filter_from_id($filterid = 0, ?array $options = null) {
+    public function get_filter_from_id($filterid = 0, ?array $options = null): datalynx_filter|stdClass {
 
         $dlx = $this->dlx;
 
@@ -121,9 +121,9 @@ class datalynx_filter_manager {
      *
      * @param moodle_url $url
      * @param bool $raw Return raw stdClass instead of datalynx_filter.
-     * @return ?datalynx_filter
+     * @return datalynx_filter|stdClass|null
      */
-    public function get_filter_from_url($url, $raw = false) {
+    public function get_filter_from_url($url, $raw = false): datalynx_filter|stdClass|null {
 
         $dlx = $this->dlx;
         $dfid = $dlx->id();
@@ -149,7 +149,7 @@ class datalynx_filter_manager {
      * @param bool $forceget Bypass cache and re-fetch from DB.
      * @return array|false
      */
-    public function get_filters($exclude = null, $menu = false, $forceget = false) {
+    public function get_filters($exclude = null, $menu = false, $forceget = false): array|false {
         global $DB;
         if (!$this->filters || $forceget) {
             $this->filters = [];
@@ -192,9 +192,9 @@ class datalynx_filter_manager {
      * @param string $action
      * @param string $fids Comma-separated filter ids.
      * @param bool $confirmed Whether the action has been confirmed.
-     * @return bool|array
+     * @return array|false
      */
-    public function process_filters($action, $fids, $confirmed = false) {
+    public function process_filters($action, $fids, $confirmed = false): array|false {
         global $DB, $OUTPUT;
 
         $dlx = $this->dlx;
@@ -408,9 +408,9 @@ class datalynx_filter_manager {
      * so that both write byte-identical records.
      *
      * @param datalynx_filter|\stdClass $filter A filter object whose customsort/customsearch are already finalised.
-     * @return datalynx_filter|\stdClass The saved filter (with its id populated for new filters).
+     * @return datalynx_filter|stdClass The saved filter (with its id populated for new filters).
      */
-    public function save_filter($filter) {
+    public function save_filter($filter): datalynx_filter|stdClass {
         global $DB;
 
         if ($filter->id) {
@@ -440,9 +440,9 @@ class datalynx_filter_manager {
      * @param datalynx_filter $filter
      * @param \stdClass $formdata
      * @param bool $finalize Whether to finalise search values.
-     * @return datalynx_filter
+     * @return datalynx_filter|stdClass
      */
-    public function get_filter_from_form($filter, $formdata, $finalize = false) {
+    public function get_filter_from_form($filter, $formdata, $finalize = false): datalynx_filter|stdClass {
         $filter->name = $formdata->name;
         $filter->description = !empty($formdata->description) ? $formdata->description : '';
         $filter->selection = !empty($formdata->selection) ? $formdata->selection : 0;
@@ -475,7 +475,7 @@ class datalynx_filter_manager {
      * @param object $customfilter The customfilter definition object.
      * @return datalynx_filter The populated filter object.
      */
-    public function get_filter_from_customfilterform($filter, $formdata, $customfilter) {
+    public function get_filter_from_customfilterform($filter, $formdata, $customfilter): datalynx_filter {
 
         $customfilterfields = json_decode($customfilter->fieldlist);
         $customfilterfieldids = [];
@@ -1020,7 +1020,7 @@ class datalynx_filter_manager {
      * @param bool $customfilter
      * @return datalynx_filter
      */
-    public function set_user_filter($filterid, \mod_datalynx\local\view\base $view, $customfilter = false) {
+    public function set_user_filter($filterid, \mod_datalynx\local\view\base $view, $customfilter = false): datalynx_filter {
         global $DB;
 
         $filter = new datalynx_filter((object) ['id' => $filterid, 'dataid' => $this->dlx->id()]);

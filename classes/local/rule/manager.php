@@ -101,7 +101,7 @@ class manager {
      * @param int $dataid
      * @return array
      */
-    private static function get_team_fields_menu($dataid) {
+    private static function get_team_fields_menu($dataid): array {
         global $DB;
         $params = ['dataid' => $dataid, 'type' => 'teammemberselect'];
         return $DB->get_records_menu('datalynx_fields', $params, '', 'id, name');
@@ -196,7 +196,7 @@ class manager {
      * @param string $name Rule name.
      * @return base|false
      */
-    public function get_rule_by_name($name) {
+    public function get_rule_by_name($name): base|false {
         foreach ($this->get_rules() as $rule) {
             if ($rule->get_name() === $name) {
                 return $rule;
@@ -213,7 +213,7 @@ class manager {
      * @param mixed $key Rule record object or rule type string.
      * @return base|false
      */
-    public function get_rule($key) {
+    public function get_rule($key): base|false {
         if ($key) {
             if (is_object($key)) {
                 $type = $key->type;
@@ -237,9 +237,9 @@ class manager {
      * @param null $exclude
      * @param bool $menu
      * @param bool $forceget
-     * @return base[] array of all rules
+     * @return array array of all rules (base[], or name strings keyed by id when $menu is set)
      */
-    public function get_rules($exclude = null, $menu = false, $forceget = false) {
+    public function get_rules($exclude = null, $menu = false, $forceget = false): array {
         global $DB;
 
         if (!$this->customrules || $forceget) {
@@ -302,9 +302,9 @@ class manager {
      * @param string $action
      * @param string $rids
      * @param bool $confirmed
-     * @return array|bool
+     * @return array|false
      */
-    public function process_rules($action, $rids, $confirmed = false) {
+    public function process_rules($action, $rids, $confirmed = false): array|false {
         global $OUTPUT, $DB;
 
         $dlx = $this->dlx;

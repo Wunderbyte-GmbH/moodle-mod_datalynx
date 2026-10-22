@@ -288,8 +288,10 @@ class field extends datalynxfield_base {
 
     /**
      * Returns the entry-IDs of all the entries where the content field is empty or there is no content dataset at all
+     *
+     * @return array
      */
-    protected function get_entry_ids_for_empty_content() {
+    protected function get_entry_ids_for_empty_content(): array {
         global $DB;
 
         $params = [];

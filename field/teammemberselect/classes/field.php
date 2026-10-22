@@ -158,7 +158,7 @@ class field extends datalynxfield_base {
     /**
      * Initialize user menu data.
      */
-    protected function init_user_menu() {
+    protected function init_user_menu(): void {
         global $DB, $COURSE;
 
         $context = context_course::instance($COURSE->id);
@@ -250,7 +250,7 @@ class field extends datalynxfield_base {
      *
      * @return stdClass|false
      */
-    public function get_teamfield() {
+    public function get_teamfield(): stdClass|false {
         global $DB;
 
         $query = "SELECT *

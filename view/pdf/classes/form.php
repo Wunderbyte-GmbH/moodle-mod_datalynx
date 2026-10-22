@@ -416,7 +416,7 @@ class form extends datalynxview_base_form {
      * @param stdClass $data
      * @param stdClass $protection
      */
-    protected function data_preprocess_protection(&$data, $protection) {
+    protected function data_preprocess_protection(&$data, $protection): void {
         $view = $this->view;
         $perms = $view::get_permission_options();
         foreach (array_keys($perms) as $perm) {
@@ -436,7 +436,7 @@ class form extends datalynxview_base_form {
      * @param stdClass $data
      * @param stdClass $signsettings
      */
-    protected function data_preprocess_signature(&$data, $signsettings) {
+    protected function data_preprocess_signature(&$data, $signsettings): void {
         $data->certpassword = $signsettings->password;
         $data->certtype = $signsettings->type;
         $data->certinfoname = $signsettings->info['Name'];
@@ -528,7 +528,7 @@ class form extends datalynxview_base_form {
      * @param stdClass $settings
      * @param stdClass $data
      */
-    protected function data_postprocess_protection(&$settings, $data) {
+    protected function data_postprocess_protection(&$settings, $data): void {
         $view = $this->view;
 
         $protection = $settings->protection;
@@ -553,7 +553,7 @@ class form extends datalynxview_base_form {
      * @param stdClass $settings
      * @param stdClass $data
      */
-    protected function data_postprocess_signature(&$settings, $data) {
+    protected function data_postprocess_signature(&$settings, $data): void {
         $signsettings = $settings->signature;
         $signsettings->password = $data->certpassword;
         $signsettings->type = $data->certtype;

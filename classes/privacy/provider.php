@@ -532,7 +532,7 @@ class provider implements
      * @param \stdClass $user
      * @param \stdClass $recordobj
      */
-    protected static function export_datalynx_entry($context, $user, $recordobj) {
+    protected static function export_datalynx_entry($context, $user, $recordobj): void {
         if (!$recordobj) {
             return;
         }
@@ -610,7 +610,7 @@ class provider implements
      * @param \context $context
      * @param \stdClass $user
      */
-    protected static function export_datalynx($context, $user) {
+    protected static function export_datalynx($context, $user): void {
         if (!$context) {
             return;
         }
@@ -625,7 +625,7 @@ class provider implements
      * @param \context $context
      * @param \stdClass $row result of SQL query - tables data_content, data_record, data_fields join together
      */
-    protected static function mark_datalynx_contents_for_deletion($context, $row) {
+    protected static function mark_datalynx_contents_for_deletion($context, $row): void {
         $recordobj = self::extract_object_from_entry($row, 'entry', ['dataid' => $row->dataid]);
         if ($row->contentid && $row->fieldid) {
             $fieldobj = self::extract_object_from_entry($row, 'field', ['dataid' => $row->dataid]);
@@ -649,7 +649,7 @@ class provider implements
      * @param \context $context
      * @param array $recordstobedeleted list of ids of the data records that need to be deleted
      */
-    protected static function delete_datalynx_entries($context, $recordstobedeleted) {
+    protected static function delete_datalynx_entries($context, $recordstobedeleted): void {
         global $DB;
         if (empty($recordstobedeleted)) {
             return;
@@ -716,7 +716,7 @@ class provider implements
      * @param \stdClass $fieldobj record from DB table {data_fields}
      * @param \stdClass $contentobj record from DB table {data_content}
      */
-    protected static function export_datalynx_content($context, $user, $recordobj, $fieldobj, $contentobj) {
+    protected static function export_datalynx_content($context, $user, $recordobj, $fieldobj, $contentobj): void {
         $value = (object)[
             'field' => [
                 // Name and description are displayed in mod_data without applying format_string().

@@ -29,9 +29,9 @@ class datalynx_rating extends rating {
      * Returns this ratings aggregate value
      *
      * @param int $aggregation The aggregation type constant.
-     * @return string
+     * @return int|float|string|null
      */
-    public function get_aggregate_value($aggregation) {
+    public function get_aggregate_value($aggregation): int|float|string|null {
         $aggregate = isset($this->aggregate[$aggregation]) ? $this->aggregate[$aggregation] : '';
 
         if ($aggregate && $aggregation != RATING_AGGREGATE_COUNT) {

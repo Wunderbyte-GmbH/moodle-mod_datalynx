@@ -41,7 +41,7 @@ class shortcodes {
      * @param Closure $next
      * @return string
      */
-    public static function displayview($shortcode, $args, $content, $env, $next) {
+    public static function displayview($shortcode, $args, $content, $env, $next): string {
         global $DB;
         if (isset($args['view']) && isset($args['cmid'])) {
             $viewname = $args['view'];

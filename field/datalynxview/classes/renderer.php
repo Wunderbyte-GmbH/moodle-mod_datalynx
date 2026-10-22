@@ -65,7 +65,7 @@ class renderer extends datalynxfield_renderer {
      * @param ?string $type The type of display.
      * @return string
      */
-    protected function display_browse($entry, $type = null) {
+    protected function display_browse($entry, $type = null): string {
         $field = $this->field;
 
         if (empty($field->refdatalynx) || empty($field->refview)) {
@@ -89,9 +89,9 @@ class renderer extends datalynxfield_renderer {
      *
      * @param stdClass $entry The entry object this field belongs to.
      * @param array $options Array of options for the display-method of the view.
-     * @return                 the display-method of the view
+     * @return string the display-method of the view
      */
-    protected function get_view_display_content($entry, array $options = []) {
+    protected function get_view_display_content($entry, array $options = []): string {
         $field = $this->field;
 
         $refdatalynx = $field->refdatalynx;

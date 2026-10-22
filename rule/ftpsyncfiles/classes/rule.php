@@ -270,7 +270,7 @@ class rule extends base {
      * @param string $connection
      * @return \CurlHandle|false
      */
-    public function init_curl(string $server, string $connection) {
+    public function init_curl(string $server, string $connection): \CurlHandle|false {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_PROTOCOLS, CURLPROTO_SFTP);
         curl_setopt($ch, CURLOPT_URL, $server);

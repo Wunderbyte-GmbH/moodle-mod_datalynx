@@ -468,11 +468,11 @@ class datalynx_entries {
      * get all entries created by the user with $userid
      *
      * @param integer $userid the user id of the user who created the entry (or was assigned as author of the entry)
-     * @return object
+     * @return stdClass
      * @throws coding_exception
      * @throws dml_exception
      */
-    public function get_user_entries($userid = null) {
+    public function get_user_entries($userid = null): stdClass {
         global $USER;
 
         if (empty($userid)) {
@@ -485,9 +485,9 @@ class datalynx_entries {
      * count number of entries
      *
      * @param boolean $filtered true for filtered only, false for total number of entries
-     * @return number
+     * @return int
      */
-    public function get_count($filtered = false) {
+    public function get_count($filtered = false): int {
         if ($filtered) {
             return $this->entriesfiltercount;
         } else {
@@ -498,9 +498,9 @@ class datalynx_entries {
     /**
      * return entries
      *
-     * @return array:
+     * @return array|null
      */
-    public function entries() {
+    public function entries(): ?array {
         return $this->entries;
     }
 
@@ -1448,9 +1448,9 @@ class datalynx_entries {
      * @param array $data
      * @param boolean $updatetime
      * @param boolean $allowfinalfieldedit
-     * @return boolean|integer <boolean, number>
+     * @return int|string|false <boolean, number>
      */
-    public function update_entry($entry, $data = null, $updatetime = true, $allowfinalfieldedit = false) {
+    public function update_entry($entry, $data = null, $updatetime = true, $allowfinalfieldedit = false): int|string|false {
         global $CFG, $DB, $USER;
 
         $dlx = $this->dlx;

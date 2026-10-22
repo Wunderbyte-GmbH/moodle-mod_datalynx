@@ -193,7 +193,7 @@ final class field_filter_capabilities_test extends advanced_testcase {
      * @param string $name The field name.
      * @return \mod_datalynx\local\field\datalynxfield_base
      */
-    private function get_field_by_name(datalynx $dlx, string $name) {
+    private function get_field_by_name(datalynx $dlx, string $name): \mod_datalynx\local\field\datalynxfield_base {
         foreach ($dlx->get_fields() as $field) {
             if ($field->name() === $name) {
                 return $field;

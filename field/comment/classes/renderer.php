@@ -104,9 +104,9 @@ class renderer extends datalynxfield_renderer {
      *
      * @param object $entry   The current entry.
      * @param array  $options Optional display options (e.g. count, notoggle, autostart).
-     * @return string
+     * @return int|string
      */
-    public function display_browse($entry, $options = []) {
+    public function display_browse($entry, $options = []): int|string {
         global $CFG, $PAGE;
 
         $dlx = $this->field->dlx();

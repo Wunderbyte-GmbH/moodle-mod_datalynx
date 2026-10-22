@@ -61,7 +61,7 @@ class datalynxfield_behavior_form extends moodleform {
      *
      * @return \mod_datalynx\datalynx
      */
-    protected function get_dlx() {
+    protected function get_dlx(): mod_datalynx\datalynx {
         return $this->dlx;
     }
 

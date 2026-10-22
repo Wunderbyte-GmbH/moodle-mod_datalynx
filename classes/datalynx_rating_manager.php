@@ -238,9 +238,9 @@ class datalynx_rating_manager extends rating_manager {
     /**
      *
      * @param object $options Rating options object.
-     * @return object the array of items with their ratings attached at $items[0]->rating
+     * @return stdClass the array of items with their ratings attached at $items[0]->rating
      */
-    public function get_rating_settings_object($options) {
+    public function get_rating_settings_object($options): stdClass {
         return $this->generate_rating_settings_object($options);
     }
 

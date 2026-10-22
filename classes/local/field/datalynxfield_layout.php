@@ -222,7 +222,7 @@ class datalynxfield_layout {
      * @param int $rendererid
      * @return stdClass
      */
-    public static function get_renderer($rendererid) {
+    public static function get_renderer($rendererid): stdClass {
         global $DB;
         $record = $DB->get_record('datalynx_renderers', ['id' => $rendererid]);
         return self::db_to_form($record);
@@ -274,9 +274,9 @@ class datalynxfield_layout {
      * Save renderer to db
      *
      * @param mixed $formdata Form data to save.
-     * @return bool|int true or new id
+     * @return int new id
      */
-    public static function insert_renderer($formdata) {
+    public static function insert_renderer($formdata): int {
         global $DB;
         $record = self::form_to_db($formdata);
         return $DB->insert_record('datalynx_renderers', $record);
@@ -286,9 +286,9 @@ class datalynxfield_layout {
      * Get DB record of a field renderer
      *
      * @param integer $rendererid
-     * @return stdClass
+     * @return stdClass|false
      */
-    public static function get_record($rendererid) {
+    public static function get_record($rendererid): stdClass|false {
         global $DB;
         return $DB->get_record('datalynx_renderers', ['id' => $rendererid]);
     }
@@ -297,8 +297,9 @@ class datalynxfield_layout {
      * Create a copy of a renderer
      *
      * @param integer $rendererid
+     * @return int
      */
-    public static function duplicate_renderer($rendererid) {
+    public static function duplicate_renderer($rendererid): int {
         global $DB;
         $object = self::get_renderer($rendererid);
         $i = 0;
@@ -314,9 +315,9 @@ class datalynxfield_layout {
      * Update renderer with submitted form data
      *
      * @param object $formdata
-     * @return integer id
+     * @return int|string id
      */
-    public static function update_renderer($formdata) {
+    public static function update_renderer($formdata): int|string {
         global $DB;
         $formdata->dataid = $formdata->d;
         // When name is altered we have to replace patterns.
@@ -331,9 +332,9 @@ class datalynxfield_layout {
      * Delete renderer.
      *
      * @param integer $rendererid
-     * @return integer id
+     * @return bool
      */
-    public static function delete_renderer($rendererid) {
+    public static function delete_renderer($rendererid): bool {
         global $DB;
         self::update_render_pattern($rendererid);
         return $DB->delete_records('datalynx_renderers', ['id' => $rendererid]);
@@ -365,14 +366,14 @@ class datalynxfield_layout {
     /**
      * Process renderer pattern
      */
-    public function process_renderer_pattern() {
+    public function process_renderer_pattern(): void {
     }
 
     /**
      *
-     * @return int
+     * @return int|string
      */
-    public function get_id() {
+    public function get_id(): int|string {
         return $this->id;
     }
 
@@ -380,23 +381,23 @@ class datalynxfield_layout {
      *
      * @return string
      */
-    public function get_name() {
+    public function get_name(): string {
         return $this->name;
     }
 
     /**
      *
-     * @return string
+     * @return string|null
      */
-    public function get_description() {
+    public function get_description(): ?string {
         return $this->description;
     }
 
     /**
      *
-     * @return mixed
+     * @return int|string|null
      */
-    public function get_no_value_template() {
+    public function get_no_value_template(): int|string|null {
         if (is_numeric($this->novaluetemplate)) {
             return intval($this->novaluetemplate);
         } else {
@@ -406,9 +407,9 @@ class datalynxfield_layout {
 
     /**
      *
-     * @return mixed
+     * @return int|string|null
      */
-    public function get_not_visible_template() {
+    public function get_not_visible_template(): int|string|null {
         if (is_numeric($this->notvisibletemplate)) {
             return intval($this->notvisibletemplate);
         } else {
@@ -418,9 +419,9 @@ class datalynxfield_layout {
 
     /**
      *
-     * @return mixed
+     * @return int|string|null
      */
-    public function get_not_editable_template() {
+    public function get_not_editable_template(): int|string|null {
         if (is_numeric($this->noteditabletemplate)) {
             return intval($this->noteditabletemplate);
         } else {
@@ -430,9 +431,9 @@ class datalynxfield_layout {
 
     /**
      *
-     * @return mixed
+     * @return int|string|null
      */
-    public function get_display_template() {
+    public function get_display_template(): int|string|null {
         if (is_numeric($this->displaytemplate)) {
             return intval($this->displaytemplate);
         } else {
@@ -442,9 +443,9 @@ class datalynxfield_layout {
 
     /**
      *
-     * @return mixed
+     * @return int|string|null
      */
-    public function get_edit_template() {
+    public function get_edit_template(): int|string|null {
         if (is_numeric($this->edittemplate)) {
             return intval($this->edittemplate);
         } else {

@@ -63,7 +63,7 @@ class entryperuser_form extends moodleform {
      * @param \mod_datalynx\datalynx $dlx The datalynx instance.
      * @param int|null $selectedviewid The selected view ID.
      */
-    protected function definition_step_1(&$mform, $dlx, $selectedviewid) {
+    protected function definition_step_1(&$mform, $dlx, $selectedviewid): void {
         $views = $dlx->get_views();
         $viewoptions = [];
 
@@ -111,7 +111,7 @@ class entryperuser_form extends moodleform {
      * @param \mod_datalynx\datalynx $dlx The datalynx instance.
      * @param int $selectedviewid The selected view ID.
      */
-    protected function definition_step_2(&$mform, $dlx, $selectedviewid) {
+    protected function definition_step_2(&$mform, $dlx, $selectedviewid): void {
         $mform->addElement('hidden', 'viewid', $selectedviewid);
         $mform->setType('viewid', PARAM_INT);
 

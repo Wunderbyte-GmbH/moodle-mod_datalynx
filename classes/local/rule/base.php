@@ -127,7 +127,7 @@ abstract class base {
      * @param string $eventname full name of the event (with namespaces)
      * @return bool
      */
-    public function is_triggered_by($eventname) {
+    public function is_triggered_by($eventname): bool {
         if (!is_string($eventname) || $eventname === '') {
             return false;
         }
@@ -151,7 +151,7 @@ abstract class base {
      *
      * @return array
      */
-    public function get_triggers() {
+    public function get_triggers(): array {
         static $triggers = [];
         if (empty($triggers)) {
             $param1 = $this->rule->param1 ?? null;
@@ -342,7 +342,7 @@ abstract class base {
      *
      * @param ?stdClass $forminput Form input data.
      */
-    public function set_rule($forminput = null) {
+    public function set_rule($forminput = null): void {
         $this->rule = new stdClass();
         $this->rule->id = !empty($forminput->id) ? $forminput->id : 0;
         $this->rule->type = $this->type;
@@ -366,10 +366,10 @@ abstract class base {
     /**
      * Insert a new rule in the database
      * @param string $fromform
-     * @return bool|int
+     * @return int|false
      * @throws dml_exception
      */
-    public function insert_rule($fromform = null) {
+    public function insert_rule($fromform = null): int|false {
         global $DB, $OUTPUT;
 
         if (!empty($fromform)) {
@@ -391,7 +391,7 @@ abstract class base {
      * @return bool
      * @throws dml_exception
      */
-    public function update_rule($fromform = null) {
+    public function update_rule($fromform = null): bool {
         global $DB, $OUTPUT;
         if (!empty($fromform)) {
             $this->set_rule($fromform);
@@ -410,7 +410,7 @@ abstract class base {
      * @return bool
      * @throws dml_exception
      */
-    public function delete_rule() {
+    public function delete_rule(): bool {
         global $DB;
 
         if (!empty($this->rule->id)) {
@@ -422,18 +422,18 @@ abstract class base {
     /**
      * Returns the rule id
      *
-     * @return number
+     * @return int|string
      */
-    public function get_id() {
+    public function get_id(): int|string {
         return $this->rule->id;
     }
 
     /**
      * Is enabled
      *
-     * @return boolean
+     * @return int|string
      */
-    public function is_enabled() {
+    public function is_enabled(): int|string {
         return $this->rule->enabled;
     }
 
@@ -442,7 +442,7 @@ abstract class base {
      *
      * @return string
      */
-    public function get_type() {
+    public function get_type(): string {
         return $this->type;
     }
 
@@ -450,7 +450,7 @@ abstract class base {
      * Returns the name of the rule
      * @return string
      */
-    public function get_name() {
+    public function get_name(): string {
         return $this->rule->name;
     }
 
@@ -459,7 +459,7 @@ abstract class base {
      *
      * @return string
      */
-    public function typename() {
+    public function typename(): string {
         return get_string('pluginname', "datalynxrule_{$this->type}");
     }
 
@@ -468,17 +468,17 @@ abstract class base {
      *
      * @return ?datalynx
      */
-    public function dlx() {
+    public function dlx(): ?datalynx {
         return $this->dlx;
     }
 
     /**
      * Get form
      *
-     * @return mixed
+     * @return \mod_datalynx\form\rule_form
      * @throws moodle_exception
      */
-    public function get_form() {
+    public function get_form(): \mod_datalynx\form\rule_form {
         $formclass = manager::get_rule_form_class_name($this->type);
         $actionurl = new moodle_url(
             '/mod/datalynx/rule/rule_edit.php',
@@ -490,9 +490,9 @@ abstract class base {
     /**
      * To form
      *
-     * @return object
+     * @return stdClass
      */
-    public function to_form() {
+    public function to_form(): stdClass {
         return $this->rule;
     }
 
@@ -501,7 +501,7 @@ abstract class base {
      *
      * @return string
      */
-    public function get_select_sql() {
+    public function get_select_sql(): string {
         if ($this->rule->id > 0) {
             $id = " c{$this->rule->id}.id AS c{$this->rule->id}_id ";
             $content = $this->get_sql_compare_text() . " AS c{$this->rule->id}_content";
@@ -518,7 +518,7 @@ abstract class base {
      * @param string $paramcount
      * @return ?array
      */
-    public function get_sort_from_sql($paramname = 'sortie', $paramcount = '') {
+    public function get_sort_from_sql($paramname = 'sortie', $paramcount = ''): ?array {
         $ruleid = $this->rule->id;
         if ($ruleid > 0) {
             $sql = " LEFT JOIN {datalynx_contents} c$ruleid
@@ -533,7 +533,7 @@ abstract class base {
      * Returngs empty string??
      * @return string
      */
-    public function get_sort_sql() {
+    public function get_sort_sql(): string {
         return '';
     }
 }
