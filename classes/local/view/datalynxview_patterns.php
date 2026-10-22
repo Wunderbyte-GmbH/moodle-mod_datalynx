@@ -1170,6 +1170,7 @@ class datalynxview_patterns {
             return $viewjump;
         } else {
             echo $viewjump;
+            return null;
         }
     }
 
@@ -1228,6 +1229,7 @@ class datalynxview_patterns {
             return $filterjump;
         } else {
             echo $filterjump;
+            return null;
         }
     }
 
@@ -1276,6 +1278,7 @@ class datalynxview_patterns {
             return $quicksearchjump;
         } else {
             echo $quicksearchjump;
+            return null;
         }
     }
 
@@ -1319,6 +1322,7 @@ class datalynxview_patterns {
             return $perpagejump;
         } else {
             echo $perpagejump;
+            return null;
         }
     }
 
@@ -1348,6 +1352,7 @@ class datalynxview_patterns {
             return $html;
         } else {
             echo $html;
+            return null;
         }
     }
 }
