@@ -62,9 +62,5 @@ class form extends datalynxfield_form {
         $mform->addRule('param2', null, 'numeric', null, 'client');
         $mform->setDefault('param2', 10);
         $mform->disabledIf('param2', 'param1', 'neq', 'random');
-
-        // Uniqueness (param3).
-        $mform->addElement('selectyesno', 'param3', get_string('uniqueness', 'datalynxfield_identifier'));
-        $mform->setDefault('param3', 1);
     }
 }

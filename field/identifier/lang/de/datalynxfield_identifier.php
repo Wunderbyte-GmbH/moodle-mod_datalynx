@@ -23,9 +23,9 @@
  */
 
 $string['entryid'] = 'Eintrags-ID';
+$string['identifierkeyfailed'] = 'Es konnte keine unbenutzte Kennung erzeugt werden. Bitte versuchen Sie es erneut.';
 $string['pluginname'] = 'Kennung';
 $string['privacy:metadata'] = 'Kennungen speichern keine personenbezogenen Daten.';
 $string['saltsize'] = 'Salt-Länge';
 $string['saltsource'] = 'Salt-Quelle';
 $string['system'] = 'System';
-$string['uniqueness'] = 'Eindeutigkeit';

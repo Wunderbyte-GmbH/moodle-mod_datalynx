@@ -26,6 +26,7 @@
 namespace datalynxfield_identifier;
 
 use mod_datalynx\local\field\datalynxfield_base;
+use moodle_exception;
 use stdClass;
 
 /**
@@ -37,6 +38,12 @@ class field extends datalynxfield_base {
     /** @var string The field type. */
     public $type = 'identifier';
 
+    /** @var int Salt size used when the field does not define one. */
+    const DEFAULT_SALT_SIZE = 10;
+
+    /** @var int Number of candidate keys to try before giving up. */
+    const MAX_KEY_ATTEMPTS = 100;
+
     /**
      * Returns the salt options.
      *
@@ -47,7 +54,7 @@ class field extends datalynxfield_base {
 
         $options = ['' => get_string('none'), 'random' => get_string('random', 'datalynx')];
         if (!empty($CFG->passwordsaltmain)) {
-            $options[] = get_string('system', 'datalynxfield_identifier');
+            $options['system'] = get_string('system', 'datalynxfield_identifier');
         }
         return $options;
     }
@@ -77,26 +84,24 @@ class field extends datalynxfield_base {
     }
 
     /**
-     * Generates a unique identifier key for an entry.
+     * Generates an identifier key for an entry that is not used by any identifier field on the site.
+     *
+     * The first candidate uses the configured salt. As that salt may be deterministic, every further
+     * candidate uses a random salt.
      *
      * @param stdClass $entry The entry object.
      * @return string
+     * @throws moodle_exception When no unused key could be found.
      */
     protected function generate_identifier_key($entry): string {
         $identifierkey = $this->get_hash_string($entry);
-        $uniqueness = !empty($this->field->param4) ? $this->field->param4 : false;
-        if ($uniqueness) {
-            // We check against stored idenitifiers in this field.
-            // To prevent this from going forever under certain configurations.
-            // After 10 times force random salt we should allow it to end at some point.
-            $count = 0;
-            while (!$this->is_unique_key($identifierkey)) {
-                $count++;
-                $forcerandomsalt = ($count > 10 ? true : false);
-                $identifierkey = $this->get_hash_string($entry, $forcerandomsalt);
+        $attempts = 1;
+        while (self::key_exists($identifierkey)) {
+            if ($attempts++ >= self::MAX_KEY_ATTEMPTS) {
+                throw new moodle_exception('identifierkeyfailed', 'datalynxfield_identifier');
             }
+            $identifierkey = $this->get_hash_string($entry, true);
         }
-
         return $identifierkey;
     }
 
@@ -115,7 +120,7 @@ class field extends datalynxfield_base {
         } else {
             $salt = !empty($this->field->param1) ? $this->field->param1 : '';
         }
-        $fieldsaltsize = !empty($this->field->param2) ? $this->field->param2 : 10;
+        $fieldsaltsize = !empty($this->field->param2) ? $this->field->param2 : self::DEFAULT_SALT_SIZE;
         // Entry identifiers.
         $entryid = $entry->id;
         $timeadded = (!empty($entry->timecreated) ? $entry->timecreated : time());
@@ -149,18 +154,65 @@ class field extends datalynxfield_base {
     }
 
     /**
-     * Checks if a key is unique.
+     * Checks whether a key is already stored by any identifier field on the site.
      *
      * @param string $key The key to check.
-     * @return bool
+     * @param int $excludecontentid A content id to ignore, e.g. the content that holds the key.
+     * @return bool True if the key is taken.
      */
-    protected function is_unique_key($key): bool {
+    public static function key_exists(string $key, int $excludecontentid = 0): bool {
         global $DB;
 
-        return $DB->record_exists(
-            'datalynx_contents',
-            ['fieldid' => $this->fieldid, 'content' => $key]
+        $sql = "SELECT 1
+                  FROM {datalynx_contents} dc
+                  JOIN {datalynx_fields} df ON df.id = dc.fieldid
+                 WHERE df.type = :type
+                   AND dc.id <> :excludeid
+                   AND " . $DB->sql_compare_text('dc.content') . " = " . $DB->sql_compare_text(':content');
+        return $DB->record_exists_sql(
+            $sql,
+            ['type' => 'identifier', 'excludeid' => $excludecontentid, 'content' => $key]
         );
+    }
+
+    /**
+     * Replaces the identifier keys of a datalynx instance that are also used elsewhere on the site.
+     *
+     * Restoring a backup on the site it was made on copies the keys of the original entries. Keys
+     * that are not taken (e.g. when restoring from the recycle bin) are kept.
+     *
+     * @param int $dataid The datalynx instance id.
+     * @return int The number of replaced keys.
+     * @throws moodle_exception When no unused key could be found.
+     */
+    public static function replace_duplicate_keys(int $dataid): int {
+        global $DB;
+
+        $sql = "SELECT dc.id, dc.entryid, dc.content, df.param2
+                  FROM {datalynx_contents} dc
+                  JOIN {datalynx_fields} df ON df.id = dc.fieldid
+                 WHERE df.dataid = :dataid
+                   AND df.type = :type";
+        $contents = $DB->get_records_sql($sql, ['dataid' => $dataid, 'type' => 'identifier']);
+
+        $replaced = 0;
+        foreach ($contents as $content) {
+            if (empty($content->content) || !self::key_exists($content->content, $content->id)) {
+                continue;
+            }
+            $saltsize = !empty($content->param2) ? $content->param2 : self::DEFAULT_SALT_SIZE;
+            $attempts = 0;
+            do {
+                if ($attempts++ >= self::MAX_KEY_ATTEMPTS) {
+                    throw new moodle_exception('identifierkeyfailed', 'datalynxfield_identifier');
+                }
+                $newkey = md5(implode('_', [$content->entryid, complex_random_string($saltsize)]));
+            } while (self::key_exists($newkey));
+
+            $DB->set_field('datalynx_contents', 'content', $newkey, ['id' => $content->id]);
+            $replaced++;
+        }
+        return $replaced;
     }
 
     /**

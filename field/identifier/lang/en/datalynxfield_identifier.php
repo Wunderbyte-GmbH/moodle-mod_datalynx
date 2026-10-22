@@ -23,9 +23,9 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 $string['entryid'] = 'Entry id';
+$string['identifierkeyfailed'] = 'No unused identifier could be generated. Please try again.';
 $string['pluginname'] = 'Identifier';
 $string['privacy:metadata'] = 'Identifiers do not store personal data.';
 $string['saltsize'] = 'Salt size';
 $string['saltsource'] = 'Salt source';
 $string['system'] = 'System';
-$string['uniqueness'] = 'Uniqueness';

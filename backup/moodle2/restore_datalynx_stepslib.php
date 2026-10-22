@@ -886,6 +886,9 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
 
         // Update group mode if the original was set to internal mode.
 
+        // Identifiers must be unique site-wide: replace keys copied from entries that still exist.
+        \datalynxfield_identifier\field::replace_duplicate_keys($datalynxnewid);
+
         // Update teammmemberselect user ids.
         $sqllike = $DB->sql_like('df.type', ':type', false);
         $sql = "SELECT dc.id, dc.content
