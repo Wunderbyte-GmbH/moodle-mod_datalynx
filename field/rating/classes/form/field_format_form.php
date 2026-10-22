@@ -27,7 +27,7 @@ class field_format_form extends \mod_datalynx\form\field_format_base_form {
     /**
      * Defines configuration elements on the form.
      */
-    protected function format_definition() {
+    protected function format_definition(): void {
         $mform = &$this->_form;
         $options = [
             'rate' => 'Rate (widget)',

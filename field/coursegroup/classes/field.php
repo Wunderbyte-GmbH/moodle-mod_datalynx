@@ -257,9 +257,9 @@ class field extends datalynxfield_base {
      * Format search value for display.
      *
      * @param array $searchparams
-     * @return string
+     * @return string|null
      */
-    public function format_search_value($searchparams) {
+    public function format_search_value($searchparams): ?string {
         [$not, $operator, $value] = $searchparams;
         [$member, $course, $group] = $value;
         if ($member) {
@@ -271,6 +271,7 @@ class field extends datalynxfield_base {
         if ($group) {
             return get_string('group') . ' ' . $not . ' ' . $operator . ' ' . $group;
         }
+        return null;
     }
 
     /**

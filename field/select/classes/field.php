@@ -124,7 +124,7 @@ class field extends datalynxfield_option_single {
      * @see datalynxfield_option_single::get_supported_search_operators()
      * @return array
      */
-    public function get_supported_search_operators() {
+    public function get_supported_search_operators(): array {
         return [
             'ANY_OF' => get_string('anyof', 'datalynx'),
             'MY_PROFILE' => get_string('matchesmyprofilefield', 'datalynxfield_select'),

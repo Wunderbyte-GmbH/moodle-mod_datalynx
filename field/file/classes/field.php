@@ -64,9 +64,9 @@ class field extends datalynxfield_base {
      *
      * @param stdClass $entry The entry object.
      * @param ?array $values The values to update.
-     * @return int|bool The content ID or false.
+     * @return int|string|bool The content ID, or true after saving changes to existing files.
      */
-    public function update_content(stdClass $entry, ?array $values = null) {
+    public function update_content(stdClass $entry, ?array $values = null): int|string|bool {
         global $DB, $USER;
 
         $entryid = $entry->id;

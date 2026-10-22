@@ -27,7 +27,7 @@ class field_format_form extends \mod_datalynx\form\field_format_base_form {
     /**
      * Define the specific elements for the text format.
      */
-    protected function format_definition() {
+    protected function format_definition(): void {
         // Default implementation has no extra elements.
     }
 }

@@ -375,7 +375,7 @@ class view extends base {
      * @param stdClass $data Form data to process.
      * @return stdClass
      */
-    public function from_form($data) {
+    public function from_form($data): stdClass {
         $data = parent::from_form($data);
 
         // Save pdf specific template files.
@@ -430,7 +430,7 @@ class view extends base {
      * @param ?stdClass $data Optional existing data object.
      * @return stdClass
      */
-    public function to_form($data = null) {
+    public function to_form($data = null): stdClass {
         $data = parent::to_form($data);
 
         // Save pdf specific template files.

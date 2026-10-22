@@ -78,9 +78,8 @@ abstract class datalynxfield_option extends datalynxfield_base {
     /**
      *
      * @param array $map
-     * @return mixed
      */
-    abstract public function update_options($map = []);
+    abstract public function update_options($map = []): void;
 
     /**
      * When an option from a single/multi choice is deleted / renamed or added
@@ -91,7 +90,7 @@ abstract class datalynxfield_option extends datalynxfield_base {
      * @see datalynxfield_base::set_field()
      * @param ?stdClass $forminput Form input data.
      */
-    public function set_field($forminput = null) {
+    public function set_field($forminput = null): void {
         $this->field = new stdClass();
         $this->field->id = !empty($forminput->id) ? $forminput->id : 0;
         $this->field->type = $this->type;
@@ -169,7 +168,7 @@ abstract class datalynxfield_option extends datalynxfield_base {
      * @param array $searchparams Search parameters array.
      * @return string|false
      */
-    public function format_search_value($searchparams) {
+    public function format_search_value($searchparams): string|false {
         [$not, $operator, $value] = $searchparams;
         if (is_array($value)) {
             $selected = implode(', ', $value);
@@ -202,7 +201,7 @@ abstract class datalynxfield_option extends datalynxfield_base {
      *
      * @return bool
      */
-    public static function is_customfilterfield() {
+    public static function is_customfilterfield(): bool {
         return true;
     }
 
@@ -212,7 +211,7 @@ abstract class datalynxfield_option extends datalynxfield_base {
      * @param string $operator
      * @return int
      */
-    public function get_argument_count(string $operator) {
+    public function get_argument_count(string $operator): int {
         if ($operator === "") { // Empty operator requires no argument.
             return 0;
         } else {

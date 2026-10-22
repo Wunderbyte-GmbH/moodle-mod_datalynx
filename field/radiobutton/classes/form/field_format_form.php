@@ -27,7 +27,7 @@ class field_format_form extends \mod_datalynx\form\field_format_base_form {
     /**
      * Define the specific elements for the radiobutton format.
      */
-    protected function format_definition() {
+    protected function format_definition(): void {
         $mform = &$this->_form;
 
         \datalynxfield_radiobutton\field_format::define_elements($mform);

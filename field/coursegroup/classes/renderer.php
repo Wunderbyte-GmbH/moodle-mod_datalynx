@@ -43,7 +43,7 @@ class renderer extends datalynxfield_renderer {
      * @param ?array $options Rendering options.
      * @return array Replacements keyed by tag.
      */
-    public function replacements(?array $tags = null, $entry = null, ?array $options = null) {
+    public function replacements(?array $tags = null, $entry = null, ?array $options = null): array {
         $edit = !empty($options['edit']) ? $options['edit'] : false;
 
         $replacements = array_fill_keys($tags, '');

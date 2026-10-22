@@ -143,7 +143,7 @@ class renderer extends datalynxfield_renderer {
      *
      * @return array field patterns
      */
-    protected function patterns() {
+    protected function patterns(): array {
         $fieldname = $this->field->name();
 
         $patterns = parent::patterns();

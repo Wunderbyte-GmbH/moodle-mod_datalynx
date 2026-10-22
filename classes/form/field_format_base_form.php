@@ -67,7 +67,7 @@ abstract class field_format_base_form extends moodleform {
     /**
      * Override this to define fields specific to the format type.
      */
-    abstract protected function format_definition();
+    abstract protected function format_definition(): void;
 
     /**
      * Form validation.
@@ -116,7 +116,7 @@ abstract class field_format_base_form extends moodleform {
      * @param array $files
      * @return array
      */
-    protected function format_validation($data, $files) {
+    protected function format_validation($data, $files): array {
         return [];
     }
 }

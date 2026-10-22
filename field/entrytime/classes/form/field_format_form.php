@@ -27,7 +27,7 @@ class field_format_form extends \mod_datalynx\form\field_format_base_form {
     /**
      * Define the specific elements for the entrytime format.
      */
-    protected function format_definition() {
+    protected function format_definition(): void {
         $mform = &$this->_form;
         $mform->addElement('text', 'dateformat', get_string('fieldformatdateformat', 'datalynxfield_entrytime'));
         $mform->setType('dateformat', PARAM_TEXT);

@@ -165,9 +165,15 @@ class renderer extends FileRenderer {
      * @param string $path
      * @param string $altname
      * @param ?array $params
-     * @return moodle_url|string
+     * @return string
      */
-    protected function display_file(stored_file $file, int $entryid, string $path, string $altname = '', ?array $params = null) {
+    protected function display_file(
+        stored_file $file,
+        int $entryid,
+        string $path,
+        string $altname = '',
+        ?array $params = null
+    ): string {
         $field = $this->field;
 
         $format = $params['field_format'] ?? null;

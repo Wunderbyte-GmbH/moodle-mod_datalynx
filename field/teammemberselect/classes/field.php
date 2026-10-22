@@ -268,9 +268,9 @@ class field extends datalynxfield_base {
      *
      * @param stdClass $entry The entry object.
      * @param ?array $values Field values.
-     * @return bool|int New content ID.
+     * @return int|string|bool New content ID.
      */
-    public function update_content(stdClass $entry, ?array $values = null) {
+    public function update_content(stdClass $entry, ?array $values = null): int|string|bool {
         $newcontentid = parent::update_content($entry, $values);
 
         // TODO: MDL-0000 All this is only to notify team members. Check if we really need this here.
@@ -607,7 +607,7 @@ class field extends datalynxfield_base {
      * @param array $searchparams Search parameters array.
      * @return string|false Formatted search value or false.
      */
-    public function format_search_value($searchparams) {
+    public function format_search_value($searchparams): string|false {
         [$not, $operator, $value] = $searchparams;
         if (is_array($value)) {
             $selected = implode(', ', $value);

@@ -60,7 +60,7 @@ abstract class datalynxfield_renderer {
      * @param string $text text that may contain field patterns
      * @return array Field patterns found in the text
      */
-    public function search($text) {
+    public function search($text): array {
         $found = [];
 
         $fieldname = $this->field->name();
@@ -104,9 +104,9 @@ abstract class datalynxfield_renderer {
      * @param ?array $tags
      * @param ?stdClass $entry
      * @param ?array $options
-     * @return array
+     * @return array|null
      */
-    public function replacements(?array $tags = null, ?stdClass $entry = null, ?array $options = null) {
+    public function replacements(?array $tags = null, ?stdClass $entry = null, ?array $options = null): ?array {
         $replacements = [];
         foreach ($tags as $tag) {
             $currentoptions = array_merge(self::$defaultoptions, $options);
@@ -412,7 +412,7 @@ abstract class datalynxfield_renderer {
      * @param array $options rendering options
      * @see datalynxfield_renderer::prerender_edit_mode
      */
-    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
+    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options): void {
         $fieldid = $this->field->id();
 
         $fieldname = "f_{$entry->id}_$fieldid";
@@ -440,9 +440,9 @@ abstract class datalynxfield_renderer {
      * @param MoodleQuickForm $mform
      * @param int $i
      * @param string $value
-     * @return array
+     * @return array|bool
      */
-    public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
+    public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = ''): array|bool {
         $fieldid = $this->field->id();
         $fieldname = "f_{$i}_$fieldid";
 
@@ -491,7 +491,7 @@ abstract class datalynxfield_renderer {
      * @param array $data
      * @return array
      */
-    public function validate($entryid, $tags, $data) {
+    public function validate($entryid, $tags, $data): array {
         return [];
     }
 
@@ -525,7 +525,7 @@ abstract class datalynxfield_renderer {
      *
      * @return array pattern => array(visible in menu, category)
      */
-    protected function patterns() {
+    protected function patterns(): array {
         $fieldname = $this->field->name();
 
         $patterns = [];
@@ -599,7 +599,7 @@ abstract class datalynxfield_renderer {
      *
      * @return array
      */
-    public function pluginfile_patterns() {
+    public function pluginfile_patterns(): array {
         return [];
     }
 }

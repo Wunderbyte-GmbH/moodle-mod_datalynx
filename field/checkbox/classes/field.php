@@ -49,8 +49,9 @@ class field extends MultiSelectField {
      * Checkbox reads defaults from array that is based on position and has value. Starts at one.
      * {@inheritDoc}
      * @see datalynxfield_multiselect::default_values()
+     * @return array
      */
-    public function default_values() {
+    public function default_values(): array {
         $rawdefaults = explode("\n", $this->field->param2); // Create array of default values.
         $rawdefaults = array_map('trim', $rawdefaults); // Trim random spaces (1b, 2c).
         $options = array_map('trim', $this->options_menu()); // Read available checkboxes (1a, 2b, 3c).
@@ -71,7 +72,7 @@ class field extends MultiSelectField {
      * @param mixed $value The value to check.
      * @return bool
      */
-    public static function is_fieldvalue_empty($value) {
+    public static function is_fieldvalue_empty($value): bool {
         // The array is always passed, check every value.
         foreach ($value as $val) {
             if ($val) {

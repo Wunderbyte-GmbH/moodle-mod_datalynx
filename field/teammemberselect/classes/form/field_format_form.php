@@ -27,7 +27,7 @@ class field_format_form extends \mod_datalynx\form\field_format_base_form {
     /**
      * Define the specific elements for the teammemberselect format.
      */
-    protected function format_definition() {
+    protected function format_definition(): void {
         $mform = &$this->_form;
         $mform->addElement('advcheckbox', 'subscribe', get_string('subscribe', 'datalynx'));
         $mform->setType('subscribe', PARAM_BOOL);

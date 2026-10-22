@@ -39,7 +39,7 @@ class view_patterns extends datalynxview_patterns {
      * @param array $options
      * @return array
      */
-    public function get_replacements($tags = null, $entry = null, array $options = []) {
+    public function get_replacements($tags = null, $entry = null, array $options = []): array {
         $replacements = parent::get_replacements($tags, $entry, $options);
 
         $view = $this->view;

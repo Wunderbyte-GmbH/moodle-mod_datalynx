@@ -27,7 +27,7 @@ class field_format_form extends \mod_datalynx\form\field_format_base_form {
     /**
      * Define the specific elements for the fieldgroup format.
      */
-    protected function format_definition() {
+    protected function format_definition(): void {
         $mform = &$this->_form;
 
         // Which aggregation to apply across the fieldgroup's number subfields.

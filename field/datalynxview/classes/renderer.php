@@ -290,8 +290,9 @@ class renderer extends datalynxfield_renderer {
      *
      * {@inheritDoc}
      * @see datalynxfield_renderer::patterns()
+     * @return array
      */
-    protected function patterns() {
+    protected function patterns(): array {
         $fieldname = $this->field->name();
 
         $patterns = parent::patterns();

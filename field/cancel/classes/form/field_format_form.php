@@ -27,7 +27,7 @@ class field_format_form extends \mod_datalynx\form\field_format_base_form {
     /**
      * Define the specific elements for the cancel format.
      */
-    protected function format_definition() {
+    protected function format_definition(): void {
         $mform = &$this->_form;
         $mform->addElement('text', 'buttontext', get_string('buttontext', 'datalynxfield_cancel'));
         $mform->setType('buttontext', PARAM_TEXT);

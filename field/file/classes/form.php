@@ -34,7 +34,7 @@ class form extends datalynxfield_form {
     /**
      * Define the field specific form elements.
      */
-    public function field_definition() {
+    public function field_definition(): void {
         global $CFG;
 
         $mform = &$this->_form;
@@ -66,7 +66,7 @@ class form extends datalynxfield_form {
     /**
      * Looks up all moodle mimetypes and shows an autocomplete list for selection.
      */
-    public function filetypes_definition() {
+    public function filetypes_definition(): void {
         $mform = &$this->_form;
 
         $mimetypes = [];

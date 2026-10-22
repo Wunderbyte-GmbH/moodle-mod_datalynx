@@ -39,7 +39,7 @@ class renderer extends datalynxfield_renderer {
      * @param array $options
      * @return void
      */
-    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
+    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options): void {
         $field = $this->field;
         $fieldid = $field->id();
         $entryid = $entry->id;
@@ -237,7 +237,7 @@ class renderer extends datalynxfield_renderer {
      * @param string $value
      * @return array
      */
-    public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
+    public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = ''): array {
         $field = $this->field;
         $fieldid = $field->id();
         $fieldname = "f_{$i}_$fieldid";
@@ -271,7 +271,7 @@ class renderer extends datalynxfield_renderer {
      * @param stdClass $formdata
      * @return array
      */
-    public function validate($entryid, $tags, $formdata) {
+    public function validate($entryid, $tags, $formdata): array {
         global $DB;
 
         $fieldid = $this->field->id();

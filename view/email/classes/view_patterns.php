@@ -32,7 +32,7 @@ class view_patterns extends base_patterns {
      * @param bool $checkvisibility
      * @return array
      */
-    protected function ref_patterns($checkvisibility = true) {
+    protected function ref_patterns($checkvisibility = true): array {
         $patterns = parent::ref_patterns($checkvisibility);
         $cat = get_string('reference', 'datalynx');
 
@@ -56,7 +56,7 @@ class view_patterns extends base_patterns {
      * @param ?array $options
      * @return string
      */
-    protected function get_ref_replacements($tag, $entry = null, ?array $options = null) {
+    protected function get_ref_replacements($tag, $entry = null, ?array $options = null): string {
         switch ($tag) {
             case '##notificationentryurl##':
                 return $options['notificationentryurl'] ?? '';

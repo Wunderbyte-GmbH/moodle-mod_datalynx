@@ -277,8 +277,9 @@ class datalynxfield_option_single extends datalynxfield_option {
      *
      * {@inheritDoc}
      * @see datalynxfield_base::get_supported_search_operators()
+     * @return array
      */
-    public function get_supported_search_operators() {
+    public function get_supported_search_operators(): array {
         return ['ANY_OF' => get_string('anyof', 'datalynx'), '' => get_string('empty', 'datalynx')];
     }
 }

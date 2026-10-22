@@ -42,7 +42,7 @@ class renderer extends TextRenderer {
      * @param array $options Rendering options.
      * @see datalynxfield_text_renderer::render_edit_mode()
      */
-    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
+    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options): void {
         $field = $this->field;
         $fieldid = $field->id();
         $entryid = $entry->id;
@@ -237,7 +237,7 @@ class renderer extends TextRenderer {
      * @return array
      * @see datalynxfield_text_renderer::render_search_mode()
      */
-    public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
+    public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = ''): array {
         $fieldid = $this->field->id();
         $fieldname = "f_{$i}_$fieldid";
 
@@ -265,7 +265,7 @@ class renderer extends TextRenderer {
      * @return array
      * @see datalynxfield_text_renderer::validate()
      */
-    public function validate($entryid, $tags, $formdata) {
+    public function validate($entryid, $tags, $formdata): array {
         $fieldid = $this->field->id();
 
         $formfieldname = "field_{$fieldid}_{$entryid}";

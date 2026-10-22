@@ -1,6 +1,23 @@
 mod_datalynx changes
 ====================
 
+2026-10-22
+----------
+
+- Code: datalynx-owned methods now declare native return types. Base-class
+  methods that subplugins override carry them too, among them
+  `datalynxfield_base` (`update_content`, `format_content`, `get_sort_sql`,
+  `get_supported_search_operators`, `is_internal`, ...), `datalynxfield_renderer`
+  (`replacements`, `render_edit_mode`, `render_search_mode`, `validate`,
+  `patterns`), `field_format\base::config_form`, the field, view and field
+  format settings forms (`field_definition`, `format_definition`, ...),
+  `view\base` and `datalynxview_patterns`, and `rule\base::trigger`.
+  **Third-party datalynxfield_, datalynxview_ and datalynxrule_ subplugins that
+  override these methods must declare the same or a narrower return type**,
+  otherwise PHP stops with a fatal "Declaration must be compatible" error. All
+  subplugins shipped with datalynx are updated. Overrides of core methods
+  (forms, events, tasks, privacy, backup) stay untyped, like core.
+
 2026-08-11
 ----------
 

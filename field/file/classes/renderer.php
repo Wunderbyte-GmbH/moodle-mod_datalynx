@@ -43,7 +43,7 @@ class renderer extends datalynxfield_renderer {
      * @param ?array $options Rendering options.
      * @return void
      */
-    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, ?array $options = null) {
+    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, ?array $options = null): void {
         $field = $this->field;
         $fieldid = $field->id();
         $entryid = $entry->id;
@@ -176,9 +176,15 @@ class renderer extends datalynxfield_renderer {
      * @param string $path
      * @param string $altname
      * @param ?array $params
-     * @return moodle_url|string
+     * @return moodle_url|string|false
      */
-    protected function display_file(stored_file $file, int $entryid, string $path, string $altname = '', ?array $params = null) {
+    protected function display_file(
+        stored_file $file,
+        int $entryid,
+        string $path,
+        string $altname = '',
+        ?array $params = null
+    ): moodle_url|string|false {
         $field = $this->field;
         $fieldid = $field->id();
         $fieldname = "field_{$fieldid}_{$entryid}";

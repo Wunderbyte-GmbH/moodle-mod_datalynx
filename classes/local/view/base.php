@@ -467,7 +467,7 @@ abstract class base {
      * If no cached patterns are found, they are retrieved from the HTML provided in the
      * view settings section field (definition)
      */
-    protected function set__patterns() {
+    protected function set__patterns(): void {
         global $DB;
 
         $patternarray = [];
@@ -686,7 +686,7 @@ abstract class base {
      * @param ?stdClass $data View data object.
      * @return stdClass
      */
-    public function to_form($data = null) {
+    public function to_form($data = null): stdClass {
         $data = $data ?: $this->view;
         $data = $this->prepare_view_editors($data);
         // Decode the permitted filters whitelist so the multiselect form element can preselect it.
@@ -701,7 +701,7 @@ abstract class base {
      * @param stdClass $data Form data.
      * @return stdClass
      */
-    public function from_form($data) {
+    public function from_form($data): stdClass {
         $data = $this->update_view_editors($data);
         return $data;
     }
@@ -1601,7 +1601,7 @@ abstract class base {
     /**
      * Generate a default template definition for this view type.
      */
-    abstract public function generate_default_view();
+    abstract public function generate_default_view(): void;
 
     /**
      * Return editor configuration options.
@@ -1749,24 +1749,24 @@ abstract class base {
      *
      * @param array $entriesset Entry definition groups.
      * @param string $name Group name.
-     * @return mixed
+     * @return array
      */
-    abstract protected function apply_entry_group_layout($entriesset, $name = '');
+    abstract protected function apply_entry_group_layout($entriesset, $name = ''): array;
 
     /**
      * Build a definition for a newly created entry row.
      *
      * @param int $entryid Temporary entry id.
-     * @return mixed
+     * @return array
      */
-    abstract protected function new_entry_definition($entryid = -1);
+    abstract protected function new_entry_definition($entryid = -1): array;
 
     /**
      *
      * @param array $fielddefinitions Field definition map.
      * @return array
      */
-    protected function entry_definition($fielddefinitions) {
+    protected function entry_definition($fielddefinitions): array {
         $elements = [];
 
         // Split the entry template to tags and html.

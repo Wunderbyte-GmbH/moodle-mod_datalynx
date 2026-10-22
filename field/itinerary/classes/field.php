@@ -247,9 +247,9 @@ class field extends datalynxfield_base {
      *
      * @param stdClass $entry
      * @param ?array $values
-     * @return bool|int
+     * @return int|string|bool
      */
-    public function update_content(stdClass $entry, ?array $values = null) {
+    public function update_content(stdClass $entry, ?array $values = null): int|string|bool {
         $result = parent::update_content($entry, $values);
 
         $this->reindex_entry((int) $entry->id);
@@ -263,7 +263,7 @@ class field extends datalynxfield_base {
      * @param int $entryid
      * @return bool
      */
-    public function delete_content($entryid = 0) {
+    public function delete_content($entryid = 0): bool {
         global $DB;
 
         $result = parent::delete_content($entryid);

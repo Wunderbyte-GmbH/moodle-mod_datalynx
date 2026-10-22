@@ -54,7 +54,7 @@ class field extends datalynxfield_base {
      *
      * @return array
      */
-    public function get_supported_search_operators() {
+    public function get_supported_search_operators(): array {
         return ['' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'),
                 'LIKE' => get_string('contains', 'datalynx')];
     }

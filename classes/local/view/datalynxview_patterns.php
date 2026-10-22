@@ -180,7 +180,7 @@ class datalynxview_patterns {
      * @param array $options options like pluginfileurl, entriescount, entriesfiltercount, hidenewentry, baseurl
      * @return array of strings key: tagname, value:the string that replaces the tag
      */
-    public function get_replacements($tags = null, $entry = null, array $options = []) {
+    public function get_replacements($tags = null, $entry = null, array $options = []): array {
         $view = $this->view;
 
         // Existing tag types.
@@ -415,7 +415,7 @@ class datalynxview_patterns {
      * @param ?array $options
      * @return string
      */
-    protected function get_ref_replacements($tag, $entry = null, ?array $options = null) {
+    protected function get_ref_replacements($tag, $entry = null, ?array $options = null): string {
         if ($tag == '##viewsmenu##') {
             return $this->print_views_menu($options, true);
         }
@@ -857,7 +857,7 @@ class datalynxview_patterns {
      * @param boolean $checkvisibility true if only views visible to the user should be considered
      * @return array associative array sith pattern string as value and key
      */
-    protected function ref_patterns($checkvisibility = true) {
+    protected function ref_patterns($checkvisibility = true): array {
         $cat = get_string('reference', 'datalynx');
         $patterns = ['##viewurl##' => [true, $cat],
                 '##viewsmenu##' => [true, $cat],

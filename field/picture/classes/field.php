@@ -46,9 +46,9 @@ class field extends FileField {
      *
      * @param stdClass $entry The entry object.
      * @param ?array $values The values to update.
-     * @return bool|int
+     * @return int|string|bool
      */
-    public function update_content(stdClass $entry, ?array $values = null) {
+    public function update_content(stdClass $entry, ?array $values = null): int|string|bool {
         $parentcontentid = parent::update_content($entry, $values);
 
         // We can read the contentid from entry and update the right files.

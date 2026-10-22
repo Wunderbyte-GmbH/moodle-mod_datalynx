@@ -95,7 +95,7 @@ class field extends datalynxfield_option_multiple {
      *
      * @return array
      */
-    public function default_values() {
+    public function default_values(): array {
         $rawdefaults = explode("\n", $this->field->param2);
         $options = $this->options_menu();
 
@@ -115,7 +115,7 @@ class field extends datalynxfield_option_multiple {
      * @param mixed $value The value to check.
      * @return bool
      */
-    public static function is_fieldvalue_empty($value) {
+    public static function is_fieldvalue_empty($value): bool {
         // If array > 1 entry we see actual input from the user, next to -999.
         // TODO: MDL-0000 This needs to consider alternative renderers with the select field.
         if (count($value) < 2) {
@@ -129,10 +129,10 @@ class field extends datalynxfield_option_multiple {
      *
      * @param stdClass $entry The entry object.
      * @param ?array $values The values to update.
-     * @return bool|int
+     * @return int|string|bool
      * @throws dml_exception
      */
-    public function update_content(stdClass $entry, ?array $values = null) {
+    public function update_content(stdClass $entry, ?array $values = null): int|string|bool {
 
         // Check if all values are known in field definition.
         $knownvalues = explode("\n", $this->field->param1);

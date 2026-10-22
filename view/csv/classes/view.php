@@ -273,7 +273,7 @@ class view extends base {
     /**
      * Add the patterns we store in param2 to all the other used patterns.
      */
-    protected function set__patterns() {
+    protected function set__patterns(): void {
         parent::set__patterns();
 
         // Get patterns from param2.

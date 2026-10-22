@@ -552,7 +552,7 @@ class field extends datalynxfield_base {
      * @param array $searchparams
      * @return string
      */
-    public function format_search_value($searchparams) {
+    public function format_search_value($searchparams): string {
         [, , $value] = $searchparams;
         if (!is_array($value)) {
             return '';

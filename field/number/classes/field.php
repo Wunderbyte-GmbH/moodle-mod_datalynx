@@ -234,8 +234,9 @@ class field extends TextField {
      *
      * {@inheritDoc}
      * @see datalynxfield_text::get_supported_search_operators()
+     * @return array
      */
-    public function get_supported_search_operators() {
+    public function get_supported_search_operators(): array {
         return ['' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'),
                 '>' => get_string('greaterthan', 'datalynx'),
                 '>=' => get_string('greaterequal', 'datalynx'),

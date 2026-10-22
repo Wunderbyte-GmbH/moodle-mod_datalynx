@@ -32,7 +32,7 @@ abstract class datalynxfield_no_content extends datalynxfield_base {
      * @param ?array $values
      * @return bool
      */
-    public function update_content(stdClass $entry, ?array $values = null) {
+    public function update_content(stdClass $entry, ?array $values = null): bool {
         return true;
     }
 
@@ -42,7 +42,7 @@ abstract class datalynxfield_no_content extends datalynxfield_base {
      * @param int $entryid
      * @return bool
      */
-    public function delete_content($entryid = 0) {
+    public function delete_content($entryid = 0): bool {
         return true;
     }
 
@@ -52,7 +52,7 @@ abstract class datalynxfield_no_content extends datalynxfield_base {
      * @param int $sortdir
      * @return array
      */
-    public function get_distinct_content($sortdir = 0) {
+    public function get_distinct_content($sortdir = 0): array {
         return [];
     }
 
@@ -61,7 +61,7 @@ abstract class datalynxfield_no_content extends datalynxfield_base {
      *
      * @return string
      */
-    public function get_select_sql() {
+    public function get_select_sql(): string {
         return '';
     }
 
@@ -70,7 +70,7 @@ abstract class datalynxfield_no_content extends datalynxfield_base {
      *
      * @return string
      */
-    public function get_sort_sql() {
+    public function get_sort_sql(): string {
         return '';
     }
 
@@ -79,7 +79,7 @@ abstract class datalynxfield_no_content extends datalynxfield_base {
      *
      * @return bool
      */
-    public function is_datalynx_content() {
+    public function is_datalynx_content(): bool {
         return false;
     }
 
@@ -87,9 +87,9 @@ abstract class datalynxfield_no_content extends datalynxfield_base {
      * No file area for this field type.
      *
      * @param ?string $suffix
-     * @return false
+     * @return bool
      */
-    protected function filearea($suffix = null) {
+    protected function filearea($suffix = null): bool {
         return false;
     }
 }

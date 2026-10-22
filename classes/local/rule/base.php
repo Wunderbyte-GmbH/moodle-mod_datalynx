@@ -119,7 +119,7 @@ abstract class base {
      * @param \core\event\base $event
      * @return bool
      */
-    abstract public function trigger(\core\event\base $event);
+    abstract public function trigger(\core\event\base $event): bool;
 
     /**
      * Checks if the rule triggers on the given event

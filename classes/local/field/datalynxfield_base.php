@@ -115,7 +115,7 @@ abstract class datalynxfield_base {
      *
      * @param stdClass $forminput
      */
-    public function set_field($forminput = null) {
+    public function set_field($forminput = null): void {
         $this->field = new stdClass();
         $this->field->id = !empty($forminput->id) ? $forminput->id : 0;
         $this->field->type = $this->type;
@@ -157,7 +157,7 @@ abstract class datalynxfield_base {
      * @param ?stdClass $fromform Form data.
      * @return bool
      */
-    public function update_field($fromform = null) {
+    public function update_field($fromform = null): bool {
         global $DB, $OUTPUT;
         $oldname = $this->field->name;
         if (!empty($fromform)) {
@@ -180,8 +180,9 @@ abstract class datalynxfield_base {
 
     /**
      * Delete a field completely
+     * @return bool
      */
-    public function delete_field() {
+    public function delete_field(): bool {
         global $DB;
 
         if (!empty($this->field->id)) {
@@ -375,7 +376,7 @@ abstract class datalynxfield_base {
      *
      * @return bool
      */
-    public static function is_internal() {
+    public static function is_internal(): bool {
         return false;
     }
 
@@ -397,10 +398,10 @@ abstract class datalynxfield_base {
      *
      * @param stdClass $entry
      * @param ?array $values
-     * @return bool|int
+     * @return int|string|bool
      * @throws dml_exception
      */
-    public function update_content(stdClass $entry, ?array $values = null) {
+    public function update_content(stdClass $entry, ?array $values = null): int|string|bool {
         global $DB;
         $fieldid = $this->field->id;
         $fieldid = $this->field->id;
@@ -456,7 +457,7 @@ abstract class datalynxfield_base {
      * @return bool
      * @throws dml_exception
      */
-    public function delete_content($entryid = 0) {
+    public function delete_content($entryid = 0): bool {
         global $DB;
 
         if ($entryid) {
@@ -489,7 +490,7 @@ abstract class datalynxfield_base {
      * @return array
      * @throws dml_exception
      */
-    public function get_distinct_content($sortdir = 0) {
+    public function get_distinct_content($sortdir = 0): array {
         global $DB;
 
         if (is_null($this->distinctvalues)) {
@@ -524,7 +525,7 @@ abstract class datalynxfield_base {
      * @param ?int $entryid
      * @return bool
      */
-    public function prepare_import_content(&$data, $importsettings, ?array $csvrecord = null, ?int $entryid = null) {
+    public function prepare_import_content(&$data, $importsettings, ?array $csvrecord = null, ?int $entryid = null): bool {
         $fieldid = $this->field->id;
         $fieldname = $this->name();
         // Internal fields use a different import settings structure.
@@ -606,7 +607,7 @@ abstract class datalynxfield_base {
      *
      * @return array of strings
      */
-    protected function content_names() {
+    protected function content_names(): array {
         return [''];
     }
 
@@ -618,7 +619,7 @@ abstract class datalynxfield_base {
      * @param ?array $values values from the entry form elements
      * @return array
      */
-    protected function format_content(stdClass $entry, ?array $values = null) {
+    protected function format_content(stdClass $entry, ?array $values = null): array {
         $fieldid = $this->field->id;
 
         $newcontent = null;
@@ -649,7 +650,7 @@ abstract class datalynxfield_base {
      *
      * @return bool true if 'group by' is supported, false otherwise
      */
-    public function supports_group_by() {
+    public function supports_group_by(): bool {
         return false;
     }
 
@@ -662,7 +663,7 @@ abstract class datalynxfield_base {
      *
      * @return bool true if the field can be filtered/searched, false otherwise
      */
-    public function supports_search() {
+    public function supports_search(): bool {
         return true;
     }
 
@@ -675,7 +676,7 @@ abstract class datalynxfield_base {
      *
      * @return bool true if entries can be ordered by this field, false otherwise
      */
-    public function supports_sort() {
+    public function supports_sort(): bool {
         return true;
     }
 
@@ -687,7 +688,7 @@ abstract class datalynxfield_base {
      *
      * @return array of strings
      */
-    public function get_content_parts() {
+    public function get_content_parts(): array {
         return ['content'];
     }
 
@@ -696,7 +697,7 @@ abstract class datalynxfield_base {
      *
      * @return string
      */
-    public function get_select_sql() {
+    public function get_select_sql(): string {
         if (is_numeric($this->field->id) && $this->field->id > 0) {
             $arr = [];
             $arr[] = " c{$this->field->id}.id AS c{$this->field->id}_id ";
@@ -715,9 +716,9 @@ abstract class datalynxfield_base {
      *
      * @param string $paramname
      * @param string $paramcount
-     * @return ?array
+     * @return array|null
      */
-    public function get_sort_from_sql($paramname = 'sortie', $paramcount = '') {
+    public function get_sort_from_sql($paramname = 'sortie', $paramcount = ''): ?array {
         $fieldid = $this->field->id;
         if (is_numeric($fieldid) && $fieldid > 0) {
             // Use a subquery with GROUP BY to ensure at most one row per entry.
@@ -744,7 +745,7 @@ abstract class datalynxfield_base {
      *
      * @return string
      */
-    public function get_sort_sql() {
+    public function get_sort_sql(): string {
         return $this->get_sql_compare_text();
     }
 
@@ -753,7 +754,7 @@ abstract class datalynxfield_base {
      *
      * @return string
      */
-    public function get_search_from_sql() {
+    public function get_search_from_sql(): string {
         $fieldid = $this->field->id;
         if (is_numeric($fieldid) && $fieldid > 0) {
             return " LEFT JOIN {datalynx_contents} c$fieldid ON c$fieldid.entryid = e.id AND c$fieldid.fieldid = $fieldid ";
@@ -907,9 +908,9 @@ abstract class datalynxfield_base {
      * Formats the search parameters for display.
      *
      * @param array $searchparams
-     * @return string|false
+     * @return string|false|null
      */
-    public function format_search_value($searchparams) {
+    public function format_search_value($searchparams): string|false|null {
         [$not, $operator, $value] = $searchparams;
         return $not . ' ' . $operator . ' ' . $value;
     }
@@ -940,7 +941,7 @@ abstract class datalynxfield_base {
      *
      * @return bool
      */
-    public function use_join() {
+    public function use_join(): bool {
         return false;
     }
 
@@ -949,7 +950,7 @@ abstract class datalynxfield_base {
      *
      * @return bool
      */
-    public function is_datalynx_content() {
+    public function is_datalynx_content(): bool {
         return true;
     }
 
@@ -957,9 +958,9 @@ abstract class datalynxfield_base {
      * Return file area of field
      *
      * @param string $suffix
-     * @return string|boolean
+     * @return string|bool
      */
-    protected function filearea($suffix = null) {
+    protected function filearea($suffix = null): string|bool {
         if (!empty($suffix)) {
             return 'field-' . str_replace(' ', '_', $suffix);
         } else {
@@ -977,9 +978,9 @@ abstract class datalynxfield_base {
      * version and should therefore be overridden by a concrete
      * field class to remove unsupported operators from the list.
      *
-     * @return array an array of operators
+     * @return array|bool an array of operators
      */
-    public function get_supported_search_operators() {
+    public function get_supported_search_operators(): array|bool {
         return []; // If search is not supported, offer no operators.
     }
 
@@ -1043,7 +1044,7 @@ abstract class datalynxfield_base {
      * @param string $operator
      * @return int
      */
-    public function get_argument_count(string $operator) {
+    public function get_argument_count(string $operator): int {
         if ($operator === "") { // Empty operator requires no argument.
             return 0;
         } else {
@@ -1056,7 +1057,7 @@ abstract class datalynxfield_base {
      *
      * @return bool
      */
-    public static function is_customfilterfield() {
+    public static function is_customfilterfield(): bool {
         return false;
     }
 
@@ -1066,7 +1067,7 @@ abstract class datalynxfield_base {
      * @param mixed $value The value to check.
      * @return bool
      */
-    public static function is_fieldvalue_empty($value) {
+    public static function is_fieldvalue_empty($value): bool {
         if ($value == '') {
             return true;
         }

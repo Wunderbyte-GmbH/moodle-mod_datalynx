@@ -88,7 +88,7 @@ class datalynxfield_form extends moodleform {
     /**
      * Defines the field-specific elements.
      */
-    public function field_definition() {
+    public function field_definition(): void {
     }
 
     /**

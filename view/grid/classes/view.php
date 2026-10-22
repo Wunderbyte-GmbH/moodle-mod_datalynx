@@ -170,7 +170,7 @@ class view extends base {
      * @param int $entryid
      * @return array
      */
-    protected function new_entry_definition($entryid = -1) {
+    protected function new_entry_definition($entryid = -1): array {
         $entry = new stdClass();
         $entry->id = $entryid;
         $options = ['edit' => true, 'manage' => true];

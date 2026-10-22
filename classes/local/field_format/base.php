@@ -41,7 +41,7 @@ abstract class base {
      *
      * @param \MoodleQuickForm $mform The form object.
      */
-    abstract public function config_form(\MoodleQuickForm &$mform);
+    abstract public function config_form(\MoodleQuickForm &$mform): void;
 
     /**
      * Validates configuration options.

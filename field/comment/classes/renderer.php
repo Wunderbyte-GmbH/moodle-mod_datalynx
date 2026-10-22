@@ -48,7 +48,7 @@ class renderer extends datalynxfield_renderer {
      * @param ?array  $options Rendering options.
      * @return array
      */
-    public function replacements(?array $tags = null, $entry = null, ?array $options = null) {
+    public function replacements(?array $tags = null, $entry = null, ?array $options = null): array {
         global $CFG;
 
         $replacements = array_fill_keys($tags, '');

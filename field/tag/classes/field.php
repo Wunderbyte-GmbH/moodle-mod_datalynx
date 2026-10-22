@@ -52,10 +52,10 @@ class field extends datalynxfield_option_multiple {
      *
      * @param stdClass $entry The entry object being updated.
      * @param ?array $values Array of tag values submitted for this field.
-     * @return int|false The content record ID or false on failure.
+     * @return int|string The content record ID.
      * @see datalynxfield_base::update_content()
      */
-    public function update_content(stdClass $entry, ?array $values = null) {
+    public function update_content(stdClass $entry, ?array $values = null): int|string {
         global $DB;
         $entryid = $entry->id;
         $fieldid = $this->field->id;
@@ -115,7 +115,7 @@ class field extends datalynxfield_option_multiple {
      * @return bool
      * @see datalynxfield_base::delete_content()
      */
-    public function delete_content($entryid = 0) {
+    public function delete_content($entryid = 0): bool {
         global $DB;
 
         $params = ['fieldid' => $this->field->id];

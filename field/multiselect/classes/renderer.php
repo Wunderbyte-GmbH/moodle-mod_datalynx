@@ -48,7 +48,7 @@ class renderer extends datalynxfield_renderer {
      * @param array $options Rendering options.
      * @return void
      */
-    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
+    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options): void {
         $field = $this->field;
         $fieldid = $field->id();
         $entryid = $entry->id;

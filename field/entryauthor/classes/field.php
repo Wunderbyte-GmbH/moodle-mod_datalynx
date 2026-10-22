@@ -343,7 +343,7 @@ class field extends datalynxfield_no_content {
      *
      * @return array
      */
-    public function get_supported_search_operators() {
+    public function get_supported_search_operators(): array {
         switch ($this->field->internalname) {
             case 'id':
             case 'name':

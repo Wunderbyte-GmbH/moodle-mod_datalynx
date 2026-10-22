@@ -311,7 +311,7 @@ class datalynxview_base_form extends moodleform {
      * To be used by a specific view
      * Settings that apply after the "view template"
      */
-    public function view_definition_after_gps() {
+    public function view_definition_after_gps(): void {
     }
 
     /**
@@ -413,7 +413,7 @@ class datalynxview_base_form extends moodleform {
      * @param mixed $data The form data to preprocess.
      * @return void
      */
-    public function data_preprocessing(&$data) {
+    public function data_preprocessing(&$data): void {
     }
 
     /**

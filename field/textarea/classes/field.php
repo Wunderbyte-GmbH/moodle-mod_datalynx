@@ -96,9 +96,9 @@ class field extends datalynxfield_base {
      *
      * @param stdClass $entry
      * @param ?array $values
-     * @return int
+     * @return int|string
      */
-    public function update_content(stdClass $entry, ?array $values = null) {
+    public function update_content(stdClass $entry, ?array $values = null): int|string {
         global $DB;
 
         $entryid = $entry->id;

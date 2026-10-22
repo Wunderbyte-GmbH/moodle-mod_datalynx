@@ -95,7 +95,7 @@ class view extends base {
     /**
      * Ensure the report view always has a view-tag bucket, even with an empty section template.
      */
-    protected function set__patterns() {
+    protected function set__patterns(): void {
         parent::set__patterns();
         if (!isset($this->tags['view'])) {
             $this->tags['view'] = [];
