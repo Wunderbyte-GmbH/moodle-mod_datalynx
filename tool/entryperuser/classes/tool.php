@@ -41,9 +41,9 @@ class tool {
      * Run the tool to create entries for each user.
      *
      * @param \mod_datalynx\datalynx $dlx Datalynx instance.
-     * @return array|null [good/bad status, message] or null if form is rendered and exits.
+     * @return array [good/bad status, message]; exits instead when the form is rendered.
      */
-    public static function run($dlx) {
+    public static function run($dlx): array {
         // Find the default view or the first view containing the ##edit## tag.
         $views = $dlx->get_views();
         $defaultviewid = 0;

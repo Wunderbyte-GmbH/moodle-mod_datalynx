@@ -72,7 +72,7 @@ class rule extends base {
      * @param \core\event\base $event
      * @return bool true when the rule ran to completion (whether or not the value changed)
      */
-    public function trigger(\core\event\base $event) {
+    public function trigger(\core\event\base $event): bool {
         global $DB;
 
         $entryid = $this->resolve_entryid($event);

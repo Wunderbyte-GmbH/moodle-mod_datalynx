@@ -169,7 +169,7 @@ class datalynx_customfilter_frontend_form extends datalynx_filter_base_form {
      *
      * @return \stdClass The template context data.
      */
-    public function export_for_template() {
+    public function export_for_template(): \stdClass {
         global $OUTPUT;
 
         $quickform = $this->_form;

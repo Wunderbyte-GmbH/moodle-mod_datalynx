@@ -355,7 +355,7 @@ class datalynxview_base_form extends moodleform {
      * @param bool $forentrytemplate if true, view-level tags (info, user prefs, actions, paging)
      *        are excluded from the general tag menu
      */
-    public function add_tags_selector($editorname, $tagstype, $forentrytemplate = false) {
+    public function add_tags_selector($editorname, $tagstype, $forentrytemplate = false): void {
         $view = $this->view;
         $mform = &$this->_form;
         switch ($tagstype) {
@@ -520,7 +520,7 @@ class datalynxview_base_form extends moodleform {
      * @param string $capability
      * @return array List of localized role names.
      */
-    protected function get_allowed_role_names($capability) {
+    protected function get_allowed_role_names($capability): array {
         $context = $this->dlx->context;
         $allroles = role_get_names($context, ROLENAME_ALIAS, true);
         $roleswithcap = get_roles_with_capability($capability, CAP_ALLOW, $context);

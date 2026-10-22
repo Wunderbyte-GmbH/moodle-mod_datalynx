@@ -41,7 +41,7 @@ class renderer extends datalynxfield_renderer {
      * @param ?array $options Rendering options.
      * @return array
      */
-    public function replacements(?array $tags = null, $entry = null, ?array $options = null) {
+    public function replacements(?array $tags = null, $entry = null, ?array $options = null): array {
         $field = $this->field;
         $fieldname = $field->get('internalname');
         $dlxid = $field->dlx()->id();
@@ -99,7 +99,7 @@ class renderer extends datalynxfield_renderer {
      * @param string $value
      * @return array
      */
-    public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
+    public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = ''): array {
         $fieldid = $this->field->id();
 
         $datesarray = json_decode($value);
@@ -158,8 +158,10 @@ class renderer extends datalynxfield_renderer {
      * WARNING: Hardcoded legacy modifiers (e.g. ##fieldname:date##) are deprecated and removed.
      * All modifiers must be implemented as Field Formats (Manage > Fields > Field Formats).
      * Do NOT re-introduce hardcoded/legacy modifier lists here.
+     *
+     * @return array
      */
-    protected function patterns() {
+    protected function patterns(): array {
         $fieldname = $this->field->get('internalname');
         $cat = get_string('entryinfo', 'datalynx');
         $patterns = [];

@@ -2860,9 +2860,9 @@ abstract class base {
      *
      * @param string $html Rendered HTML.
      * @param string $pluginfileurl Replacement URL.
-     * @return string
+     * @return string|null
      */
-    private function replace_pluginfile_urls($html, $pluginfileurl) {
+    private function replace_pluginfile_urls($html, $pluginfileurl): ?string {
         $pluginfilepath = moodle_url::make_file_url(
             "/pluginfile.php",
             "/{$this->dlx->context->id}/mod_datalynx/content"

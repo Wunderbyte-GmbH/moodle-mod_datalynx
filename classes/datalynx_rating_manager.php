@@ -125,7 +125,7 @@ class datalynx_rating_manager extends rating_manager {
      * @param object $options Rating options object.
      * @return array the array of items with their ratings attached at $items[0]->rating
      */
-    public function get_sql_aggregate($options) {
+    public function get_sql_aggregate($options): array {
         global $DB, $USER;
 
         // User id; default to current user.
@@ -194,7 +194,7 @@ class datalynx_rating_manager extends rating_manager {
      * @param object $options Rating options object.
      * @return array the array of items with their ratings attached at $items[0]->rating
      */
-    public function get_sql_all($options) {
+    public function get_sql_all($options): array {
         global $DB, $USER;
 
         // User id; default to current user.
@@ -250,7 +250,7 @@ class datalynx_rating_manager extends rating_manager {
      * @param object $ratingrecord The rating record.
      * @return datalynx_rating the array of items with their ratings attached at $items[0]->rating
      */
-    public function get_rating_object($item, $ratingrecord) {
+    public function get_rating_object($item, $ratingrecord): datalynx_rating {
         $rec = $ratingrecord;
 
         $options = new stdClass();

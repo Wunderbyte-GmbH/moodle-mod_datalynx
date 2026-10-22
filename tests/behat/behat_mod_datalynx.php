@@ -47,7 +47,7 @@ class behat_mod_datalynx extends behat_base {
      * @param string $activityname
      * @param TableNode $table
      */
-    public function i_add_to_the_datalynx_the_following_fields($activityname, TableNode $table) {
+    public function i_add_to_the_datalynx_the_following_fields($activityname, TableNode $table): void {
 
         $this->execute("behat_general::click_link", $this->escape($activityname));
         $csstarget = '.nav-item [title="Manage"]';
@@ -178,7 +178,7 @@ class behat_mod_datalynx extends behat_base {
      * @param TableNode $viewformdata
      * @throws coding_exception
      */
-    public function i_add_to_datalynx_the_view_of_type_with($activityname, $viewtype, TableNode $viewformdata) {
+    public function i_add_to_datalynx_the_view_of_type_with($activityname, $viewtype, TableNode $viewformdata): void {
         $this->execute("behat_general::click_link", $this->escape($activityname));
         $csstarget = '.nav-item [title="Manage"]';
         $this->execute('behat_general::i_click_on', [$csstarget, 'css_element']);
@@ -195,7 +195,7 @@ class behat_mod_datalynx extends behat_base {
      * @param string $activityname
      * @param TableNode $viewdata
      */
-    public function the_datalynx_has_the_following_report_view($activityname, TableNode $viewdata) {
+    public function the_datalynx_has_the_following_report_view($activityname, TableNode $viewdata): void {
         global $DB;
 
         $record = $DB->get_record('datalynx', ['name' => $activityname], '*', MUST_EXIST);
@@ -273,7 +273,7 @@ class behat_mod_datalynx extends behat_base {
      * @param string $activityname
      * @param TableNode $filtersdata
      */
-    public function the_datalynx_has_the_following_my_profile_filters($activityname, TableNode $filtersdata) {
+    public function the_datalynx_has_the_following_my_profile_filters($activityname, TableNode $filtersdata): void {
         global $DB;
 
         $record = $DB->get_record('datalynx', ['name' => $activityname], '*', MUST_EXIST);
@@ -322,7 +322,7 @@ class behat_mod_datalynx extends behat_base {
      * @param string $viewname
      * @param string $activityname
      */
-    public function i_open_the_view_of_datalynx($viewname, $activityname) {
+    public function i_open_the_view_of_datalynx($viewname, $activityname): void {
         global $DB;
 
         $record = $DB->get_record('datalynx', ['name' => $activityname], '*', MUST_EXIST);
@@ -338,7 +338,7 @@ class behat_mod_datalynx extends behat_base {
      * @param string $activityname
      * @param TableNode $entriesdata
      */
-    public function the_datalynx_has_the_following_entries($activityname, TableNode $entriesdata) {
+    public function the_datalynx_has_the_following_entries($activityname, TableNode $entriesdata): void {
         global $DB;
 
         $record = $DB->get_record('datalynx', ['name' => $activityname], '*', MUST_EXIST);
@@ -423,7 +423,7 @@ class behat_mod_datalynx extends behat_base {
      * @param string $name
      * @param TableNode $data
      */
-    public function the_datalynx_has_the_customfilter_with($activityname, $name, TableNode $data) {
+    public function the_datalynx_has_the_customfilter_with($activityname, $name, TableNode $data): void {
         global $DB;
 
         $record = $DB->get_record('datalynx', ['name' => $activityname], '*', MUST_EXIST);
@@ -512,7 +512,7 @@ class behat_mod_datalynx extends behat_base {
      * @throws coding_exception
      * @throws Exception
      */
-    public function i_fill_in_the_entry_form_fields(TableNode $fielddata) {
+    public function i_fill_in_the_entry_form_fields(TableNode $fielddata): void {
         $fields = $fielddata->getHash();
         foreach ($fields as $field) {
             switch ($field['type']) {
@@ -600,7 +600,7 @@ class behat_mod_datalynx extends behat_base {
      * @param string $newvalue  Content to insert at the current cursor position
      * @throws coding_exception
      */
-    public function i_add_to_editor_the_text($editorid, $newvalue) {
+    public function i_add_to_editor_the_text($editorid, $newvalue): void {
         if (!$this->running_javascript()) {
             throw new coding_exception('Updating text requires javascript.');
         }
@@ -622,7 +622,7 @@ class behat_mod_datalynx extends behat_base {
      * @param string $newvalue  New content to set in the editor
      * @throws coding_exception
      */
-    public function i_set_the_editor_to($editorid, $newvalue) {
+    public function i_set_the_editor_to($editorid, $newvalue): void {
         if (!$this->running_javascript()) {
             throw new coding_exception('Updating text requires javascript.');
         }
@@ -644,7 +644,7 @@ class behat_mod_datalynx extends behat_base {
      * @param int    $nth    1-based index of the teammemberselect on the page
      * @throws coding_exception
      */
-    public function i_select_for_teammemberselect($value, $nth) {
+    public function i_select_for_teammemberselect($value, $nth): void {
         if (!$this->running_javascript()) {
             throw new coding_exception('This step requires JavaScript.');
         }
@@ -680,7 +680,7 @@ class behat_mod_datalynx extends behat_base {
      * @param string $activityname
      * @return void
      */
-    public function i_add_the_comment_to_the_latest_entry_in_datalynx($content, $activityname) {
+    public function i_add_the_comment_to_the_latest_entry_in_datalynx($content, $activityname): void {
         global $CFG, $DB;
 
         require_once($CFG->dirroot . '/comment/lib.php');
@@ -722,7 +722,7 @@ class behat_mod_datalynx extends behat_base {
      * @param string $content
      * @return void
      */
-    public function the_latest_entry_in_datalynx_should_have_the_comment($activityname, $content) {
+    public function the_latest_entry_in_datalynx_should_have_the_comment($activityname, $content): void {
         global $DB;
 
         $record = $DB->get_record('datalynx', ['name' => $activityname], '*', MUST_EXIST);
@@ -765,7 +765,7 @@ class behat_mod_datalynx extends behat_base {
      * @param string $viewname
      * @return void
      */
-    public function the_site_frontpage_contains_the_displayview_shortcode_for_datalynx_view($activityname, $viewname) {
+    public function the_site_frontpage_contains_the_displayview_shortcode_for_datalynx_view($activityname, $viewname): void {
         global $CFG, $DB, $SITE;
 
         require_once($CFG->dirroot . '/course/lib.php');
@@ -792,7 +792,7 @@ class behat_mod_datalynx extends behat_base {
      *
      * @Given /^I close the autocomplete suggestions list$/
      */
-    public function i_close_the_autocomplete_suggestions_list() {
+    public function i_close_the_autocomplete_suggestions_list(): void {
         $csstarget = ".col-form-label";
         $this->execute('behat_general::i_click_on', [$csstarget, 'css_element']);
     }
@@ -803,7 +803,7 @@ class behat_mod_datalynx extends behat_base {
      * @When /^I follow the datalynx "(?P<link_string>(?:[^"]|\\")*)" link$/
      * @param string $linktext The link text to follow.
      */
-    public function i_follow_the_datalynx_link($linktext) {
+    public function i_follow_the_datalynx_link($linktext): void {
         $page = $this->getSession()->getPage();
         switch ($linktext) {
             case 'View Filters':
@@ -972,7 +972,7 @@ class behat_mod_datalynx extends behat_base {
      * @param string $activityname
      * @param TableNode $table
      */
-    public function the_datalynx_has_the_following_behaviors($activityname, TableNode $table) {
+    public function the_datalynx_has_the_following_behaviors($activityname, TableNode $table): void {
         global $DB;
 
         $record = $DB->get_record('datalynx', ['name' => $activityname], '*', MUST_EXIST);
@@ -1007,7 +1007,7 @@ class behat_mod_datalynx extends behat_base {
      * @param string $activityname
      * @param string $template
      */
-    public function the_view_of_datalynx_has_the_entry_template($viewname, $activityname, $template) {
+    public function the_view_of_datalynx_has_the_entry_template($viewname, $activityname, $template): void {
         global $DB;
 
         $record = $DB->get_record('datalynx', ['name' => $activityname], '*', MUST_EXIST);
@@ -1032,7 +1032,7 @@ class behat_mod_datalynx extends behat_base {
      * @param string $target
      * @param string $flag "1" to continue editing the same entry, "0" otherwise.
      */
-    public function the_view_of_datalynx_redirects_to_view($viewname, $activityname, $target, $flag) {
+    public function the_view_of_datalynx_redirects_to_view($viewname, $activityname, $target, $flag): void {
         global $DB;
 
         $record = $DB->get_record('datalynx', ['name' => $activityname], '*', MUST_EXIST);
@@ -1061,7 +1061,7 @@ class behat_mod_datalynx extends behat_base {
      * @param string $viewname
      * @param string $activityname
      */
-    public function the_view_is_the_default_and_edit_view_of_datalynx($viewname, $activityname) {
+    public function the_view_is_the_default_and_edit_view_of_datalynx($viewname, $activityname): void {
         global $DB;
 
         $record = $DB->get_record('datalynx', ['name' => $activityname], '*', MUST_EXIST);
@@ -1085,7 +1085,7 @@ class behat_mod_datalynx extends behat_base {
      * @throws coding_exception
      * @throws \Exception
      */
-    public function the_editor_should_contain($editorid, $expectedvalue) {
+    public function the_editor_should_contain($editorid, $expectedvalue): void {
         if (!$this->running_javascript()) {
             throw new coding_exception('Reading editor content requires javascript.');
         }

@@ -101,7 +101,7 @@ class datalynx_customfilter {
      *
      * @return stdClass
      */
-    public function get_filter_obj() {
+    public function get_filter_obj(): stdClass {
         $filter = new stdClass();
         $filter->id = $this->id;
         $filter->dataid = $this->dataid;

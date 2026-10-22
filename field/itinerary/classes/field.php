@@ -63,7 +63,7 @@ class field extends datalynxfield_base {
      *
      * @return array
      */
-    protected function content_names() {
+    protected function content_names(): array {
         return ['waypoints', 'route'];
     }
 
@@ -72,7 +72,7 @@ class field extends datalynxfield_base {
      *
      * @return array
      */
-    public function get_content_parts() {
+    public function get_content_parts(): array {
         return ['content', 'content1', 'content2', 'content3', 'content4'];
     }
 
@@ -81,7 +81,7 @@ class field extends datalynxfield_base {
      *
      * @return bool
      */
-    public function supports_group_by() {
+    public function supports_group_by(): bool {
         return false;
     }
 
@@ -90,7 +90,7 @@ class field extends datalynxfield_base {
      *
      * @return bool
      */
-    public function supports_search() {
+    public function supports_search(): bool {
         return true;
     }
 
@@ -99,7 +99,7 @@ class field extends datalynxfield_base {
      *
      * @return bool
      */
-    public static function is_customfilterfield() {
+    public static function is_customfilterfield(): bool {
         return true;
     }
 
@@ -154,7 +154,7 @@ class field extends datalynxfield_base {
      * @param ?array $values
      * @return array [array of new contents, array of old contents]
      */
-    protected function format_content(stdClass $entry, ?array $values = null) {
+    protected function format_content(stdClass $entry, ?array $values = null): array {
         $fieldid = $this->field->id;
         $oldcontents = [];
         $contents = [];
@@ -461,7 +461,7 @@ class field extends datalynxfield_base {
      *
      * @return array
      */
-    public function get_supported_search_operators() {
+    public function get_supported_search_operators(): array {
         return ['' => get_string('matchesroute', 'datalynxfield_itinerary')];
     }
 
@@ -473,7 +473,7 @@ class field extends datalynxfield_base {
      * @param array $searchparams [$not, $operator, $value]
      * @return string
      */
-    public function format_search_value($searchparams) {
+    public function format_search_value($searchparams): string {
         [$not, , $value] = $searchparams;
 
         if (!is_array($value)) {
@@ -509,7 +509,7 @@ class field extends datalynxfield_base {
      * @param mixed $value
      * @return bool
      */
-    public static function is_fieldvalue_empty($value) {
+    public static function is_fieldvalue_empty($value): bool {
         if (is_array($value)) {
             $value = $value['waypoints'] ?? reset($value);
         }

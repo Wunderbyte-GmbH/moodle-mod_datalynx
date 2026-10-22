@@ -167,7 +167,7 @@ class datalynxfield_layout {
      * @param int $dataid
      * @return datalynxfield_layout
      */
-    public static function get_renderer_by_name($name, $dataid) {
+    public static function get_renderer_by_name($name, $dataid): datalynxfield_layout {
         global $DB;
         $record = $DB->get_record(
             'datalynx_renderers',
@@ -185,7 +185,7 @@ class datalynxfield_layout {
      * @param int $id
      * @return datalynxfield_layout
      */
-    public static function get_renderer_by_id($id) {
+    public static function get_renderer_by_id($id): datalynxfield_layout {
         global $DB;
         $record = $DB->get_record('datalynx_renderers', ['id' => $id], '*', MUST_EXIST);
         return new datalynxfield_layout($record);
@@ -209,7 +209,7 @@ class datalynxfield_layout {
      * @param datalynx $dlx
      * @return datalynxfield_layout
      */
-    public static function get_default_renderer(mod_datalynx\datalynx $dlx) {
+    public static function get_default_renderer(mod_datalynx\datalynx $dlx): datalynxfield_layout {
         $record = (object) self::$default;
         $record->dlx = $dlx;
         $record->dataid = $dlx->id();
@@ -234,7 +234,7 @@ class datalynxfield_layout {
      * @param stdClass $record
      * @return stdClass
      */
-    public static function db_to_form($record) {
+    public static function db_to_form($record): stdClass {
         $formdata = new stdClass();
         $formdata->id = isset($record->id) ? $record->id : 0;
         $formdata->d = $record->dataid;
@@ -255,7 +255,7 @@ class datalynxfield_layout {
      * @param stdClass $formdata
      * @return stdClass
      */
-    public static function form_to_db($formdata) {
+    public static function form_to_db($formdata): stdClass {
         $record = new stdClass();
         $record->id = isset($formdata->id) ? $formdata->id : 0;
         $record->dataid = $formdata->d;
@@ -346,7 +346,7 @@ class datalynxfield_layout {
      * @param string $renderername The new renderer name (empty if deleting).
      * @return void
      */
-    public static function update_render_pattern($rendererid, $renderername = '') {
+    public static function update_render_pattern($rendererid, $renderername = ''): void {
         global $DB;
         $rendererinfo = $DB->get_record(
             'datalynx_renderers',

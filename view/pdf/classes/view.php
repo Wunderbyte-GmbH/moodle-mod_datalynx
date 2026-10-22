@@ -91,7 +91,7 @@ class view extends base {
      *
      * @return array
      */
-    public static function get_permission_options() {
+    public static function get_permission_options(): array {
         return ['print' => get_string('permprint', 'datalynxview_pdf'),
                 'modify' => get_string('permmodify', 'datalynxview_pdf'),
                 'copy' => get_string('permcopy', 'datalynxview_pdf'),
@@ -206,7 +206,7 @@ class view extends base {
      *
      * @param string|int $export Export type or entry ID
      */
-    public function process_export($export = self::EXPORT_PAGE) {
+    public function process_export($export = self::EXPORT_PAGE): void {
         $settings = $this->settings;
         $this->tmpfiles = [];
 
@@ -565,7 +565,7 @@ class view extends base {
     /**
      * Returns a fieldset of view options
      */
-    public function generate_default_view() {
+    public function generate_default_view(): void {
         // Get all the fields.
         $fields = $this->dlx->get_fields();
         if (!$fields) {
@@ -611,7 +611,7 @@ class view extends base {
      * @param string $name
      * @return array
      */
-    protected function apply_entry_group_layout($entriesset, $name = '') {
+    protected function apply_entry_group_layout($entriesset, $name = ''): array {
         global $OUTPUT;
 
         $elements = [];
@@ -640,7 +640,7 @@ class view extends base {
      * @param int $entryid
      * @return array
      */
-    protected function new_entry_definition($entryid = -1) {
+    protected function new_entry_definition($entryid = -1): array {
         $elements = [];
 
         // Get patterns definitions.
@@ -968,7 +968,7 @@ class view extends base {
      * @param string $namepattern
      * @return string
      */
-    protected function get_documentname($namepattern) {
+    protected function get_documentname($namepattern): string {
         $namepattern = !empty($namepattern) ? $namepattern : '';
         $foundtags = [];
         $replacements = [];

@@ -72,7 +72,7 @@ class field extends datalynxfield_base {
      * @param int $seconds an amout of time in seconds.
      * @return array associative array ($number => $unit)
      */
-    public function seconds_to_unit($seconds) {
+    public function seconds_to_unit($seconds): array {
         if ($seconds === 0) {
             return [0, 1];
         }
@@ -102,7 +102,7 @@ class field extends datalynxfield_base {
      * @param ?array $values
      * @return array
      */
-    protected function format_content($entry, ?array $values = null) {
+    protected function format_content($entry, ?array $values = null): array {
         $fieldid = $this->field->id;
         $contents = [];
         $oldcontents = [];
@@ -167,7 +167,7 @@ class field extends datalynxfield_base {
      * @param ?int $entryid The target entry ID.
      * @return bool True on success.
      */
-    public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
+    public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null): bool {
         // Import only from csv.
         if ($csvrecord) {
             $fieldid = $this->field->id;
@@ -293,7 +293,7 @@ class field extends datalynxfield_base {
      * @param array $searchparams Search parameters array [not, operator, value].
      * @return string Formatted search value string.
      */
-    public function format_search_value($searchparams) {
+    public function format_search_value($searchparams): string {
         [$not, $operator, $value] = $searchparams;
         if (is_array($value)) {
             if (count($value) > 1) {
@@ -310,7 +310,7 @@ class field extends datalynxfield_base {
      *
      * @return array
      */
-    public function get_supported_search_operators() {
+    public function get_supported_search_operators(): array {
         return ['' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'),
                 '>' => get_string('greaterthan', 'datalynx'),
                 '>=' => get_string('greaterequal', 'datalynx'),
@@ -324,7 +324,7 @@ class field extends datalynxfield_base {
      * @param mixed $value The field value to check.
      * @return bool
      */
-    public static function is_fieldvalue_empty($value) {
+    public static function is_fieldvalue_empty($value): bool {
         if ($value == 0) {
             return true;
         }

@@ -37,7 +37,7 @@ class rule_form extends \mod_datalynx\form\rule_form {
      *
      * @return void
      */
-    public function rule_definition() {
+    public function rule_definition(): void {
         $mform = &$this->_form;
         $comp = 'datalynxrule_teammemberbyprofile';
 

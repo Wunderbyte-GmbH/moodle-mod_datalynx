@@ -46,7 +46,7 @@ class datalynx_tcpdf extends setasign\Fpdi\Tcpdf\Fpdi {
     }
 
     // Page header.
-    public function Header() { // phpcs:ignore  @codingStandardsIgnoreLine
+    public function Header(): void { // phpcs:ignore  @codingStandardsIgnoreLine
         // Adjust X to override left margin.
         $x = $this->GetX();
         $this->SetX($this->dlsettings->header->marginleft);
@@ -59,7 +59,7 @@ class datalynx_tcpdf extends setasign\Fpdi\Tcpdf\Fpdi {
     }
 
     // Page footer.
-    public function Footer() { // phpcs:ignore  @codingStandardsIgnoreLine
+    public function Footer(): void { // phpcs:ignore  @codingStandardsIgnoreLine
         if (!empty($this->dlsettings->footer->text)) {
             $text = $this->set_page_numbers($this->dlsettings->footer->text);
             $this->writeHtml($text);

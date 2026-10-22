@@ -130,7 +130,7 @@ class rule extends base {
      * @param core_event_base $event Triggering event.
      * @return bool
      */
-    public function trigger(core_event_base $event) {
+    public function trigger(core_event_base $event): bool {
         global $CFG;
         require_once($CFG->libdir . '/filelib.php');
         require_once($CFG->libdir . '/completionlib.php');

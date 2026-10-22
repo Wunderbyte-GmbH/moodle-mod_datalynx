@@ -38,7 +38,7 @@ class renderer extends datalynxfield_renderer {
      * @param stdClass $entry The entry object.
      * @param array $options Rendering options.
      */
-    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
+    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options): void {
         $field = $this->field;
         $fieldid = $field->id();
         $entryid = $entry->id;
@@ -123,7 +123,7 @@ class renderer extends datalynxfield_renderer {
      * @param string $value The current search value.
      * @return array Array of elements.
      */
-    public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
+    public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = ''): array {
         $fieldid = $this->field->id();
         $fieldname = "f_{$i}_$fieldid";
 
@@ -153,7 +153,7 @@ class renderer extends datalynxfield_renderer {
      *
      * @return array Array of patterns.
      */
-    protected function patterns() {
+    protected function patterns(): array {
         // The parent::patterns() contributes [[fieldname]] plus a visible tag per user-created duration
         // format. The legacy suffix modifiers stay recognised for old templates but hidden from menu.
         $patterns = parent::patterns();
@@ -172,7 +172,7 @@ class renderer extends datalynxfield_renderer {
      * @param stdClass $formdata The submitted form data.
      * @return array Array of errors.
      */
-    public function validate($entryid, $tags, $formdata) {
+    public function validate($entryid, $tags, $formdata): array {
         $fieldid = $this->field->id();
 
         $formfieldname = "field_{$fieldid}_{$entryid}";

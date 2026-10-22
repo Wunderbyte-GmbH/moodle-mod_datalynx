@@ -137,7 +137,7 @@ class renderer extends datalynxfield_renderer {
      * @param bool $urlquery Whether the filter is for a URL query string.
      * @return array Updated filter options array.
      */
-    protected function get_filter_by_options(array $options, $entry, $urlquery = false) {
+    protected function get_filter_by_options(array $options, $entry, $urlquery = false): array {
         global $DB;
 
         $field = $this->field;
@@ -202,7 +202,7 @@ class renderer extends datalynxfield_renderer {
      *
      * @return array Array of sort options keyed by ref-field id.
      */
-    protected function get_sort_options() {
+    protected function get_sort_options(): array {
         $field = $this->field;
 
         $refview = $field->dlx->get_view_from_id($field->refview);
@@ -230,7 +230,7 @@ class renderer extends datalynxfield_renderer {
      * @param stdClass $entry
      * @return array
      */
-    protected function get_search_options($entry) {
+    protected function get_search_options($entry): array {
         $field = $this->field;
         $soptions = [];
 
@@ -309,7 +309,7 @@ class renderer extends datalynxfield_renderer {
      * @param ?array $options Rendering options.
      * @see datalynxfield_renderer::render_edit_mode()
      */
-    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, ?array $options = null) {
+    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, ?array $options = null): void {
 
         // Variable $field datalynxfield_datalynxview.
         $field = $this->field;
@@ -348,7 +348,7 @@ class renderer extends datalynxfield_renderer {
      * @return array Array of validation errors keyed by field name.
      * @see datalynxfield_renderer::validate()
      */
-    public function validate($entryid, $tags, $formdata) {
+    public function validate($entryid, $tags, $formdata): array {
         $fieldid = $this->field->id();
 
         $formfieldname = "field_{$fieldid}_{$entryid}";

@@ -66,7 +66,7 @@ class field extends datalynxfield_base {
      *
      * @return array
      */
-    protected function content_names() {
+    protected function content_names(): array {
         return ['course', 'group', 'groupid'];
     }
 
@@ -77,7 +77,7 @@ class field extends datalynxfield_base {
      * @param ?array $values
      * @return array
      */
-    protected function format_content(stdClass $entry, ?array $values = null) {
+    protected function format_content(stdClass $entry, ?array $values = null): array {
         $fieldid = $this->field->id;
         $oldcontents = [];
         $contents = [];
@@ -164,14 +164,14 @@ class field extends datalynxfield_base {
      *
      * @return array
      */
-    public function get_content_parts() {
+    public function get_content_parts(): array {
         return ['content', 'content1'];
     }
 
     /**
      * Sort only by course
      */
-    public function get_sort_sql() {
+    public function get_sort_sql(): string {
         return "c{$this->field->id}.content";
     }
 
@@ -282,7 +282,7 @@ class field extends datalynxfield_base {
      * @param ?int $entryid
      * @return bool
      */
-    public function prepare_import_content(&$data, $importsettings, ?array $csvrecord = null, ?int $entryid = null) {
+    public function prepare_import_content(&$data, $importsettings, ?array $csvrecord = null, ?int $entryid = null): bool {
         // Import only from csv.
         if ($csvrecord) {
             $fieldid = $this->field->id;

@@ -40,7 +40,7 @@ class renderer extends datalynxfield_renderer {
      * @param ?array $options
      * @return array
      */
-    public function replacements(?array $tags = null, $entry = null, ?array $options = null) {
+    public function replacements(?array $tags = null, $entry = null, ?array $options = null): array {
         $field = $this->field;
         $edit = !empty($options['edit']) ? $options['edit'] : false;
         $dlxid = $field->dlx()->id();
@@ -125,7 +125,7 @@ class renderer extends datalynxfield_renderer {
      * @param stdClass $entry
      * @param ?array $options
      */
-    public function display_edit(&$mform, $entry, ?array $options = null) {
+    public function display_edit(&$mform, $entry, ?array $options = null): void {
         $field = $this->field;
         $fieldid = $field->id();
         $entryid = $entry->id;
@@ -150,8 +150,10 @@ class renderer extends datalynxfield_renderer {
 
     /**
      * Array of patterns this field supports
+     *
+     * @return array
      */
-    protected function patterns() {
+    protected function patterns(): array {
         $cat = get_string('groupinfo', 'datalynx');
         $patterns = [];
 

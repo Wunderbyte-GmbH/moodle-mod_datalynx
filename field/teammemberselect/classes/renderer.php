@@ -198,7 +198,7 @@ class renderer extends datalynxfield_renderer {
      * @param stdClass $entry
      * @param ?array $options
      */
-    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, ?array $options = null) {
+    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, ?array $options = null): void {
         global $USER, $PAGE;
 
         // Variable $field datalynxfield_teammemberselect.
@@ -259,7 +259,7 @@ class renderer extends datalynxfield_renderer {
      * @param string $value
      * @return array
      */
-    public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
+    public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = ''): array {
         $field = $this->field;
         $fieldid = $field->id();
         $fieldname = "f_{$i}_{$fieldid}";
@@ -281,7 +281,7 @@ class renderer extends datalynxfield_renderer {
      *
      * @return array
      */
-    protected function patterns() {
+    protected function patterns(): array {
         // The parent::patterns() contributes [[fieldname]] plus a visible tag per user-created
         // teammemberselect format (e.g. a "subscribe" format). The legacy :subscribe suffix stays
         // recognised for old templates but is hidden from the menu.
@@ -298,7 +298,7 @@ class renderer extends datalynxfield_renderer {
      * @param stdClass $formdata
      * @return array
      */
-    public function validate($entryid, $tags, $formdata) {
+    public function validate($entryid, $tags, $formdata): array {
         $fieldid = $this->field->id();
 
         $formfieldname = "field_{$fieldid}_{$entryid}";

@@ -367,7 +367,7 @@ class schedule {
      * @param string $date
      * @return DateTimeImmutable|null
      */
-    private static function date_in_site_timezone(string $date) {
+    private static function date_in_site_timezone(string $date): ?DateTimeImmutable {
         if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
             return null;
         }

@@ -226,7 +226,7 @@ class entry extends base_mod {
      * @param StdClass $entry
      * @return array
      */
-    protected function get_fields_for_entries($entry) {
+    protected function get_fields_for_entries($entry): array {
         global $DB;
 
         $indexfields = [];

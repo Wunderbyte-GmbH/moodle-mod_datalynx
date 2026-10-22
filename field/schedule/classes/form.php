@@ -30,7 +30,7 @@ class form extends datalynxfield_form {
     /**
      * Field specific definition.
      */
-    public function field_definition() {
+    public function field_definition(): void {
         $mform = &$this->_form;
 
         // Param1: step between the offered times of day.

@@ -78,7 +78,7 @@ class view extends base {
      * @param string $name
      * @return array
      */
-    protected function apply_entry_group_layout($entriesset, $name = '') {
+    protected function apply_entry_group_layout($entriesset, $name = ''): array {
         return [];
     }
 
@@ -88,7 +88,7 @@ class view extends base {
      * @param int $entryid
      * @return array
      */
-    protected function new_entry_definition($entryid = -1) {
+    protected function new_entry_definition($entryid = -1): array {
         return [];
     }
 
@@ -1012,7 +1012,7 @@ class view extends base {
     /**
      * Generates the view with default settings.
      */
-    public function generate_default_view() {
+    public function generate_default_view(): void {
         if (!$fields = $this->dlx->get_fields()) {
             return;
         }

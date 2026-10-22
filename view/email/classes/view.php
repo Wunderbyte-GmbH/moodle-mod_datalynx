@@ -67,7 +67,7 @@ class view extends base {
     /**
      * Generate the default email template.
      */
-    public function generate_default_view() {
+    public function generate_default_view(): void {
         $fields = $this->dlx->get_fields();
         if (!$fields) {
             return;
@@ -100,7 +100,7 @@ class view extends base {
      * @param string $name
      * @return array
      */
-    protected function apply_entry_group_layout($entriesset, $name = '') {
+    protected function apply_entry_group_layout($entriesset, $name = ''): array {
         $elements = [];
         foreach ($entriesset as $entrydefinitions) {
             $elements = array_merge($elements, $entrydefinitions);
@@ -114,7 +114,7 @@ class view extends base {
      * @param int $entryid
      * @return array
      */
-    protected function new_entry_definition($entryid = -1) {
+    protected function new_entry_definition($entryid = -1): array {
         $elements = [];
 
         $fields = $this->dlx->get_fields();

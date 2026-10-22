@@ -168,8 +168,10 @@ class renderer extends datalynxfield_renderer {
 
     /**
      * Array of patterns this field supports
+     *
+     * @return array
      */
-    protected function patterns() {
+    protected function patterns(): array {
         $cat = get_string('comments', 'datalynx');
         $patterns = [];
 

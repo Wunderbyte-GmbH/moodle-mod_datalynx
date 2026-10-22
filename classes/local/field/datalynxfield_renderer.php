@@ -258,9 +258,9 @@ abstract class datalynxfield_renderer {
      *
      * @param string $template
      * @param mixed $value
-     * @return mixed
+     * @return string|null
      */
-    private function replace_renderer_template_tags($template, $value) {
+    private function replace_renderer_template_tags($template, $value): ?string {
         return preg_replace('/#value/', $value, $template);
     }
 

@@ -70,7 +70,7 @@ class field extends datalynxfield_base {
      * @param mixed $forminput Form input data or null.
      * @return void
      */
-    public function set_field($forminput = null) {
+    public function set_field($forminput = null): void {
         global $DB;
 
         $itemid = !empty($this->field->param1) ? $this->field->param1 : null;
@@ -92,7 +92,7 @@ class field extends datalynxfield_base {
      *
      * @return string The SQL.
      */
-    public function get_select_sql() {
+    public function get_select_sql(): string {
         $id = " c{$this->field->id}.id AS c{$this->field->id}_id ";
         $content = $this->get_sql_compare_text() . " AS c{$this->field->id}_content";
         return " $id , $content ";
@@ -116,7 +116,7 @@ class field extends datalynxfield_base {
      * @param string $paramcount The parameter count.
      * @return ?array The SQL and parameters.
      */
-    public function get_sort_from_sql($paramname = 'sortie', $paramcount = '') {
+    public function get_sort_from_sql($paramname = 'sortie', $paramcount = ''): ?array {
         $fieldid = $this->field->id;
         if (is_numeric($fieldid) && $fieldid > 0) {
             $sql = " LEFT JOIN {grade_grades} c$fieldid ON (c$fieldid.userid = e.userid AND
@@ -132,7 +132,7 @@ class field extends datalynxfield_base {
      *
      * @return string The SQL.
      */
-    public function get_search_from_sql() {
+    public function get_search_from_sql(): string {
         $fieldid = $this->field->id;
         if (is_numeric($fieldid) && $fieldid > 0) {
             return " JOIN {grade_grades} c$fieldid ON c$fieldid.userid = e.userid ";
@@ -146,7 +146,7 @@ class field extends datalynxfield_base {
      *
      * @return bool True if it is.
      */
-    public function is_datalynx_content() {
+    public function is_datalynx_content(): bool {
         return false;
     }
 }

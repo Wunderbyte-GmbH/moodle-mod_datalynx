@@ -42,7 +42,7 @@ class field extends datalynxfield_base {
      *
      * @return array
      */
-    public static function get_salt_options() {
+    public static function get_salt_options(): array {
         global $CFG;
 
         $options = ['' => get_string('none'), 'random' => get_string('random', 'datalynx')];
@@ -59,7 +59,7 @@ class field extends datalynxfield_base {
      * @param ?array $values The values to format.
      * @return array
      */
-    protected function format_content($entry, ?array $values = null) {
+    protected function format_content($entry, ?array $values = null): array {
         $fieldid = $this->field->id;
         // Old content (should not exist if we get here, as update should be triggered only when no content).
         if (isset($entry->{"c{$fieldid}_content"})) {
@@ -107,7 +107,7 @@ class field extends datalynxfield_base {
      * @param bool $forcerandomsalt Whether to force a random salt.
      * @return string
      */
-    protected function get_hash_string($entry, $forcerandomsalt = false) {
+    protected function get_hash_string($entry, $forcerandomsalt = false): string {
         global $CFG, $USER;
 
         if ($forcerandomsalt) {
@@ -168,7 +168,7 @@ class field extends datalynxfield_base {
      *
      * @return array
      */
-    public function get_supported_search_operators() {
+    public function get_supported_search_operators(): array {
         return ['' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'),
                 'LIKE' => get_string('contains', 'datalynx')];
     }

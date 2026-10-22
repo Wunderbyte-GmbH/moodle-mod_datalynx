@@ -365,7 +365,7 @@ class datalynx_filter_manager {
      * @param \stdClass $filter
      * @return datalynx_filter_form
      */
-    public function get_filter_form($filter) {
+    public function get_filter_form($filter): datalynx_filter_form {
         $formurl = new moodle_url(
             '/mod/datalynx/filter/index.php',
             ['d' => $this->dlx->id(), 'fid' => $filter->id, 'update' => 1]
@@ -381,7 +381,7 @@ class datalynx_filter_manager {
      * @param \stdClass $filter
      * @param ?array $urlparams
      */
-    public function display_filter_form($mform, $filter, $urlparams = null) {
+    public function display_filter_form($mform, $filter, $urlparams = null): void {
         $streditinga = $filter->id ? get_string('filteredit', 'datalynx', $filter->name) : get_string(
             'filternew',
             'datalynx'
@@ -594,7 +594,7 @@ class datalynx_filter_manager {
      * @param \stdClass $formdata
      * @return string Serialised sort options, or empty string.
      */
-    public function get_sort_options_from_form($formdata) {
+    public function get_sort_options_from_form($formdata): string {
         $sortfields = [];
         $i = 0;
         while (isset($formdata->{"sortfield$i"})) {
@@ -617,7 +617,7 @@ class datalynx_filter_manager {
      * @param bool $finalize Whether to finalise search values.
      * @return string Serialised search options.
      */
-    public function get_search_options_from_form($formdata, $finalize = false) {
+    public function get_search_options_from_form($formdata, $finalize = false): string {
         $searchfields = $this->build_search_options_array($formdata, $finalize);
         if ($searchfields) {
             return serialize($searchfields);
@@ -689,7 +689,7 @@ class datalynx_filter_manager {
      * @param bool $finalize Whether to finalize (clean up empty criteria).
      * @return string Serialized search fields, or empty string.
      */
-    protected function get_customfilter_search_options_from_form($formdata, $finalize = false) {
+    protected function get_customfilter_search_options_from_form($formdata, $finalize = false): string {
         if ($fields = $this->dlx->get_fields()) {
             $searchfields = [];
             foreach (array_keys((array) $formdata) as $var) {
@@ -738,7 +738,7 @@ class datalynx_filter_manager {
     /**
      * Renders the filter management list table and outputs it.
      */
-    public function print_filter_list() {
+    public function print_filter_list(): void {
         global $OUTPUT;
 
         $dlx = $this->dlx;
@@ -946,7 +946,7 @@ class datalynx_filter_manager {
     /**
      * Renders the "Add filter" link and outputs it.
      */
-    public function print_add_filter() {
+    public function print_add_filter(): void {
         global $PAGE;
 
         // Enhance the add/edit links to open the filter editor in an AJAX modal.
@@ -991,7 +991,11 @@ class datalynx_filter_manager {
      * @param bool $customfilter
      * @return datalynx_customfilter_frontend_form
      */
-    public function get_customfilter_frontend_form($filter, \mod_datalynx\local\view\base $view, $customfilter = false) {
+    public function get_customfilter_frontend_form(
+        $filter,
+        \mod_datalynx\local\view\base $view,
+        $customfilter = false
+    ): datalynx_customfilter_frontend_form {
         $cfilter = isset($customfilter->id) ? $customfilter->id : "1";
         $formurl = new moodle_url($view->get_navigationurl(), ['filter' => self::USER_FILTER_SET, 'cfilter' => $cfilter]);
         $mform = new datalynx_customfilter_frontend_form(
@@ -1044,7 +1048,7 @@ class datalynx_filter_manager {
      * @param datalynx_filter $filter
      * @return string
      */
-    public static function get_filter_url_query($filter) {
+    public static function get_filter_url_query($filter): string {
         $urlquery = [];
 
         if ($filter->customsort) {
@@ -1066,7 +1070,7 @@ class datalynx_filter_manager {
      * @param array $sorties
      * @return string
      */
-    public static function get_sort_url_query(array $sorties) {
+    public static function get_sort_url_query(array $sorties): string {
         if ($sorties) {
             $usort = [];
             foreach ($sorties as $fieldid => $dir) {
@@ -1087,7 +1091,7 @@ class datalynx_filter_manager {
      * @param string $query
      * @return array [fieldid => direction] where direction is 0 (ascending) or 1 (descending)
      */
-    public static function get_sort_options_from_query($query) {
+    public static function get_sort_options_from_query($query): array {
         $sortoptions = [];
         foreach (explode(',', urldecode((string) $query)) as $sortpair) {
             $sortpair = trim($sortpair);
@@ -1113,7 +1117,7 @@ class datalynx_filter_manager {
      * @param array $searchies
      * @return ?string
      */
-    public static function get_search_url_query(array $searchies) {
+    public static function get_search_url_query(array $searchies): ?string {
         $usearch = null;
         if ($searchies) {
             $usearch = [];
@@ -1151,7 +1155,7 @@ class datalynx_filter_manager {
      * @param string $query
      * @return array
      */
-    public static function get_search_options_from_query($query) {
+    public static function get_search_options_from_query($query): array {
         $soptions = [];
         if ($query) {
             $usearch = urldecode($query);
@@ -1174,7 +1178,7 @@ class datalynx_filter_manager {
      * @param ?moodle_url $url
      * @return array
      */
-    public static function get_filter_options_from_url($url = null) {
+    public static function get_filter_options_from_url($url = null): array {
         $filteroptions = [      // Left: filteroption-names, right: urlparameter-names.
                 'filterid' => ['filter', 0, PARAM_INT],
                 'perpage' => ['uperpage', 0, PARAM_INT],

@@ -158,7 +158,7 @@ class field extends TextField {
      * @param ?array $values The values to format.
      * @return array
      */
-    protected function format_content($entry, ?array $values = null) {
+    protected function format_content($entry, ?array $values = null): array {
         $fieldid = $this->field->id;
         $contents = [];
         $oldcontents = [];
@@ -218,7 +218,7 @@ class field extends TextField {
      * @return string
      * @see datalynxfield_base::format_search_value()
      */
-    public function format_search_value($searchparams) {
+    public function format_search_value($searchparams): string {
         [$not, $operator, $value] = $searchparams;
         if (is_array($value)) {
             if (count($value) > 1 && $operator == 'BETWEEN') {

@@ -41,7 +41,7 @@ trait filter_form_elements {
      * @param bool $customfilter
      * @return void
      */
-    public function custom_sort_definition($customsort, $fields, $fieldoptions, $showlabel = false, $customfilter = false) {
+    public function custom_sort_definition($customsort, $fields, $fieldoptions, $showlabel = false, $customfilter = false): void {
         $mform = &$this->_form;
 
         // Drop fields that cannot be sorted (e.g. the submit/cancel button fields).
@@ -107,7 +107,7 @@ trait filter_form_elements {
         $fields,
         $fieldoptions,
         $showlabel = false
-    ) {
+    ): void {
         $mform = &$this->_form;
         $mform->updateAttributes(['showprofilecompare' => true]);
         $dlx = $this->dlx;
@@ -295,7 +295,7 @@ trait filter_form_elements {
      * @param array $fieldoptions
      * @return void
      */
-    public function customfilter_search_definition($fields, $fieldoptions) {
+    public function customfilter_search_definition($fields, $fieldoptions): void {
         $mform = &$this->_form;
 
         // Drop fields that cannot be searched (e.g. the submit/cancel button fields).

@@ -38,7 +38,7 @@ class renderer extends datalynxfield_renderer {
      * @param stdClass $entry The entry object.
      * @param array $options Additional options.
      */
-    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
+    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options): void {
         $field = $this->field;
         $fieldid = $field->id();
         $entryid = $entry->id;
@@ -101,7 +101,7 @@ class renderer extends datalynxfield_renderer {
      * @param stdClass $formdata The form data.
      * @return array
      */
-    public function validate($entryid, $tags, $formdata) {
+    public function validate($entryid, $tags, $formdata): array {
         $fieldid = $this->field->id();
 
         $formfieldname = "field_{$fieldid}_{$entryid}";

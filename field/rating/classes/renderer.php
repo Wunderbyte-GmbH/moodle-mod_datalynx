@@ -44,9 +44,9 @@ class renderer extends datalynxfield_renderer {
      * @param ?array $tags List of tag patterns to replace.
      * @param mixed $entry The entry object.
      * @param ?array $options Rendering options.
-     * @return array Associative array of tag => replacement pairs.
+     * @return array|null Associative array of tag => replacement pairs.
      */
-    public function replacements(?array $tags = null, $entry = null, ?array $options = null) {
+    public function replacements(?array $tags = null, $entry = null, ?array $options = null): ?array {
         global $DB;
 
         $field = $this->field;
@@ -210,7 +210,7 @@ class renderer extends datalynxfield_renderer {
      * @param array $patterns Array of pattern strings to match.
      * @return ?array Array of matching aggregation keys, or null if none match.
      */
-    public function get_aggregations($patterns) {
+    public function get_aggregations($patterns): ?array {
         $aggr = [field::AGGREGATE_AVG => '##ratings:avg##',
                 field::AGGREGATE_MAX => '##ratings:max##',
                 field::AGGREGATE_MIN => '##ratings:min##',
@@ -408,7 +408,7 @@ class renderer extends datalynxfield_renderer {
      * @param object $entry The entry object.
      * @return string HTML string.
      */
-    public function render_rating($entry) {
+    public function render_rating($entry): string {
         global $OUTPUT, $PAGE;
 
         $ratinghtml = '';
@@ -507,8 +507,10 @@ class renderer extends datalynxfield_renderer {
 
     /**
      * Array of patterns this field supports
+     *
+     * @return array
      */
-    protected function patterns() {
+    protected function patterns(): array {
         $fieldinternalname = $this->field->get('internalname');
         $cat = get_string('ratings', 'datalynx');
         $patterns = [];

@@ -73,7 +73,7 @@ class datalynxfield_option_single extends datalynxfield_option {
      * @see datalynxfield_option::update_options()
      * @param array $map Mapping of old option keys to new option keys.
      */
-    public function update_options($map = []) {
+    public function update_options($map = []): void {
         global $DB;
 
         $params = [];
@@ -101,7 +101,7 @@ class datalynxfield_option_single extends datalynxfield_option {
      * @param ?array $values Values from the entry form.
      * @return array
      */
-    protected function format_content($entry, ?array $values = null) {
+    protected function format_content($entry, ?array $values = null): array {
         $fieldid = $this->field->id;
         // Old contents.
         $oldcontents = [];
@@ -131,7 +131,7 @@ class datalynxfield_option_single extends datalynxfield_option {
      * @param int $entryid ID of the entry being edited; 0 for new entries.
      * @return array an array of disabled values
      */
-    public function get_disabled_values_for_user($entryid = 0) {
+    public function get_disabled_values_for_user($entryid = 0): array {
         global $DB;
 
         $sql = "SELECT dc.content, COUNT(dc.id)
@@ -155,7 +155,7 @@ class datalynxfield_option_single extends datalynxfield_option {
      * {@inheritDoc}
      * @see datalynxfield_base::supports_group_by()
      */
-    public function supports_group_by() {
+    public function supports_group_by(): bool {
         return true;
     }
 
@@ -255,7 +255,7 @@ class datalynxfield_option_single extends datalynxfield_option {
      * @param ?int $entryid Entry ID.
      * @return bool
      */
-    public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
+    public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null): bool {
         // Import only from csv.
         if ($csvrecord) {
             $fieldid = $this->field->id;

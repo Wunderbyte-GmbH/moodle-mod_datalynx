@@ -29,7 +29,7 @@ class field_format extends \mod_datalynx\local\field_format\base {
      *
      * @param \MoodleQuickForm $mform
      */
-    public function config_form(\MoodleQuickForm &$mform) {
+    public function config_form(\MoodleQuickForm &$mform): void {
         $options = $this->get_name_options();
         $mform->addElement('select', 'option', get_string('fieldformatoption', 'mod_datalynx'), $options);
         $mform->setType('option', PARAM_ALPHANUM);

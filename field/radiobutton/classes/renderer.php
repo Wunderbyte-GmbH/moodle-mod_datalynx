@@ -43,7 +43,7 @@ class renderer extends SelectRenderer {
      * @param stdClass $entry The entry object.
      * @param array $options Additional options.
      */
-    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
+    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options): void {
         $field = $this->field;
         $fieldid = $field->id();
         $entryid = $entry->id;

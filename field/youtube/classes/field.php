@@ -45,7 +45,7 @@ class field extends datalynxfield_base {
      *
      * @return bool
      */
-    public function supports_group_by() {
+    public function supports_group_by(): bool {
         return false;
     }
 
@@ -54,7 +54,7 @@ class field extends datalynxfield_base {
      *
      * @return array
      */
-    public function get_supported_search_operators() {
+    public function get_supported_search_operators(): array {
         return [];
     }
 
@@ -63,7 +63,7 @@ class field extends datalynxfield_base {
      *
      * @return bool
      */
-    public static function is_customfilterfield() {
+    public static function is_customfilterfield(): bool {
         return false;
     }
 
@@ -74,7 +74,7 @@ class field extends datalynxfield_base {
      * @param ?array $values The values to format.
      * @return array
      */
-    protected function format_content($entry, ?array $values = null) {
+    protected function format_content($entry, ?array $values = null): array {
         $contents = [];
 
         if (!empty($values)) {

@@ -40,7 +40,7 @@ class renderer extends datalynxfield_renderer {
      * @param array $options Rendering options.
      * @see datalynxfield_renderer::render_edit_mode()
      */
-    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
+    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options): void {
         $field = $this->field;
         $fieldid = $field->id();
         $entryid = $entry->id;
@@ -110,7 +110,7 @@ class renderer extends datalynxfield_renderer {
     /**
      * Array of patterns this field supports
      */
-    protected function patterns() {
+    protected function patterns(): array {
         // The parent::patterns() contributes [[fieldname]] plus a visible tag per user-created tag format.
         // The legacy :nolink suffix stays recognised for old templates but is hidden from the menu
         // (it is also exposed via the "linked" format option).
@@ -128,7 +128,7 @@ class renderer extends datalynxfield_renderer {
      * @return array Array of form elements and labels.
      * @see datalynxfield_renderer::render_search_mode()
      */
-    public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
+    public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = ''): array {
 
         $field = $this->field;
         $fieldid = $field->id();
@@ -158,7 +158,7 @@ class renderer extends datalynxfield_renderer {
      * @return array Array of validation errors keyed by field name.
      * @see datalynxfield_renderer::validate()
      */
-    public function validate($entryid, $tags, $formdata) {
+    public function validate($entryid, $tags, $formdata): array {
         $fieldid = $this->field->id();
 
         $formfieldname = "field_{$fieldid}_{$entryid}";

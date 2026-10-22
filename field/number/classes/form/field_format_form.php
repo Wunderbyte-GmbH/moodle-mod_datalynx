@@ -42,7 +42,7 @@ class field_format_form extends \mod_datalynx\form\field_format_base_form {
      * @param array $files
      * @return array
      */
-    protected function format_validation($data, $files) {
+    protected function format_validation($data, $files): array {
         return field_format::validate_settings($data);
     }
 }

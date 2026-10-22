@@ -34,7 +34,7 @@ class form extends SelectForm {
     /**
      * Define the field attributes.
      */
-    public function field_definition() {
+    public function field_definition(): void {
         parent::field_definition();
 
         $mform = &$this->_form;

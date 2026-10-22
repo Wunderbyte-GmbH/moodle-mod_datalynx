@@ -40,7 +40,7 @@ class renderer extends datalynxfield_renderer {
      * @param stdClass $entry
      * @param array $options
      */
-    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
+    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options): void {
         $field = $this->field;
         $fieldid = $field->id();
         $entryid = $entry->id;
@@ -111,7 +111,7 @@ class renderer extends datalynxfield_renderer {
      * @param string $value
      * @return array
      */
-    public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
+    public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = ''): array {
         $field = $this->field;
         $fieldid = $field->id();
         $fieldname = "f_{$i}_{$fieldid}";
@@ -402,7 +402,7 @@ class renderer extends datalynxfield_renderer {
     /**
      * Array of patterns this field supports
      */
-    protected function patterns() {
+    protected function patterns(): array {
         // The parent::patterns() contributes [[fieldname]] plus a visible tag per user-created time format
         // (e.g. a "date" format with a configured strftime string). The legacy date/time suffixes stay
         // recognised for old templates but are hidden from the menu.
@@ -422,7 +422,7 @@ class renderer extends datalynxfield_renderer {
      * @param stdClass $formdata
      * @return array
      */
-    public function validate($entryid, $tags, $formdata) {
+    public function validate($entryid, $tags, $formdata): array {
         $fieldid = $this->field->id();
 
         $formfieldname = "field_{$fieldid}_{$entryid}";

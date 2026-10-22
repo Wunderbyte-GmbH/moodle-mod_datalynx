@@ -120,7 +120,7 @@ class renderer extends datalynxfield_renderer {
      * @param stdClass $entry
      * @param array $options
      */
-    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
+    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options): void {
         global $OUTPUT;
 
         $this->require_js();
@@ -263,7 +263,7 @@ class renderer extends datalynxfield_renderer {
      * @param string|array $value
      * @return array [$elements, $separators]
      */
-    public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, $value = '') {
+    public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, $value = ''): array {
         global $OUTPUT;
 
         $this->require_js();

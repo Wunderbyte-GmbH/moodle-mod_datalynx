@@ -225,7 +225,7 @@ class field extends datalynxfield_base {
      * @param \context $context
      * @return array
      */
-    protected function get_admissibility_for_roles($context) {
+    protected function get_admissibility_for_roles($context): array {
         $allneeded = [];
         $allforbidden = [];
 
@@ -308,7 +308,7 @@ class field extends datalynxfield_base {
      * @param ?int $entryid Entry ID.
      * @return bool True on success.
      */
-    public function prepare_import_content(&$data, $importsettings, ?array $csvrecord = null, ?int $entryid = null) {
+    public function prepare_import_content(&$data, $importsettings, ?array $csvrecord = null, ?int $entryid = null): bool {
         // Import only from csv.
         if ($csvrecord) {
             $fieldid = $this->field->id;
@@ -349,7 +349,7 @@ class field extends datalynxfield_base {
         $makelinks = false,
         $excludeuser = 0,
         $allowall = false
-    ) {
+    ): array {
         $fieldid = $this->field->id;
         if (!isset(self::$allusers[$fieldid])) {
             $this->init_user_menu();
@@ -500,7 +500,7 @@ class field extends datalynxfield_base {
      * @param ?array $values
      * @return array
      */
-    protected function format_content(stdClass $entry, ?array $values = null) {
+    protected function format_content(stdClass $entry, ?array $values = null): array {
         $fieldid = $this->field->id;
         $oldcontents = [];
         $contents = [];
@@ -533,7 +533,7 @@ class field extends datalynxfield_base {
      *
      * @return array
      */
-    public function get_supported_search_operators() {
+    public function get_supported_search_operators(): array {
         return ['' => get_string('empty', 'datalynx'),
             'USER' => get_string('iamteammember', 'datalynx'),
             'OTHER_USER' => get_string('useristeammember', 'datalynx')];
@@ -544,7 +544,7 @@ class field extends datalynxfield_base {
      *
      * @return bool
      */
-    public function supports_group_by() {
+    public function supports_group_by(): bool {
         return false;
     }
 
@@ -557,7 +557,7 @@ class field extends datalynxfield_base {
      * @param array $oldmembers
      * @param array $newmembers
      */
-    public function notify_team_members($entry, $field, $oldmembers, $newmembers) {
+    public function notify_team_members($entry, $field, $oldmembers, $newmembers): void {
         global $DB;
 
         $oldmembers = !empty($oldmembers) ? array_filter($oldmembers) : [];
@@ -785,7 +785,7 @@ class field extends datalynxfield_base {
      *
      * @return bool
      */
-    public static function is_customfilterfield() {
+    public static function is_customfilterfield(): bool {
         return true;
     }
 
@@ -794,7 +794,7 @@ class field extends datalynxfield_base {
      * @param mixed $value Field value to check.
      * @return bool
      */
-    public static function is_fieldvalue_empty($value) {
+    public static function is_fieldvalue_empty($value): bool {
 
         if (empty($value)) {
             return true;

@@ -53,7 +53,7 @@ class datalynx_preset_manager {
      * @param in $presetarea PRESET_COURSEAREA/PRESET_SITEAREA
      * @return array
      */
-    public function get_user_presets($presetarea) {
+    public function get_user_presets($presetarea): array {
         global $USER;
 
         $presets = [];
@@ -95,7 +95,7 @@ class datalynx_preset_manager {
      * @param array $localpresets
      * @param array $sharedpresets
      */
-    public function print_presets_list($localpresets, $sharedpresets) {
+    public function print_presets_list($localpresets, $sharedpresets): void {
         global $CFG, $OUTPUT;
 
         $targetpage = '/mod/datalynx/preset/index.php';
@@ -270,7 +270,7 @@ class datalynx_preset_manager {
     /**
      * Print preset form
      */
-    public function print_preset_form() {
+    public function print_preset_form(): void {
         echo html_writer::start_tag('div', ['style' => 'width:80%;margin:auto;']);
         $mform = new mod_datalynx_preset_form(
             new moodle_url(
@@ -288,7 +288,7 @@ class datalynx_preset_manager {
      *
      * @param object $params
      */
-    public function process_presets($params) {
+    public function process_presets($params): void {
         $mform = new mod_datalynx_preset_form(
             new moodle_url(
                 'mod/datalynx/preset/index.php',
@@ -341,7 +341,7 @@ class datalynx_preset_manager {
      * @param string $userdata
      * @return bool
      */
-    public function create_preset_from_backup($userdata) {
+    public function create_preset_from_backup($userdata): bool {
         global $CFG, $USER, $SESSION;
 
         require_once("$CFG->dirroot/backup/util/includes/backup_includes.php");
@@ -420,7 +420,7 @@ class datalynx_preset_manager {
      * @param int $draftid
      * @return bool
      */
-    public function create_preset_from_upload($draftid) {
+    public function create_preset_from_upload($draftid): bool {
         global $USER;
 
         $usercontext = context_user::instance($USER->id);
@@ -486,7 +486,7 @@ class datalynx_preset_manager {
      * @param int $userpreset
      * @param bool $torestorer
      */
-    public function apply_preset($userpreset, $torestorer = true) {
+    public function apply_preset($userpreset, $torestorer = true): void {
         global $DB, $CFG, $USER;
 
         // Extract the backup file to the temp folder.
@@ -560,7 +560,7 @@ class datalynx_preset_manager {
      *
      * @param string $presetids
      */
-    public function download_presets($presetids) {
+    public function download_presets($presetids): bool {
         if (headers_sent()) {
             throw new moodle_exception('headerssent');
         }
@@ -642,7 +642,7 @@ class datalynx_preset_manager {
      * @param string $presetids
      * @return bool
      */
-    public function share_presets($presetids) {
+    public function share_presets($presetids): bool {
         if (!has_capability('mod/datalynx:presetsviewall', $this->dlx->context)) {
             return false;
         }
@@ -666,7 +666,7 @@ class datalynx_preset_manager {
      * @param string $presetids
      * @return bool
      */
-    public function delete_presets($presetids) {
+    public function delete_presets($presetids): bool {
         if (!$pids = explode(',', $presetids)) {
             return false;
         }

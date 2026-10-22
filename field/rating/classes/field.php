@@ -72,7 +72,7 @@ class field extends datalynxfield_no_content {
      *
      * @return bool
      */
-    public static function is_internal() {
+    public static function is_internal(): bool {
         return true;
     }
 
@@ -81,7 +81,7 @@ class field extends datalynxfield_no_content {
      *
      * @return bool
      */
-    public function use_join() {
+    public function use_join(): bool {
         return true;
     }
 
@@ -91,7 +91,7 @@ class field extends datalynxfield_no_content {
      * @param int $dataid
      * @return array
      */
-    public static function get_field_objects($dataid) {
+    public static function get_field_objects($dataid): array {
         $fieldobjects = [];
 
         $fieldobjects[self::_RATING] = (object) ['id' => self::_RATING, 'dataid' => $dataid,
@@ -127,7 +127,7 @@ class field extends datalynxfield_no_content {
      *
      * @return string
      */
-    public function get_select_sql() {
+    public function get_select_sql(): string {
         return ' er.itemid, er.component, er.ratingarea, er.contextid,
                 er.numratings, er.avgratings, er.sumratings, er.maxratings, er.minratings,
                 er.ratingid, er.ratinguserid, er.scaleid, er.usersrating ';
@@ -148,7 +148,7 @@ class field extends datalynxfield_no_content {
      *
      * @return string
      */
-    public function get_sort_sql() {
+    public function get_sort_sql(): string {
         $internalname = $this->field->internalname;
         if ($internalname == 'ratings') {
             return "er.usersrating";
@@ -164,9 +164,9 @@ class field extends datalynxfield_no_content {
     /**
      * Return SQL for JOIN clause.
      *
-     * @return string
+     * @return array
      */
-    public function get_join_sql() {
+    public function get_join_sql(): array {
         global $USER;
 
         $params = [];

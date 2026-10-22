@@ -163,7 +163,7 @@ class renderer extends datalynxfield_renderer {
      * @return array
      * @see datalynxfield_renderer::render_search_mode()
      */
-    public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
+    public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = ''): array {
         $field = $this->field;
         $fieldid = $field->id();
         $fieldname = "f_{$i}_{$fieldid}";
@@ -202,7 +202,7 @@ class renderer extends datalynxfield_renderer {
      * @param object $formdata
      * @return string[]
      */
-    public function validate($entryid, $tags, $formdata) {
+    public function validate($entryid, $tags, $formdata): array {
         $fieldid = $this->field->id();
         $errors = [];
 

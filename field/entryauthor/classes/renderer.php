@@ -48,7 +48,7 @@ class renderer extends datalynxfield_renderer {
      * @return array
      * @throws coding_exception
      */
-    public function replacements(?array $tags = null, $entry = null, ?array $options = null) {
+    public function replacements(?array $tags = null, $entry = null, ?array $options = null): array {
         $field = $this->field;
         $edit = !empty($options['edit']) ? $options['edit'] : false;
         $dlxid = $field->dlx()->id();
@@ -149,7 +149,7 @@ class renderer extends datalynxfield_renderer {
      * @param ?array $options
      * @throws coding_exception
      */
-    public function display_edit(&$mform, $entry, ?array $options = null) {
+    public function display_edit(&$mform, $entry, ?array $options = null): void {
         global $USER;
         if ($entry->id < 0) { // New entry.
             $entry->firstname = $USER->firstname;
@@ -523,7 +523,7 @@ class renderer extends datalynxfield_renderer {
      * @param stdClass $entry The entry object.
      * @param ?array $options Additional options.
      */
-    public function display_edit_profile(&$mform, $entry, ?array $options = null) {
+    public function display_edit_profile(&$mform, $entry, ?array $options = null): void {
         global $CFG;
         require_once("$CFG->dirroot/user/profile/lib.php");
 
@@ -579,7 +579,7 @@ class renderer extends datalynxfield_renderer {
      * @param stdClass $formdata The submitted form data.
      * @return array Validation errors keyed by form element name.
      */
-    public function validate($entryid, $tags, $formdata) {
+    public function validate($entryid, $tags, $formdata): array {
         global $USER, $DB, $CFG;
 
         $field = $this->field;
@@ -631,7 +631,7 @@ class renderer extends datalynxfield_renderer {
      * @return array
      * @throws coding_exception
      */
-    protected function patterns() {
+    protected function patterns(): array {
         $fieldinternalname = $this->field->get('internalname');
         $cat = get_string('authorinfo', 'datalynx');
         $patterns = [];

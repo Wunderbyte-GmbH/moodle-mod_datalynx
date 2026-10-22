@@ -78,7 +78,7 @@ class field extends datalynxfield_base {
      *
      * @return bool
      */
-    public function is_editor() {
+    public function is_editor(): bool {
         return !empty($this->field->param1);
     }
 
@@ -134,7 +134,7 @@ class field extends datalynxfield_base {
      *
      * @return array
      */
-    public function get_content_parts() {
+    public function get_content_parts(): array {
         return ['content', 'content1'];
     }
 
@@ -147,7 +147,7 @@ class field extends datalynxfield_base {
      * @param int $entryid
      * @return bool
      */
-    public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
+    public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null): bool {
         $fieldid = $this->field->id;
 
         parent::prepare_import_content($data, $importsettings, $csvrecord, $entryid);
@@ -176,7 +176,7 @@ class field extends datalynxfield_base {
      *
      * @return array
      */
-    public function get_supported_search_operators() {
+    public function get_supported_search_operators(): array {
         return ['' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'),
                 'LIKE' => get_string('contains', 'datalynx')];
     }

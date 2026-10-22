@@ -49,7 +49,7 @@ class view extends base {
     /**
      * Returns a fieldset of view options
      */
-    public function generate_default_view() {
+    public function generate_default_view(): void {
         global $OUTPUT; // Needed for mustache implementation.
 
         // Get all the fields.
@@ -145,7 +145,7 @@ class view extends base {
      * @param string $name
      * @return array
      */
-    protected function apply_entry_group_layout($entriesset, $name = '') {
+    protected function apply_entry_group_layout($entriesset, $name = ''): array {
         global $OUTPUT;
 
         $elements = [];

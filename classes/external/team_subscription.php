@@ -37,7 +37,7 @@ class team_subscription extends external_api {
      *
      * @return external_function_parameters
      */
-    public static function execute_parameters() {
+    public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
                 'd' => new external_value(PARAM_INT, 'Datalynx instance ID'),
                 'entryid' => new external_value(PARAM_INT, 'Entry ID'),
@@ -57,7 +57,7 @@ class team_subscription extends external_api {
      * @param string $action
      * @return array
      */
-    public static function execute($d, $entryid, $fieldid, $userid, $action) {
+    public static function execute($d, $entryid, $fieldid, $userid, $action): array {
         global $DB, $USER;
 
         // Validate parameters.
@@ -127,7 +127,7 @@ class team_subscription extends external_api {
      *
      * @return external_single_structure
      */
-    public static function execute_returns() {
+    public static function execute_returns(): external_single_structure {
         return new external_single_structure([
                 'success' => new external_value(PARAM_BOOL, 'Success status'),
                 'error' => new external_value(PARAM_TEXT, 'Error message (if any)', VALUE_OPTIONAL),

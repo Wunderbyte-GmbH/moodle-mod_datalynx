@@ -78,7 +78,7 @@ class field extends datalynxfield_base {
      *
      * @return array
      */
-    protected function content_names() {
+    protected function content_names(): array {
         return ['', 'year', 'month', 'day', 'hour', 'minute', 'enabled'];
     }
 
@@ -89,7 +89,7 @@ class field extends datalynxfield_base {
      * @param ?array $values
      * @return array
      */
-    protected function format_content(stdClass $entry, ?array $values = null) {
+    protected function format_content(stdClass $entry, ?array $values = null): array {
         $fieldid = $this->field->id;
         $oldcontents = [];
         $contents = [];
@@ -160,7 +160,7 @@ class field extends datalynxfield_base {
      *
      * @return bool
      */
-    public function supports_group_by() {
+    public function supports_group_by(): bool {
         return true;
     }
 
@@ -315,7 +315,7 @@ class field extends datalynxfield_base {
      * @param ?int $entryid Entry ID.
      * @return bool True on success.
      */
-    public function prepare_import_content(&$data, $importsettings, ?array $csvrecord = null, ?int $entryid = null) {
+    public function prepare_import_content(&$data, $importsettings, ?array $csvrecord = null, ?int $entryid = null): bool {
         // Import only from csv.
         if ($csvrecord) {
             $fieldid = $this->field->id;
@@ -373,7 +373,7 @@ class field extends datalynxfield_base {
      * @param array $searchparams
      * @return string
      */
-    public function format_search_value($searchparams) {
+    public function format_search_value($searchparams): string {
         [$not, $operator, $value] = $searchparams;
         if (is_array($value)) {
             if (count($value) > 1) {
@@ -402,7 +402,7 @@ class field extends datalynxfield_base {
      * {@inheritDoc}
      * @see datalynxfield_base::get_supported_search_operators()
      */
-    public function get_supported_search_operators() {
+    public function get_supported_search_operators(): array {
         return ['' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'),
                 '>' => get_string('after', 'datalynx'), '<' => get_string('before', 'datalynx'),
                 'BETWEEN' => get_string('between', 'datalynx')];
@@ -413,7 +413,7 @@ class field extends datalynxfield_base {
      * @param mixed $value Field value to check.
      * @return bool
      */
-    public static function is_fieldvalue_empty($value) {
+    public static function is_fieldvalue_empty($value): bool {
         if ($value == 0) {
             return true;
         }
@@ -424,7 +424,7 @@ class field extends datalynxfield_base {
      * Are fields of this field type suitable for use in customfilters?
      * @return bool
      */
-    public static function is_customfilterfield() {
+    public static function is_customfilterfield(): bool {
         return true;
     }
 }

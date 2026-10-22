@@ -119,7 +119,7 @@ class rule extends base {
      * @param \core\event\base $event
      * @return bool
      */
-    private function checkteam(\core\event\base $event) {
+    private function checkteam(\core\event\base $event): bool {
         $teamid = $event->get_data()['other']['fieldid'];
         $param1 = $this->rule->param1 ?? null;
         $triggers = empty($param1) ? [] : (json_decode($param1, true) ?? []);
@@ -137,7 +137,7 @@ class rule extends base {
      * @param \core\event\base $event
      * @return bool
      */
-    public function trigger(\core\event\base $event) {
+    public function trigger(\core\event\base $event): bool {
         $eventname = (new \ReflectionClass($event))->getShortName();
         $teamfieldid = 0;
         if (strpos($eventname, 'team') !== false) {
@@ -663,7 +663,7 @@ class rule extends base {
      * @param int $entryid ID of the entry (if applicable)
      * @return array array of user IDs
      */
-    private function get_recipients($authorid = 0, $entryid = 0) {
+    private function get_recipients($authorid = 0, $entryid = 0): array {
         $recipientids = [];
         if (isset($this->recipient['author']) && $authorid) {
             $recipientids[] = $authorid;
@@ -698,7 +698,7 @@ class rule extends base {
      * @param array $permissions
      * @return array IDs of recipient users
      */
-    protected function get_recipients_by_permission(context $context, $permissions) {
+    protected function get_recipients_by_permission(context $context, $permissions): array {
         $allneeded = [];
         $allforbidden = [];
 
@@ -753,7 +753,7 @@ class rule extends base {
      * @throws coding_exception
      * @throws dml_exception
      */
-    protected function get_team_recipients($teams, $entryid = 0) {
+    protected function get_team_recipients($teams, $entryid = 0): array {
         global $DB;
         $ids = [];
         if (empty($teams)) {

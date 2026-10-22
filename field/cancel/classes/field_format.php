@@ -29,7 +29,7 @@ class field_format extends \mod_datalynx\local\field_format\base {
      *
      * @param \MoodleQuickForm $mform
      */
-    public function config_form(\MoodleQuickForm &$mform) {
+    public function config_form(\MoodleQuickForm &$mform): void {
         $mform->addElement('text', 'buttontext', get_string('buttontext', 'datalynxfield_cancel'));
         $mform->setType('buttontext', PARAM_TEXT);
         $mform->addElement('text', 'cssclasses', get_string('cssclasses', 'datalynxfield_cancel'));

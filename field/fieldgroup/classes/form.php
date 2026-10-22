@@ -38,7 +38,7 @@ class form extends datalynxfield_form {
      * {@inheritdoc}
      * @see datalynxfield_form::field_definition()
      */
-    public function field_definition() {
+    public function field_definition(): void {
         global $PAGE;
         $mform = &$this->_form;
 

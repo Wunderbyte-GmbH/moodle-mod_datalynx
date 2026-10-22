@@ -131,7 +131,7 @@ class datalynx_filter {
      *
      * @return stdClass
      */
-    public function get_filter_obj() {
+    public function get_filter_obj(): stdClass {
         $filter = new stdClass();
         $filter->id = $this->id;
         $filter->dataid = $this->dataid;
@@ -156,7 +156,7 @@ class datalynx_filter {
      * @param array $fields
      * @return array
      */
-    public function get_sql($fields) {
+    public function get_sql($fields): array {
         $this->init_filter_sql();
 
         // SEARCH sql.
@@ -175,7 +175,7 @@ class datalynx_filter {
     /**
      * TODO: Write comment
      */
-    public function init_filter_sql() {
+    public function init_filter_sql(): void {
         $this->filteredtables = null;
         $this->searchfields = [];
         $this->sortfields = [];
@@ -394,7 +394,7 @@ class datalynx_filter {
      * @param object $field The field object being evaluated.
      * @return bool True if the fieldid should be added, false otherwise.
      */
-    public function add_fieldid($option, $field) {
+    public function add_fieldid($option, $field): bool {
 
         // If the field says it needs no content we trust its judgement.
         if (!$field->is_datalynx_content()) {
@@ -418,7 +418,7 @@ class datalynx_filter {
      * @param array $fields
      * @return array [$sorttables, $sortorder, $params]
      */
-    public function get_sort_sql($fields) {
+    public function get_sort_sql($fields): array {
         global $DB;
 
         $sorties = [];
@@ -516,7 +516,7 @@ class datalynx_filter {
      * @param array $fields
      * @return array [$datalynxcontent, $whatcontent, $contenttables, $params]
      */
-    public function get_content_sql($fields) {
+    public function get_content_sql($fields): array {
         $contentfields = $this->contentfields;
 
         $params = [];
@@ -599,7 +599,7 @@ class datalynx_filter {
      *
      * @param array $sorties fieldid => sortdir pairs
      */
-    public function append_sort_options(array $sorties) {
+    public function append_sort_options(array $sorties): void {
         if ($sorties) {
             $sortoptions = $this->customsort ? unserialize($this->customsort) : [];
             foreach ($sorties as $fieldid => $sortdir) {
@@ -614,7 +614,7 @@ class datalynx_filter {
      *
      * @param array $searchies fieldid => search option pairs
      */
-    public function append_search_options(array $searchies) {
+    public function append_search_options(array $searchies): void {
         if ($searchies) {
             $searchoptions = $this->customsearch ? unserialize($this->customsearch) : [];
             foreach (array_keys($searchies) as $fieldid) {

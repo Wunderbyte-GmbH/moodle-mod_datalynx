@@ -65,7 +65,7 @@ class field extends datalynxfield_option_multiple {
      * @param ?int $entryid The entry ID.
      * @return bool
      */
-    public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
+    public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null): bool {
         // Import only from csv.
         if ($csvrecord) {
             $fieldid = $this->field->id;

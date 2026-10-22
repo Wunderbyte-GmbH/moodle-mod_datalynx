@@ -132,7 +132,7 @@ class datalynx_entries {
      * @throws coding_exception
      * @throws dml_exception
      */
-    public function set_content(array $options = []) {
+    public function set_content(array $options = []): void {
         if (isset($options['entriesset'])) {
             $entriesset = $options['entriesset'];
         } else {
@@ -159,11 +159,11 @@ class datalynx_entries {
      * the permissions of the user viewing the view and other conditions
      *
      * @param array $options array of strings
-     * @return object retrieved entries
+     * @return \stdClass retrieved entries
      * @throws coding_exception
      * @throws dml_exception
      */
-    public function get_entries($options = null) {
+    public function get_entries($options = null): stdClass {
         global $DB, $USER;
 
         $dlx = &$this->dlx;
@@ -512,7 +512,7 @@ class datalynx_entries {
      * @return array of stored files
      * @throws coding_exception
      */
-    public function get_embedded_files(array $fids) {
+    public function get_embedded_files(array $fids): array {
         $files = [];
 
         if (!empty($fids) && !empty($this->entries)) {
@@ -553,7 +553,7 @@ class datalynx_entries {
      * @param array $fids
      * @return array int[]
      */
-    public function get_contentinfo(array $fids) {
+    public function get_contentinfo(array $fids): array {
         $contentinfo = [];
 
         if (!empty($fids) && !empty($this->entries)) {
@@ -1307,7 +1307,7 @@ class datalynx_entries {
      * @param array $entryids An array containing IDs of entries to create approved entries from
      * @return array An array of processed and/or added entries (id => entry)
      */
-    public function create_approved_entries_for_team(array $entryids) {
+    public function create_approved_entries_for_team(array $entryids): array {
         global $DB;
         $dlx = $this->dlx;
 
@@ -1555,7 +1555,7 @@ class datalynx_entries {
      * @param string $value
      * @return string
      */
-    private function sqlparams(&$params, $param, $value) {
+    private function sqlparams(&$params, $param, $value): string {
         if (!array_key_exists($param, $params)) {
             $params[$param] = [];
         }

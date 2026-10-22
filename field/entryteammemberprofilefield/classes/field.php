@@ -55,14 +55,14 @@ class field extends datalynxfield_no_content_can_join {
      *
      * @return bool
      */
-    public function supports_group_by() {
+    public function supports_group_by(): bool {
         return false;
     }
 
     /**
      * Returns true to indicate this is an internal field.
      */
-    public static function is_internal() {
+    public static function is_internal(): bool {
         return true;
     }
 
@@ -73,7 +73,7 @@ class field extends datalynxfield_no_content_can_join {
      * @param array $fields
      * @return array
      */
-    public static function get_field_objects($dataid, $fields = []) {
+    public static function get_field_objects($dataid, $fields = []): array {
         $fieldobjects = [];
 
         $teammemberselectfields = array_filter($fields, function ($field) {
@@ -141,7 +141,7 @@ class field extends datalynxfield_no_content_can_join {
     /**
      * Returns empty string as this field has no sort SQL.
      */
-    public function get_sort_sql() {
+    public function get_sort_sql(): string {
         return "";
     }
 
@@ -259,7 +259,7 @@ class field extends datalynxfield_no_content_can_join {
      * @param int $sortdir Sort direction: 0 for ASC, 1 for DESC.
      * @return array Array of distinct field values.
      */
-    public function get_distinct_content($sortdir = 0) {
+    public function get_distinct_content($sortdir = 0): array {
         global $DB;
         $sortdir = $sortdir ? 'DESC' : 'ASC';
         $contentfull = $this->get_sort_sql();
@@ -292,7 +292,7 @@ class field extends datalynxfield_no_content_can_join {
      *
      * @return array
      */
-    public function get_supported_search_operators() {
+    public function get_supported_search_operators(): array {
         return [
             '' => '&lt;' . get_string('choose') . '&gt;',
             self::OPERATOR_LITERAL_VALUE => get_string('literalvalue', 'datalynxfield_entryteammemberprofilefield'),
@@ -306,7 +306,7 @@ class field extends datalynxfield_no_content_can_join {
      * @param string $operator
      * @return int
      */
-    public function get_argument_count(string $operator) {
+    public function get_argument_count(string $operator): int {
         if ($operator === self::OPERATOR_MY_PROFILE_FIELD) {
             return 0;
         } else {

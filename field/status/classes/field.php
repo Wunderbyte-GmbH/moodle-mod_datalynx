@@ -60,7 +60,7 @@ class field extends datalynxfield_no_content {
      * @param int $dataid The datalynx activity id.
      * @return array
      */
-    public static function get_field_objects($dataid) {
+    public static function get_field_objects($dataid): array {
         $fieldobjects = [];
 
         $fieldobjects[self::_STATUS] = (object) ['id' => self::_STATUS, 'dataid' => $dataid,
@@ -75,7 +75,7 @@ class field extends datalynxfield_no_content {
      *
      * @return boolean always true
      */
-    public static function is_internal() {
+    public static function is_internal(): bool {
         return true;
     }
 
@@ -84,7 +84,7 @@ class field extends datalynxfield_no_content {
      *
      * @return bool
      */
-    public function is_editable() {
+    public function is_editable(): bool {
         return true;
     }
 
@@ -102,7 +102,7 @@ class field extends datalynxfield_no_content {
      *
      * @return string
      */
-    public function get_sort_sql() {
+    public function get_sort_sql(): string {
         return 'e.status';
     }
 
@@ -143,7 +143,7 @@ class field extends datalynxfield_no_content {
      * @return array
      * @throws coding_exception
      */
-    public function get_supported_search_operators() {
+    public function get_supported_search_operators(): array {
         return ['=' => get_string('equal', 'datalynx')];
     }
 
@@ -151,7 +151,7 @@ class field extends datalynxfield_no_content {
      * Are fields of this field type suitable for use in customfilters?
      * @return bool
      */
-    public static function is_customfilterfield() {
+    public static function is_customfilterfield(): bool {
         return true;
     }
 }

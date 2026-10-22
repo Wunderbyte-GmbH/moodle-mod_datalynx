@@ -29,7 +29,7 @@ class field_format extends \mod_datalynx\local\field_format\base {
      *
      * @param \MoodleQuickForm $mform
      */
-    public function config_form(\MoodleQuickForm &$mform) {
+    public function config_form(\MoodleQuickForm &$mform): void {
         $modes = [
             '' => get_string('default'),
             'unit' => 'Unit only',

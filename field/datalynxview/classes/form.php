@@ -34,7 +34,7 @@ class form extends datalynxfield_form {
     /**
      * Define field settings form.
      */
-    public function field_definition() {
+    public function field_definition(): void {
         global $PAGE;
 
         $mform = &$this->_form;
@@ -141,7 +141,7 @@ class form extends datalynxfield_form {
      *
      * @param object $data
      */
-    public function data_preprocessing(&$data) {
+    public function data_preprocessing(&$data): void {
         if (!empty($data->param6)) {
             [$data->entryauthor, $data->entrygroup] = explode(',', $data->param6);
         }

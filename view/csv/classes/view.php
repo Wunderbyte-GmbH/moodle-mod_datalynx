@@ -125,7 +125,7 @@ class view extends base {
      * @param string $name
      * @return array
      */
-    protected function apply_entry_group_layout($entriesset, $name = '') {
+    protected function apply_entry_group_layout($entriesset, $name = ''): array {
         global $OUTPUT;
 
         $elements = [];
@@ -189,7 +189,7 @@ class view extends base {
      * @param array $fielddefinitions
      * @return array
      */
-    protected function entry_definition($fielddefinitions) {
+    protected function entry_definition($fielddefinitions): array {
         $elements = [];
         // Get the columns definition from the view template.
         $columns = $this->get_columns();
@@ -226,7 +226,7 @@ class view extends base {
      * @param int $entryid
      * @return array
      */
-    protected function new_entry_definition($entryid = -1) {
+    protected function new_entry_definition($entryid = -1): array {
         $elements = [];
 
         // Get the columns definition from the view template.
@@ -347,7 +347,7 @@ class view extends base {
      * @param string $range
      * @return void
      */
-    public function process_export(string $range = self::EXPORT_PAGE) {
+    public function process_export(string $range = self::EXPORT_PAGE): void {
         global $CFG;
         require_once($CFG->libdir . '/csvlib.class.php');
         $csvcontent = $this->get_csv_content($range);
@@ -398,7 +398,7 @@ class view extends base {
      * @param string $range
      * @return ?array
      */
-    public function get_csv_content($range = self::EXPORT_PAGE) {
+    public function get_csv_content($range = self::EXPORT_PAGE): ?array {
         // Set content.
         if ($range == self::EXPORT_ALL) {
             $entries = new datalynx_entries($this->dlx, $this->filter);
@@ -543,7 +543,7 @@ class view extends base {
      * @param stdClass $data
      * @return ?bool
      */
-    public function execute_import($data) {
+    public function execute_import($data): ?bool {
         if ($data->eids) {
             [$strnotify, $data] = $this->entries->process_entries('update', $data->eids, $data, true);
             $this->notifications['good']['entries'] = $strnotify;
@@ -622,7 +622,7 @@ class view extends base {
      *
      * @return datalynxview_csv_import_form
      */
-    public function get_import_form() {
+    public function get_import_form(): datalynxview_csv_import_form {
         global $CFG;
         require_once("$CFG->dirroot/mod/datalynx/view/csv/import_form.php");
 
@@ -633,7 +633,7 @@ class view extends base {
     /**
      * Generates the view with default settings.
      */
-    public function generate_default_view() {
+    public function generate_default_view(): void {
         // Get all the fields.
         if (!$fields = $this->dlx->get_fields()) {
             return; // You shouldn't get that far if there are no user fields.
@@ -684,7 +684,7 @@ class view extends base {
      *
      * @return bool
      */
-    protected function has_headers() {
+    protected function has_headers(): bool {
         foreach ($this->get_columns() as $column) {
             if (!empty($column[1])) {
                 return true;
@@ -708,7 +708,7 @@ class view extends base {
      *
      * @return string
      */
-    public function get_output_type() {
+    public function get_output_type(): string {
         return $this->output;
     }
 
@@ -717,7 +717,7 @@ class view extends base {
      *
      * @return string
      */
-    public function get_delimiter() {
+    public function get_delimiter(): string {
         return $this->delimiter;
     }
 
@@ -726,7 +726,7 @@ class view extends base {
      *
      * @return string
      */
-    public function get_enclosure() {
+    public function get_enclosure(): string {
         return $this->enclosure;
     }
 
@@ -735,7 +735,7 @@ class view extends base {
      *
      * @return string
      */
-    public function get_encoding() {
+    public function get_encoding(): string {
         return $this->encoding;
     }
 }

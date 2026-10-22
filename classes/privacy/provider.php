@@ -589,7 +589,7 @@ class provider implements
      * @param array $additionalfields
      * @return \stdClass
      */
-    protected static function extract_object_from_entry($entry, $prefix, $additionalfields = []) {
+    protected static function extract_object_from_entry($entry, $prefix, $additionalfields = []): \stdClass {
         $object = new \stdClass();
         foreach ($entry as $key => $value) {
             if (preg_match('/^' . preg_quote($prefix, '/') . '(.*)/', $key, $matches)) {
@@ -757,7 +757,7 @@ class provider implements
      *
      * @return string
      */
-    protected static function sql_fields() {
+    protected static function sql_fields(): string {
         // Field df.required AS fieldrequired was removed.
         return 'dl.id AS dataid, dc.id AS contentid, dc.fieldid, df.type AS fieldtype, df.name AS fieldname,
                   df.description AS fielddescription,

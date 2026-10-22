@@ -90,7 +90,7 @@ class field extends datalynxfield_base {
      *
      * @return bool
      */
-    public function is_editable() {
+    public function is_editable(): bool {
         return true;
     }
 }

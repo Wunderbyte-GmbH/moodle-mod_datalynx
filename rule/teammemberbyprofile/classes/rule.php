@@ -50,7 +50,7 @@ class rule extends base {
      * @param \core\event\base $event
      * @return bool
      */
-    public function trigger(\core\event\base $event) {
+    public function trigger(\core\event\base $event): bool {
         global $DB;
 
         $selectfieldid = (int) ($this->rule->param6 ?? 0);

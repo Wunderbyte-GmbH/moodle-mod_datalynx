@@ -41,7 +41,7 @@ class renderer extends FileRenderer {
      * @param stdClass $entry
      * @param ?array $options
      */
-    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, ?array $options = null) {
+    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, ?array $options = null): void {
         $field = $this->field;
         $fieldid = $field->id();
 
@@ -270,7 +270,7 @@ class renderer extends FileRenderer {
      * @param stored_file $file The file to check.
      * @return bool true if file ok
      */
-    public function is_valid_video($file) {
+    public function is_valid_video($file): bool {
         $mimetype = $file->get_mimetype();
         if (!file_mimetype_in_typegroup($mimetype, 'web_video')) {
             return false;
@@ -284,7 +284,7 @@ class renderer extends FileRenderer {
      * @param stored_file $file The file to check.
      * @return bool true if file ok
      */
-    public function is_valid_audio($file) {
+    public function is_valid_audio($file): bool {
         $mimetype = $file->get_mimetype();
         if (!file_mimetype_in_typegroup($mimetype, 'web_audio')) {
             return false;

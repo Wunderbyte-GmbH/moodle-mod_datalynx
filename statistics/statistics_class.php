@@ -94,7 +94,7 @@ class datalynx_statistics_class {
      * @param stdClass $params Statistics parameters.
      * @throws moodle_exception
      */
-    public function print_statistics($params) {
+    public function print_statistics($params): void {
         if (empty($params) || empty($params->show)) {
             echo "<hr />Nothing to display.<hr />";
         } else {
@@ -200,7 +200,7 @@ class datalynx_statistics_class {
      * @param int $to End timestamp.
      * @return array Array containing counts for total, approved, deleted, and visits.
      */
-    private function get_count($mode, $from = 0, $to = PHP_INT_MAX) {
+    private function get_count($mode, $from = 0, $to = PHP_INT_MAX): array {
         global $DB;
 
         $params = ['dataid' => $this->dlx->id(), 'fromdate' => $from,

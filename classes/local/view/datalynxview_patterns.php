@@ -110,7 +110,7 @@ class datalynxview_patterns {
      * @param bool $checkvisibility Whether to check pattern visibility.
      * @return array
      */
-    public function search($text, $checkvisibility = true) {
+    public function search($text, $checkvisibility = true): array {
         $found = [];
         // Fixed patterns.
         $patterns = array_keys($this->patterns($checkvisibility));
@@ -142,7 +142,7 @@ class datalynxview_patterns {
      *        view-level template (info, user preferences, general actions, paging)
      * @return array
      */
-    final public function get_menu($showall = false, $checkvisibility = true, $forentrytemplate = false) {
+    final public function get_menu($showall = false, $checkvisibility = true, $forentrytemplate = false): array {
         $patternsmenu = [];
         $excludedtags = $forentrytemplate ? array_merge(
             array_keys($this->info_patterns()),
@@ -319,7 +319,7 @@ class datalynxview_patterns {
      * @param number $userid
      * @return bool true if user is allowed to add a new entry
      */
-    private function user_can_add_new_entry($userid = 0) {
+    private function user_can_add_new_entry($userid = 0): bool {
         global $USER, $DB;
         $userid = $userid ? $userid : $USER->id;
         $dlx = $this->view->get_dlx();
@@ -763,7 +763,7 @@ class datalynxview_patterns {
      * @param array $contentfields
      * @return string
      */
-    protected function contentfield_convert_array_to_string($contentfields) {
+    protected function contentfield_convert_array_to_string($contentfields): string {
 
         $contentfieldstr = "";
         foreach ($contentfields as $key => $val) {
@@ -843,7 +843,7 @@ class datalynxview_patterns {
      *
      * @return array of arrays
      */
-    protected function info_patterns() {
+    protected function info_patterns(): array {
         $cat = get_string('entries', 'datalynx');
         $patterns = ['##numentriestotal##' => [true, $cat],
                 '##numentriesdisplayed##' => [true, $cat]];
@@ -879,7 +879,7 @@ class datalynxview_patterns {
      *
      * @return array multidimensional
      */
-    protected function userpref_patterns() {
+    protected function userpref_patterns(): array {
         global $DB;
 
         $cat = get_string('userpref', 'datalynx');
@@ -899,7 +899,7 @@ class datalynxview_patterns {
      *
      * @return array multidimensional
      */
-    protected function action_patterns() {
+    protected function action_patterns(): array {
         $cat = get_string('generalactions', 'datalynx');
         $patterns = ['##addnewentry##' => [true, $cat], '##addnewentries##' => [true, $cat],
                 '##selectallnone##' => [true, $cat], '##multiduplicate##' => [true, $cat],
@@ -917,7 +917,7 @@ class datalynxview_patterns {
      *
      * @return array multidimensional
      */
-    protected function paging_patterns() {
+    protected function paging_patterns(): array {
         $cat = get_string('pagingbar', 'datalynx');
         $patterns = ['##pagingbar##' => [true, $cat]];
         return $patterns;
@@ -933,7 +933,7 @@ class datalynxview_patterns {
      * @param bool $checkvisibility true if only views visible to the user should be considered
      * @return array multidimensional with pattern as key and array with showinmenu and category as value
      */
-    protected function viewlink_patterns($checkvisibility = true) {
+    protected function viewlink_patterns($checkvisibility = true): array {
         $dlx = $this->view->get_dlx();
 
         $views = [];
@@ -969,7 +969,7 @@ class datalynxview_patterns {
      * @param boolean $checkvisibility true if only views visible to the user should be considered
      * @return array multidimensional with pattern as key and array with showinmenu and category as value
      */
-    protected function regexp_patterns($checkvisibility = true) {
+    protected function regexp_patterns($checkvisibility = true): array {
         $views = $checkvisibility ? $this->get_cached_visible_view_names() : $this->get_cached_all_view_names();
         $patterns = [];
         // Get list of views.
@@ -991,7 +991,7 @@ class datalynxview_patterns {
      *
      * @return array multitype:multitype:boolean string
      */
-    protected function bulkedit_patterns() {
+    protected function bulkedit_patterns(): array {
         $dlx = $this->view->get_dlx();
 
         $patterns = [];
@@ -1013,7 +1013,7 @@ class datalynxview_patterns {
      * @param string $pattern
      * @return boolean true if $pattern is a viewname or fieldame
      */
-    public function is_regexp_pattern($pattern) {
+    public function is_regexp_pattern($pattern): bool {
         $views = $this->get_cached_visible_view_names();
 
         if ($views) {

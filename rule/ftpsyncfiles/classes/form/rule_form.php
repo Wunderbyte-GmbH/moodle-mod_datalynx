@@ -30,7 +30,7 @@ class rule_form extends base_rule_form {
     /**
      * Define the rule settings form
      */
-    public function rule_definition() {
+    public function rule_definition(): void {
         $br = html_writer::empty_tag('br');
         $mform = &$this->_form;
 

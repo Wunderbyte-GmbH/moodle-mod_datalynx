@@ -40,7 +40,7 @@ class renderer extends datalynxfield_renderer {
      * @return array an array of replacements (either HTML for browse mode or callback info for the
      *         edit mode)
      */
-    public function replacements(?array $tags = null, $entry = null, ?array $options = null) {
+    public function replacements(?array $tags = null, $entry = null, ?array $options = null): array {
         $edit = !empty($options['edit']) ? $options['edit'] : false;
 
         $replacements = [];
@@ -74,7 +74,7 @@ class renderer extends datalynxfield_renderer {
      * @param datalynx_entry $entry an entry
      * @param array $options unused
      */
-    public function display_edit(&$mform, $entry, array $options = []) {
+    public function display_edit(&$mform, $entry, array $options = []): void {
         global $PAGE; // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
         $field = $this->field;
         $fieldid = $field->id();
@@ -167,7 +167,7 @@ class renderer extends datalynxfield_renderer {
      * @param string $value
      * @return array
      */
-    public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
+    public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = ''): array {
         $fieldid = $this->field->id();
         $fieldname = "f_{$i}_$fieldid";
 
@@ -193,7 +193,7 @@ class renderer extends datalynxfield_renderer {
      *
      * @return array (string) pattern => array((boolean) supported, (string) pattern category)
      */
-    protected function patterns() {
+    protected function patterns(): array {
         $cat = get_string('actions', 'datalynx');
 
         $patterns = [];

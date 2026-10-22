@@ -388,7 +388,7 @@ class renderer extends datalynxfield_renderer {
      * @param string $value
      * @return bool
      */
-    protected function validate_iban($value) {
+    protected function validate_iban($value): bool {
         $iban = str_replace([' ', '-'], '', strtoupper($value));
         if (empty($iban)) {
             return false;

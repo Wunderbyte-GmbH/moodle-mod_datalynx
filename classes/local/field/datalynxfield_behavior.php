@@ -179,7 +179,7 @@ class datalynxfield_behavior {
      * @throws dml_exception
      * @throws moodle_exception
      */
-    public static function get_default_behavior(mod_datalynx\datalynx $dlx) {
+    public static function get_default_behavior(mod_datalynx\datalynx $dlx): datalynxfield_behavior {
         $record = (object) self::$default;
         $record->visibleto = serialize($record->visibleto);
         $record->editableby = serialize($record->editableby);
@@ -217,7 +217,7 @@ class datalynxfield_behavior {
      * @param stdClass $user
      * @return bool
      */
-    private function user_is_admin($user) {
+    private function user_is_admin($user): bool {
         $admins = get_admins();
         return in_array($user->id, array_keys($admins));
     }
@@ -291,7 +291,7 @@ class datalynxfield_behavior {
      * @return bool
      * @throws coding_exception
      */
-    public function is_editable_by_user($user = null, bool $isentryauthor = false, bool $ismentor = false) {
+    public function is_editable_by_user($user = null, bool $isentryauthor = false, bool $ismentor = false): bool {
         global $USER;
         $user = $user ? $user : $USER;
         $permissions = $this->dlx->get_user_datalynx_permissions($user->id, 'edit');
@@ -481,9 +481,8 @@ class datalynxfield_behavior {
      *
      * @param integer $behaviorid
      * @param string $behaviorname empty if it is deleted
-     * @return bool success status of deletion
      */
-    public static function update_behavior_pattern($behaviorid, $behaviorname = '') {
+    public static function update_behavior_pattern($behaviorid, $behaviorname = ''): void {
         global $DB;
         $behaviorinfo = $DB->get_record(
             'datalynx_behaviors',
@@ -570,7 +569,7 @@ class datalynxfield_behavior {
      *
      * @return int
      */
-    public function get_id() {
+    public function get_id(): int {
         return $this->id;
     }
 
@@ -579,7 +578,7 @@ class datalynxfield_behavior {
      *
      * @return string
      */
-    public function get_name() {
+    public function get_name(): string {
         return $this->name;
     }
 
@@ -588,7 +587,7 @@ class datalynxfield_behavior {
      *
      * @return string
      */
-    public function get_description() {
+    public function get_description(): string {
         return $this->description;
     }
 
@@ -597,7 +596,7 @@ class datalynxfield_behavior {
      *
      * @return bool
      */
-    public function is_required() {
+    public function is_required(): bool {
         return $this->required;
     }
 

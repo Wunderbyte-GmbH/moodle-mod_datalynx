@@ -110,7 +110,7 @@ class field extends datalynxfield_option_single {
      * @param string $operator The operator.
      * @return int
      */
-    public function get_argument_count(string $operator) {
+    public function get_argument_count(string $operator): int {
         if ($operator === "") { // Empty operator.
             return 0;
         } else {

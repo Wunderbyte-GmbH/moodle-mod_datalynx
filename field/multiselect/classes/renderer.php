@@ -208,7 +208,7 @@ class renderer extends datalynxfield_renderer {
      * @param string $value Default search value.
      * @return array Array of [$elements, $options].
      */
-    public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
+    public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = ''): array {
         $field = $this->field;
         $fieldid = $field->id();
         $fieldname = "f_{$i}_{$fieldid}";
@@ -256,7 +256,7 @@ class renderer extends datalynxfield_renderer {
      * @param stdClass $formdata Form data submitted by the user.
      * @return array Associative array of field name => error message.
      */
-    public function validate($entryid, $tags, $formdata) {
+    public function validate($entryid, $tags, $formdata): array {
         $fieldid = $this->field->id();
         $formfieldname = "field_{$fieldid}_{$entryid}";
 
@@ -296,7 +296,7 @@ class renderer extends datalynxfield_renderer {
      *
      * @return array pattern => array(visible in menu, category)
      */
-    protected function patterns() {
+    protected function patterns(): array {
         // The parent::patterns() contributes [[fieldname]] plus a visible tag per user-created multiselect
         // format. The legacy :addnew suffix stays recognised for old templates but is hidden from the
         // menu (it is also exposed as an "addnew" format option).

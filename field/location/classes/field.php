@@ -42,7 +42,7 @@ class field extends datalynxfield_base {
      *
      * @return array
      */
-    protected function content_names() {
+    protected function content_names(): array {
         return ['address', 'lat', 'lng'];
     }
 
@@ -51,7 +51,7 @@ class field extends datalynxfield_base {
      *
      * @return array
      */
-    public function get_content_parts() {
+    public function get_content_parts(): array {
         return ['content', 'content1', 'content2'];
     }
 
@@ -60,7 +60,7 @@ class field extends datalynxfield_base {
      *
      * @return bool
      */
-    public function supports_group_by() {
+    public function supports_group_by(): bool {
         return false;
     }
 
@@ -69,7 +69,7 @@ class field extends datalynxfield_base {
      *
      * @return bool
      */
-    public function supports_search() {
+    public function supports_search(): bool {
         return true;
     }
 
@@ -80,7 +80,7 @@ class field extends datalynxfield_base {
      * @param ?array $values
      * @return array [array of new contents, array of old contents]
      */
-    protected function format_content(stdClass $entry, ?array $values = null) {
+    protected function format_content(stdClass $entry, ?array $values = null): array {
         $fieldid = $this->field->id;
         $oldcontents = [];
         $contents = [];
@@ -246,7 +246,7 @@ class field extends datalynxfield_base {
      *
      * @return array
      */
-    public function get_supported_search_operators() {
+    public function get_supported_search_operators(): array {
         return [
             ''     => get_string('empty', 'datalynx'),
             'LIKE' => get_string('contains', 'datalynx'),
@@ -259,7 +259,7 @@ class field extends datalynxfield_base {
      * @param mixed $value The value to check.
      * @return bool
      */
-    public static function is_fieldvalue_empty($value) {
+    public static function is_fieldvalue_empty($value): bool {
         if (empty($value)) {
             return true;
         }

@@ -39,7 +39,7 @@ class datalynxtool_downloadfiles {
      *
      * @param datalynx $dlx
      */
-    public static function run(mod_datalynx\datalynx $dlx) {
+    public static function run(mod_datalynx\datalynx $dlx): void {
         // Create filter in order to get all files of all entries of a dl instance.
         $fields = $dlx->get_fields_by_type('file');
         $filterdata = new stdClass();

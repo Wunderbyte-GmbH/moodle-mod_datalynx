@@ -53,7 +53,7 @@ class manager {
      * @return array
      * @throws coding_exception
      */
-    public static function get_event_data($dataid = 0) {
+    public static function get_event_data($dataid = 0): array {
         if (self::$observers === null) {
             self::$observers = self::load_observers();
         }
@@ -123,7 +123,7 @@ class manager {
      *
      * @param \core\event\base $event event data
      */
-    public static function trigger_rules(\core\event\base $event) {
+    public static function trigger_rules(\core\event\base $event): void {
         global $DB;
         $cmid = $event->get_data()['contextinstanceid'];
         $dataid = $DB->get_field('course_modules', 'instance', ['id' => $cmid]);
@@ -142,7 +142,7 @@ class manager {
      * @param bool $forceget
      * @return ?base
      */
-    public function get_rule_from_id($ruleid, $forceget = false) {
+    public function get_rule_from_id($ruleid, $forceget = false): ?base {
         $rules = $this->get_rules(null, false, $forceget);
 
         if (empty($rules[$ruleid])) {
@@ -160,7 +160,7 @@ class manager {
      * @param bool $menu If true, return name-keyed menu array instead of objects.
      * @return base[]
      */
-    public function get_rules_by_plugintype($type, $menu = false) {
+    public function get_rules_by_plugintype($type, $menu = false): array {
         $typerules = [];
         foreach ($this->get_rules() as $ruleid => $rule) {
             if ($rule->get_type() === $type) {
@@ -180,7 +180,7 @@ class manager {
      * @param bool $enabledonly
      * @return base[]
      */
-    public function get_rules_for_event($eventname, $enabledonly = true) {
+    public function get_rules_for_event($eventname, $enabledonly = true): array {
         $rules = [];
         foreach ($this->get_rules() as $ruleid => $rule) {
             if ($rule->is_triggered_by($eventname) && (!$enabledonly || $rule->is_enabled())) {
@@ -475,7 +475,7 @@ class manager {
     /**
      * Print the list of rules in a table
      */
-    public function print_rule_list() {
+    public function print_rule_list(): void {
         global $OUTPUT;
 
         $dlx = $this->dlx;
@@ -591,7 +591,7 @@ class manager {
     /**
      * Print the "Add rule" selection menu
      */
-    public function print_add_rule() {
+    public function print_add_rule(): void {
         global $OUTPUT;
 
         // Display the rule form jump list.

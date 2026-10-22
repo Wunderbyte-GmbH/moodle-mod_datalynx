@@ -52,7 +52,7 @@ class renderer extends datalynxfield_renderer {
      * @param stdClass $entry
      * @param array $options
      */
-    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
+    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options): void {
         $field = $this->field;
         $fieldid = $field->id();
         $prefix = "field_{$fieldid}_{$entry->id}";
@@ -184,7 +184,7 @@ class renderer extends datalynxfield_renderer {
      * @param mixed $value
      * @return array [$elements, $separators]
      */
-    public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = '') {
+    public function render_search_mode(MoodleQuickForm &$mform, $i = 0, $value = ''): array {
         $fieldid = $this->field->id();
         $prefix = "f_{$i}_{$fieldid}";
         $search = self::search_parts($value);
@@ -287,7 +287,7 @@ class renderer extends datalynxfield_renderer {
      * @param stdClass $formdata
      * @return array
      */
-    public function validate($entryid, $tags, $formdata) {
+    public function validate($entryid, $tags, $formdata): array {
         $errors = [];
         $prefix = "field_{$this->field->id()}_{$entryid}";
         $values = $this->field->get_content_from_data($entryid, $formdata);

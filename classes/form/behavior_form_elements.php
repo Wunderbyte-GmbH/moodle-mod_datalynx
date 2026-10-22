@@ -438,7 +438,7 @@ trait behavior_form_elements {
      * @param array $data
      * @return array
      */
-    protected function validate_behavior($data) {
+    protected function validate_behavior($data): array {
         global $DB;
         $errors = [];
         if (!$data['name']) {
@@ -501,7 +501,7 @@ trait behavior_form_elements {
      *
      * @return array with userid -> firstname lastname.
      */
-    public function get_allusers() {
+    public function get_allusers(): array {
         global $DB;
         $allusers = [];
         $tempusers = $DB->get_records('user', [], '', 'id, firstname, lastname');
@@ -522,7 +522,7 @@ trait behavior_form_elements {
      * @param string $capability
      * @return array List of localized role names.
      */
-    protected function get_allowed_role_names($capability) {
+    protected function get_allowed_role_names($capability): array {
         $context = $this->get_dlx()->context;
         $allroles = role_get_names($context, ROLENAME_ALIAS, true);
         $roleswithcap = get_roles_with_capability($capability, CAP_ALLOW, $context);

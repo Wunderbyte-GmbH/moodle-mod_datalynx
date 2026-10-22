@@ -67,7 +67,7 @@ class field extends datalynxfield_base {
      *
      * @return array
      */
-    protected function content_names() {
+    protected function content_names(): array {
         return array_merge(
             ['mode', 'date', 'start', 'end', 'from', 'until'],
             array_map(static fn($day) => "day{$day}", range(1, 7))
@@ -79,7 +79,7 @@ class field extends datalynxfield_base {
      *
      * @return array
      */
-    public function get_content_parts() {
+    public function get_content_parts(): array {
         return ['content', 'content1', 'content2', 'content3', 'content4'];
     }
 
@@ -88,7 +88,7 @@ class field extends datalynxfield_base {
      *
      * @return bool
      */
-    public function supports_group_by() {
+    public function supports_group_by(): bool {
         return false;
     }
 
@@ -97,7 +97,7 @@ class field extends datalynxfield_base {
      *
      * @return bool
      */
-    public function supports_search() {
+    public function supports_search(): bool {
         return true;
     }
 
@@ -106,7 +106,7 @@ class field extends datalynxfield_base {
      *
      * @return bool
      */
-    public static function is_customfilterfield() {
+    public static function is_customfilterfield(): bool {
         return true;
     }
 
@@ -194,7 +194,7 @@ class field extends datalynxfield_base {
      * @param array|null $values
      * @return array [$contents, $oldcontents]
      */
-    protected function format_content(stdClass $entry, ?array $values = null) {
+    protected function format_content(stdClass $entry, ?array $values = null): array {
         $fieldid = $this->field->id;
         $oldcontents = [];
         $contents = [];
@@ -542,7 +542,7 @@ class field extends datalynxfield_base {
      *
      * @return array
      */
-    public function get_supported_search_operators() {
+    public function get_supported_search_operators(): array {
         return ['' => get_string('runson', 'datalynxfield_schedule')];
     }
 
@@ -623,7 +623,7 @@ class field extends datalynxfield_base {
      * @param mixed $value
      * @return bool
      */
-    public static function is_fieldvalue_empty($value) {
+    public static function is_fieldvalue_empty($value): bool {
         return !schedule::from_json((string) $value)->is_valid();
     }
 }

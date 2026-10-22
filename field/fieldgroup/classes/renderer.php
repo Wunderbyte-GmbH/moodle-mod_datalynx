@@ -180,7 +180,7 @@ class renderer extends datalynxfield_renderer {
      * @param stdClass $entry The entry object.
      * @param array $options Rendering options.
      */
-    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options) {
+    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options): void {
         // We want to display these fields.
         $fieldgroupfields = $this->get_subfields();
 
@@ -403,7 +403,7 @@ class renderer extends datalynxfield_renderer {
      * @param string $value Current search value.
      * @return bool Always false.
      */
-    public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
+    public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = ''): bool {
         return false; // Remove from search.
     }
 
@@ -417,7 +417,7 @@ class renderer extends datalynxfield_renderer {
      * @param mixed $formdata Submitted form data.
      * @return array Validation errors.
      */
-    public function validate($entryid, $tags, $formdata) {
+    public function validate($entryid, $tags, $formdata): array {
         return [];
     }
 
@@ -426,8 +426,10 @@ class renderer extends datalynxfield_renderer {
      *
      * {@inheritDoc}
      * @see datalynxfield_renderer::patterns()
+     *
+     * @return array
      */
-    protected function patterns() {
+    protected function patterns(): array {
         $cat = get_string('fieldgroups', 'datalynx');
         $fieldname = $this->field->name();
 

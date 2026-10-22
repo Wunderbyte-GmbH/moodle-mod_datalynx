@@ -83,7 +83,7 @@ final class view_permitted_filters_test extends advanced_testcase {
      * @param int $param5 "Allow all filters" override flag.
      * @return \mod_datalynx\local\view\base
      */
-    private function make_view(string $name, int $filter, ?array $permitted, int $param5) {
+    private function make_view(string $name, int $filter, ?array $permitted, int $param5): \mod_datalynx\local\view\base {
         global $DB;
         $record = (object) [
             'dataid' => $this->dlx->id(),

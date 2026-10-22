@@ -66,7 +66,7 @@ class datalynxview_entries_form extends moodleform {
      *
      * @return void
      */
-    public function add_delegate_action_buttons() {
+    public function add_delegate_action_buttons(): void {
         $mform =& $this->_form;
         $buttonarray = [];
 

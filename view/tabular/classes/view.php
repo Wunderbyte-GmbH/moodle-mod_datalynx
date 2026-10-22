@@ -58,7 +58,7 @@ class view extends base {
     /**
      * Generates the default view
      */
-    public function generate_default_view() {
+    public function generate_default_view(): void {
         // Get all the fields.
         $fields = $this->dlx->get_fields();
         if (!$fields) {
@@ -207,7 +207,7 @@ class view extends base {
      * @param string $name
      * @return array
      */
-    protected function apply_entry_group_layout($entriesset, $name = '') {
+    protected function apply_entry_group_layout($entriesset, $name = ''): array {
         global $OUTPUT;
 
         $tablehtml = trim($this->get_prepared_entry_template());
@@ -369,7 +369,7 @@ class view extends base {
      * @param array $fielddefinitions
      * @return array
      */
-    protected function entry_definition($fielddefinitions) {
+    protected function entry_definition($fielddefinitions): array {
         $elements = [];
         // Just store the definitions.
         // And group_entries_definition will process them.
@@ -383,7 +383,7 @@ class view extends base {
      * @param int $entryid
      * @return array
      */
-    protected function new_entry_definition($entryid = -1) {
+    protected function new_entry_definition($entryid = -1): array {
         $elements = [];
 
         // Get patterns definitions.

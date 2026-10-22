@@ -45,7 +45,7 @@ class field extends datalynxfield_no_content {
      *
      * @return bool
      */
-    public static function is_internal() {
+    public static function is_internal(): bool {
         return true;
     }
 
@@ -55,7 +55,7 @@ class field extends datalynxfield_no_content {
      * @param int $dataid
      * @return array
      */
-    public static function get_field_objects($dataid) {
+    public static function get_field_objects($dataid): array {
         $fieldobjects = [];
 
         $fieldobjects[self::_COMMENT] = (object) ['id' => self::_COMMENT, 'dataid' => $dataid,
@@ -68,7 +68,7 @@ class field extends datalynxfield_no_content {
     /**
      * TODO: use join?
      */
-    public function get_sort_sql() {
+    public function get_sort_sql(): string {
         return '';
     }
 
@@ -78,7 +78,7 @@ class field extends datalynxfield_no_content {
      * @param stdClass $params
      * @return array
      */
-    public function permissions($params) {
+    public function permissions($params): array {
         global $USER;
 
         if (
@@ -96,7 +96,7 @@ class field extends datalynxfield_no_content {
      *
      * @param stdClass $params
      */
-    public function validation($params) {
+    public function validation($params): bool {
         global $DB, $USER;
 
         // Validate context.

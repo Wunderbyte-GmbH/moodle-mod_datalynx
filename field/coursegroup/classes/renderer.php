@@ -82,7 +82,7 @@ class renderer extends datalynxfield_renderer {
      * @param stdClass $entry The current entry object.
      * @param ?array $options Rendering options.
      */
-    public function display_edit(&$mform, $entry, ?array $options = null) {
+    public function display_edit(&$mform, $entry, ?array $options = null): void {
         global $CFG, $DB, $PAGE;
 
         $field = $this->field;
@@ -235,7 +235,7 @@ class renderer extends datalynxfield_renderer {
      * @param string $value The current search value.
      * @return array Array of form elements and labels.
      */
-    public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
+    public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = ''): array {
         $fieldid = $this->field->id();
 
         if (is_array($value)) {
@@ -265,7 +265,7 @@ class renderer extends datalynxfield_renderer {
     /**
      * Array of patterns this field supports
      */
-    protected function patterns() {
+    protected function patterns(): array {
         // The parent::patterns() contributes [[fieldname]] plus a visible tag per user-created coursegroup
         // format. The legacy suffix modifiers stay recognised for old templates but hidden from menu.
         $patterns = parent::patterns();

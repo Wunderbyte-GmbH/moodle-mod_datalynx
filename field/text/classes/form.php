@@ -36,7 +36,7 @@ class form extends datalynxfield_form {
      *
      * @return void
      */
-    public function field_definition() {
+    public function field_definition(): void {
         global $OUTPUT, $PAGE;
 
         $mform = &$this->_form;
@@ -215,7 +215,7 @@ class form extends datalynxfield_form {
      *
      * @return bool true if duplicates are found.
      */
-    public function has_duplicates() {
+    public function has_duplicates(): bool {
         global $DB;
 
         $fieldid = $this->field->id();

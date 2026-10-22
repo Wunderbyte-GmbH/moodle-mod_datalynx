@@ -47,7 +47,7 @@ class restore_datalynx_activity_task extends restore_activity_task {
      *
      * @param int $ownerid
      */
-    public function set_ownerid($ownerid) {
+    public function set_ownerid($ownerid): void {
         $this->ownerid = $ownerid;
     }
 
@@ -372,8 +372,10 @@ class restore_datalynx_activity_task extends restore_activity_task {
      * Note this rules are applied when restoring course logs
      * by the restore final task, but are defined here at
      * activity level. All them are rules not linked to any module instance (cmid = 0)
+     *
+     * @return array
      */
-    public static function define_restore_log_rules_for_course() {
+    public static function define_restore_log_rules_for_course(): array {
         $rules = [];
 
         $rules[] = new restore_log_rule('datalynx', 'view all', 'index.php?id={course}', null);
@@ -384,7 +386,7 @@ class restore_datalynx_activity_task extends restore_activity_task {
     /**
      * Post-execution custom actions.
      */
-    public function after_restore() {
+    public function after_restore(): void {
         // 1. Get the version of datalynx used when the backup was created.
         $info = $this->get_info();
         $backupversion = $info->metadata->plugin_mod_datalynx_version ?? 0;

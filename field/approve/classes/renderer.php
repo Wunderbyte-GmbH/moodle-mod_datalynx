@@ -47,7 +47,7 @@ class renderer extends datalynxfield_renderer {
      * @param ?array  $options Rendering options.
      * @return array
      */
-    public function replacements(?array $tags = null, $entry = null, ?array $options = null) {
+    public function replacements(?array $tags = null, $entry = null, ?array $options = null): array {
         $dlx = $this->field->dlx();
 
         $canapprove = has_capability('mod/datalynx:approve', $dlx->context);
@@ -79,7 +79,7 @@ class renderer extends datalynxfield_renderer {
      * @param string $value The current search value.
      * @return array
      */
-    public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = '') {
+    public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = ''): array {
         $field = $this->field;
         $fieldid = $field->id();
 
@@ -103,7 +103,7 @@ class renderer extends datalynxfield_renderer {
      * @param ?array      $options Rendering options.
      * @return void
      */
-    public function display_edit(&$mform, $entry, ?array $options = null) {
+    public function display_edit(&$mform, $entry, ?array $options = null): void {
         $field = $this->field;
         $fieldid = $field->id();
         $entryid = $entry->id;
@@ -185,7 +185,7 @@ class renderer extends datalynxfield_renderer {
     /**
      * Array of patterns this field supports
      */
-    protected function patterns() {
+    protected function patterns(): array {
         $cat = get_string('actions', 'datalynx');
 
         $patterns = [];

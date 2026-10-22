@@ -48,7 +48,7 @@ class field extends datalynxfield_no_content {
      *
      * @return bool
      */
-    public static function is_internal() {
+    public static function is_internal(): bool {
         return true;
     }
 
@@ -58,7 +58,7 @@ class field extends datalynxfield_no_content {
      * @param int $dataid The datalynx instance id.
      * @return array
      */
-    public static function get_field_objects($dataid) {
+    public static function get_field_objects($dataid): array {
         $fieldobjects = [];
 
         $fieldobjects[self::_ENTRY] = (object) ['id' => self::_ENTRY, 'dataid' => $dataid,

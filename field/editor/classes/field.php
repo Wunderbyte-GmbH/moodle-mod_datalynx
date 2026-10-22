@@ -82,14 +82,14 @@ class field extends datalynxfield_base {
      *
      * @see datalynxfield_base::content_names()
      */
-    protected function content_names() {
+    protected function content_names(): array {
         return ['editor'];
     }
 
     /**
      * Returns true to indicate this is an editor field.
      */
-    public function is_editor() {
+    public function is_editor(): bool {
         return true;
     }
 
@@ -152,7 +152,7 @@ class field extends datalynxfield_base {
      *
      * @see datalynxfield_base::get_content_parts()
      */
-    public function get_content_parts() {
+    public function get_content_parts(): array {
         return ['content', 'content1'];
     }
 
@@ -165,7 +165,7 @@ class field extends datalynxfield_base {
      * @param mixed $entryid The entry id.
      * @return bool
      */
-    public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
+    public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null): bool {
         $fieldid = $this->field->id;
 
         parent::prepare_import_content($data, $importsettings, $csvrecord, $entryid);
@@ -194,7 +194,7 @@ class field extends datalynxfield_base {
      *
      * @return array
      */
-    public function get_supported_search_operators() {
+    public function get_supported_search_operators(): array {
         return ['' => get_string('empty', 'datalynx'), '=' => get_string('equal', 'datalynx'),
                 'LIKE' => get_string('contains', 'datalynx')];
     }
@@ -204,7 +204,7 @@ class field extends datalynxfield_base {
      * @param mixed $value The field value to check.
      * @return bool
      */
-    public static function is_fieldvalue_empty($value) {
+    public static function is_fieldvalue_empty($value): bool {
         if ($value['text'] == '') {
             return true;
         }

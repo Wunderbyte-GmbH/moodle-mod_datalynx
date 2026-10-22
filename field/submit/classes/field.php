@@ -36,7 +36,7 @@ class field extends datalynxfield_no_content {
      * @param int $dataid The datalynx activity id.
      * @return array
      */
-    public static function get_field_objects($dataid) {
+    public static function get_field_objects($dataid): array {
         $fieldobjects = [];
         $fieldobjects['submit'] = (object) [
             'id' => 'submit',
@@ -54,7 +54,7 @@ class field extends datalynxfield_no_content {
      *
      * @return boolean always true
      */
-    public static function is_internal() {
+    public static function is_internal(): bool {
         return true;
     }
 
@@ -72,7 +72,7 @@ class field extends datalynxfield_no_content {
      *
      * @return bool always false
      */
-    public function supports_search() {
+    public function supports_search(): bool {
         return false;
     }
 
@@ -81,7 +81,7 @@ class field extends datalynxfield_no_content {
      *
      * @return bool always false
      */
-    public function supports_sort() {
+    public function supports_sort(): bool {
         return false;
     }
 }

@@ -355,7 +355,7 @@ class datalynx_customfilter_manager {
      * @param datalynx_customfilter $filter
      * @return datalynx_customfilter_backend_form
      */
-    public function get_customfilter_backend_form($filter) {
+    public function get_customfilter_backend_form($filter): datalynx_customfilter_backend_form {
 
         $formurl = new moodle_url(
             '/mod/datalynx/customfilter/index.php',
@@ -372,7 +372,7 @@ class datalynx_customfilter_manager {
      * @param datalynx_customfilter $filter
      * @param ?array $urlparams
      */
-    public function display_filter_form($mform, $filter, $urlparams = null) {
+    public function display_filter_form($mform, $filter, $urlparams = null): void {
         $stredittitle = $filter->id ? get_string('filteredit', 'datalynx', $filter->name)
             : get_string('customfilternew', 'datalynx');
         $heading = html_writer::tag('h2', format_string($stredittitle), ['class' => 'mdl-align']);
@@ -415,7 +415,7 @@ class datalynx_customfilter_manager {
      * @throws \coding_exception
      * @throws \moodle_exception
      */
-    public function print_filter_list() {
+    public function print_filter_list(): void {
         global $OUTPUT;
 
         $dlx = $this->dlx;
@@ -503,7 +503,7 @@ class datalynx_customfilter_manager {
      * @throws \coding_exception
      * @throws \moodle_exception
      */
-    public function print_add_filter() {
+    public function print_add_filter(): void {
         echo html_writer::empty_tag('br');
         echo html_writer::start_tag('div', ['class' => 'fieldadd mdl-align']);
         echo html_writer::link(
@@ -526,7 +526,7 @@ class datalynx_customfilter_manager {
      * @return array
      * @throws \coding_exception
      */
-    public static function get_filter_options_from_url($url = null) {
+    public static function get_filter_options_from_url($url = null): array {
         $filteroptions = [      // Left: filteroption-names, right: urlparameter-names.
             'filterid' => ['filter', 0, PARAM_INT],
             'perpage' => ['uperpage', 0, PARAM_INT],

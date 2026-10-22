@@ -456,7 +456,7 @@ class datalynx {
      * @throws \coding_exception
      * @throws \dml_exception
      */
-    public function update($params, $notify = '') {
+    public function update($params, $notify = ''): bool {
         global $DB;
 
         if ($params) {
@@ -500,7 +500,7 @@ class datalynx {
      * @throws moodle_exception
      * @return string output
      */
-    public function set_page($page = 'view', ?array $params = null, $skiplogincheck = false) {
+    public function set_page($page = 'view', ?array $params = null, $skiplogincheck = false): string {
         global $CFG, $PAGE, $USER;
 
         $this->pagefile = $page;
@@ -804,7 +804,7 @@ class datalynx {
      *
      * @param ?array $params
      */
-    public function print_header(?array $params = null) {
+    public function print_header(?array $params = null): void {
         global $OUTPUT, $CFG;
 
         $params = (object) $params;
@@ -855,7 +855,7 @@ class datalynx {
      *
      * @param ?array $params
      */
-    public function print_footer(?array $params = null) {
+    public function print_footer(?array $params = null): void {
         global $OUTPUT;
 
         echo $OUTPUT->footer();
@@ -867,7 +867,7 @@ class datalynx {
      * @param mixed $view The view id.
      * @param mixed $filter The filter id.
      */
-    public function print_groups_menu($view, $filter) {
+    public function print_groups_menu($view, $filter): void {
         if ($this->groupmode && !in_array($this->groupmode, $this->internalgroupmodes)) {
             $returnurl = new moodle_url(
                 "/mod/datalynx/{$this->pagefile}.php",
@@ -880,7 +880,7 @@ class datalynx {
     /**
      * TODO: consider moving into the view
      */
-    public function print_rsslink() {
+    public function print_rsslink(): void {
         global $USER, $CFG;
         // Link to the RSS feed.
         if (
@@ -897,7 +897,7 @@ class datalynx {
     /**
      * TODO: consider moving into the view
      */
-    public function print_intro() {
+    public function print_intro(): void {
         global $OUTPUT;
         // TODO: MDL-00000 Make intro stickily closable. Display the intro only when there are no pages.
         if ($this->data->intro) {
@@ -910,7 +910,7 @@ class datalynx {
     /**
      * Set view content.
      */
-    public function set_content() {
+    public function set_content(): void {
         if (!empty($this->currentview)) {
             $this->currentview->process_data();
             $this->currentview->set_content();
@@ -949,7 +949,7 @@ class datalynx {
         int $viewid = 0,
         ?int $eids = null,
         array $options = ['tohtml' => true]
-    ) {
+    ): string {
         $urlparams = new stdClass();
         $dlx = new datalynx($datalynxid);
         $urlparams->d = $datalynxid;
@@ -1209,7 +1209,7 @@ class datalynx {
      * @return array
      * @throws \dml_exception
      */
-    public function get_fieldnames($sort = '') {
+    public function get_fieldnames($sort = ''): array {
         global $DB;
 
         $fieldnames = [];
@@ -1304,7 +1304,7 @@ class datalynx {
      * @param string $string
      * @return boolean
      */
-    private function is_html($string) {
+    private function is_html($string): bool {
         return preg_match("/<[^<]+>/", $string) != 0;
     }
 
@@ -1918,7 +1918,7 @@ class datalynx {
      * @param string $sort
      * @return array $viewids[viewid]
      */
-    public function get_views_menu(?array $exclude = null, $forceget = false, $sort = '') {
+    public function get_views_menu(?array $exclude = null, $forceget = false, $sort = ''): array {
         $views = [];
 
         if (!empty($this->get_view_records($forceget, $sort))) {
@@ -2467,7 +2467,7 @@ class datalynx {
      * @throws \coding_exception
      * @throws \dml_exception
      */
-    public function user_at_max_entries($perinterval = false) {
+    public function user_at_max_entries($perinterval = false): bool {
         if (
             $this->data->maxentries < 0 ||
                 has_capability('mod/datalynx:manageentries', $this->context)
@@ -2490,7 +2490,7 @@ class datalynx {
      * @throws \dml_exception
      * @throws coding_exception
      */
-    public function user_can_view_all_entries(?array $options = null) {
+    public function user_can_view_all_entries(?array $options = null): bool {
         global $OUTPUT;
         if (has_capability('mod/datalynx:manageentries', $this->context)) {
             return true;
@@ -2534,7 +2534,7 @@ class datalynx {
      * @return bool
      * @throws \coding_exception
      */
-    public function user_can_export_entry(?stdClass $entry = null) {
+    public function user_can_export_entry(?stdClass $entry = null): bool {
         global $CFG, $USER;
         // We need portfolios for export.
         if (!empty($CFG->enableportfolios)) {
@@ -2570,7 +2570,7 @@ class datalynx {
      * @return boolean
      * @throws \coding_exception
      */
-    public function user_can_manage_entry(?object $entry = null, bool $allowfinalfieldedit = false) {
+    public function user_can_manage_entry(?object $entry = null, bool $allowfinalfieldedit = false): bool {
         global $USER, $CFG;
 
         // Teachers can always manage entries.
@@ -2675,7 +2675,7 @@ class datalynx {
      * @param ?stdClass $entry
      * @return bool
      */
-    public function teammember_can_edit(?stdClass $entry = null) {
+    public function teammember_can_edit(?stdClass $entry = null): bool {
         global $USER;
         // Get all teammemberselect fields, that allow editing of entry.
         $teammemberfields = $this->get_fields_by_type('teammemberselect');
@@ -2800,7 +2800,7 @@ class datalynx {
      * @return array
      * @throws \coding_exception
      */
-    public function get_datalynx_permission_names($absoluteonly = false, $includeadmin = false) {
+    public function get_datalynx_permission_names($absoluteonly = false, $includeadmin = false): array {
         $permissions = [];
 
         if ($includeadmin) {
@@ -2998,7 +2998,7 @@ class datalynx {
      *
      * @param object $fieldinput Field input object passed by reference.
      */
-    public function convert_arrays_to_strings(&$fieldinput) {
+    public function convert_arrays_to_strings(&$fieldinput): void {
         foreach ($fieldinput as $key => $val) {
             if (is_array($val)) {
                 $str = '';
@@ -3017,7 +3017,7 @@ class datalynx {
      * @param string $event Event name.
      * @param object $data Event data object.
      */
-    public function events_trigger($event, $data) {
+    public function events_trigger($event, $data): void {
         $data->dlx = $this;
         $data->coursename = $this->course->shortname;
         $data->datalynxname = $this->name();
@@ -3093,7 +3093,7 @@ class datalynx {
      * @param int $id datalynx-instance-ID
      * @return string[] array with used text-fields-values!
      */
-    public function get_distinct_textfieldvalues_by_id($id) {
+    public function get_distinct_textfieldvalues_by_id($id): array {
         global $DB;
 
         $sql = "SELECT DISTINCT c.content FROM {datalynx_contents} c WHERE c.fieldid = :fieldid ORDER BY c.content";

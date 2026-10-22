@@ -68,7 +68,7 @@ class field extends FileField {
      * @param ?stdClass $fromform Data from the form.
      * @return bool
      */
-    public function update_field($fromform = null) {
+    public function update_field($fromform = null): bool {
         global $DB, $OUTPUT;
 
         // Get the old field data so that we can check whether the thumbnail dimensions have changed.
@@ -115,7 +115,7 @@ class field extends FileField {
     /**
      * Delete a field completely
      */
-    public function delete_field() {
+    public function delete_field(): bool {
         global $DB;
 
         if (!empty($this->field->id)) {

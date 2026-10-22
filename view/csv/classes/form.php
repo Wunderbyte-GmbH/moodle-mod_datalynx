@@ -41,7 +41,7 @@ class form extends datalynxview_base_form {
     /**
      * Add view specific elements to the form.
      */
-    public function view_definition_after_gps() {
+    public function view_definition_after_gps(): void {
         $mform = &$this->_form;
 
         $mform->addElement('header', 'settingshdr', get_string('settings'));
@@ -87,7 +87,7 @@ class form extends datalynxview_base_form {
      *
      * @param stdClass $data
      */
-    public function data_preprocessing(&$data) {
+    public function data_preprocessing(&$data): void {
         parent::data_preprocessing($data);
         // CSV settings.
         if (!empty($data->param1)) {

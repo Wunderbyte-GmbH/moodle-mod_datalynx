@@ -64,7 +64,7 @@ final class view_text_filter_test extends advanced_testcase {
      * @param string $param2 Entry template.
      * @return \mod_datalynx\local\view\base
      */
-    private function make_view(string $section, string $param2) {
+    private function make_view(string $section, string $param2): \mod_datalynx\local\view\base {
         global $DB;
 
         $record = (object) [

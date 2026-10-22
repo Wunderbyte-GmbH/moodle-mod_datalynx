@@ -38,7 +38,7 @@ class form extends datalynxfield_form {
      *
      * @return void
      */
-    public function field_definition() {
+    public function field_definition(): void {
         $mform = &$this->_form;
 
         $mform->addElement(

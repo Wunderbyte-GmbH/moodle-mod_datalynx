@@ -137,7 +137,7 @@ class field extends datalynxfield_option_multiple {
      * @param ?stdClass $forminput Form input data object or null to use defaults.
      * @see datalynxfield_option::set_field()
      */
-    public function set_field($forminput = null) {
+    public function set_field($forminput = null): void {
         $this->field = new stdClass();
         $this->field->id = !empty($forminput->id) ? $forminput->id : 0;
         $this->field->type = $this->type;
@@ -225,7 +225,7 @@ class field extends datalynxfield_option_multiple {
      *
      * @return array
      */
-    public function get_supported_search_operators() {
+    public function get_supported_search_operators(): array {
         return ['ANY_OF' => get_string('anyof', 'datalynx'),
                 'ALL_OF' => get_string('allof', 'datalynx'),
                 '' => get_string('empty', 'datalynx')];
@@ -241,7 +241,7 @@ class field extends datalynxfield_option_multiple {
      * @return bool True on success.
      * @see datalynxfield_base::prepare_import_content()
      */
-    public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null) {
+    public function prepare_import_content(&$data, $importsettings, $csvrecord = null, $entryid = null): bool {
         // Import only from csv.
         if ($csvrecord) {
             $fieldid = $this->field->id;

@@ -79,7 +79,7 @@ class field extends datalynxfield_no_content {
      *
      * @return bool
      */
-    public function supports_group_by() {
+    public function supports_group_by(): bool {
         return true;
     }
 
@@ -88,7 +88,7 @@ class field extends datalynxfield_no_content {
      *
      * @return bool
      */
-    public static function is_internal() {
+    public static function is_internal(): bool {
         return true;
     }
 
@@ -99,7 +99,7 @@ class field extends datalynxfield_no_content {
      * @param array|null $fields Existing user-defined fields (unused here; kept for signature compatibility).
      * @return array
      */
-    public static function get_field_objects($dataid, $fields = null) {
+    public static function get_field_objects($dataid, $fields = null): array {
         $fieldobjects = [];
 
         $fieldobjects[self::_USERID] = (object) ['id' => self::_USERID, 'dataid' => $dataid,
@@ -243,7 +243,7 @@ class field extends datalynxfield_no_content {
      *
      * @return string
      */
-    public function get_sort_sql() {
+    public function get_sort_sql(): string {
         if ($this->field->internalname != 'picture') {
             if ($this->field->internalname == 'name') {
                 $internalname = 'id';
@@ -309,7 +309,7 @@ class field extends datalynxfield_no_content {
      * @param int $sortdir Sort direction (0=ASC, 1=DESC).
      * @return array Distinct content values.
      */
-    public function get_distinct_content($sortdir = 0) {
+    public function get_distinct_content($sortdir = 0): array {
         global $DB;
 
         $sortdir = $sortdir ? 'DESC' : 'ASC';

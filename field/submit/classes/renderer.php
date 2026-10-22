@@ -36,7 +36,7 @@ class renderer extends datalynxfield_renderer {
      * @param string $text
      * @return array
      */
-    public function search($text) {
+    public function search($text): array {
         $found = [];
         $matches = [];
         if (preg_match_all('/##submit(?::[^#]+)?##(?:@)?/', $text, $matches)) {
@@ -53,7 +53,7 @@ class renderer extends datalynxfield_renderer {
      * @param ?array $options
      * @return array
      */
-    public function replacements(?array $tags = null, ?stdClass $entry = null, ?array $options = null) {
+    public function replacements(?array $tags = null, ?stdClass $entry = null, ?array $options = null): array {
         $edit = !empty($options['edit']) ? $options['edit'] : false;
         $replacements = [];
 
@@ -97,7 +97,7 @@ class renderer extends datalynxfield_renderer {
      * @param stdClass $entry
      * @param array $options
      */
-    public function display_edit(&$mform, $entry, array $options = []) {
+    public function display_edit(&$mform, $entry, array $options = []): void {
         $label = get_string('savechanges');
         $class = 'datalynx-custom-submit';
 
@@ -137,7 +137,7 @@ class renderer extends datalynxfield_renderer {
      *
      * @return array
      */
-    protected function patterns() {
+    protected function patterns(): array {
         $cat = get_string('formactions', 'datalynx');
         return [
             '##submit##' => [true, $cat],

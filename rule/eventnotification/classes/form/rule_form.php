@@ -34,7 +34,7 @@ class rule_form extends base_rule_form {
     /**
      * Definition of the rule settings form
      */
-    public function rule_definition() {
+    public function rule_definition(): void {
         $br = html_writer::empty_tag('br');
         $mform = &$this->_form;
 
@@ -298,7 +298,7 @@ class rule_form extends base_rule_form {
      * @param \mod_datalynx\local\field\datalynxfield_base|null $field the chosen field, if any
      * @param array $criterion the stored row, if any
      */
-    private function match_row(int $count, array $fieldoptions, array $units, $field, array $criterion) {
+    private function match_row(int $count, array $fieldoptions, array $units, $field, array $criterion): void {
         $mform = &$this->_form;
 
         $arr = [];

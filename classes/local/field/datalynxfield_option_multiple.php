@@ -73,7 +73,7 @@ class datalynxfield_option_multiple extends datalynxfield_option {
      * @see datalynxfield_option::update_options()
      * @param array $map Mapping of old option keys to new option keys.
      */
-    public function update_options($map = []) {
+    public function update_options($map = []): void {
         global $DB;
         $params = [];
         $i = 0;
@@ -112,7 +112,7 @@ class datalynxfield_option_multiple extends datalynxfield_option {
      *
      * @see datalynxfield_base::supports_group_by()
      */
-    public function supports_group_by() {
+    public function supports_group_by(): bool {
         return false;
     }
 
@@ -126,7 +126,7 @@ class datalynxfield_option_multiple extends datalynxfield_option {
      * @param ?array $values Values from the entry form.
      * @return array
      */
-    protected function format_content($entry, ?array $values = null) {
+    protected function format_content($entry, ?array $values = null): array {
         $fieldid = $this->field->id;
         $contents = [];
         $oldcontents = [];
@@ -329,7 +329,7 @@ class datalynxfield_option_multiple extends datalynxfield_option {
      * @param string $operator
      * @return int
      */
-    public function get_argument_count(string $operator) {
+    public function get_argument_count(string $operator): int {
         if ($operator === "") { // Empty operator requires no argument.
             return 0;
         } else {

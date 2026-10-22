@@ -34,7 +34,7 @@ class form extends FileForm {
     /**
      * Define the field attributes.
      */
-    public function field_definition() {
+    public function field_definition(): void {
         global $CFG;
 
         $mform = &$this->_form;
@@ -145,7 +145,7 @@ class form extends FileForm {
     /**
      * Define the file types attributes.
      */
-    public function filetypes_definition() {
+    public function filetypes_definition(): void {
         $mform = &$this->_form;
 
         // Accetped types.

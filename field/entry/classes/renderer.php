@@ -48,7 +48,7 @@ class renderer extends datalynxfield_renderer {
      * @param ?array  $options Rendering options.
      * @return array
      */
-    public function replacements(?array $tags = null, $entry = null, ?array $options = null) {
+    public function replacements(?array $tags = null, $entry = null, ?array $options = null): array {
         $manageable = !empty($options['manage']) ? $options['manage'] : false;
         $manageable = $manageable && ((isset($entry->status) &&
                                 $entry->status != datalynxfield_status::STATUS_FINAL_SUBMISSION) ||
@@ -286,7 +286,7 @@ class renderer extends datalynxfield_renderer {
     /**
      * Array of patterns this field supports
      */
-    protected function patterns() {
+    protected function patterns(): array {
         $patterns = [];
 
         // Actions.

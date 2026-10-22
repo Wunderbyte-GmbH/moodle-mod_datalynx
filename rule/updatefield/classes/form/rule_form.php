@@ -36,7 +36,7 @@ class rule_form extends base_rule_form {
      * The base form already renders name/description/enabled, the triggering events and the
      * trigger-condition rows.
      */
-    public function rule_definition() {
+    public function rule_definition(): void {
         $mform = &$this->_form;
 
         // Only-on-change field selection: the rule fires only when at least one of the

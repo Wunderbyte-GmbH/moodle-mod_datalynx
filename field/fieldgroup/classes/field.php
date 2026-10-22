@@ -59,7 +59,7 @@ class field extends datalynxfield_base {
      *
      * @return string[]
      */
-    protected function content_names() {
+    protected function content_names(): array {
         return [''];
     }
 
@@ -68,7 +68,7 @@ class field extends datalynxfield_base {
      *
      * @return bool
      */
-    public function supports_group_by() {
+    public function supports_group_by(): bool {
         return false;
     }
 
@@ -77,7 +77,7 @@ class field extends datalynxfield_base {
      *
      * @return bool
      */
-    public function get_supported_search_operators() {
+    public function get_supported_search_operators(): bool {
         return false;
     }
 
@@ -86,7 +86,7 @@ class field extends datalynxfield_base {
      *
      * @return bool
      */
-    public static function is_customfilterfield() {
+    public static function is_customfilterfield(): bool {
         return false;
     }
 
@@ -95,7 +95,7 @@ class field extends datalynxfield_base {
      *
      * @return string
      */
-    public function get_select_sql() {
+    public function get_select_sql(): string {
         return '';
     }
 
@@ -104,7 +104,7 @@ class field extends datalynxfield_base {
      *
      * @return string
      */
-    public function get_sort_sql() {
+    public function get_sort_sql(): string {
         return '';
     }
 
@@ -114,7 +114,7 @@ class field extends datalynxfield_base {
      * @param ?string $suffix
      * @return bool
      */
-    protected function filearea($suffix = null) {
+    protected function filearea($suffix = null): bool {
         return false;
     }
 }

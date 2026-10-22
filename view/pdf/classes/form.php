@@ -36,7 +36,7 @@ class form extends datalynxview_base_form {
     /**
      * Add view specific elements to the form
      */
-    public function view_definition_after_gps() {
+    public function view_definition_after_gps(): void {
         $view = $this->view;
         $editoroptions = $view->editors();
         $editorattr = ['cols' => 40, 'rows' => 12];
@@ -364,7 +364,7 @@ class form extends datalynxview_base_form {
      *
      * @param stdClass $data
      */
-    public function data_preprocessing(&$data) {
+    public function data_preprocessing(&$data): void {
         parent::data_preprocessing($data);
 
         $view = $this->view;

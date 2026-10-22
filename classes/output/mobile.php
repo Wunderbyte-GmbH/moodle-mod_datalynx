@@ -31,7 +31,7 @@ class mobile {
      * @param  array $args Arguments from tool_mobile_get_content WS
      * @return array HTML, javascript and otherdata
      */
-    public static function mobile_course_view($args) {
+    public static function mobile_course_view($args): array {
         global $USER, $CFG;
         require_once("$CFG->dirroot/mod/datalynx/classes/datalynx.php");
 
