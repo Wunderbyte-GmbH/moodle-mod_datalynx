@@ -1898,7 +1898,7 @@ abstract class base {
         $sortfields = [];
         if ($this->filter->customsort) {
             $sortfields = unserialize($this->filter->customsort);
-            if ($insort = in_array($fieldid, array_keys($sortfields))) {
+            if (in_array($fieldid, array_keys($sortfields))) {
                 $sortdir = $sortfields[$fieldid];
                 unset($sortfields[$fieldid]);
             }

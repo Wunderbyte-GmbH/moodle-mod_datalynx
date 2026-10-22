@@ -126,7 +126,8 @@ abstract class datalynxfield_option extends datalynxfield_base {
         }
 
         $map = [0 => 0];
-        for ($i = 1; $i <= count($oldvalues); $i++) {
+        $oldcount = count($oldvalues);
+        for ($i = 1; $i <= $oldcount; $i++) {
             $j = array_search($oldvalues[$i], $newvalues);
             if ($j !== false) {
                 $map[$i] = $j;

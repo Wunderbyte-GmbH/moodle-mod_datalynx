@@ -87,7 +87,7 @@ final class field_search_operator_test extends advanced_testcase {
     public function test_allowed_operator_is_used(string $operator): void {
         $field = $this->create_text_field();
 
-        [$sql, $params, $usecontent] = $field->get_search_sql(['', $operator, '42']);
+        [$sql, $params] = $field->get_search_sql(['', $operator, '42']);
 
         $this->assertNotSame('', $sql, "operator $operator should produce SQL");
         $this->assertStringContainsString(" $operator :", $sql);

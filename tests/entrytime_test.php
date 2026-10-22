@@ -166,8 +166,6 @@ final class entrytime_test extends advanced_testcase {
      * Test entrytime rendering when the timestamp is null or empty.
      */
     public function test_entrytime_rendering_empty(): void {
-        global $DB;
-
         $course = $this->getDataGenerator()->create_course();
         $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
         $dlx = new datalynx($instance->id);

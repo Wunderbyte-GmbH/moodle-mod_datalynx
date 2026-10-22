@@ -129,7 +129,7 @@ class renderer extends SelectRenderer {
 
             $steps = [];
             $i = 0;
-            foreach ($menuoptions as $key => $label) {
+            foreach ($menuoptions as $label) {
                 $iconclass = '';
                 if (isset($icons[$i]) && $icons[$i] !== '') {
                     $iconclass = $icons[$i];

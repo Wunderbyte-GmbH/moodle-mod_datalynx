@@ -191,7 +191,7 @@ class field extends datalynxfield_base {
     public function get_search_sql(array $search): array {
         global $DB;
 
-        [$not, $operator, $searchdata] = $search;
+        [, , $searchdata] = $search;
 
         static $i = 0;
         $i++;

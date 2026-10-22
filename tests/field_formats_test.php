@@ -127,7 +127,7 @@ final class field_formats_test extends advanced_testcase {
         $view->type = 'grid';
         $view->description = '';
         $view->section = '##mytime:customdate##';
-        $viewid = $DB->insert_record('datalynx_views', $view);
+        $DB->insert_record('datalynx_views', $view);
 
         // Attempt deletion, expecting exception.
         $this->expectException(\moodle_exception::class);
@@ -352,7 +352,7 @@ final class field_formats_test extends advanced_testcase {
         $formatrec->name = 'avg:bar';
         $formatrec->fieldtype = 'rating';
         $formatrec->settings = json_encode([]);
-        $formatid = $DB->insert_record('datalynx_field_formats', $formatrec);
+        $DB->insert_record('datalynx_field_formats', $formatrec);
 
         // 4. Run the replacement and upgrade migration logic (simulating what upgrade.php does).
         // A. View templates replacement
@@ -420,7 +420,7 @@ final class field_formats_test extends advanced_testcase {
      */
     public function test_new_field_format_options(): void {
         $course = $this->getDataGenerator()->create_course();
-        $dlx = new datalynx($this->getDataGenerator()->create_module('datalynx', ['course' => $course->id])->id);
+        $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
 
         // Test multiselect/checkbox default settings and formatting.
         $multiselectformat = \mod_datalynx\local\field_format\manager::get_format_instance((object)[

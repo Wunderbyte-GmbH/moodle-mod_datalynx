@@ -44,8 +44,6 @@ class tool {
      * @return array|null [good/bad status, message] or null if form is rendered and exits.
      */
     public static function run($dlx) {
-        global $PAGE, $OUTPUT;
-
         // Find the default view or the first view containing the ##edit## tag.
         $views = $dlx->get_views();
         $defaultviewid = 0;
@@ -149,7 +147,7 @@ class tool {
                 $processed = $em->process_entries('update', $entriesdata->eids, $entriesdata, true);
 
                 if (is_array($processed)) {
-                    [$strnotify, $processedeids] = $processed;
+                    [, $processedeids] = $processed;
                     $entriesprocessed = $processedeids ? count($processedeids) : 0;
                     if ($entriesprocessed) {
                         return ['good', get_string('success', 'datalynxtool_entryperuser')];

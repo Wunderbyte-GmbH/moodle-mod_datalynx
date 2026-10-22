@@ -137,8 +137,6 @@ final class matching_test extends advanced_testcase {
      * @return int[]
      */
     protected function counterparts(int $subjectid, ?int $tolerance = null): array {
-        global $DB;
-
         $criterion = ['fieldid' => (int) $this->field->id(), 'op' => match_compiler::OP_WITHIN];
         if ($tolerance !== null) {
             $criterion['tolerance'] = $tolerance;

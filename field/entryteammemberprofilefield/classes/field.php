@@ -207,16 +207,6 @@ class field extends datalynxfield_no_content_can_join {
     }
 
     /**
-     * Wraps a value in double quotes for use in JSON-style content matching.
-     *
-     * @param mixed $value
-     * @return string
-     */
-    private function wrap_ids($value) {
-        return "\"$value\"";
-    }
-
-    /**
      * Returns users whose profile field matches the given value.
      *
      * @param string $profilefieldname

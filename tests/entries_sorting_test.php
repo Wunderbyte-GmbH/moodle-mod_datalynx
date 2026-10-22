@@ -77,7 +77,6 @@ final class entries_sorting_test extends advanced_testcase {
             'param10' => '',
         ];
         $fieldid = (int) $DB->insert_record('datalynx_fields', $fieldrecord);
-        $field = new \datalynxfield_duration\field($dlx, $DB->get_record('datalynx_fields', ['id' => $fieldid]));
 
         // 3. Create three entries with different duration contents (e.g. 100, 300, 200).
         $entry1id = (int) $DB->insert_record('datalynx_entries', (object) [
@@ -204,7 +203,6 @@ final class entries_sorting_test extends advanced_testcase {
             'param10' => '',
         ];
         $fieldid = (int) $DB->insert_record('datalynx_fields', $fieldrecord);
-        $field = new \datalynxfield_duration\field($dlx, $DB->get_record('datalynx_fields', ['id' => $fieldid]));
 
         // 3. Create three entries with different duration contents (e.g. 100, 300, 200).
         $entry1id = (int) $DB->insert_record('datalynx_entries', (object) [

@@ -235,7 +235,7 @@ final class rule_ride_matching_test extends advanced_testcase {
         global $DB;
 
         $waypoints = [];
-        foreach ($places as $index => $place) {
+        foreach ($places as $place) {
             [$lat, $lng] = self::PLACES[$place];
             $waypoints[] = [
                 'address' => $place,

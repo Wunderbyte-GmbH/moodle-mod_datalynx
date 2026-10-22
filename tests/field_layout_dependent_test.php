@@ -60,7 +60,7 @@ final class field_layout_dependent_test extends advanced_testcase {
         $fieldrecord->id = (int) $DB->insert_record('datalynx_fields', $fieldrecord);
 
         // Create a custom renderer layout.
-        $rendererid = (int) $DB->insert_record('datalynx_renderers', (object) [
+        $DB->insert_record('datalynx_renderers', (object) [
             'dataid' => $dlx->id(),
             'type' => 'field',
             'name' => 'MyLayout',
@@ -70,7 +70,7 @@ final class field_layout_dependent_test extends advanced_testcase {
         ]);
 
         // Create a non-editable behavior.
-        $behaviorid = (int) $DB->insert_record('datalynx_behaviors', (object) [
+        $DB->insert_record('datalynx_behaviors', (object) [
             'dataid' => $dlx->id(),
             'name' => 'MyBehavior',
             'description' => '',

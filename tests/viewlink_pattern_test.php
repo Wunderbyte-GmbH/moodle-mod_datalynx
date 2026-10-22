@@ -656,7 +656,7 @@ final class viewlink_pattern_test extends advanced_testcase {
      * @covers ::get_regexp_replacements
      */
     public function test_viewsesslink_rendered_in_edit_mode_when_targeting_different_view(): void {
-        [$dlx, $targetobj, $templateobj] = $this->create_test_views(
+        [, , $templateobj] = $this->create_test_views(
             '##viewsesslink:myview;Go to Step 1;editentries=##entryid##;badge##'
         );
 

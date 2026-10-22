@@ -239,7 +239,7 @@ class manager {
      * @return void
      */
     public static function auto_create_formats_from_templates(int $datalynxid): void {
-        global $DB, $CFG;
+        global $DB;
 
         // Fetch all fields for this datalynx instance.
         $fields = $DB->get_records('datalynx_fields', ['dataid' => $datalynxid]);
@@ -509,7 +509,7 @@ class manager {
             }
         } catch (\Exception $e) {
             // Safe fallback during early DB upgrade stages if table/fields do not exist yet.
-            $unused = $e;
+            return;
         }
     }
 }

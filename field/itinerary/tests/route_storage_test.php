@@ -99,8 +99,6 @@ final class route_storage_test extends advanced_testcase {
      * @param ?string $route JSON route summary the picker would have sent.
      */
     protected function save(int $entryid, array $places, ?string $route): void {
-        global $DB;
-
         $waypoints = [];
         foreach ($places as $place) {
             [$lat, $lng] = self::PLACES[$place];

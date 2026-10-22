@@ -138,8 +138,6 @@ class rule extends base {
      * @return bool
      */
     public function trigger(\core\event\base $event) {
-        global $DB;
-
         $eventname = (new \ReflectionClass($event))->getShortName();
         $teamfieldid = 0;
         if (strpos($eventname, 'team') !== false) {
@@ -701,8 +699,6 @@ class rule extends base {
      * @return array IDs of recipient users
      */
     protected function get_recipients_by_permission(context $context, $permissions) {
-        global $DB;
-
         $allneeded = [];
         $allforbidden = [];
 
@@ -720,11 +716,6 @@ class rule extends base {
                 $allforbidden = array_merge($allforbidden, $forbidden);
             }
         }
-
-        [$contextlist, $params1] = $DB->get_in_or_equal(
-            $context->get_parent_context_ids(true),
-            SQL_PARAMS_NAMED
-        );
 
         $users = [];
         if (!empty($allneeded)) {

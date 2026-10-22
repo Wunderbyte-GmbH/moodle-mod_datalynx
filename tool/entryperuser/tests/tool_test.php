@@ -189,7 +189,7 @@ final class tool_test extends advanced_testcase {
         $processed = $em->process_entries('update', $entriesdata->eids, $entriesdata, true);
 
         $this->assertIsArray($processed);
-        [$strnotify, $processedeids] = $processed;
+        [, $processedeids] = $processed;
         $this->assertCount(2, $processedeids);
 
         // Verify created entries in database.
@@ -242,7 +242,7 @@ final class tool_test extends advanced_testcase {
             'name' => 'testfield',
             'description' => '',
         ];
-        $fieldid = $DB->insert_record('datalynx_fields', $fieldrecord);
+        $DB->insert_record('datalynx_fields', $fieldrecord);
 
         // Add a required behavior.
         $behaviorrecord = (object) [

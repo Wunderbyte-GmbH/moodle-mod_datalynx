@@ -958,12 +958,10 @@ class datalynx {
 
         // It's used nowhere but keeping for backwards compatibility.
         $urlparams->pagelayout = 'external';
-        $filteroptions = true;
 
         // In case we come from the app, do stuff.
         if (isset($options['pagelayout']) && $options['pagelayout'] == 'mobile') {
             $urlparams->pagelayout = 'mobile';
-            $filteroptions = ['eids' => $eids];
         }
 
         // NOTE: The app ignores urlparams, added filter to view constructor.

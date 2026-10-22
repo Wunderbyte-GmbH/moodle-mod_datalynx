@@ -79,7 +79,7 @@ final class location_field_test extends advanced_testcase {
      * Test location field content formatting and update logic.
      */
     public function test_format_content(): void {
-        [$dlx, $fieldobj, $field] = $this->create_location_field_fixture();
+        [, $fieldobj] = $this->create_location_field_fixture();
 
         $entry = new stdClass();
         $entry->id = 1;
@@ -93,7 +93,7 @@ final class location_field_test extends advanced_testcase {
         // Access protected format_content method.
         $ref = new \ReflectionMethod($fieldobj, 'format_content');
         $ref->setAccessible(true);
-        [$contents, $oldcontents] = $ref->invoke($fieldobj, $entry, $values);
+        [$contents] = $ref->invoke($fieldobj, $entry, $values);
 
         $this->assertCount(3, $contents);
         $this->assertEquals('Alexanderplatz 1, 10178 Berlin', $contents[0]);
@@ -148,7 +148,7 @@ final class location_field_test extends advanced_testcase {
      * Test search parameter parsing.
      */
     public function test_parse_search(): void {
-        [$dlx, $fieldobj, $field] = $this->create_location_field_fixture();
+        [, $fieldobj, $field] = $this->create_location_field_fixture();
 
         $fieldid = $field->id;
         $i = 0;
@@ -172,7 +172,7 @@ final class location_field_test extends advanced_testcase {
      * Test Haversine SQL query generation for distance search.
      */
     public function test_get_search_sql_haversine(): void {
-        [$dlx, $fieldobj, $field] = $this->create_location_field_fixture();
+        [, $fieldobj] = $this->create_location_field_fixture();
 
         $searchdata = [
             'address' => 'Stephansplatz, Wien',
@@ -195,7 +195,7 @@ final class location_field_test extends advanced_testcase {
      */
     public function test_update_content_persistence(): void {
         global $DB;
-        [$dlx, $fieldobj, $field] = $this->create_location_field_fixture();
+        [$dlx, $fieldobj] = $this->create_location_field_fixture();
 
         $entryid = (int) $DB->insert_record('datalynx_entries', (object) [
             'dataid' => $dlx->id(),

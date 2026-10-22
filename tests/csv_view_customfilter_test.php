@@ -134,7 +134,7 @@ final class csv_view_customfilter_test extends advanced_testcase {
         $this->resetAfterTest();
         $this->setAdminUser();
 
-        [$dlx, $viewrecord, $fieldid, $entryone, $entrytwo, $entrythree] = $this->create_multiselect_fixture();
+        [$dlx, $viewrecord, $fieldid] = $this->create_multiselect_fixture();
 
         // Build a customsearch that matches only entries with Opt2 (key '2').
         $searchfields = [$fieldid => ['AND' => [['', 'ANY_OF', ['2']]]]];

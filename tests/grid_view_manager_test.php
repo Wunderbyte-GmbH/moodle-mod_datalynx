@@ -141,7 +141,7 @@ final class grid_view_manager_test extends advanced_testcase {
      * @covers ::requires_rendered_entry_html
      */
     public function test_custom_entry_template_is_honoured_and_reflects_edits(): void {
-        global $DB, $USER;
+        global $DB;
 
         $this->resetAfterTest();
         $this->setAdminUser();

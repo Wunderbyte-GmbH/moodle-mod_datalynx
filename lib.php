@@ -941,7 +941,7 @@ function datalynx_user_outline($course, $user, $mod, $data) {
  * @param stdClass $data Datalynx instance object.
  */
 function datalynx_user_complete($course, $user, $mod, $data) {
-    global $DB, $CFG;
+    global $CFG;
     require_once("$CFG->libdir/gradelib.php");
 
     $grades = grade_get_grades($course->id, 'mod', 'datalynx', $data->id, $user->id);

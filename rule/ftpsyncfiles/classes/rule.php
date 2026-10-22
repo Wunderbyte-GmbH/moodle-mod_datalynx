@@ -218,7 +218,6 @@ class rule extends base {
                     }
                 }
             }
-            curl_close($ch);
             foreach ($remotelist as $line) {
                 $filename = trim($line);
                 if (!empty($filename) && $filename !== '.' && $filename !== '..') {
@@ -232,7 +231,6 @@ class rule extends base {
                             curl_setopt($ch, CURLOPT_QUOTE, ["rm \"$filename\""]);
                             $deleteresult = curl_exec($ch);
                             if ($deleteresult === false) {
-                                curl_close($ch);
                                 $ch1 = $this->init_curl($server, $connection);
                                 // Tried to delete files using different char encodings. Now checking if dir is empty.
                                 $response = curl_exec($ch1);
@@ -249,7 +247,6 @@ class rule extends base {
                                         ' There was a problem deleting all files.' . PHP_EOL);
                                     }
                                 }
-                                curl_close($ch1);
                             } else {
                                 mtrace("Deleted $filename successfully." . PHP_EOL);
                             }
@@ -262,15 +259,16 @@ class rule extends base {
                 }
             }
         }
-        curl_close($ch);
     }
 
     /**
      * Initialise curl session with necessary params.
      *
+     * The handle is released automatically when it goes out of scope (PHP 8+), so no explicit close is needed.
+     *
      * @param string $server
      * @param string $connection
-     * @return false|resource
+     * @return \CurlHandle|false
      */
     public function init_curl(string $server, string $connection) {
         $ch = curl_init();

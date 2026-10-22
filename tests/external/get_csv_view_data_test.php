@@ -375,7 +375,7 @@ final class get_csv_view_data_test extends advanced_testcase {
         $this->resetAfterTest();
         $this->setAdminUser();
 
-        [$dlx, $view, $fieldid, $entryone, $entrytwo] = $this->create_csv_multiselect_fixture();
+        [$dlx, $view, , $entryone, $entrytwo] = $this->create_csv_multiselect_fixture();
         // A PHP-serialized object string — the pre-fix code would have unserialized this.
         $payload = serialize((object) ['injected' => true]);
 

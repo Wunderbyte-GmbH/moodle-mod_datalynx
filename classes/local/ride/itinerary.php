@@ -209,7 +209,8 @@ class itinerary {
      */
     public function length_km(): float {
         $total = 0.0;
-        for ($i = 1; $i < count($this->waypoints); $i++) {
+        $count = count($this->waypoints);
+        for ($i = 1; $i < $count; $i++) {
             $total += $this->waypoints[$i - 1]->distance_to($this->waypoints[$i]);
         }
 

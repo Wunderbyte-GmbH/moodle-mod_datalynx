@@ -107,11 +107,11 @@ final class entryauthor_field_renderer_test extends advanced_testcase {
 
         $this->assertIsArray($tags);
         // Ensure no option values are arrays (which would cause the HTML writer error).
-        foreach ($tags as $cat => $sub) {
+        foreach ($tags as $sub) {
             $this->assertIsArray($sub);
-            foreach ($sub as $subcat => $items) {
+            foreach ($sub as $items) {
                 $this->assertIsArray($items);
-                foreach ($items as $tag => $label) {
+                foreach ($items as $label) {
                     $this->assertIsString($label);
                 }
             }

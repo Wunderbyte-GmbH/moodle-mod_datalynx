@@ -112,8 +112,6 @@ class view extends base {
      * @return string
      */
     public function display(array $options = []): string {
-        global $PAGE;
-
         $tohtml = $options['tohtml'] ?? false;
         $inlinefieldview = !empty($options['fieldview']);
         $browsemode = !$inlinefieldview && !$this->returntoentriesform && !$this->user_is_editing() &&

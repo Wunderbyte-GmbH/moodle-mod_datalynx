@@ -81,7 +81,7 @@ final class text_field_validation_test extends advanced_testcase {
      * Test email format validation.
      */
     public function test_email_validation(): void {
-        [$dlx, $fieldobj, $field] = $this->create_text_field_fixture('email');
+        [, $fieldobj, $field] = $this->create_text_field_fixture('email');
         $renderer = $fieldobj->renderer();
         $tags = ["[[{$field->name}]]"];
 
@@ -102,7 +102,7 @@ final class text_field_validation_test extends advanced_testcase {
      * Test IBAN format validation.
      */
     public function test_iban_validation(): void {
-        [$dlx, $fieldobj, $field] = $this->create_text_field_fixture('iban');
+        [, $fieldobj, $field] = $this->create_text_field_fixture('iban');
         $renderer = $fieldobj->renderer();
         $tags = ["[[{$field->name}]]"];
 
@@ -123,7 +123,7 @@ final class text_field_validation_test extends advanced_testcase {
      * Test BIC/SWIFT format validation.
      */
     public function test_bicswift_validation(): void {
-        [$dlx, $fieldobj, $field] = $this->create_text_field_fixture('bicswift');
+        [, $fieldobj, $field] = $this->create_text_field_fixture('bicswift');
         $renderer = $fieldobj->renderer();
         $tags = ["[[{$field->name}]]"];
 
@@ -144,7 +144,7 @@ final class text_field_validation_test extends advanced_testcase {
      * Test IPv4 format validation.
      */
     public function test_ipv4_validation(): void {
-        [$dlx, $fieldobj, $field] = $this->create_text_field_fixture('ipv4');
+        [, $fieldobj, $field] = $this->create_text_field_fixture('ipv4');
         $renderer = $fieldobj->renderer();
         $tags = ["[[{$field->name}]]"];
 
@@ -165,7 +165,7 @@ final class text_field_validation_test extends advanced_testcase {
      * Test Phone format validation.
      */
     public function test_phone_validation(): void {
-        [$dlx, $fieldobj, $field] = $this->create_text_field_fixture('phone');
+        [, $fieldobj, $field] = $this->create_text_field_fixture('phone');
         $renderer = $fieldobj->renderer();
         $tags = ["[[{$field->name}]]"];
 
