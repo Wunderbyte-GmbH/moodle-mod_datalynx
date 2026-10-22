@@ -75,10 +75,10 @@ class field extends datalynxfield_base {
     /**
      * Get the supported search operators for this field.
      *
-     * @return bool
+     * @return array
      */
-    public function get_supported_search_operators(): bool {
-        return false;
+    public function get_supported_search_operators(): array {
+        return [];
     }
 
     /**

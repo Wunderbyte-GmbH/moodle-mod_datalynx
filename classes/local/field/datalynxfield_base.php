@@ -978,9 +978,9 @@ abstract class datalynxfield_base {
      * version and should therefore be overridden by a concrete
      * field class to remove unsupported operators from the list.
      *
-     * @return array|bool an array of operators
+     * @return array an array of operators, empty if search is not supported
      */
-    public function get_supported_search_operators(): array|bool {
+    public function get_supported_search_operators(): array {
         return []; // If search is not supported, offer no operators.
     }
 

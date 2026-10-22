@@ -265,6 +265,18 @@ final class rule_match_compiler_test extends advanced_testcase {
     }
 
     /**
+     * A fieldgroup cannot be compared, and its presence must not break the listing.
+     */
+    public function test_eligible_fields_skips_fieldgroups(): void {
+        $text = $this->make_field('text', 'Organiser');
+        $this->make_field('fieldgroup', 'Stops', json_encode([$text]));
+
+        $eligible = match_compiler::eligible_fields($this->dlx);
+
+        $this->assertSame([$text], array_keys($eligible));
+    }
+
+    /**
      * Which relations a field offers depends on what it can be compared for.
      */
     public function test_operators_offered_per_field_type(): void {
