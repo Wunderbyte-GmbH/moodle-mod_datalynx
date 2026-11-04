@@ -2391,49 +2391,32 @@ class datalynx {
             $gradebookroles = '';
         }
 
-        if (!empty($CFG->enablegroupings) && $this->cm->groupmembersonly) {
-            $groupingsusers = groups_get_grouping_members($this->cm->groupingid, 'u.id', 'u.id');
-            $gusers = $groupingsusers ? array_keys($groupingsusers) : null;
-        }
-
         if (!empty($userids)) {
-            if (!empty($gusers)) {
-                $gusers = array_intersect($userids, $gusers);
-            } else {
-                $gusers = $userids;
-            }
-        }
-
-        if (isset($gusers)) {
-            if (!empty($gusers)) {
-                [$inuids, $params] = $DB->get_in_or_equal($gusers);
-                return get_role_users(
-                    $gradebookroles,
-                    $this->context,
-                    true,
-                    \core_user\fields::for_userpic()->get_sql('u', false, '', '', false)->selects,
-                    'u.lastname ASC',
-                    true,
-                    $this->currentgroup,
-                    '',
-                    '',
-                    "u.id $inuids",
-                    $params
-                );
-            } else {
-                return null;
-            }
-        } else {
+            [$inuids, $params] = $DB->get_in_or_equal($userids);
             return get_role_users(
                 $gradebookroles,
                 $this->context,
                 true,
-                'u.id, u.lastname, u.firstname',
+                \core_user\fields::for_userpic()->get_sql('u', false, '', '', false)->selects,
                 'u.lastname ASC',
                 true,
-                $this->currentgroup
+                $this->currentgroup,
+                '',
+                '',
+                "u.id $inuids",
+                $params
             );
         }
+
+        return get_role_users(
+            $gradebookroles,
+            $this->context,
+            true,
+            'u.id, u.lastname, u.firstname',
+            'u.lastname ASC',
+            true,
+            $this->currentgroup
+        );
     }
 
     /**
