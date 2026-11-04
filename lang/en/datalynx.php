@@ -111,6 +111,7 @@ $string['configmaxentries'] = 'This value determines the maximum number of entri
 $string['configmaxfields'] = 'This value determines the maximum number of fields that may be added to a datalynx activity.';
 $string['configmaxfilters'] = 'This value determines the maximum number of filters that may be added to a datalynx activity.';
 $string['configmaxviews'] = 'This value determines the maximum number of views that may be added to a datalynx activity.';
+$string['confirmationrequired'] = 'This action has to be confirmed first.';
 $string['confirmbehaviordelete'] = 'You are about to delete this field behavior!';
 $string['confirmbehaviorduplicate'] = 'You are about to duplicate this field behavior!';
 $string['confirmfieldgroupdelete'] = 'You are about to delete this fieldgroup!';

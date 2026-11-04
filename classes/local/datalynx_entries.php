@@ -96,6 +96,16 @@ class datalynx_entries {
     protected $entriesfiltercount = 0;
 
     /**
+     * Whether process_entries() may ask for confirmation by printing a page.
+     *
+     * A web service has no page to print and must not exit: it sets this to false, and an
+     * unconfirmed action then returns a notification instead of a confirmation page.
+     *
+     * @var bool
+     */
+    public bool $interactive = true;
+
+    /**
      * Constructor
      * View or datalynx or both, each can be id or object
      *
@@ -576,16 +586,43 @@ class datalynx_entries {
     }
 
     /**
-     * Process entries when after editing content for saving into db
+     * Print the page that asks the user to confirm an action on entries.
      *
      * @param string $action
-     * @param string $eids
+     * @param array $entries the entries the action applies to, keyed by id
+     */
+    protected function print_action_confirmation(string $action, array $entries): void {
+        global $OUTPUT, $PAGE;
+
+        echo $OUTPUT->header();
+        $confirmcontinueparams = [$action => implode(',', array_keys($entries)),
+                'sesskey' => sesskey(), 'confirmed' => true];
+        // Preserve the post-action return URL (set by the reset action) across the
+        // confirmation step so the redirect after processing lands on the right URL.
+        if ($returnurl = optional_param('returnurl', '', PARAM_LOCALURL)) {
+            $confirmcontinueparams['returnurl'] = $returnurl;
+        }
+        echo $OUTPUT->confirm(
+            get_string("entriesconfirm$action", 'datalynx', count($entries)),
+            new moodle_url($PAGE->url, $confirmcontinueparams),
+            new moodle_url($PAGE->url)
+        );
+        echo $OUTPUT->footer();
+    }
+
+    /**
+     * Process entries when after editing content for saving into db
+     *
+     * An unconfirmed action prints a confirmation page and exits, unless $interactive is false.
+     *
+     * @param string $action
+     * @param string|array $eids comma separated entry ids, or negative for new entries on update
      * @param null $data
      * @param bool $confirmed
      * @return array notificationstrings, list of processed ids
      */
     public function process_entries(string $action, $eids, $data = null, bool $confirmed = false): array {
-        global $DB, $USER, $OUTPUT, $PAGE;
+        global $DB, $USER;
         $dlx = $this->dlx;
         $errorstring = '';
 
@@ -651,8 +688,19 @@ class datalynx_entries {
 
                 // All other types of processing must refer to specific entry ids.
             } else {
-                $entries =
-                        $DB->get_records_select('datalynx_entries', "dataid = ? AND id IN ($eids)", [$dlx->id()]);
+                // The ids come from the request. Only tokens that are whole positive numbers reach
+                // the query; anything else is dropped rather than coerced, so "5) OR (1=1" is no id.
+                $ids = is_array($eids) ? $eids : explode(',', (string) $eids);
+                $ids = array_filter(array_map(fn($id) => trim((string) $id), $ids), fn($id) => ctype_digit($id));
+                $ids = array_values(array_unique(array_filter(array_map('intval', $ids))));
+                if ($ids) {
+                    [$insql, $inparams] = $DB->get_in_or_equal($ids, SQL_PARAMS_NAMED, 'eid');
+                    $entries = $DB->get_records_select(
+                        'datalynx_entries',
+                        "dataid = :dataid AND id $insql",
+                        ['dataid' => $dlx->id()] + $inparams
+                    );
+                }
             }
 
             if (!empty($importentryids)) {
@@ -699,22 +747,10 @@ class datalynx_entries {
             return [get_string("entrynoneforaction", 'datalynx') . '<br>' . $errorstring, ''];
         } else {
             if (!$confirmed) {
-                // Print a confirmation page.
-                echo $OUTPUT->header();
-                $confirmcontinueparams = [$action => implode(',', array_keys($entries)),
-                        'sesskey' => sesskey(), 'confirmed' => true];
-                // Preserve the post-action return URL (set by the reset action) across the
-                // confirmation step so the redirect after processing lands on the right URL.
-                if ($returnurl = optional_param('returnurl', '', PARAM_LOCALURL)) {
-                    $confirmcontinueparams['returnurl'] = $returnurl;
+                if (!$this->interactive) {
+                    return [get_string('confirmationrequired', 'datalynx'), ''];
                 }
-                echo $OUTPUT->confirm(
-                    get_string("entriesconfirm$action", 'datalynx', count($entries)),
-                    new moodle_url($PAGE->url, $confirmcontinueparams),
-                    new moodle_url($PAGE->url)
-                );
-
-                echo $OUTPUT->footer();
+                $this->print_action_confirmation($action, $entries);
                 exit(0);
             } else {
                 $processed = [];

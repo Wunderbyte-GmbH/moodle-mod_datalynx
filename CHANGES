@@ -1,6 +1,16 @@
 mod_datalynx changes
 ====================
 
+2026-11-04
+----------
+
+- Security: acting on an entry from a view (`view\base::confirm_view_action()`)
+  now requires that view to belong to the same datalynx instance and to be visible
+  to the user. Before, a view of another instance holding the action tag could
+  authorise the action, and visibility was checked on the current view instead of
+  the requested one. Entry ids given to `process_entries()` are bound as query
+  parameters, and only whole numbers count as ids.
+
 2026-10-22
 ----------
 

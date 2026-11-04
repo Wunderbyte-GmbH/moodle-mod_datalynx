@@ -2476,6 +2476,21 @@ abstract class base {
     }
 
     /**
+     * Return the entries manager of this view, for acting on its entries outside a page request.
+     *
+     * A view built without filter options has none yet; one is then created for the current filter.
+     *
+     * @return datalynx_entries
+     */
+    public function get_entries_manager(): datalynx_entries {
+        if ($this->entries === null) {
+            $this->entries = new datalynx_entries($this->dlx, $this->filter);
+        }
+
+        return $this->entries;
+    }
+
+    /**
      * Return base URL for this view (minimal: d, view, currentgroup only).
      * Use for cross-view redirects, cancel buttons, and view-switcher links.
      *
@@ -2770,24 +2785,30 @@ abstract class base {
 
     /**
      * Verifies if the given action is available to the user in the view.
-     * The TARGET view must be visible to the user
+     * The TARGET view must belong to this datalynx, be visible to the user
      * AND contain the necessary action tag in the entry template in order for the action to be
      * allowed. This function
      * prevents users to circumvent action restrictions via URL queries.
      *
+     * It is the only place that enforces an author's decision to leave an action tag such as
+     * ##delete## out of a view: process_entries() does not check it. A web service acting on
+     * entries must therefore call it with the view the request names.
+     *
      * @param string $action String of the action
+     * @param int $targetviewid the view the action is requested from; 0 reads the 'view' request
+     *                          parameter, falling back to this view
      * @return bool true, if the action is allowed; false otherwise.
      */
-    private function confirm_view_action($action): bool {
+    public function confirm_view_action(string $action, int $targetviewid = 0): bool {
         global $DB;
         // Fall back to the current view when no explicit target view is given in the request, e.g.
         // when editing on the default view without a 'view' URL parameter.
-        $targetview = optional_param('view', 0, PARAM_INT) ?: $this->id();
-        $view = $DB->get_record('datalynx_views', ['id' => $targetview]);
+        $targetview = $targetviewid ?: (optional_param('view', 0, PARAM_INT) ?: $this->id());
+        $view = $DB->get_record('datalynx_views', ['id' => $targetview, 'dataid' => $this->dlx->id()]);
         if (!$view) {
             return false;
         }
-        if (!$this->dlx->is_visible_to_user($this->view)) {
+        if (!$this->dlx->is_visible_to_user($view)) {
             return false;
         }
         if (
