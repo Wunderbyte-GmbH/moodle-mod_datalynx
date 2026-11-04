@@ -1,0 +1,42 @@
+/*
+ * Styles for mod_datalynx in the Moodle App.
+ *
+ * Entry bodies are the author's own templates, written for the web and its Bootstrap theme.
+ * These rules only keep that markup from breaking a phone screen. They are scoped to the
+ * plugin's root class and never restyle Ionic components.
+ */
+.mod-datalynx-mobile .mod-datalynx-mobile-count {
+    font-size: 0.875em;
+    opacity: 0.75;
+}
+
+.mod-datalynx-mobile .mod-datalynx-mobile-entry img,
+.mod-datalynx-mobile .mod-datalynx-mobile-entry video,
+.mod-datalynx-mobile .mod-datalynx-mobile-entry iframe {
+    max-width: 100%;
+    height: auto;
+}
+
+.mod-datalynx-mobile .mod-datalynx-mobile-entry table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+/* Bootstrap grid classes do nothing in the app; let the columns stack. */
+.mod-datalynx-mobile .mod-datalynx-mobile-entry .row {
+    display: block;
+}
+
+.mod-datalynx-mobile .mod-datalynx-mobile-entry [class*="col-"] {
+    max-width: 100%;
+}
+
+/* Links styled as Bootstrap buttons on the web read as plain links in the app. */
+.mod-datalynx-mobile .mod-datalynx-mobile-entry .btn {
+    display: inline-block;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--ion-color-primary);
+}

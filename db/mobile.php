@@ -15,25 +15,44 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Defines message providers (types of messages being sent)
+ * Moodle App support: the course module handler and the strings its templates use.
  *
- * @package mod_datalynx
- * @copyright 2020 Michael Pollak <moodle@michaelpollak.org>
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * The app caches this definition (tool_mobile/plugininfo). Purge the caches after every change
+ * here, and use "Force reload site plugins" in the app's developer options.
+ *
+ * @package    mod_datalynx
+ * @copyright  2026 David Bogner
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 defined('MOODLE_INTERNAL') || die();
 
 $addons = [
-    'mod_datalynx' => [ // Plugin identifier.
-        'handlers' => [ // Different places where the plugin will display content.
-            'datalynx' => [ // Handler unique name (alphanumeric).
+    'mod_datalynx' => [
+        'handlers' => [
+            'datalynxview' => [
                 'displaydata' => [
+                    'title' => 'pluginname',
                     'icon' => $CFG->wwwroot . '/mod/datalynx/pix/monologo.svg',
                     'class' => '',
                 ],
-                'delegate' => 'CoreCourseModuleDelegate', // Delegate (where to display the link to the plugin).
-                'method' => 'mobile_course_view', // Main function in \mod_certificate\output\mobile.
+                'delegate' => 'CoreCourseModuleDelegate',
+                'method' => 'mobile_course_view',
+                'styles' => [
+                    'url' => $CFG->wwwroot . '/mod/datalynx/mobileapp/styles.css',
+                    'version' => 1,
+                ],
             ],
+        ],
+        'lang' => [
+            ['pluginname', 'datalynx'],
+            ['mobilefilterdefault', 'datalynx'],
+            ['mobilefilterselect', 'datalynx'],
+            ['mobilenoview', 'datalynx'],
+            ['mobileopeninbrowser', 'datalynx'],
+            ['mobileshowingxofy', 'datalynx'],
+            ['mobileviewnotsupported', 'datalynx'],
+            ['mobileviewselect', 'datalynx'],
         ],
     ],
 ];

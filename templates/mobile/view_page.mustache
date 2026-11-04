@@ -1,0 +1,126 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_datalynx/mobile/view_page
+
+    Moodle App: browse the entries of a datalynx activity.
+
+    Rendered on the server, compiled by Angular in the app. The delimiters are switched to <% %>
+    so that the double curly braces stay Angular's. Everything the page shows comes from
+    CONTENT_OTHERDATA through property bindings; only the two ids below are written into the source.
+
+    Example context (json):
+    {
+        "cmid": 12,
+        "courseid": 3
+    }
+}}
+{{=<% %>=}}
+<div class="mod-datalynx-mobile">
+    <core-course-module-description *ngIf="CONTENT_OTHERDATA.intro" [description]="CONTENT_OTHERDATA.intro"
+            component="mod_datalynx" componentId="<% cmid %>"></core-course-module-description>
+
+    <core-empty-box *ngIf="!CONTENT_OTHERDATA.hasview" icon="fas-database"
+            [message]="'plugin.mod_datalynx.mobilenoview' | translate"></core-empty-box>
+
+    <ion-list *ngIf="CONTENT_OTHERDATA.hasview" class="mod-datalynx-mobile-controls">
+        <ion-item *ngIf="CONTENT_OTHERDATA.views.length > 1">
+            <ion-select [label]="'plugin.mod_datalynx.mobileviewselect' | translate" labelPlacement="stacked"
+                    interface="action-sheet" [value]="CONTENT_OTHERDATA.viewid"
+                    (ionChange)="$event.detail.value !== CONTENT_OTHERDATA.viewid && updateContent({
+                        cmid: <% cmid %>, courseid: <% courseid %>, viewid: $event.detail.value
+                    })">
+                <ion-select-option *ngFor="let view of CONTENT_OTHERDATA.views" [value]="view.id">{{ view.name }}</ion-select-option>
+            </ion-select>
+        </ion-item>
+        <ion-item *ngIf="CONTENT_OTHERDATA.canfilter && CONTENT_OTHERDATA.filters.length">
+            <ion-select [label]="'plugin.mod_datalynx.mobilefilterselect' | translate" labelPlacement="stacked"
+                    interface="action-sheet" [value]="CONTENT_OTHERDATA.filterid"
+                    (ionChange)="$event.detail.value !== CONTENT_OTHERDATA.filterid && updateContent({
+                        cmid: <% cmid %>, courseid: <% courseid %>, viewid: CONTENT_OTHERDATA.viewid,
+                        filterid: $event.detail.value, search: CONTENT_OTHERDATA.search,
+                        criteria: CONTENT_OTHERDATA.criteria, sort: CONTENT_OTHERDATA.sort
+                    })">
+                <ion-select-option [value]="0">{{ 'plugin.mod_datalynx.mobilefilterdefault' | translate }}</ion-select-option>
+                <ion-select-option *ngFor="let filter of CONTENT_OTHERDATA.filters" [value]="filter.id">{{ filter.name }}</ion-select-option>
+            </ion-select>
+        </ion-item>
+    </ion-list>
+
+    <ion-searchbar *ngIf="CONTENT_OTHERDATA.hasview && CONTENT_OTHERDATA.supported && CONTENT_OTHERDATA.canfilter"
+            [value]="CONTENT_OTHERDATA.search" [placeholder]="'core.search' | translate"
+            (ionChange)="($event.detail.value || '') !== CONTENT_OTHERDATA.search && updateContent({
+                cmid: <% cmid %>, courseid: <% courseid %>, viewid: CONTENT_OTHERDATA.viewid,
+                filterid: CONTENT_OTHERDATA.filterid, search: $event.detail.value || '',
+                criteria: CONTENT_OTHERDATA.criteria, sort: CONTENT_OTHERDATA.sort
+            })"></ion-searchbar>
+
+    <ion-card *ngIf="CONTENT_OTHERDATA.hasview && !CONTENT_OTHERDATA.supported">
+        <ion-card-content>
+            <p>{{ 'plugin.mod_datalynx.mobileviewnotsupported' | translate }}</p>
+            <ion-button expand="block" fill="outline" [href]="CONTENT_OTHERDATA.browserurl" core-link autoLogin="yes">
+                {{ 'plugin.mod_datalynx.mobileopeninbrowser' | translate }}
+            </ion-button>
+        </ion-card-content>
+    </ion-card>
+
+    <ng-container *ngIf="CONTENT_OTHERDATA.hasview && CONTENT_OTHERDATA.supported">
+        <ng-container *ngIf="CONTENT_OTHERDATA.entriesfiltercount">
+            <p class="ion-padding-horizontal mod-datalynx-mobile-count">
+                {{ 'plugin.mod_datalynx.mobileshowingxofy' | translate: { $a: {
+                    count: CONTENT_OTHERDATA.entries.length, total: CONTENT_OTHERDATA.entriesfiltercount
+                } } }}
+            </p>
+        </ng-container>
+
+        <core-empty-box *ngIf="!CONTENT_OTHERDATA.entries.length" icon="fas-database"
+                [message]="CONTENT_OTHERDATA.emptycontent"></core-empty-box>
+
+        <ion-card *ngFor="let entry of CONTENT_OTHERDATA.entries" class="mod-datalynx-mobile-entry">
+            <ion-card-content *ngIf="entry.html">
+                <core-format-text [text]="entry.html" component="mod_datalynx" [componentId]="<% cmid %>"
+                        contextLevel="module" [contextInstanceId]="<% cmid %>" [courseId]="<% courseid %>"></core-format-text>
+            </ion-card-content>
+            <ion-list *ngIf="!entry.html" lines="none">
+                <ion-item *ngFor="let field of entry.fields" class="ion-text-wrap">
+                    <ion-label>
+                        <p class="item-heading">{{ field.name }}</p>
+                        <core-format-text [text]="field.valuehtml" component="mod_datalynx" [componentId]="<% cmid %>"
+                                contextLevel="module" [contextInstanceId]="<% cmid %>" [courseId]="<% courseid %>"></core-format-text>
+                    </ion-label>
+                </ion-item>
+            </ion-list>
+        </ion-card>
+
+        <ion-infinite-scroll *ngIf="CONTENT_OTHERDATA.cangrow" (ionInfinite)="updateContent({
+                    cmid: <% cmid %>, courseid: <% courseid %>, viewid: CONTENT_OTHERDATA.viewid,
+                    filterid: CONTENT_OTHERDATA.filterid, search: CONTENT_OTHERDATA.search,
+                    criteria: CONTENT_OTHERDATA.criteria, sort: CONTENT_OTHERDATA.sort,
+                    perpage: CONTENT_OTHERDATA.nextperpage
+                }); $event.target.complete()">
+            <ion-infinite-scroll-content></ion-infinite-scroll-content>
+        </ion-infinite-scroll>
+
+        <ion-card *ngIf="!CONTENT_OTHERDATA.cangrow && CONTENT_OTHERDATA.entries.length < CONTENT_OTHERDATA.entriesfiltercount">
+            <ion-card-content>
+                <ion-button expand="block" fill="outline" [href]="CONTENT_OTHERDATA.browserurl" core-link autoLogin="yes">
+                    {{ 'plugin.mod_datalynx.mobileopeninbrowser' | translate }}
+                </ion-button>
+            </ion-card-content>
+        </ion-card>
+    </ng-container>
+</div>

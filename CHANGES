@@ -4,6 +4,10 @@ mod_datalynx changes
 2026-11-04
 ----------
 
+- Moodle App: grid and tabular views can be browsed in the app, with view and
+  filter switching, search and a growing list. Other view types offer a link to
+  the web. Entries are read-only in the app for now, and this has not been tested
+  on a device yet. The mock page shown in the app so far is gone.
 - Security: acting on an entry from a view (`view\base::confirm_view_action()`)
   now requires that view to belong to the same datalynx instance and to be visible
   to the user. Before, a view of another instance holding the action tag could

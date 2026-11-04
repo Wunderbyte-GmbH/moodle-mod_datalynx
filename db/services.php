@@ -151,4 +151,14 @@ $functions = [
                 'capabilities' => 'mod/datalynx:viewentry',
                 'ajax'        => true,
         ],
+        'mod_datalynx_get_mobile_entries' => [
+                'classname'   => 'mod_datalynx\external\get_mobile_entries',
+                'methodname'  => 'execute',
+                'classpath'   => '',
+                'description' => 'Fetch one page of entries of a grid or tabular view for the Moodle App.',
+                'type'        => 'read',
+                'capabilities' => 'mod/datalynx:viewentry',
+                'ajax'        => true,
+                'services'    => [MOODLE_OFFICIAL_MOBILE_SERVICE],
+        ],
 ];

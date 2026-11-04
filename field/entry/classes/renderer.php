@@ -161,15 +161,6 @@ class renderer extends datalynxfield_renderer {
         }
         $str = get_string('editentryid', 'datalynx', $entry->id);
 
-        // In case we serve the app show a nice button for mobile devices.
-        if (WS_SERVER) {
-            $cmid = $field->dlx()->cm->id;
-            $courseid = $field->dlx()->cm->course;
-            $args = "[args]='{entry: $entry->id, action: \"edit\", cmid: $cmid, courseid: $courseid }'";
-            return "<button ion-button core-site-plugins-new-content title='editbutton'
-                component='mod_datalynx' method='mobile_course_view' $args>$str</button>";
-        }
-
         // Icon alt is empty so the accessible name comes solely from the sr-only span,
         // avoiding a duplicate "Edit Edit Entryid 123" announcement by screen readers.
         $sronly = html_writer::span($str, 'sr-only');
@@ -205,19 +196,9 @@ class renderer extends datalynxfield_renderer {
     protected function display_delete($entry): string {
         global $OUTPUT;
 
-        $field = $this->field;
         $params = ['delete' => $entry->id, 'sesskey' => sesskey()];
         $url = new moodle_url($entry->baseurl, $params);
         $str = get_string('deleteentryid', 'datalynx', $entry->id);
-
-        // In case we serve the app show a nice button for mobile devices.
-        if (WS_SERVER) {
-            $cmid = $field->dlx()->cm->id;
-            $courseid = $field->dlx()->cm->course;
-            $args = "[args]='{entry: $entry->id, action: \"delete\", cmid: $cmid, courseid: $courseid }'";
-            return "<button ion-button core-site-plugins-new-content title='deletebutton'
-                component='mod_datalynx' method='mobile_course_view' $args>$str</button>";
-        }
 
         $sronly = html_writer::span($str, 'sr-only');
         return html_writer::link($url->out(false), $OUTPUT->pix_icon('t/delete', '') . $sronly);

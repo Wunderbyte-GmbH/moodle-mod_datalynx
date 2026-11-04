@@ -941,7 +941,7 @@ class datalynx {
      * @param int $datalynxid The id of the datalynx whose content should be displayed.
      * @param int $viewid The id of the datalynx's view whose content should be displayed.
      * @param ?int $eids The id of the datalynx entrie that should be displayed.
-     * @param array $options bool skiplogincheck, bool tohtml, string pagelayout.
+     * @param array $options bool skiplogincheck, bool tohtml.
      * @return string
      */
     public static function get_content_inline(
@@ -959,12 +959,6 @@ class datalynx {
         // It's used nowhere but keeping for backwards compatibility.
         $urlparams->pagelayout = 'external';
 
-        // In case we come from the app, do stuff.
-        if (isset($options['pagelayout']) && $options['pagelayout'] == 'mobile') {
-            $urlparams->pagelayout = 'mobile';
-        }
-
-        // NOTE: The app ignores urlparams, added filter to view constructor.
         if ($eids) {
             $urlparams->eids = $eids;
         }
