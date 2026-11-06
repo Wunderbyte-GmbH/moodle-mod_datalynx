@@ -35,10 +35,10 @@ namespace mod_datalynx;
  */
 trait multilang_test_trait {
     /** @var string Marker rendered when the current language is German. */
-    private const GERMAN_MARKER = 'GERMANMARKER';
+    private static string $germanmarker = 'GERMANMARKER';
 
     /** @var string Marker rendered when the current language is English. */
-    private const ENGLISH_MARKER = 'ENGLISHMARKER';
+    private static string $englishmarker = 'ENGLISHMARKER';
 
     /**
      * Enable core's multilang filter for content and headings.
@@ -50,13 +50,13 @@ trait multilang_test_trait {
     }
 
     /**
-     * Multilang markup resolving to {@see GERMAN_MARKER} in German and {@see ENGLISH_MARKER} otherwise.
+     * Multilang markup resolving to {@see $germanmarker} in German and {@see $englishmarker} otherwise.
      *
      * @return string
      */
     private function multilang_markup(): string {
-        return '<span lang="de" class="multilang">' . self::GERMAN_MARKER . '</span>' .
-            '<span lang="en" class="multilang">' . self::ENGLISH_MARKER . '</span>';
+        return '<span lang="de" class="multilang">' . self::$germanmarker . '</span>' .
+            '<span lang="en" class="multilang">' . self::$englishmarker . '</span>';
     }
 
     /**
@@ -82,8 +82,8 @@ trait multilang_test_trait {
      */
     private function assert_localised(string $lang, string $html, string $message = ''): void {
         [$expected, $unexpected] = $lang === 'de'
-            ? [self::GERMAN_MARKER, self::ENGLISH_MARKER]
-            : [self::ENGLISH_MARKER, self::GERMAN_MARKER];
+            ? [self::$germanmarker, self::$englishmarker]
+            : [self::$englishmarker, self::$germanmarker];
 
         $this->assertStringNotContainsString('class="multilang"', $html, "unresolved markup: $message");
         $this->assertStringContainsString($expected, $html, "missing $lang text: $message");

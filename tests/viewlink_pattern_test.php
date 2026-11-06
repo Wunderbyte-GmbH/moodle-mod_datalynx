@@ -612,7 +612,7 @@ final class viewlink_pattern_test extends advanced_testcase {
             $link = $patternclass->get_replacements([$tag], null, [])[$tag];
             $this->assert_localised($lang, $link, 'viewlink link text');
             // The localised text is the link's own text, not markup around it.
-            $marker = $lang === 'de' ? self::GERMAN_MARKER : self::ENGLISH_MARKER;
+            $marker = $lang === 'de' ? self::$germanmarker : self::$englishmarker;
             $this->assertStringContainsString(">$marker<", $link);
         }
     }
@@ -642,7 +642,7 @@ final class viewlink_pattern_test extends advanced_testcase {
         $filtered = format_text($masked, FORMAT_HTML, ['context' => $dlx->context, 'filter' => true]);
         $this->assertStringNotContainsString('##viewsesslink', $filtered);
         $this->assertStringNotContainsString('class="multilang"', $filtered);
-        $this->assertStringNotContainsString(self::ENGLISH_MARKER, $filtered);
+        $this->assertStringNotContainsString(self::$englishmarker, $filtered);
 
         // After unmasking, the original tag is restored verbatim, ready for substitution.
         $restored = $templateobj->unmask_tags($filtered);
