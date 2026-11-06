@@ -332,7 +332,12 @@ final class rule_test extends advanced_testcase {
         ]);
 
         // Duplicate the activity: a full backup + restore that re-creates fields and the rule.
-        $newcm = duplicate_module($this->dlx->course, $this->dlx->cm);
+        // Moodle 5.2 moved duplicate_module() to cmactions::duplicate() and deprecated it.
+        if (method_exists(\core_courseformat\local\cmactions::class, 'duplicate')) {
+            $newcm = \core_courseformat\formatactions::cm($this->dlx->course->id)->duplicate($this->dlx->cm->id);
+        } else {
+            $newcm = duplicate_module($this->dlx->course, $this->dlx->cm);
+        }
         $newdataid = (int) $newcm->instance;
 
         $newfields = $DB->get_records_menu('datalynx_fields', ['dataid' => $newdataid], '', 'name, id');

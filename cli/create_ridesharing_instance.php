@@ -81,7 +81,12 @@ if ($existing && empty($options['reset'])) {
 }
 foreach ($existing as $instance) {
     $cm = get_coursemodule_from_instance('datalynx', $instance->id, $course->id, false, MUST_EXIST);
-    course_delete_module($cm->id);
+    // Moodle 5.2 moved course_delete_module() to cmactions::delete() and deprecated it.
+    if (method_exists(\core_courseformat\local\cmactions::class, 'delete')) {
+        \core_courseformat\formatactions::cm($course->id)->delete($cm->id);
+    } else {
+        course_delete_module($cm->id);
+    }
     cli_writeln("Removed existing activity (cmid {$cm->id}).");
 }
 
