@@ -132,4 +132,35 @@ final class comment_field_renderer_test extends advanced_testcase {
         $this->assertStringContainsString('datalynx-comment-body', $template);
         $this->assertSame(datalynx_comment_template($args), $template);
     }
+
+    /**
+     * Invalid comment parameters are rejected with core's comment exception.
+     *
+     * The field class is namespaced, so an unqualified comment_exception resolved to a class
+     * that does not exist and every rejection ended in a fatal error.
+     *
+     * @covers \datalynxfield_comment\field::validation
+     * @covers ::datalynx_comment_validate
+     */
+    public function test_validation_rejects_foreign_context_with_comment_exception(): void {
+        global $CFG;
+        require_once($CFG->dirroot . '/comment/lib.php');
+        require_once($CFG->dirroot . '/mod/datalynx/lib.php');
+
+        $course = $this->getDataGenerator()->create_course();
+        $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
+        $dlx = new datalynx($instance->id);
+
+        $params = (object) [
+            'context' => \context_course::instance($course->id),
+            'courseid' => $course->id,
+            'cm' => $dlx->cm,
+            'commentarea' => 'entry',
+            'itemid' => 1,
+        ];
+
+        $this->expectException(\comment_exception::class);
+        $this->expectExceptionMessage(get_string('invalidcontext', 'error'));
+        datalynx_comment_validate($params);
+    }
 }

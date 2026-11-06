@@ -101,22 +101,22 @@ class field extends datalynxfield_no_content {
 
         // Validate context.
         if (empty($params->context) || $params->context->id != $this->dlx->context->id) {
-            throw new comment_exception('invalidcontextid', 'datalynx');
+            throw new \comment_exception('invalidcontext');
         }
 
         // Validate course.
         if ($params->courseid != $this->dlx->course->id) {
-            throw new comment_exception('invalidcourseid', 'datalynx');
+            throw new \comment_exception('invalidcourseid');
         }
 
         // Validate cm.
         if ($params->cm->id != $this->dlx->cm->id) {
-            throw new comment_exception('invalidcmid', 'datalynx');
+            throw new \comment_exception('invalidcoursemodule');
         }
 
         // Validate comment area.
         if ($params->commentarea != 'entry' && $params->commentarea != 'activity') {
-            throw new comment_exception('invalidcommentarea');
+            throw new \comment_exception('invalidcommentarea');
         }
 
         // Validation for non-comment-managers.
@@ -127,14 +127,14 @@ class field extends datalynxfield_no_content {
             // Comments in the activity level are associated (itemid) with participants.
             if ($params->commentarea == 'activity') {
                 if ($params->itemid != $USER->id) {
-                    throw new comment_exception('invalidcommentitemid');
+                    throw new \comment_exception('invalidcommentitemid');
                 }
             }
 
             if ($params->commentarea == 'entry') {
                 // Validate entry.
                 if (!$entry = $DB->get_record('datalynx_entries', ['id' => $params->itemid])) {
-                    throw new comment_exception('invalidcommentitemid');
+                    throw new \comment_exception('invalidcommentitemid');
                 }
 
                 // Group access.
@@ -145,7 +145,7 @@ class field extends datalynxfield_no_content {
                             !has_capability('moodle/site:accessallgroups', $this->dlx->context)
                     ) {
                         if (!groups_is_member($entry->groupid)) {
-                            throw new comment_exception('notmemberofgroup');
+                            throw new \comment_exception('notmemberofgroup');
                         }
                     }
                 }
@@ -159,16 +159,16 @@ class field extends datalynxfield_no_content {
                 ])
             ) {
                 if ($comment->commentarea != 'entry' && $comment->commentarea != 'activity') {
-                    throw new comment_exception('invalidcommentarea');
+                    throw new \comment_exception('invalidcommentarea');
                 }
                 if ($comment->contextid != $params->context->id) {
-                    throw new comment_exception('invalidcontext');
+                    throw new \comment_exception('invalidcontext');
                 }
                 if ($comment->itemid != $params->itemid) {
-                    throw new comment_exception('invalidcommentitemid');
+                    throw new \comment_exception('invalidcommentitemid');
                 }
             } else {
-                throw new comment_exception('invalidcommentid');
+                throw new \comment_exception('invalidcommentid');
             }
         }
 
