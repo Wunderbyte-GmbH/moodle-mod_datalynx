@@ -42,35 +42,36 @@ export const init = () => {
     }
     initialised = true;
 
-    // Intercept and handle rule addition dropdown.
-    const select = document.querySelector(ADD_SELECT_SELECTOR);
-    if (select) {
-        select.removeAttribute('onchange');
-        select.addEventListener('change', (e) => {
-            const type = e.target.value;
-            if (!type) {
-                return;
-            }
-            e.preventDefault();
+    // Intercept the rule addition dropdown. Core's single_select submits its form from a change
+    // handler on the select unless the chosen option carries data-ignore. Listening in the capture
+    // phase on the document runs before that handler regardless of which script loaded first, and
+    // resetting the select to its "Choose..." option (which has data-ignore) stops the submission.
+    document.addEventListener('change', (e) => {
+        if (!e.target.matches(ADD_SELECT_SELECTOR)) {
+            return;
+        }
+        const type = e.target.value;
+        if (!type) {
+            return;
+        }
 
-            const form = e.target.closest('form');
-            const dInput = form.querySelector('input[name="d"]');
-            const cmidInput = form.querySelector('input[name="cmid"]');
-            const d = dInput ? parseInt(dInput.value, 10) : 0;
-            const cmid = cmidInput ? parseInt(cmidInput.value, 10) : 0;
+        const form = e.target.closest('form');
+        const dInput = form.querySelector('input[name="d"]');
+        const cmidInput = form.querySelector('input[name="cmid"]');
+        const d = dInput ? parseInt(dInput.value, 10) : 0;
+        const cmid = cmidInput ? parseInt(cmidInput.value, 10) : 0;
 
-            e.target.value = '';
+        e.target.value = '';
 
-            openRuleModal({
-                d: d,
-                cmid: cmid,
-                rid: 0,
-                type: type,
-                formClass: `\\datalynxrule_${type}\\form\\rule_form`,
-                trigger: e.target
-            });
+        openRuleModal({
+            d: d,
+            cmid: cmid,
+            rid: 0,
+            type: type,
+            formClass: `\\datalynxrule_${type}\\form\\rule_form`,
+            trigger: e.target
         });
-    }
+    }, true);
 
     document.addEventListener('click', (e) => {
         const trigger = e.target.closest(TRIGGER_SELECTOR);
