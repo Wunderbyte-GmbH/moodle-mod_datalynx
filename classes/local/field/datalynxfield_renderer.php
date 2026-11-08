@@ -162,8 +162,10 @@ abstract class datalynxfield_renderer {
                     $replacements[$tag] = ['html', ''];
                 } else {
                     // No value is shown when not visible, so strip the #value placeholder.
-                    $replacements[$tag] = ['html',
-                            $this->replace_renderer_template_tags($renderer->get_not_visible_template(), '')];
+                    $replacements[$tag] = ['html', $this->replace_renderer_template_tags(
+                        $this->filter_layout_template($renderer->get_not_visible_template()),
+                        ''
+                    )];
                 }
             } else {
                 // VISIBLE ===.
@@ -186,7 +188,7 @@ abstract class datalynxfield_renderer {
                         } else if (
                             $noteditabletemplate === $renderer::NOT_EDITABLE_SHOW_AS_DISPLAY_MODE
                         ) {
-                            $currentoptions['template'] = $renderer->get_display_template();
+                            $currentoptions['template'] = $this->filter_layout_template($renderer->get_display_template());
                             $currentoptions['value'] = $this->render_display_mode($entry, $currentoptions);
                             $replacements[$tag] = ['', [[$this, 'prerender_edit_mode'], [$entry, $currentoptions]]];
                         } else if (
@@ -196,19 +198,21 @@ abstract class datalynxfield_renderer {
                             if ($displayvalue === '') {
                                 $replacements[$tag] = ['html', ''];
                             } else {
-                                $currentoptions['template'] = $renderer->get_display_template();
+                                $currentoptions['template'] = $this->filter_layout_template(
+                                    $renderer->get_display_template()
+                                );
                                 $currentoptions['value'] = $displayvalue;
                                 $replacements[$tag] = ['', [[$this, 'prerender_edit_mode'], [$entry, $currentoptions]]];
                             }
                         } else {
-                            $replacements[$tag] = ['html', $noteditabletemplate];
+                            $replacements[$tag] = ['html', $this->filter_layout_template($noteditabletemplate)];
                         }
                     } else {
                         // EDITABLE ===.
                         if ($renderer->get_edit_template() === $renderer::EDIT_MODE_TEMPLATE_NONE) {
                             $replacements[$tag] = ['', [[$this, 'prerender_edit_mode'], [$entry, $currentoptions]]];
                         } else {
-                            $currentoptions['template'] = $renderer->get_edit_template();
+                            $currentoptions['template'] = $this->filter_layout_template($renderer->get_edit_template());
                             $replacements[$tag] = ['', [[$this, 'prerender_edit_mode'], [$entry, $currentoptions]]];
                         }
                     }
@@ -223,12 +227,16 @@ abstract class datalynxfield_renderer {
                             if (
                                 $renderer->get_no_value_template() === $renderer::NO_VALUE_SHOW_DISPLAY_MODE_TEMPLATE
                             ) {
-                                $replacements[$tag] = ['html',
-                                        $this->replace_renderer_template_tags($renderer->get_display_template(), '')];
+                                $replacements[$tag] = ['html', $this->replace_renderer_template_tags(
+                                    $this->filter_layout_template($renderer->get_display_template()),
+                                    ''
+                                )];
                             } else {
                                 // No value here, so strip the #value placeholder from the custom template.
-                                $replacements[$tag] = ['html',
-                                        $this->replace_renderer_template_tags($renderer->get_no_value_template(), '')];
+                                $replacements[$tag] = ['html', $this->replace_renderer_template_tags(
+                                    $this->filter_layout_template($renderer->get_no_value_template()),
+                                    ''
+                                )];
                             }
                         }
                     } else {
@@ -240,7 +248,7 @@ abstract class datalynxfield_renderer {
                         } else {
                             $replacements[$tag] = ['html',
                                     $this->replace_renderer_template_tags(
-                                        $renderer->get_display_template(),
+                                        $this->filter_layout_template($renderer->get_display_template()),
                                         $replacement
                                     ),
                             ];
@@ -251,6 +259,31 @@ abstract class datalynxfield_renderer {
         }
 
         return $replacements;
+    }
+
+    /**
+     * Run a custom field layout template through the content filters (multilang, ...).
+     *
+     * View templates are filtered before their tags are substituted, so a layout template that is
+     * inserted afterwards would otherwise show filter markup such as {mlang} raw. Only the static
+     * template is filtered: the field value is formatted by render_display_mode() and the form
+     * element is added to the form separately, so neither is filtered twice. Sentinel values
+     * (___0___ etc.) select a built-in mode and are returned unchanged.
+     *
+     * @param int|string|null $template The layout template or sentinel.
+     * @return int|string|null
+     */
+    protected function filter_layout_template(int|string|null $template): int|string|null {
+        if (!is_string($template) || $template === '' || preg_match('/^___\d+___$/', $template)) {
+            return $template;
+        }
+        return format_text($template, FORMAT_HTML, [
+            'trusted' => true,
+            'noclean' => true,
+            'filter' => true,
+            'para' => false,
+            'context' => $this->field->dlx()->context,
+        ]);
     }
 
     /**
