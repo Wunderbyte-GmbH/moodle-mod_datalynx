@@ -538,33 +538,38 @@ class renderer extends datalynxfield_renderer {
         $content = ($userprofile && $shortname && isset($userprofile->{$shortname}))
             ? $userprofile->{$shortname} : '';
 
+        // Like every other field, the input carries no visible label of its own: the view template
+        // or field layout around the tag provides it. The profile field name is kept for assistive
+        // technology only, so the label is not shown twice.
+        $attributes = ['aria-label' => format_string((string) ($field->get('infoname') ?: $shortname))];
+
         $mform->addElement(
             'html',
-            '<div class="datalynx-field-wrapper" data-field-type="entryauthor" data-field-name="' .
-            s($field->name()) . '">'
+            '<div class="datalynx-field-wrapper datalynx-no-fitem-wrapper" data-field-type="entryauthor" ' .
+            'data-field-name="' . s($field->name()) . '">'
         );
 
         switch ($field->get('infotype')) {
             case 'datetime':
                 $fieldtype = $field->get('param10') ? 'date_time_selector' : 'date_selector';
-                $mform->addElement($fieldtype, $fieldname, $shortname);
+                $mform->addElement($fieldtype, $fieldname, '', [], $attributes);
                 break;
             case 'menu':
                 $dropdown = explode("\n", (string) $field->get('param8'));
                 $dropdown = array_combine($dropdown, $dropdown);
-                $mform->addElement('select', $fieldname, $shortname, $dropdown);
+                $mform->addElement('select', $fieldname, '', $dropdown, $attributes);
                 break;
             case 'checkbox':
-                $mform->addElement('advcheckbox', $fieldname, $shortname);
+                $mform->addElement('advcheckbox', $fieldname, '', '', $attributes);
                 break;
             default:
-                $mform->addElement('text', $fieldname, $shortname);
+                $mform->addElement('text', $fieldname, '', $attributes);
                 $mform->setType($fieldname, PARAM_TEXT);
         }
         $mform->setDefault($fieldname, $content);
 
         if (!empty($field->get('mandatory'))) {
-            $mform->addRule($fieldname, null, 'required', null, 'client');
+            $mform->addRule($fieldname, get_string('required'), 'required', null, 'client');
         }
 
         $mform->addElement('html', '</div>');

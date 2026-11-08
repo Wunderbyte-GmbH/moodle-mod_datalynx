@@ -203,7 +203,7 @@ class field extends datalynxfield_no_content {
             $info = $DB->get_record(
                 'user_info_field',
                 ['shortname' => $shortname],
-                'datatype, param1, param3'
+                'name, datatype, param1, param3'
             );
 
             $objects[$formatname] = (object) [
@@ -215,6 +215,7 @@ class field extends datalynxfield_no_content {
                 'internalname' => 'profileeditor',
                 'option' => $shortname,
                 'infoshortname' => $shortname,
+                'infoname' => $info ? $info->name : $shortname,
                 'infotype' => $info ? $info->datatype : 'text',
                 'param8' => $info ? $info->param1 : null,
                 'param10' => $info ? $info->param3 : null,
