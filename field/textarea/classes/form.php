@@ -57,5 +57,16 @@ class form extends datalynxfield_form {
         );
         $mform->setType('param3', PARAM_INT);
         $mform->addRule('param3', null, 'numeric', null, 'client');
+
+        // Word limits, checked when an entry is saved. Empty or 0 means no limit.
+        $mform->addElement('text', 'param8', get_string('wordcountmin', 'datalynxfield_textarea'), ['size' => '8']);
+        $mform->setType('param8', PARAM_INT);
+        $mform->addRule('param8', null, 'numeric', null, 'client');
+        $mform->addHelpButton('param8', 'wordcountmin', 'datalynxfield_textarea');
+
+        $mform->addElement('text', 'param7', get_string('wordcountmax', 'datalynxfield_textarea'), ['size' => '8']);
+        $mform->setType('param7', PARAM_INT);
+        $mform->addRule('param7', null, 'numeric', null, 'client');
+        $mform->addHelpButton('param7', 'wordcountmax', 'datalynxfield_textarea');
     }
 }

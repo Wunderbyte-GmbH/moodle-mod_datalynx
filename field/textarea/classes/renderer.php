@@ -138,6 +138,40 @@ class renderer extends datalynxfield_renderer {
             }
         }
 
+        if (empty($errors[$formfieldname]) && isset($formdata->$formfieldname)) {
+            $error = $this->validate_word_count((string) $formdata->$formfieldname);
+            if ($error !== null) {
+                $errors[$formfieldname] = $error;
+            }
+        }
+
         return $errors;
+    }
+
+    /**
+     * Check the configured minimum (param8) and maximum (param7) number of words.
+     *
+     * An empty text is left to the required check, so an optional field may stay empty
+     * even when a minimum is set.
+     *
+     * @param string $text The submitted text.
+     * @return string|null Error message, or null when the text is within the limits.
+     */
+    public function validate_word_count(string $text): ?string {
+        $max = (int) $this->field->get('param7');
+        $min = (int) $this->field->get('param8');
+        if ((!$max && !$min) || trim($text) === '') {
+            return null;
+        }
+
+        $count = count_words($text, FORMAT_PLAIN);
+        $a = (object) ['count' => $count, 'max' => $max, 'min' => $min];
+        if ($max && $count > $max) {
+            return get_string('wordcountmaxerror', 'datalynxfield_textarea', $a);
+        }
+        if ($min && $count < $min) {
+            return get_string('wordcountminerror', 'datalynxfield_textarea', $a);
+        }
+        return null;
     }
 }
