@@ -32,6 +32,7 @@ use ReflectionMethod;
  * Tests for the file field renderer.
  *
  * @covers \datalynxfield_file\renderer::patterns
+ * @covers \datalynxfield_file\renderer::render_edit_mode
  */
 final class file_field_renderer_test extends advanced_testcase {
     /**
@@ -150,5 +151,25 @@ final class file_field_renderer_test extends advanced_testcase {
 
         $this->assertContains('[[Attachment:downloadlink]]', $tags);
         $this->assertNotContains('[[Attachment:alt]]', $tags);
+    }
+
+    /**
+     * The file manager must not show the internal field name as its label: the view template or
+     * field layout provides the label, and a required file still gets a required rule.
+     */
+    public function test_edit_mode_has_no_field_name_label(): void {
+        global $CFG;
+        require_once($CFG->libdir . '/formslib.php');
+        [$dlx, $fieldid] = $this->create_file_field_instance();
+        $field = $dlx->get_fields()[$fieldid];
+
+        $mform = new \MoodleQuickForm('filetest', 'post', 'index.php');
+        $entry = (object) ['id' => -1];
+        $field->renderer()->render_edit_mode($mform, $entry, ['required' => true]);
+
+        $element = $mform->getElement("field_{$fieldid}_-1_filemanager");
+        $this->assertSame('', $element->getLabel());
+        $this->assertSame('Attachment', $element->getAttribute('aria-label'));
+        $this->assertTrue($mform->isElementRequired("field_{$fieldid}_-1_filemanager"));
     }
 }

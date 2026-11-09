@@ -69,12 +69,20 @@ class renderer extends datalynxfield_renderer {
             $fmoptions
         );
 
-        // Add file manager element.
-        $mform->addElement('filemanager', "{$fieldname}_filemanager", $field->name(), null, $fmoptions);
+        // Add file manager element. Like every other field it has no visible label of its own: the
+        // view template or field layout around the tag provides it, so the internal field name is
+        // not shown next to it. The name stays available to assistive technology.
+        $mform->addElement(
+            'filemanager',
+            "{$fieldname}_filemanager",
+            '',
+            ['aria-label' => format_string($field->name())],
+            $fmoptions
+        );
         $mform->setDefault("{$fieldname}_filemanager", $draftitemid);
 
         if (!empty($options['required'])) {
-            $mform->addRule("{$fieldname}_filemanager", null, 'required', null, 'client');
+            $mform->addRule("{$fieldname}_filemanager", get_string('required'), 'required', null, 'client');
         }
     }
 
