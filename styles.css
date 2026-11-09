@@ -727,6 +727,55 @@ form.mform div.entry div.datalynx-field-wrapper {
     font-weight: 600;
 }
 
+/* Special state (e.g. "Information needed"): the step it belongs to is marked, not completed. */
+.datalynx-stepper .step.special .step-icon {
+    border-width: 3px;
+    border-color: var(--dlx-stepper-special, #f0ad4e);
+    background-color: #fff;
+    color: var(--dlx-stepper-special, #f0ad4e);
+}
+
+.datalynx-stepper .step.special .step-title {
+    color: #374250;
+    font-weight: 600;
+}
+
+.datalynx-stepper .step .step-status {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    margin-top: 0.25rem;
+}
+
+.datalynx-stepper .step.special-warning {
+    --dlx-stepper-special: var(--bs-warning, var(--warning, #f0ad4e));
+}
+
+.datalynx-stepper .step.special-warning .step-status {
+    /* Bootstrap's warning yellow is too light for text on white. */
+    color: #8a5a00 !important;
+}
+
+.datalynx-stepper .step.special-danger {
+    --dlx-stepper-special: var(--bs-danger, var(--danger, #ca3120));
+}
+
+.datalynx-stepper .step.special-info {
+    --dlx-stepper-special: var(--bs-info, var(--info, #008196));
+}
+
+.datalynx-stepper .step.special-success {
+    --dlx-stepper-special: var(--bs-success, var(--success, #357a32));
+}
+
+.datalynx-stepper .step.special-secondary {
+    --dlx-stepper-special: var(--bs-secondary, var(--secondary, #6c757d));
+}
+
+.datalynx-stepper-notice {
+    margin-top: -0.75rem;
+    margin-bottom: 1.5rem;
+}
+
 /* Responsive design: vertical timeline on mobile */
 @media (max-width: 576px) {
     .datalynx-stepper.steps {

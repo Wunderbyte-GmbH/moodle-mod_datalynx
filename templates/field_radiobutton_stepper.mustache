@@ -19,6 +19,10 @@
 
     Displays a stepper progress bar for a radiobutton field.
 
+    A special state (e.g. "Information needed") marks the step it belongs to with a contextual
+    style and its label instead of completing it. A special state without a step is shown as
+    a notice below the stepper.
+
     Example context (json):
     {
         "steps": [
@@ -27,21 +31,26 @@
                 "completed": true,
                 "icon": "fa fa-shopping-cart",
                 "hasicon": true,
-                "number": 1
+                "number": 1,
+                "special": false
             },
             {
                 "label": "Step 2",
                 "completed": false,
                 "icon": "",
                 "hasicon": false,
-                "number": 2
+                "number": 2,
+                "special": true,
+                "style": "warning",
+                "statuslabel": "Information needed"
             }
-        ]
+        ],
+        "notice": null
     }
 }}
 <div class="datalynx-stepper steps d-flex flex-wrap flex-sm-nowrap justify-content-between my-4">
     {{#steps}}
-        <div class="step{{#completed}} completed{{/completed}}">
+        <div class="step{{#completed}} completed{{/completed}}{{#special}} special special-{{style}}{{/special}}"{{#special}} aria-current="step"{{/special}}>
             <div class="step-icon-wrap">
                 <div class="step-icon">
                     {{#hasicon}}
@@ -52,7 +61,13 @@
                     {{/hasicon}}
                 </div>
             </div>
-            <h5 class="step-title">{{label}}</h5>
+            <h5 class="step-title">
+                {{label}}
+                {{#special}}<span class="step-status d-block text-{{style}}">{{statuslabel}}</span>{{/special}}
+            </h5>
         </div>
     {{/steps}}
 </div>
+{{#notice}}
+    <div class="datalynx-stepper-notice alert alert-{{style}} py-2 px-3" role="status">{{label}}</div>
+{{/notice}}

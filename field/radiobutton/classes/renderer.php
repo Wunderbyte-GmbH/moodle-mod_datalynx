@@ -113,26 +113,33 @@ class renderer extends SelectRenderer {
             global $OUTPUT;
             $menuoptions = $field->options_menu();
 
-            // Find position of selected option in the options menu keys.
-            $selectedindex = -1;
-            $keys = array_keys($menuoptions);
-            $selectedindex = array_search($selected, $keys);
-            if ($selectedindex === false) {
-                $selectedindex = -1;
-            }
-
             $icons = [];
             $iconssetting = $fieldformat->get_setting('stepper_icons');
             if (!empty($iconssetting)) {
                 $icons = array_map('trim', explode(',', $iconssetting));
             }
 
+            // Options configured as special states are not shown as steps of their own.
+            $special = field_format::parse_special_states((string) $fieldformat->get_setting('stepper_special', ''));
+            $stepkeys = array_values(array_diff(array_keys($menuoptions), array_keys($special)));
+
+            // The step reached: the selected option, or for a special state the step it is mapped to.
+            $current = $special[$selected] ?? null;
+            $reachedkey = $current ? $current['step'] : $selected;
+            $reachedindex = array_search($reachedkey, $stepkeys);
+            if ($reachedindex === false) {
+                $reachedindex = -1;
+            }
+            $statuslabel = $current ? format_string($menuoptions[$selected] ?? '') : '';
+
             $steps = [];
-            $i = 0;
-            foreach ($menuoptions as $label) {
+            // Icons are listed per option, so they are looked up by the option's position.
+            $optionpositions = array_flip(array_keys($menuoptions));
+            foreach ($stepkeys as $i => $key) {
                 $iconclass = '';
-                if (isset($icons[$i]) && $icons[$i] !== '') {
-                    $iconclass = $icons[$i];
+                $iconpos = $optionpositions[$key];
+                if (isset($icons[$iconpos]) && $icons[$iconpos] !== '') {
+                    $iconclass = $icons[$iconpos];
                     if (!str_contains($iconclass, ' ')) {
                         if (!str_starts_with($iconclass, 'fa-')) {
                             $iconclass = 'fa-' . $iconclass;
@@ -141,21 +148,27 @@ class renderer extends SelectRenderer {
                     }
                 }
 
-                $completed = ($selectedindex !== -1 && $i <= $selectedindex);
-
+                $isspecial = $current && $i === $reachedindex;
                 $steps[] = [
-                    'label' => format_string($label),
-                    'completed' => $completed,
+                    'label' => format_string($menuoptions[$key]),
+                    // A special state marks its step instead of completing it.
+                    'completed' => $reachedindex !== -1 && ($i < $reachedindex || ($i === $reachedindex && !$current)),
+                    'special' => $isspecial,
+                    'style' => $isspecial ? $current['style'] : '',
+                    'statuslabel' => $isspecial ? $statuslabel : '',
                     'icon' => $iconclass,
                     'hasicon' => !empty($iconclass),
                     'number' => $i + 1,
                 ];
-                $i++;
             }
 
             $mustachecontext = [
                 'steps' => $steps,
             ];
+            // A special state without a step of its own is shown below the stepper.
+            if ($current && $reachedindex === -1) {
+                $mustachecontext['notice'] = ['label' => $statuslabel, 'style' => $current['style']];
+            }
 
             // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
             return $OUTPUT->render_from_template('mod_datalynx/field_radiobutton_stepper', $mustachecontext);

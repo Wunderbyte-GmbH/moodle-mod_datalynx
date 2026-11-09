@@ -585,4 +585,56 @@ final class field_formats_test extends advanced_testcase {
         $this->assertStringContainsString('<div class="step completed">', $html);
         $this->assertStringContainsString('<div class="step">', $html);
     }
+
+    /**
+     * Special states of the stepper are not steps of their own and mark the step they belong to.
+     *
+     * @covers \datalynxfield_radiobutton\renderer::render_display_mode
+     * @covers \datalynxfield_radiobutton\field_format::parse_special_states
+     */
+    public function test_radiobutton_stepper_special_states(): void {
+        global $DB;
+        $dlx = $this->create_test_datalynx();
+        $fieldid = $DB->insert_record('datalynx_fields', (object) [
+            'dataid' => $dlx->id(), 'name' => 'Status', 'type' => 'radiobutton', 'description' => '',
+            'param1' => "Draft\nReview\nApproved\nRejected\nInformation needed",
+        ]);
+        $formatid = \mod_datalynx\local\field_format\manager::save_format((object) [
+            'dataid' => $dlx->id(), 'name' => 'progress', 'fieldtype' => 'radiobutton',
+            'settings' => json_encode(['option' => 'stepper', 'stepper_special' => "4::danger\n5:1"]),
+        ]);
+        $field = $dlx->get_field_from_id($fieldid, true);
+        $format = \mod_datalynx\local\field_format\manager::get_format_by_id($formatid);
+        $render = fn(int $value) => $field->renderer()->render_display_mode(
+            (object) ['id' => 1, "c{$fieldid}_content" => $value],
+            ['field_format' => $format]
+        );
+
+        // A regular step: only the three real steps are shown, the reached ones completed.
+        $html = $render(2);
+        $this->assertSame(3, preg_match_all('/class="step[ "]/', $html), 'special states are no steps');
+        $this->assertStringNotContainsString('Rejected', $html);
+        $this->assertSame(2, substr_count($html, 'step completed'));
+        $this->assertStringNotContainsString('special', $html);
+
+        // The state "Information needed" marks step 1 (warning is the default style) and completes nothing.
+        $html = $render(5);
+        $this->assertStringNotContainsString('step completed', $html);
+        $this->assertStringContainsString('step special special-warning', $html);
+        $this->assertStringContainsString('Information needed', $html);
+        $this->assertStringNotContainsString('datalynx-stepper-notice', $html);
+
+        // The state "Rejected" reaches no step: nothing is completed and the state is a notice.
+        $html = $render(4);
+        $this->assertStringNotContainsString('step completed', $html);
+        $this->assertStringNotContainsString('step special', $html);
+        $this->assertStringContainsString('datalynx-stepper-notice alert alert-danger', $html);
+        $this->assertStringContainsString('Rejected', $html);
+
+        // Invalid lines are reported, valid ones parsed.
+        $invalid = [];
+        $states = \datalynxfield_radiobutton\field_format::parse_special_states("7::danger\nx:1\n8:1:pink\n9:4", $invalid);
+        $this->assertSame([7 => ['step' => 0, 'style' => 'danger'], 9 => ['step' => 4, 'style' => 'warning']], $states);
+        $this->assertCount(2, $invalid);
+    }
 }

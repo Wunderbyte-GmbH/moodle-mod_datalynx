@@ -32,4 +32,15 @@ class field_format_form extends \mod_datalynx\form\field_format_base_form {
 
         \datalynxfield_radiobutton\field_format::define_elements($mform);
     }
+
+    /**
+     * Validates the radiobutton format settings.
+     *
+     * @param array $data
+     * @param array $files
+     * @return array
+     */
+    protected function format_validation($data, $files): array {
+        return \datalynxfield_radiobutton\field_format::validate_elements($data);
+    }
 }

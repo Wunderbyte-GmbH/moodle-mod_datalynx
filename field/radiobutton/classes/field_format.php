@@ -24,6 +24,9 @@ namespace datalynxfield_radiobutton;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class field_format extends \mod_datalynx\local\field_format\base {
+    /** @var string[] Styles a special state of the stepper can use (Bootstrap contextual colours). */
+    public const SPECIAL_STYLES = ['warning', 'danger', 'info', 'success', 'secondary'];
+
     /**
      * The display formats a radiobutton format can choose from.
      *
@@ -87,6 +90,86 @@ class field_format extends \mod_datalynx\local\field_format\base {
         $mform->setType('stepper_icons', PARAM_TEXT);
         $mform->addHelpButton('stepper_icons', 'fieldformatoptionsteppericons', 'datalynxfield_radiobutton');
         $mform->hideIf('stepper_icons', 'option', 'neq', 'stepper');
+
+        $mform->addElement(
+            'textarea',
+            'stepper_special',
+            get_string('fieldformatoptionstepperspecial', 'datalynxfield_radiobutton'),
+            ['rows' => 4, 'cols' => 40]
+        );
+        $mform->setType('stepper_special', PARAM_RAW_TRIMMED);
+        $mform->addHelpButton('stepper_special', 'fieldformatoptionstepperspecial', 'datalynxfield_radiobutton');
+        $mform->hideIf('stepper_special', 'option', 'neq', 'stepper');
+    }
+
+    /**
+     * Validates the special states setting of the stepper.
+     *
+     * @param array $data Form data.
+     * @param array $files Uploaded files.
+     * @return array Validation errors.
+     */
+    public function validation(array $data, array $files): array {
+        return self::validate_elements($data);
+    }
+
+    /**
+     * Validates the configuration elements of this format.
+     *
+     * @param array $data Form data.
+     * @return array Validation errors keyed by element name.
+     */
+    public static function validate_elements(array $data): array {
+        $errors = [];
+        if (($data['option'] ?? '') === 'stepper' && !empty($data['stepper_special'])) {
+            $invalid = [];
+            self::parse_special_states((string) $data['stepper_special'], $invalid);
+            if ($invalid) {
+                $errors['stepper_special'] = get_string(
+                    'fieldformatoptionstepperspecialerror',
+                    'datalynxfield_radiobutton',
+                    implode(', ', $invalid)
+                );
+            }
+        }
+        return $errors;
+    }
+
+    /**
+     * Parses the special states of the stepper.
+     *
+     * One state per line: "option:step:style". The option is the number of the option that is
+     * not shown as a step of its own. While an entry has this option, the stepper shows progress
+     * up to the given step (the number of another option) and marks that step with the style.
+     * Without a step (or with 0) no step is reached and the state is shown below the stepper.
+     * The style defaults to "warning".
+     *
+     * @param string $setting The raw setting.
+     * @param array|null $invalid Receives the lines that could not be parsed.
+     * @return array Option number => ['step' => int, 'style' => string].
+     */
+    public static function parse_special_states(string $setting, ?array &$invalid = null): array {
+        $states = [];
+        $invalid = [];
+        foreach (preg_split('/\R/', $setting) as $line) {
+            $line = trim($line);
+            if ($line === '') {
+                continue;
+            }
+            $parts = array_map('trim', explode(':', $line));
+            $option = $parts[0];
+            $step = $parts[1] ?? '';
+            $style = strtolower($parts[2] ?? '') ?: 'warning';
+            if (
+                count($parts) > 3 || !ctype_digit($option) || (int) $option < 1
+                || ($step !== '' && !ctype_digit($step)) || !in_array($style, self::SPECIAL_STYLES)
+            ) {
+                $invalid[] = s($line);
+                continue;
+            }
+            $states[(int) $option] = ['step' => (int) $step, 'style' => $style];
+        }
+        return $states;
     }
 
     /**
