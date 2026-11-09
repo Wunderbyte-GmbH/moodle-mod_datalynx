@@ -942,7 +942,9 @@ $string['teachersandstudents'] = '{$a->teachers} und {$a->students}';
 $string['teamfield'] = 'Teamfeld';
 $string['teamfield_help'] = 'Haken sie diese Checkbox an, um dieses Feld als Teamfeld zu bezeichnen. Bei Freigabe eines Eintrags wird dieser jeder Person in diesem Feld zugewiesen. Nur ein Feld darf pro eine Datalynx-Instanz als Teamfeld bezeichnet werden.';
 $string['teammembercaneditentry'] = 'Team-Mitglieder dürfen den Eintrag editieren';
-$string['teammembercaneditentry_help'] = 'Wenn diese Option aktiviert ist, dürfen die zum Feld hinzugefügten User den Eintrag genau so editieren wie der/die Autor/in des Eintrags';
+$string['teammembercaneditentry_help'] = 'Wenn diese Option aktiviert ist, dürfen die zum Feld hinzugefügten User den Eintrag genau so editieren wie der/die Autor/in des Eintrags.
+
+Das gilt nur in Ansichten, die dieses Team-Feld enthalten. Das Feld kann mit einem Verhalten oder Feld-Layout eingebunden werden, das es ausblendet; es muss nur Teil der Ansicht sein. In Ansichten ohne das Team-Feld haben Team-Mitglieder keine Bearbeitungsrechte für den Eintrag. So lässt sich pro Ansicht festlegen, wo Team-Mitglieder bearbeiten dürfen.';
 $string['teammembers'] = 'Teammitglieder';
 $string['teammemberselect'] = 'Team-Member Feld';
 $string['teammemberselectmultiple'] = 'Eine gewissene Person kann nur einmal als Mitglied eines gewissenen Teams ausgewählt werden!';

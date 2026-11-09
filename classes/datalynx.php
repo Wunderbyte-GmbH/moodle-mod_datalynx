@@ -2633,11 +2633,15 @@ class datalynx {
     /**
      * Checks if team member can edit the entry.
      *
+     * Only the team content loaded on the entry is considered. A view loads the contents of the
+     * fields in its templates, so team members get editing rights only in views that contain the
+     * team field (possibly hidden). This per-view control is intended; see mod_datalynx#282.
+     *
      * @param ?stdClass $entry
      * @return bool
      */
     public function teammember_can_edit(?stdClass $entry = null): bool {
-        global $USER, $DB;
+        global $USER;
         // Get all teammemberselect fields, that allow editing of entry.
         $teammemberfields = $this->get_fields_by_type('teammemberselect');
         $fieldids = [];
@@ -2650,23 +2654,13 @@ class datalynx {
             return false;
         }
         foreach ($fieldids as $fieldid) {
-            // Extract all userids of teammemberselect field. A view only loads the contents of the
-            // fields it shows, so read the team from the database when it was not loaded; otherwise
-            // team members could not save in a view that does not display the team field.
-            if (isset($entry->{"c{$fieldid}_content"})) {
-                $content = $entry->{"c{$fieldid}_content"};
-            } else if (!empty($entry->id)) {
-                $content = $DB->get_field(
-                    'datalynx_contents',
-                    'content',
-                    ['entryid' => $entry->id, 'fieldid' => $fieldid, 'lineid' => 0]
-                );
-            } else {
-                $content = null;
-            }
-            $userids = $content ? json_decode($content, true) : [];
+            // Extract all userids of teammemberselect field.
+            $userids = isset($entry->{"c{$fieldid}_content"}) ? json_decode(
+                $entry->{"c{$fieldid}_content"},
+                true
+            ) : [];
             // Check if $USER is part of the teammembers who are allowed to edit.
-            if (is_array($userids) && in_array($USER->id, $userids)) {
+            if (in_array($USER->id, $userids)) {
                 return true;
             }
         }

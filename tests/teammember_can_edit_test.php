@@ -27,16 +27,18 @@ namespace mod_datalynx;
 use advanced_testcase;
 
 /**
- * A view only loads the contents of the fields it displays. Team members must still be allowed to
- * edit an entry in a view that does not show the team field.
+ * Team members may only edit an entry in views that contain the team field: a view loads the
+ * contents of the fields in its templates, and only loaded team content grants editing rights.
+ * This per-view control is part of the access concept (see mod_datalynx#282) and must not be
+ * replaced by a database lookup, which would also allow team members to delete entries.
  *
  * @covers \mod_datalynx\datalynx::teammember_can_edit
  */
 final class teammember_can_edit_test extends advanced_testcase {
     /**
-     * The team is read from the database when the entry object does not carry it.
+     * Rights follow the team content loaded by the view, not the stored team.
      */
-    public function test_team_member_can_edit_without_loaded_team_content(): void {
+    public function test_team_member_rights_depend_on_loaded_team_content(): void {
         global $DB;
         $this->resetAfterTest();
 
@@ -62,15 +64,14 @@ final class teammember_can_edit_test extends advanced_testcase {
         $dlx = new datalynx($instance->id);
         $entry = (object) ['id' => $entryid, 'userid' => $author->id, 'status' => 2];
 
+        // View without the team field: nothing loaded, no rights even for a stored team member.
         $this->setUser($member);
-        $this->assertTrue($dlx->teammember_can_edit($entry));
-
-        $this->setUser($other);
         $this->assertFalse($dlx->teammember_can_edit($entry));
 
-        // Content that was loaded by the view still takes precedence.
-        $this->setUser($member);
-        $entry->{"c{$teamfieldid}_content"} = json_encode([(int) $other->id]);
+        // View with the team field: the loaded team grants rights to its members only.
+        $entry->{"c{$teamfieldid}_content"} = json_encode([(int) $member->id]);
+        $this->assertTrue($dlx->teammember_can_edit($entry));
+        $this->setUser($other);
         $this->assertFalse($dlx->teammember_can_edit($entry));
     }
 }

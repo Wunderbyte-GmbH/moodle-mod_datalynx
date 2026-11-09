@@ -944,7 +944,9 @@ $string['teachersandstudents'] = '{$a->teachers} and {$a->students}';
 $string['teamfield'] = 'Team field';
 $string['teamfield_help'] = 'Check this box to designate this field as a team field. When approving an entry with a specified team that entry will be copied and assigned to every team member. Only one field per Datalynx instance may be designated as a team field.';
 $string['teammembercaneditentry'] = 'Team members are allowed to edit the entry';
-$string['teammembercaneditentry_help'] = 'If this option is activated, the users added to the field may edit the entry in exactly the same way as the author of the entry';
+$string['teammembercaneditentry_help'] = 'If this option is activated, the users added to the field may edit the entry in exactly the same way as the author of the entry.
+
+This applies only in views that contain this team field. The field may be included with a behavior or field layout that hides it; it only has to be part of the view. In views without the team field, team members have no editing rights for the entry. This lets you decide per view where team members may edit.';
 $string['teammembers'] = 'Team members';
 $string['teammemberselect'] = 'Team member select field';
 $string['teammemberselectmultiple'] = 'A single person can be selected only once as a team member!';
