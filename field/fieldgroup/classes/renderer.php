@@ -109,6 +109,9 @@ class renderer extends datalynxfield_renderer {
                 $tag  = "[[{$inner}|{$behaviorname}|{$layoutname}]]";
                 $suboptions = $options;
                 $suboptions['edit'] = false;
+                // The fieldgroup's own format (e.g. the totals) must not be applied to its subfields;
+                // they use the format named in their own definition, if any.
+                unset($suboptions['field_format']);
                 $tagresults = $subfield->renderer()->replacements([$tag], $entry, $suboptions);
                 $subfielddefinition['content'] = ($tagresults[$tag][0] === 'html') ? $tagresults[$tag][1] : '';
 

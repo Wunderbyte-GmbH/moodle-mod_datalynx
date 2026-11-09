@@ -205,10 +205,12 @@ class renderer extends TextRenderer {
         $field = $this->field;
         $fieldid = $field->id();
         $outputemptystring = !empty($field->get('param4')) ? $field->get('param4') : 0;
-        if (!isset($entry->{"c{$fieldid}_content"}) && !$outputemptystring) {
-            return 0;
-        } else if (!isset($entry->{"c{$fieldid}_content"})) {
+        $content = $entry->{"c{$fieldid}_content"} ?? null;
+        // A stored empty value (e.g. an empty fieldgroup row) counts as empty, too.
+        if (($content === null || $content === '') && $outputemptystring) {
             return '';
+        } else if ($content === null) {
+            return 0;
         }
         $number = (float) $entry->{"c{$fieldid}_content"};
         $fieldformat = $options['field_format'] ?? null;
