@@ -35,6 +35,7 @@ use mod_datalynx\local\filter\datalynx_filter;
  *
  * @covers \mod_datalynx\local\field\datalynxfield_behavior::is_editable_after_final
  * @covers \mod_datalynx\local\view\base::get_editable_after_final_fieldids
+ * @covers \mod_datalynx\local\view\base::get_editable_after_final_subfieldids
  * @covers \mod_datalynx\local\datalynx_entries::process_entries
  */
 final class editable_after_final_test extends advanced_testcase {
@@ -108,6 +109,38 @@ final class editable_after_final_test extends advanced_testcase {
 
         $this->assertSame([$noteid], $allowed);
         $this->assertNotContains($plainid, $allowed);
+    }
+
+    /**
+     * A fieldgroup tagged with an editable-after-final behavior also whitelists its subfields (its rows
+     * are stored as subfield contents), except a subfield whose own behavior is not editable after final.
+     */
+    public function test_fieldgroup_subfields_follow_fieldgroup_behavior(): void {
+        global $DB;
+        foreach (['editfinal' => 1, 'lockedsub' => 0] as $name => $eaf) {
+            $DB->insert_record('datalynx_behaviors', datalynxfield_behavior::form_to_db((object) [
+                'id' => 0, 'd' => $this->dlx->id(), 'name' => $name, 'description' => '',
+                'visibletopermission' => [1], 'visibletouser' => [], 'visibletoteammember' => [],
+                'editableby' => [16], 'editable' => 1, 'required' => 0, 'editableafterfinal' => $eaf,
+                'conditions' => ['match' => 'all', 'rules' => []],
+            ]));
+        }
+        $amountid = $this->create_field('number', 'Amount');
+        $noteid = $this->create_field('text', 'Note');
+        $groupid = $this->create_field('fieldgroup', 'Rows');
+        $DB->set_field('datalynx_fields', 'param1', json_encode(["$amountid:|", "$noteid:|lockedsub|"]), ['id' => $groupid]);
+        $this->dlx->get_fields(null, false, true);
+
+        $viewrecord = $this->create_grid_view('<div>[[Rows|editfinal]] ##status##</div>');
+        $allowed = $this->dlx->get_view('grid', $viewrecord)->get_editable_after_final_fieldids();
+
+        $this->assertContains($groupid, $allowed);
+        $this->assertContains($amountid, $allowed);
+        $this->assertNotContains($noteid, $allowed);
+
+        // Without the flag on the fieldgroup tag nothing is whitelisted.
+        $viewrecord = $this->create_grid_view('<div>[[Rows]] ##status##</div>');
+        $this->assertSame([], $this->dlx->get_view('grid', $viewrecord)->get_editable_after_final_fieldids());
     }
 
     /**

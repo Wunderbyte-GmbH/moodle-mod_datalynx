@@ -2093,12 +2093,52 @@ abstract class base {
                     $behavior = datalynxfield_behavior::from_name($matches[2], $this->dlx->id());
                     if ($behavior && $behavior->is_editable_after_final()) {
                         $allowed[(int) $fieldid] = (int) $fieldid;
+                        // A fieldgroup's rows are stored as contents of its subfields, which never
+                        // appear as tags of their own (mod_datalynx#283).
+                        foreach ($this->get_editable_after_final_subfieldids((int) $fieldid) as $subfieldid) {
+                            $allowed[$subfieldid] = $subfieldid;
+                        }
                         break;
                     }
                 }
             }
         }
         return array_values($allowed);
+    }
+
+    /**
+     * Subfields of a fieldgroup that may be saved when the fieldgroup itself is editable after final
+     * submission. A subfield is excluded only if its own behavior in the fieldgroup definition
+     * (param1 entries "fieldid:format|behavior|layout") explicitly is not editable after final.
+     *
+     * @param int $fieldid Id of the field whose tag is editable after final submission.
+     * @return int[] Subfield ids; empty if the field is not a fieldgroup.
+     */
+    protected function get_editable_after_final_subfieldids(int $fieldid): array {
+        $field = $this->dlx->get_field_from_id($fieldid);
+        if (!$field || $field->type !== 'fieldgroup') {
+            return [];
+        }
+        $definitions = json_decode((string) $field->field->param1, true);
+        if (!is_array($definitions)) {
+            return [];
+        }
+        $ids = [];
+        foreach ($definitions as $definition) {
+            [$subfieldid, $rest] = array_pad(explode(':', (string) $definition, 2), 2, '');
+            if (!is_numeric($subfieldid)) {
+                continue;
+            }
+            $behaviorname = explode('|', $rest)[1] ?? '';
+            if ($behaviorname !== '') {
+                $subbehavior = datalynxfield_behavior::from_name($behaviorname, $this->dlx->id());
+                if ($subbehavior && !$subbehavior->is_editable_after_final()) {
+                    continue;
+                }
+            }
+            $ids[] = (int) $subfieldid;
+        }
+        return $ids;
     }
 
     /**
