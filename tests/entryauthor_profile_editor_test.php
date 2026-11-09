@@ -43,7 +43,7 @@ final class entryauthor_profile_editor_test extends advanced_testcase {
      * The input has no visible label of its own but keeps the profile field name as aria-label.
      */
     public function test_profile_editor_input_has_no_shortname_label(): void {
-        global $DB, $USER;
+        global $USER;
         $this->resetAfterTest();
         $this->setAdminUser();
 
@@ -52,7 +52,9 @@ final class entryauthor_profile_editor_test extends advanced_testcase {
         ]);
         $course = $this->getDataGenerator()->create_course();
         $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
-        $DB->insert_record('datalynx_field_formats', (object) [
+        // Use the manager API: it clears its per-instance cache, which a direct insert would
+        // leave stale (instance ids repeat across tests).
+        \mod_datalynx\local\field_format\manager::save_format((object) [
             'dataid' => $instance->id,
             'name' => 'Street',
             'fieldtype' => 'entryauthor',
