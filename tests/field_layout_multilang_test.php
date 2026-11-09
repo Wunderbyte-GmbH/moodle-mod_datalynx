@@ -37,6 +37,7 @@ require_once($CFG->dirroot . '/mod/datalynx/tests/fixtures/multilang_test_trait.
  *
  * @covers \mod_datalynx\local\field\datalynxfield_renderer::replacements
  * @covers \mod_datalynx\local\field\datalynxfield_renderer::filter_layout_template
+ * @covers \datalynxfield_fieldgroup\renderer::render_edit_mode
  */
 final class field_layout_multilang_test extends advanced_testcase {
     use multilang_test_trait;
@@ -138,6 +139,26 @@ final class field_layout_multilang_test extends advanced_testcase {
             $this->assertSame('prerender_edit_mode', $callback[1]);
             $this->assertStringContainsString('#input', $options['template']);
             $this->assert_localised($lang, $options['template'], 'edit template');
+        }
+    }
+
+    /**
+     * Edit mode inside a fieldgroup: the subfield's layout is filtered too.
+     */
+    public function test_fieldgroup_subfield_edit_template_is_filtered(): void {
+        global $CFG, $DB;
+        require_once($CFG->libdir . '/formslib.php');
+        $groupid = (int) $DB->insert_record('datalynx_fields', (object) [
+            'dataid' => $this->dlx->id(), 'type' => 'fieldgroup', 'name' => 'rows', 'description' => '',
+            'param1' => json_encode([$this->field->id() . ':||mllayout']), 'param2' => '2', 'param3' => '1', 'param4' => '0',
+        ]);
+        $group = (new datalynx($this->dlx->id()))->get_field_from_id($groupid, true);
+
+        foreach (['de', 'en'] as $lang) {
+            $this->set_current_language($lang);
+            $mform = new \MoodleQuickForm('fgtest' . $lang, 'post', 'index.php');
+            $group->renderer()->render_edit_mode($mform, (object) ['id' => -1], ['edit' => true]);
+            $this->assert_localised($lang, $mform->toHtml(), 'fieldgroup subfield edit template');
         }
     }
 }

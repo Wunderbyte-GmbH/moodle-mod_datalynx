@@ -271,7 +271,8 @@ class renderer extends datalynxfield_renderer {
                 if ($layout) {
                     $edittemplate = $layout->get_edit_template();
                     if ($edittemplate !== datalynxfield_layout::EDIT_MODE_TEMPLATE_NONE) {
-                        $suboptions['template'] = $edittemplate;
+                        // Filter like replacements() does for top-level fields (multilang etc.).
+                        $suboptions['template'] = $this->filter_layout_template($edittemplate);
                     }
                     // When not-editable mode is "show as display", provide the rendered value.
                     if (
