@@ -31,6 +31,7 @@ $string['fieldformatoptionimageflex'] = 'Bild flexibel';
 $string['fieldformatoptionlink'] = 'Link';
 $string['fieldformatoptionmedia'] = 'Medienplayer';
 $string['forcename'] = 'Namen für den Link erzwingen';
+$string['invalidurl'] = 'Bitte geben Sie eine gültige Webadresse ein, z. B. https://example.org.';
 $string['linktext'] = 'Linktext';
 $string['makeimage'] = 'URL als Bild darstellen';
 $string['makelink'] = 'URL als Link darstellen';

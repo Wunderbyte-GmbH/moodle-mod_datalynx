@@ -93,8 +93,7 @@ class field extends datalynxfield_base {
                 if ($name) { // Update from form.
                     switch ($name) {
                         case 'url':
-                            // TODO: MDL-0000 Is this really the place to validate for empty fields?
-                            $url = clean_param($value, PARAM_URL);
+                            $url = clean_param(self::normalise_url((string) $value), PARAM_URL);
                             break;
                         case 'alt':
                             $linktext = clean_param($value, PARAM_NOTAGS);
@@ -103,10 +102,10 @@ class field extends datalynxfield_base {
                 } else { // Update from import.
                     if (strpos($value, '##') !== false) {
                         $value = explode('##', $value);
-                        $url = clean_param($value[0], PARAM_URL);
+                        $url = clean_param(self::normalise_url((string) $value[0]), PARAM_URL);
                         $linktext = clean_param($value[1], PARAM_NOTAGS);
                     } else {
-                        $url = clean_param($value, PARAM_URL);
+                        $url = clean_param(self::normalise_url((string) $value), PARAM_URL);
                     }
                     // There should be only one from import, so break.
                     break;
@@ -166,9 +165,26 @@ class field extends datalynxfield_base {
      * @return bool
      */
     public static function is_fieldvalue_empty($value): bool {
-        if ($value == '' || $value == 'http://') {
-            return true;
+        return self::normalise_url((string) $value) === '';
+    }
+
+    /**
+     * Normalise a URL entered by a user.
+     *
+     * Empty input and a bare scheme ("http://", "https://" - the legacy prefill of the input) count
+     * as empty. Input without a scheme, e.g. "example.org/page", gets "https://" prepended.
+     *
+     * @param string $value Raw input.
+     * @return string Normalised URL, or '' if empty.
+     */
+    public static function normalise_url(string $value): string {
+        $value = trim($value);
+        if ($value === '' || preg_match('~^[a-z][a-z0-9+.-]*://$~i', $value)) {
+            return '';
         }
-        return false;
+        if (!preg_match('~^[a-z][a-z0-9+.-]*:~i', $value)) {
+            $value = 'https://' . ltrim($value, '/');
+        }
+        return $value;
     }
 }

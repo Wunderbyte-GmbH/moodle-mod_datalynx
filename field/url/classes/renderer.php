@@ -49,9 +49,17 @@ class renderer extends datalynxfield_renderer {
         $url = isset($entry->{"c{$fieldid}_content"}) ? $entry->{"c{$fieldid}_content"} : null;
         $alt = isset($entry->{"c{$fieldid}_content1"}) ? $entry->{"c{$fieldid}_content1"} : null;
 
-        $url = empty($url) ? 'http://' : $url;
+        // Legacy entries may hold a bare "http://" prefill; show those as empty.
+        $url = \datalynxfield_url\field::normalise_url((string) $url);
         $displaylinktextfield = empty($field->field->param5) ? false : true;
-        $options = ['title' => s($field->field->description), 'size' => 60];
+        $options = [
+            'title' => s($field->field->description),
+            'size' => 60,
+            'placeholder' => 'https://',
+            'inputmode' => 'url',
+            'autocomplete' => 'url',
+            'spellcheck' => 'false',
+        ];
 
         $group = [];
         $group[] = $mform->createElement('text', "{$fieldname}_url", null, $options);
@@ -95,7 +103,7 @@ class renderer extends datalynxfield_renderer {
 
         if (isset($entry->{"c{$fieldid}_content"})) {
             $url = $entry->{"c{$fieldid}_content"};
-            if (empty($url) || ($url == 'http://')) {
+            if (\datalynxfield_url\field::normalise_url((string) $url) === '') {
                 return '';
             }
 
@@ -189,21 +197,16 @@ class renderer extends datalynxfield_renderer {
         foreach ($tags as $tag) {
             [, $behavior, ] = $this->process_tag($tag);
             // Variable $behavior datalynx_field_behavior.
-            if (
-                $behavior->is_required() &&
-                    (!isset($formdata->$formfieldname) || $formdata->$formfieldname === 'http://')
-            ) {
-                $errors["field_{$fieldid}_{$entryid}_grp"] = get_string('fieldrequired', 'datalynx');
-            }
-            // Validate that the input is a URL.
-            $value = $formdata->$formfieldname ?? '';
-            $isurl = filter_var($value, FILTER_VALIDATE_URL);
-            $isdefault = $value === 'http://';
-            $isempty = $value === '';
-            if ($isurl || $isdefault || $isempty) {
+            $value = \datalynxfield_url\field::normalise_url((string) ($formdata->$formfieldname ?? ''));
+            if ($value === '') {
+                if ($behavior->is_required()) {
+                    $errors["field_{$fieldid}_{$entryid}_grp"] = get_string('fieldrequired', 'datalynx');
+                }
                 continue;
-            } else {
-                $errors["field_{$fieldid}_{$entryid}_grp"] = "Please enter a valid URL."; // TODO: MDL-0000 Multilang.
+            }
+            // Validate that the (normalised) input is a URL.
+            if (!filter_var($value, FILTER_VALIDATE_URL)) {
+                $errors["field_{$fieldid}_{$entryid}_grp"] = get_string('invalidurl', 'datalynxfield_url');
             }
         }
 
