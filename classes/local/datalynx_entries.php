@@ -927,8 +927,9 @@ class datalynx_entries {
                                 $oldapproved = isset($entry->approved) ? (int) $entry->approved : null;
 
                                 if ($entry->id = $this->update_entry($entry, $contents[$eid]['info'], true, $allowfinaledit)) {
-                                    $emptycontent = []; // Array with lines and deleted contentids.
-                                    $countfgfields = 0; // Store how many fields exist per line.
+                                    // Lines of fieldgroups as posted: fieldgroup => line => content ids and
+                                    // whether any subfield of the line has a value.
+                                    $fglines = [];
                                     $changedfields = []; // Track field IDs whose content changed.
 
                                     // Record changes to internal fields under their field id so they appear in
@@ -954,7 +955,6 @@ class datalynx_entries {
                                         // If we see a fieldgroup we split and reset the content.
                                         $fieldgroup = array_search(true, $content);
                                         if (strpos($fieldgroup, "fieldgroup") === 0) {
-                                            $countfgfields++;
                                             // TODO: MDL-66151 Rewrite this for fieldgroup_id instead of fieldgroup.
                                             // Use $fieldgroup.
                                             // How many lines were visible to the user, store only those.
@@ -1033,14 +1033,17 @@ class datalynx_entries {
                                                     $changedfields[$fieldid] = true;
                                                 }
 
-                                                // In case this field has no content mark and check deletion later.
-                                                // TODO: MDL-66151 Needs to be extended for all field classes in function.
-                                                if ($fields[$fieldid]->is_fieldvalue_empty($value)) {
-                                                    if (isset($entry->{"c{$fieldid}_id_fieldgroup"}[$i])) {
-                                                        $emptycontent[$i][] = $entry->{"c{$fieldid}_id_fieldgroup"}[$i];
-                                                    } else {
-                                                        $emptycontent[$i][] = $newcontentid;
-                                                    }
+                                                // Remember the line's content ids and whether it has a value, so
+                                                // lines without any value can be removed below.
+                                                if (!$fields[$fieldid]->is_fieldvalue_empty($value)) {
+                                                    $fglines[$fieldgroup][$i]['hasvalue'] = true;
+                                                }
+                                                if (isset($entry->{"c{$fieldid}_id_fieldgroup"}[$i])) {
+                                                    $fglines[$fieldgroup][$i]['contentids'][] =
+                                                            $entry->{"c{$fieldid}_id_fieldgroup"}[$i];
+                                                }
+                                                if (is_numeric($newcontentid) && !is_bool($newcontentid)) {
+                                                    $fglines[$fieldgroup][$i]['contentids'][] = $newcontentid;
                                                 }
                                             }
                                         } else {
@@ -1052,20 +1055,39 @@ class datalynx_entries {
                                         }
                                     }
 
-                                    // Remove contentids that we have collected.
-                                    if ($emptycontent) {
-                                        $deletedcontentids = [];
-                                        foreach ($emptycontent as $contentids) {
-                                            // Check if every field is empty, only then remove line.
-                                            if (count($contentids) != $countfgfields) {
+                                    // Remove the lines of a fieldgroup in which no subfield has a value. The whole
+                                    // line goes, including subfields that posted nothing (e.g. a disabled date),
+                                    // so the subfields' lines stay aligned.
+                                    $deletedcontentids = [];
+                                    foreach ($fglines as $fieldgroup => $lines) {
+                                        $groupid = (int) substr($fieldgroup, strlen('fieldgroup_'));
+                                        $subfieldids = [];
+                                        if (isset($fields[$groupid]) && !empty($fields[$groupid]->fieldids)) {
+                                            $subfieldids = array_map('intval', $fields[$groupid]->fieldids);
+                                        }
+                                        foreach ($lines as $i => $line) {
+                                            if (!empty($line['hasvalue'])) {
                                                 continue;
+                                            }
+                                            $contentids = $line['contentids'] ?? [];
+                                            foreach ($subfieldids as $subfieldid) {
+                                                if (isset($entry->{"c{$subfieldid}_id_fieldgroup"}[$i])) {
+                                                    $contentids[] = $entry->{"c{$subfieldid}_id_fieldgroup"}[$i];
+                                                } else if (
+                                                        $i == 0 && !empty($entry->{"c{$subfieldid}_id"})
+                                                        && !isset($contents[$eid]['fields'][$subfieldid])
+                                                ) {
+                                                    // A subfield that posted nothing still holds its single row.
+                                                    $contentids[] = $entry->{"c{$subfieldid}_id"};
+                                                }
                                             }
                                             $deletedcontentids = array_merge($deletedcontentids, $contentids);
                                         }
-                                        if ($deletedcontentids) {
-                                            $in = implode(',', $deletedcontentids);
-                                            $DB->delete_records_select('datalynx_contents', "id IN ($in)"); // TESTING.
-                                        }
+                                    }
+                                    $deletedcontentids = array_unique(array_filter(array_map('intval', $deletedcontentids)));
+                                    if ($deletedcontentids) {
+                                        [$insql, $inparams] = $DB->get_in_or_equal($deletedcontentids);
+                                        $DB->delete_records_select('datalynx_contents', "id $insql", $inparams);
                                     }
                                     $entry->changed_field_ids = array_keys($changedfields);
                                     $processed[$entry->id] = $entry;
