@@ -69,13 +69,14 @@ class renderer extends datalynxfield_renderer {
             $fmoptions
         );
 
-        // Add file manager element. Like every other field it has no visible label of its own: the
-        // view template or field layout around the tag provides it, so the internal field name is
-        // not shown next to it. The name stays available to assistive technology.
+        // Add file manager element. It is labelled with the field name, unless a custom field
+        // layout wraps the input (#input): that layout provides the label, and the internal field
+        // name would otherwise appear next to it.
+        $hascustomlayout = isset($options['template']) && strpos($options['template'], '#input') !== false;
         $mform->addElement(
             'filemanager',
             "{$fieldname}_filemanager",
-            '',
+            $hascustomlayout ? '' : $field->name(),
             ['aria-label' => format_string($field->name())],
             $fmoptions
         );

@@ -154,22 +154,28 @@ final class file_field_renderer_test extends advanced_testcase {
     }
 
     /**
-     * The file manager must not show the internal field name as its label: the view template or
-     * field layout provides the label, and a required file still gets a required rule.
+     * Without a custom field layout the file manager is labelled with the field name (also used
+     * by Behat to find it); a custom layout with #input provides its own label, so the internal
+     * field name is not shown next to it. A required file gets a required rule in both cases.
      */
-    public function test_edit_mode_has_no_field_name_label(): void {
+    public function test_edit_mode_label_depends_on_custom_layout(): void {
         global $CFG;
         require_once($CFG->libdir . '/formslib.php');
         [$dlx, $fieldid] = $this->create_file_field_instance();
         $field = $dlx->get_fields()[$fieldid];
+        $name = "field_{$fieldid}_-1_filemanager";
+        $entry = (object) ['id' => -1];
 
         $mform = new \MoodleQuickForm('filetest', 'post', 'index.php');
-        $entry = (object) ['id' => -1];
         $field->renderer()->render_edit_mode($mform, $entry, ['required' => true]);
+        $this->assertSame('Attachment', $mform->getElement($name)->getLabel());
+        $this->assertTrue($mform->isElementRequired($name));
 
-        $element = $mform->getElement("field_{$fieldid}_-1_filemanager");
-        $this->assertSame('', $element->getLabel());
-        $this->assertSame('Attachment', $element->getAttribute('aria-label'));
-        $this->assertTrue($mform->isElementRequired("field_{$fieldid}_-1_filemanager"));
+        $mform = new \MoodleQuickForm('filetest2', 'post', 'index.php');
+        $layout = '<label>Upload your CV</label>#input';
+        $field->renderer()->render_edit_mode($mform, $entry, ['required' => true, 'template' => $layout]);
+        $this->assertSame('', $mform->getElement($name)->getLabel());
+        $this->assertSame('Attachment', $mform->getElement($name)->getAttribute('aria-label'));
+        $this->assertTrue($mform->isElementRequired($name));
     }
 }
