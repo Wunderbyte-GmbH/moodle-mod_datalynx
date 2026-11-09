@@ -744,6 +744,7 @@ form.mform div.entry div.datalynx-field-wrapper {
     font-size: 0.8125rem;
     font-weight: 600;
     margin-top: 0.25rem;
+    color: var(--dlx-stepper-special, #f0ad4e);
 }
 
 .datalynx-stepper .step.special-warning {
@@ -752,7 +753,7 @@ form.mform div.entry div.datalynx-field-wrapper {
 
 .datalynx-stepper .step.special-warning .step-status {
     /* Bootstrap's warning yellow is too light for text on white. */
-    color: #8a5a00 !important;
+    color: #8a5a00;
 }
 
 .datalynx-stepper .step.special-danger {
