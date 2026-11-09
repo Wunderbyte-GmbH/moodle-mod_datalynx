@@ -704,7 +704,8 @@ class datalynx_entries {
             }
 
             if (!empty($importentryids)) {
-                $filterdata = ['dataid' => $dlx->id(), 'eids' => $importentryids];
+                // The filter takes the ids as a comma separated string (see get_entries()).
+                $filterdata = ['dataid' => $dlx->id(), 'eids' => implode(',', $importentryids)];
                 $filter = new datalynx_filter((object) $filterdata);
                 $entries += $this->get_entries(['filter' => $filter])->entries;
             }
