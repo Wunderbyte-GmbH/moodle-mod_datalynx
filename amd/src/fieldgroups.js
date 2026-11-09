@@ -72,11 +72,17 @@ const fieldGroups = {
             return true;
         }
 
-        if (Array.from(line.querySelectorAll('textarea')).some(textarea => textarea.value !== '')) {
+        if (Array.from(line.querySelectorAll('textarea')).some(textarea => !textarea.disabled && textarea.value !== '')) {
             return true;
         }
 
-        return Array.from(line.querySelectorAll('select')).some(select =>
+        // The selects of a date that is not enabled always have an option selected, but are no content.
+        // Check the "Enable" checkbox, as the selects may not be disabled yet when this runs.
+        const isInactiveDate = select => {
+            const enabled = select.closest('fieldset')?.querySelector('input[type="checkbox"][name$="[enabled]"]');
+            return !!enabled && !enabled.checked;
+        };
+        return Array.from(line.querySelectorAll('select')).some(select => !select.disabled && !isInactiveDate(select) &&
             Array.from(select.options).some(option => option.selected && option.value !== '' && option.value !== '-999')
         );
     },
