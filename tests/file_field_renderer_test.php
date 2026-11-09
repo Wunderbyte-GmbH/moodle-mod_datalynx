@@ -49,14 +49,14 @@ final class file_field_renderer_test extends advanced_testcase {
      *
      * @return array{0: datalynx, 1: int}
      */
-    private function create_file_field_instance(): array {
+    private function create_file_field_instance(string $type = 'file'): array {
         global $DB;
         $course = $this->getDataGenerator()->create_course();
         $dlx = new datalynx($this->getDataGenerator()->create_module('datalynx', ['course' => $course->id])->id);
 
         $fieldid = (int) $DB->insert_record('datalynx_fields', (object) [
             'dataid' => $dlx->id(),
-            'type' => 'file',
+            'type' => $type,
             'name' => 'Attachment',
             'description' => '',
             'param2' => '2',
@@ -174,6 +174,31 @@ final class file_field_renderer_test extends advanced_testcase {
         $mform = new \MoodleQuickForm('filetest2', 'post', 'index.php');
         $layout = '<label>Upload your CV</label>#input';
         $field->renderer()->render_edit_mode($mform, $entry, ['required' => true, 'template' => $layout]);
+        $this->assertSame('', $mform->getElement($name)->getLabel());
+        $this->assertSame('Attachment', $mform->getElement($name)->getAttribute('aria-label'));
+        $this->assertTrue($mform->isElementRequired($name));
+    }
+
+    /**
+     * The picture field labels its file manager like the file field: with the field name, unless a
+     * custom layout with #input provides the label.
+     *
+     * @covers \datalynxfield_picture\renderer::render_edit_mode
+     */
+    public function test_picture_edit_mode_label_depends_on_custom_layout(): void {
+        global $CFG;
+        require_once($CFG->libdir . '/formslib.php');
+        [$dlx, $fieldid] = $this->create_file_field_instance('picture');
+        $field = $dlx->get_fields()[$fieldid];
+        $name = "field_{$fieldid}_-1_filemanager";
+        $entry = (object) ['id' => -1];
+
+        $mform = new \MoodleQuickForm('picturetest', 'post', 'index.php');
+        $field->renderer()->render_edit_mode($mform, $entry, []);
+        $this->assertSame('Attachment', $mform->getElement($name)->getLabel());
+
+        $mform = new \MoodleQuickForm('picturetest2', 'post', 'index.php');
+        $field->renderer()->render_edit_mode($mform, $entry, ['required' => true, 'template' => '<label>Photo</label>#input']);
         $this->assertSame('', $mform->getElement($name)->getLabel());
         $this->assertSame('Attachment', $mform->getElement($name)->getAttribute('aria-label'));
         $this->assertTrue($mform->isElementRequired($name));

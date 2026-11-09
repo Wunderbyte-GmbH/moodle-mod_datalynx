@@ -70,8 +70,17 @@ class renderer extends FileRenderer {
             $fmoptions
         );
 
-        // File manager.
-        $mform->addElement('filemanager', "{$fieldname}_filemanager", $field->name(), null, $fmoptions);
+        // File manager. It is labelled with the field name, unless a custom field layout wraps the
+        // input (#input): that layout provides the label, and the internal field name would otherwise
+        // appear next to it.
+        $hascustomlayout = isset($options['template']) && strpos($options['template'], '#input') !== false;
+        $mform->addElement(
+            'filemanager',
+            "{$fieldname}_filemanager",
+            $hascustomlayout ? '' : $field->name(),
+            ['aria-label' => format_string($field->name())],
+            $fmoptions
+        );
         $mform->setDefault("{$fieldname}_filemanager", $draftitemid);
         $required = !empty($options['required']);
         if ($required) {
