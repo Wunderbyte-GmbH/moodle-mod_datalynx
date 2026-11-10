@@ -433,6 +433,29 @@ class renderer extends datalynxfield_renderer {
     // phpcs:enable moodle.PHP.ForbiddenGlobalUse.BadGlobal
 
     /**
+     * Author tags that render an input in edit mode count as editable: the inline profile editor
+     * (##author:<profilefield>##) and ##author:edit## (change the author, managers only).
+     *
+     * @param string $tag The tag as found in the view template.
+     * @param stdClass $entry The entry.
+     * @return bool
+     */
+    public function is_tag_editable(string $tag, stdClass $entry): bool {
+        $field = $this->field;
+        if ($field->get('internalname') === 'profileeditor') {
+            return !empty($field->get('editable')) && $this->profile_edit_allowed($entry);
+        }
+        $stripped = trim($tag, '@');
+        if (strpos($stripped, '##author:') !== 0) {
+            return false;
+        }
+        $suffix = substr($stripped, strlen('##author:'), -2);
+        $format = \mod_datalynx\local\field_format\manager::get_format_by_name($field->dlx()->id(), $suffix);
+        $displayfield = ($format && $format->get_fieldtype() === 'entryauthor') ? $format->get_setting('option', $suffix) : $suffix;
+        return $displayfield === 'edit' && has_capability('mod/datalynx:manageentries', $field->dlx()->context);
+    }
+
+    /**
      * Resolve the user whose profile is targeted by this profile-editor field for a given entry.
      *
      * @param stdClass $entry The entry object.

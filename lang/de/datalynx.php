@@ -1043,6 +1043,8 @@ $string['viewnoneindatalynx'] = 'Für diese Datalynx sind keine Ansichten angele
 $string['viewoptions'] = 'Optionen anzeigen';
 $string['viewpagingfield'] = 'Seitennavigation';
 $string['viewpatternclass'] = 'CSS-Klasse';
+$string['viewpatternifeditable'] = 'Nur anzeigen, wenn der Eintrag dort noch bearbeitet werden kann';
+$string['viewpatternifeditable_help'] = 'Blendet den Link für einen Eintrag aus, wenn die Zielansicht kein Feld enthält, das die aktuelle Person in diesem Eintrag bearbeiten kann (zum Beispiel nach der endgültigen Abgabe, außer einzelne Felder bleiben bearbeitbar). Ob ein Feld bearbeitbar ist, richtet sich nach Verhalten, Bedingungen, der Sperre nach endgültiger Abgabe und der Sperre nach dem Speichern; Profilfelder der Autorin/des Autors zählen ebenfalls. Fügt dem Tag ;ifeditable hinzu.';
 $string['viewpatternlinktext'] = 'Linktext';
 $string['viewpatternurlquery'] = 'URL-Parameter';
 $string['viewpatternurlquery_help'] = 'Zusätzliche URL-Parameter, die an den Link angehängt werden. Trennen Sie mehrere Parameter mit einem senkrechten Strich (|). Sie können Eintragstags wie ##entryid## verwenden, die für den aktuellen Eintrag aufgelöst werden. Der Parameter filter erwartet die numerische Filter-ID (zum Beispiel filter=12). Beispiele: filter=12|editentries=##entryid## oder new=1.';

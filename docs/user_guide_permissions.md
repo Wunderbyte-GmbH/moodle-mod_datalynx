@@ -96,6 +96,7 @@ When an entry reaches the **Final submission** status, it is locked so authors c
 - Users with **`mod/datalynx:editfinalsubmission`** (editing teachers and managers by default) can still edit finally-submitted entries — useful for corrections or unlocking.
 - Users with **Manage entries** can also edit them.
 - Individual fields can be allowed to remain editable after final submission by enabling the field behavior’s *editable after final* option.
+- Edit links built with `##viewlink##` / `##viewsesslink##` can be hidden once nothing in their target view is editable any more: add the `ifeditable` flag (see *View link patterns* in the patterns guide).
 
 > **Pro-Tip**  
 > Grant `mod/datalynx:editfinalsubmission` sparingly. It is flagged as a spam-risk capability because it lets a user change records that learners consider “submitted and final”.

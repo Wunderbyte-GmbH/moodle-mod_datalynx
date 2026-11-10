@@ -1696,6 +1696,35 @@ abstract class base {
     }
 
     /**
+     * Whether this view would show at least one editable field for the entry to the current user.
+     *
+     * Uses the same editability decision as the edit form (behavior, conditions, final submission,
+     * lock after save), see {@see \mod_datalynx\local\field\datalynxfield_renderer::is_tag_editable()}. View links with the
+     * ifeditable flag are only shown when this returns true for their target view.
+     *
+     * @param stdClass $entry The entry (needs id, userid and status).
+     * @return bool
+     */
+    public function entry_has_editable_fields(stdClass $entry): bool {
+        if (empty($entry->id) || empty($this->tags['field'])) {
+            return false;
+        }
+        $fields = $this->dlx->get_fields();
+        foreach ($this->tags['field'] as $fieldid => $tags) {
+            if (empty($tags) || empty($fields[$fieldid])) {
+                continue;
+            }
+            $renderer = $fields[$fieldid]->renderer();
+            foreach ($tags as $tag) {
+                if ($renderer->is_tag_editable($tag, $entry)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
      * Collect embedded files used by this view and optionally by fields.
      *
      * @param ?string $set Restrict to view or field set.

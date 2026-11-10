@@ -1045,6 +1045,8 @@ $string['viewnoneindatalynx'] = 'There are no views defined for this datalynx.';
 $string['viewoptions'] = 'View options';
 $string['viewpagingfield'] = 'Paging field';
 $string['viewpatternclass'] = 'CSS class';
+$string['viewpatternifeditable'] = 'Only show if the entry can still be edited there';
+$string['viewpatternifeditable_help'] = 'Hides the link for an entry when the target view contains no field that the current user can edit in this entry (for example after final submission, unless some fields stay editable). Fields count as editable according to their behavior, conditions, the final submission lock and lock after save; author profile fields count as well. Adds ;ifeditable to the tag.';
 $string['viewpatternlinktext'] = 'Link text';
 $string['viewpatternurlquery'] = 'URL query';
 $string['viewpatternurlquery_help'] = 'Extra URL parameters added to the link. Separate several parameters with a pipe character (|). You may use entry tags such as ##entryid##, which are resolved for the current entry. The filter parameter takes the numeric filter id (for example filter=12). Examples: filter=12|editentries=##entryid## or new=1.';

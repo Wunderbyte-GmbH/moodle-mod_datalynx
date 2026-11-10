@@ -219,17 +219,19 @@ These patterns build links and URLs to **other views** of the same Datalynx acti
 | `##viewcontent:VIEWNAME##` | Renders the content of the named view inline |
 | `##viewlink:VIEWNAME;LINKTEXT;URLQUERY;CSSCLASS##` | A clickable link to the named view |
 | `##viewsesslink:VIEWNAME;LINKTEXT;URLQUERY;CSSCLASS##` | Like `##viewlink##`, but also adds the **session key** (`sesskey`) |
+| `##viewsesslink:VIEWNAME;LINKTEXT;URLQUERY;CSSCLASS;ifeditable##` | Like above, but only shown while the entry can still be edited in the target view (see below) |
 
 **When to use `##viewsesslink##` vs `##viewlink##`**
 
 Use `##viewsesslink##` whenever the link triggers an **action** that changes data — creating an entry (`new=1`) or editing one (`editentries=...`). These actions require a valid session key, which `##viewsesslink##` adds automatically. Use plain `##viewlink##` for read-only navigation.
 
-**The four parts (separated by `;`)**
+**The parts (separated by `;`)**
 
 1. **VIEWNAME** — the exact name of the target view.
 2. **LINKTEXT** — the visible link text. It may contain HTML (for example a Font Awesome icon: `<i class="fa fa-pencil"></i> Edit`).
 3. **URLQUERY** — extra URL parameters (see below). Leave empty if not needed.
 4. **CSSCLASS** — CSS classes applied to the link (for example `btn btn-primary btn-sm`).
+5. **FLAGS** *(optional)* — `ifeditable`: show the link only if the target view still has something to edit (see below). Omit the part, including its `;`, for a link that is always shown.
 
 **URL query parameters**
 
@@ -251,6 +253,27 @@ filter=12|editentries=##entryid##
 
 > **Tip — finding the filter id**  
 > Open the filter in the activity's **Filters** management area; the numeric id appears in the page URL (the `filter` / `fid` parameter). That number is what you put after `filter=`.
+
+**Edit links that disappear when nothing can be edited (`ifeditable`)**
+
+An "Edit" button in a list view (for example *My applications*) usually points to an edit view with `editentries=##entryid##`. After final submission most fields are locked, so the button would lead to a form without editable fields. With the `ifeditable` flag the link is only shown for an entry if the **target view contains at least one field that the current user can edit in this entry**. Datalynx uses the same rules as the edit form:
+
+- the field behavior (*editable by*, *visible to*) and its **conditions**,
+- the **final submission** lock and the behavior's *editable after final* option (or the capability *mod/datalynx:editfinalsubmission*),
+- **lock after save** of single-choice fields.
+
+Inline author profile fields (`##author:PROFILEFIELD##`) and `##author:edit##` (managers) count as editable as well. Action tags such as `##status##`, `##edit##` or `##submit##` do not count.
+
+Only the target view of the link is checked. In a multi-step form, point the link to a step whose fields use the same behavior as the other steps.
+
+In the tag dialog, tick **Only show if the entry can still be edited there**.
+
+```text
+##viewsesslink:Step 1 – Application type;Edit;editentries=##entryid##|eids=##entryid##;btn btn-primary;ifeditable##
+```
+
+> **Note**  
+> Hiding the link only improves the user interface. The edit form itself still enforces which fields are editable.
 
 **Full examples**
 

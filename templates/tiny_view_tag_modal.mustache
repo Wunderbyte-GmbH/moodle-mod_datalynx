@@ -6,17 +6,21 @@
     * fieldids.linktext
     * fieldids.urlquery
     * fieldids.cssclass
+    * fieldids.ifeditable
     * labels.view
     * labels.linktext
     * labels.urlquery
     * labels.urlqueryhelp
     * labels.cssclass
+    * labels.ifeditable
+    * labels.ifeditablehelp
     * labels.delete
     * options[] { value, name, selected }
     * showlinkoptions
     * values.linktext
     * values.urlquery
     * values.cssclass
+    * values.ifeditable
 
     Example context (json):
     {
@@ -24,7 +28,8 @@
             "viewselect": "dlx-view-select-view",
             "linktext": "dlx-link-text-view",
             "urlquery": "dlx-url-query-view",
-            "cssclass": "dlx-css-class-view"
+            "cssclass": "dlx-css-class-view",
+            "ifeditable": "dlx-if-editable-view"
         },
         "labels": {
             "view": "View",
@@ -32,6 +37,8 @@
             "urlquery": "URL query",
             "urlqueryhelp": "Separate parameters with | e.g. filter=12|editentries=##entryid## or new=1",
             "cssclass": "CSS class",
+            "ifeditable": "Only show if the entry can still be edited there",
+            "ifeditablehelp": "Hides the link when the target view has no field the user can edit in this entry.",
             "delete": "Delete tag"
         },
         "options": [
@@ -42,7 +49,8 @@
         "values": {
             "linktext": "View link",
             "urlquery": "new=1|bar=2",
-            "cssclass": "btn btn-primary"
+            "cssclass": "btn btn-primary",
+            "ifeditable": true
         }
     }
 }}
@@ -68,6 +76,11 @@
     <div class="form-group">
         <label for="{{fieldids.cssclass}}">{{labels.cssclass}}</label>
         <input type="text" class="form-control" id="{{fieldids.cssclass}}" name="{{fieldids.cssclass}}" value="{{values.cssclass}}" data-region="tag-cssclass-input">
+    </div>
+    <div class="form-check mb-3">
+        <input type="checkbox" class="form-check-input" id="{{fieldids.ifeditable}}" name="{{fieldids.ifeditable}}" value="1"{{#values.ifeditable}} checked{{/values.ifeditable}} data-region="tag-ifeditable-input">
+        <label class="form-check-label" for="{{fieldids.ifeditable}}">{{labels.ifeditable}}</label>
+        {{#labels.ifeditablehelp}}<small class="form-text text-muted d-block" data-region="tag-ifeditable-help">{{labels.ifeditablehelp}}</small>{{/labels.ifeditablehelp}}
     </div>
 {{/showlinkoptions}}
 

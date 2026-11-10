@@ -132,27 +132,7 @@ abstract class datalynxfield_renderer {
             // when not met the field is hidden in both view and edit mode, and cannot be required.
             $conditionsmet = $behavior->passes_conditions($entry);
             $currentoptions['visible'] = $behavior->is_visible_to_user($entry) && $conditionsmet;
-            // Pass isentryauthor: for new entries the current user will be the author;
-            // for existing entries compare entry userid with current user.
-            global $USER;
-            $isentryauthor = empty($entry->id) || (isset($entry->userid) && (string)$entry->userid === (string)$USER->id);
-            $editable = $behavior->is_editable_by_user(null, $isentryauthor) && $conditionsmet;
-            // Once an entry reaches final submission, only fields whose behavior explicitly allows it
-            // stay editable for users without editfinalsubmission. The status field itself is never excepted,
-            // so the entry cannot be reverted to draft to bypass the lock.
-            if (
-                $editable && isset($entry->status)
-                && (int) $entry->status === \datalynxfield_status\field::STATUS_FINAL_SUBMISSION
-                && !has_capability('mod/datalynx:editfinalsubmission', $this->field->dlx()->context)
-            ) {
-                $editable = $behavior->is_editable_after_final() && $this->field->type !== 'status';
-            }
-            // A single-choice field set to lock after first save is read-only for everyone once the
-            // entry has a saved value. The value can only be changed by resetting the entry (##reset##).
-            if ($editable && $this->field->is_locked_for_entry($entry)) {
-                $editable = false;
-            }
-            $currentoptions['editable'] = $editable;
+            $currentoptions['editable'] = $this->behavior_allows_edit($behavior, $entry, $conditionsmet);
             $currentoptions['required'] = $behavior->is_required() && $conditionsmet;
             $currentoptions['internal'] = $this->field->is_internal();
 
@@ -295,6 +275,65 @@ abstract class datalynxfield_renderer {
      */
     private function replace_renderer_template_tags($template, $value): ?string {
         return preg_replace('/#value/', $value, $template);
+    }
+
+    /**
+     * Whether the field can be edited in an entry under the given behavior.
+     *
+     * This is the single place that decides editability for the edit form ({@see replacements()})
+     * and for {@see is_tag_editable()}, so both always agree.
+     *
+     * @param datalynxfield_behavior $behavior Behavior of the field tag.
+     * @param stdClass $entry The entry.
+     * @param bool $conditionsmet Whether the behavior's availability conditions are met for the entry.
+     * @return bool
+     */
+    protected function behavior_allows_edit(datalynxfield_behavior $behavior, stdClass $entry, bool $conditionsmet): bool {
+        global $USER;
+        // Pass isentryauthor: for new entries the current user will be the author;
+        // for existing entries compare entry userid with current user.
+        $isentryauthor = empty($entry->id) || (isset($entry->userid) && (string)$entry->userid === (string)$USER->id);
+        $editable = $behavior->is_editable_by_user(null, $isentryauthor) && $conditionsmet;
+        // Once an entry reaches final submission, only fields whose behavior explicitly allows it
+        // stay editable for users without editfinalsubmission. The status field itself is never excepted,
+        // so the entry cannot be reverted to draft to bypass the lock.
+        if (
+            $editable && isset($entry->status)
+            && (int) $entry->status === \datalynxfield_status\field::STATUS_FINAL_SUBMISSION
+            && !has_capability('mod/datalynx:editfinalsubmission', $this->field->dlx()->context)
+        ) {
+            $editable = $behavior->is_editable_after_final() && $this->field->type !== 'status';
+        }
+        // A single-choice field set to lock after first save is read-only for everyone once the
+        // entry has a saved value. The value can only be changed by resetting the entry (##reset##).
+        if ($editable && $this->field->is_locked_for_entry($entry)) {
+            $editable = false;
+        }
+        return $editable;
+    }
+
+    /**
+     * Whether a field tag of a view would render as an editable input for the entry.
+     *
+     * Used to decide whether an edit link to a view is worth showing, see
+     * {@see \mod_datalynx\local\view\base::entry_has_editable_fields()}.
+     * Only [[field|behavior|layout]] tags are considered here; field types with ##...## tags override this
+     * method if their tags can be edited.
+     *
+     * @param string $tag The field tag as found in the view template.
+     * @param stdClass $entry The entry.
+     * @return bool
+     */
+    public function is_tag_editable(string $tag, stdClass $entry): bool {
+        if (strpos(trim($tag, '@'), '[[') !== 0) {
+            return false;
+        }
+        [, $behavior] = $this->process_tag($tag);
+        $conditionsmet = $behavior->passes_conditions($entry);
+        if (!$behavior->is_visible_to_user($entry) || !$conditionsmet) {
+            return false;
+        }
+        return $this->behavior_allows_edit($behavior, $entry, $conditionsmet);
     }
 
     /**

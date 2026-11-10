@@ -40,6 +40,9 @@ class datalynxview_patterns {
     /** @var int Pattern category constant */
     const PATTERN_CATEGORY = 1;
 
+    /** @var string Optional 5th segment of a view link: show the link only if the target view has editable fields. */
+    const VIEW_LINK_FLAG_IFEDITABLE = 'ifeditable';
+
     /**
      *
      * @var ?base
@@ -259,7 +262,16 @@ class datalynxview_patterns {
                     }
                     // Strip leading and trailing ## delimiters.
                     $tagdefinition = substr($tag, 2, -2);
-                    [, $linktext, $urlquery, $class] = array_pad(explode(';', $tagdefinition, 4), 4, '');
+                    [, $linktext, $urlquery, $class, $flags] = array_pad(explode(';', $tagdefinition, 5), 5, '');
+                    // Opt-in: an edit link is only useful while the target view has something the user can still
+                    // change in this entry (e.g. no longer after final submission, unless fields stay editable).
+                    if (
+                        in_array(self::VIEW_LINK_FLAG_IFEDITABLE, array_map('trim', explode(',', $flags)), true)
+                        && !empty($entry->id) && $entry->id > 0
+                        && !$view->entry_has_editable_fields($entry)
+                    ) {
+                        return '';
+                    }
                     // Pix icon for text.
                     if (strpos($linktext, '_pixicon:') === 0) {
                         [, $icon, $titletext] = explode(':', $linktext);
@@ -978,8 +990,8 @@ class datalynxview_patterns {
             $cat = get_string('reference', 'datalynx');
             foreach ($views as $viewname) {
                 $viewname = preg_quote($viewname, '/');
-                $patterns["##viewlink:$viewname;[^;]*;[^;]*;[a-z\d\-_\s]*##"] = [true, $cat];
-                $patterns["##viewsesslink:$viewname;[^;]*;[^;]*;[a-z\d\-_\s]*##"] = [true, $cat];
+                $patterns["##viewlink:$viewname;[^;]*;[^;]*;[a-z\d\-_\s]*(?:;[a-z,]*)?##"] = [true, $cat];
+                $patterns["##viewsesslink:$viewname;[^;]*;[^;]*;[a-z\d\-_\s]*(?:;[a-z,]*)?##"] = [true, $cat];
             }
         }
 

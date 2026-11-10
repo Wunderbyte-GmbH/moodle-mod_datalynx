@@ -72,7 +72,9 @@ const FIELD_TAG_CLOSE = ']]';
 /** Regex that matches a full [[field|behavior|layout]] tag (behavior and layout optional). */
 const FIELD_TAG_RE = /^\[\[([^|\]]+)(?:\|([^|\]]*))?(?:\|([^|\]]*))?\]\]$/;
 const VIEW_URL_TAG_RE = /^##viewurl(?::([^#]+))?##$/;
-const VIEW_LINK_TAG_RE = /^##(viewlink|viewsesslink):([^;#]+);([^;]*);([^;]*);([^#]*)##$/;
+const VIEW_LINK_TAG_RE = /^##(viewlink|viewsesslink):([^;#]+);([^;]*);([^;]*);([^;#]*)(?:;([^#]*))?##$/;
+/** Optional 5th view link segment: only show the link if the target view has editable fields. */
+const VIEW_LINK_FLAG_IFEDITABLE = 'ifeditable';
 
 /**
  * Parse a field tag pattern into its components.
@@ -123,7 +125,7 @@ function escapeHtml(value) {
 /**
  * Parse a view-reference pattern into its editable parts.
  * @param {string} pattern
- * @returns {{type:string, viewname:string, linktext:string, urlquery:string, cssclass:string}}
+ * @returns {{type:string, viewname:string, linktext:string, urlquery:string, cssclass:string, ifeditable:boolean}}
  */
 function parseViewTag(pattern) {
     let match = pattern.match(VIEW_LINK_TAG_RE);
@@ -134,6 +136,7 @@ function parseViewTag(pattern) {
             linktext: match[3] || '',
             urlquery: match[4] || '',
             cssclass: match[5] || '',
+            ifeditable: (match[6] || '').split(',').map((f) => f.trim()).includes(VIEW_LINK_FLAG_IFEDITABLE),
         };
     }
 
@@ -164,14 +167,16 @@ function parseViewTag(pattern) {
  * @param {string} linktext
  * @param {string} urlquery
  * @param {string} cssclass
+ * @param {boolean} ifeditable Only show the link while the target view has editable fields.
  * @returns {string}
  */
-function buildViewTagPattern(type, viewname, linktext = '', urlquery = '', cssclass = '') {
+function buildViewTagPattern(type, viewname, linktext = '', urlquery = '', cssclass = '', ifeditable = false) {
     if (type === 'viewurl') {
         return viewname ? `##viewurl:${viewname}##` : '##viewurl##';
     }
 
-    return `##${type}:${viewname};${linktext};${urlquery};${cssclass}##`;
+    const flags = ifeditable ? `;${VIEW_LINK_FLAG_IFEDITABLE}` : '';
+    return `##${type}:${viewname};${linktext};${urlquery};${cssclass}${flags}##`;
 }
 
 /**
@@ -210,6 +215,7 @@ function getViewDialogFieldIds(editorId = '') {
         linktext: `dlx-link-text-${suffix}`,
         urlquery: `dlx-url-query-${suffix}`,
         cssclass: `dlx-css-class-${suffix}`,
+        ifeditable: `dlx-if-editable-${suffix}`,
     };
 }
 
@@ -607,7 +613,7 @@ class PatternDialogue {
         const isViewTag = button.classList.contains('datalynx-view-tag');
 
         const [behaviorLabel, layoutLabel, formatLabel, deleteLabel, viewLabel, linkTextLabel, urlQueryLabel,
-            urlQueryHelp, classLabel, currentViewLabel] = await Promise.all([
+            urlQueryHelp, classLabel, currentViewLabel, ifEditableLabel, ifEditableHelp] = await Promise.all([
             Str.get_string('behavior', 'datalynx'),
             Str.get_string('layout', 'datalynx'),
             Str.get_string('fieldformat', 'datalynx'),
@@ -618,6 +624,8 @@ class PatternDialogue {
             Str.get_string('viewpatternurlquery_help', 'datalynx'),
             Str.get_string('viewpatternclass', 'datalynx'),
             Str.get_string('targetviewthis', 'datalynx'),
+            Str.get_string('viewpatternifeditable', 'datalynx'),
+            Str.get_string('viewpatternifeditable_help', 'datalynx'),
         ]);
 
         const pattern = button.getAttribute('data-datalynx-field') || '';
@@ -711,7 +719,7 @@ class PatternDialogue {
             });
 
         } else if (isViewTag) {
-            const {type, viewname, linktext, urlquery, cssclass} = parseViewTag(pattern);
+            const {type, viewname, linktext, urlquery, cssclass, ifeditable} = parseViewTag(pattern);
             const views = await this.getViews();
             const editorId = owningEditor?.id || button.getAttribute('data-datalynx-editor-id') || '';
             const fieldids = getViewDialogFieldIds(editorId);
@@ -753,6 +761,8 @@ class PatternDialogue {
                         urlquery: urlQueryLabel,
                         urlqueryhelp: urlQueryHelp,
                         cssclass: classLabel,
+                        ifeditable: ifEditableLabel,
+                        ifeditablehelp: ifEditableHelp,
                         'delete': deleteLabel,
                     },
                     options: selectOptions,
@@ -761,6 +771,7 @@ class PatternDialogue {
                         linktext,
                         urlquery,
                         cssclass,
+                        ifeditable,
                     },
                 }),
                 show: true,
@@ -781,7 +792,8 @@ class PatternDialogue {
                     selectedView,
                     modalBody.querySelector(`#${fieldids.linktext}`)?.value || '',
                     modalBody.querySelector(`#${fieldids.urlquery}`)?.value || '',
-                    modalBody.querySelector(`#${fieldids.cssclass}`)?.value || ''
+                    modalBody.querySelector(`#${fieldids.cssclass}`)?.value || '',
+                    !!modalBody.querySelector(`#${fieldids.ifeditable}`)?.checked
                 );
 
                 const {type: newType, viewname: newViewName, linktext: newLinkText} = parseViewTag(newPattern);
