@@ -45,8 +45,9 @@ final class file_field_renderer_test extends advanced_testcase {
     }
 
     /**
-     * Build a datalynx instance with a single file field and return [$dlx, $fieldid].
+     * Build a datalynx instance with a single file (or picture) field and return [$dlx, $fieldid].
      *
+     * @param string $type Field type: file or picture.
      * @return array{0: datalynx, 1: int}
      */
     private function create_file_field_instance(string $type = 'file'): array {
