@@ -898,6 +898,7 @@ $string['statusdraft'] = 'Entwurf';
 $string['statusfinalsubmission'] = 'Endgültige Abgabe';
 $string['statuslabeloff'] = 'Antrag als Entwurf speichern';
 $string['statuslabelon'] = 'Antrag verbindlich einreichen';
+$string['statuslockeddesc'] = 'Der Eintrag wurde verbindlich eingereicht. Der Status kann nicht mehr geändert werden.';
 $string['statusmarkfinal'] = 'Als endgültige Abgabe markieren';
 $string['statusnotcreated'] = 'Nicht gesetzt';
 $string['statusrequired'] = 'Status muss gesetzt werden!';

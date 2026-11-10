@@ -23,9 +23,11 @@
  */
 namespace datalynxfield_status;
 
+use html_writer;
 use mod_datalynx\local\field\datalynxfield_renderer;
 use moodleform;
 use MoodleQuickForm;
+use stdClass;
 
 /**
  * Implementation of internal field for setting entry submission statuses.
@@ -45,8 +47,19 @@ class renderer extends datalynxfield_renderer {
 
         $replacements = [];
 
+        // Once an entry is finally submitted, only users with editfinalsubmission may change its status
+        // (the entry processor ignores the posted status for everyone else). Show the status as read-only
+        // text then instead of a switch that has no effect.
+        $statuslocked = $entry && !empty($entry->id) && $entry->id > 0 && isset($entry->status)
+            && (int) $entry->status === field::STATUS_FINAL_SUBMISSION
+            && !has_capability('mod/datalynx:editfinalsubmission', $this->field->dlx()->context);
+
         foreach ($tags as $tag) {
-            if (!$entry || $edit) {
+            if ($edit && $statuslocked) {
+                if (trim($tag, '@') == "##status##" || trim($tag, '@') == "##*status##") {
+                    $replacements[$tag] = ['html', $this->display_locked($entry)];
+                }
+            } else if (!$entry || $edit) {
                 if (trim($tag, '@') == "##status##" || trim($tag, '@') == "##*status##") {
                     $required = trim($tag, '@') === "##*status##";
                     $replacements[$tag] = ['',
@@ -114,6 +127,23 @@ class renderer extends datalynxfield_renderer {
         $mform->addElement('static', $fieldname . '_desc', '', '<small class="text-muted">' . $desc . '</small>');
         $PAGE->requires->js_call_amd('mod_datalynx/status_toggle', 'init'); // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
         $mform->addElement('html', '</div>');
+    }
+
+    /**
+     * Read-only status shown in the edit form when the status can no longer be changed.
+     *
+     * @param stdClass $entry The entry.
+     * @return string
+     */
+    protected function display_locked($entry): string {
+        global $OUTPUT; // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
+        $status = html_writer::span(
+            $OUTPUT->pix_icon('i/lock', '') . // phpcs:ignore moodle.PHP.ForbiddenGlobalUse.BadGlobal
+            s($this->display_browse($entry)),
+            'datalynxfield_status-locked badge bg-success text-white p-2'
+        );
+        $desc = html_writer::tag('small', get_string('statuslockeddesc', 'datalynx'), ['class' => 'd-block text-muted mt-1']);
+        return html_writer::div($status . $desc, 'datalynxfield_status-readonly');
     }
 
     /**

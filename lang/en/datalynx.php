@@ -900,6 +900,7 @@ $string['statusdraft'] = 'Draft';
 $string['statusfinalsubmission'] = 'Final submission';
 $string['statuslabeloff'] = 'Save application as draft';
 $string['statuslabelon'] = 'Submit application bindingly';
+$string['statuslockeddesc'] = 'The entry has been submitted bindingly. Its status can no longer be changed.';
 $string['statusmarkfinal'] = 'Mark as final submission';
 $string['statusnotcreated'] = 'Not set';
 $string['statusrequired'] = 'Status must be set!';
