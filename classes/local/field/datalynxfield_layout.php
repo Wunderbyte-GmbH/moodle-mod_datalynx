@@ -163,11 +163,14 @@ class datalynxfield_layout {
      * Static constructor method for datalynx_field_renderer:
      * Return the renderer object using the name of the renderer and the dataid (datalynx id)
      *
+     * Rendering code should use datalynx::get_layout_by_name(), which loads them once per instance.
+     *
      * @param string $name
      * @param int $dataid
+     * @param datalynx|null $dlx The instance object, if at hand, so no new one is built.
      * @return datalynxfield_layout
      */
-    public static function get_renderer_by_name($name, $dataid): datalynxfield_layout {
+    public static function get_renderer_by_name($name, $dataid, ?mod_datalynx\datalynx $dlx = null): datalynxfield_layout {
         global $DB;
         $record = $DB->get_record(
             'datalynx_renderers',
@@ -175,6 +178,19 @@ class datalynxfield_layout {
             '*',
             MUST_EXIST
         );
+        return $dlx ? self::from_record($record, $dlx) : new datalynxfield_layout($record);
+    }
+
+    /**
+     * Build the layout object from its database record and the instance it belongs to.
+     *
+     * @param stdClass $record The renderer database record.
+     * @param datalynx $dlx The datalynx instance of the record.
+     * @return datalynxfield_layout
+     */
+    public static function from_record(stdClass $record, mod_datalynx\datalynx $dlx): datalynxfield_layout {
+        $record = clone $record;
+        $record->dlx = $dlx;
         return new datalynxfield_layout($record);
     }
 

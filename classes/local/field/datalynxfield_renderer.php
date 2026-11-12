@@ -356,12 +356,12 @@ abstract class datalynxfield_renderer {
 
             $behaviorname = isset($matches[2]) ? $matches[2] : false;
             if ($behaviorname) {
-                $behavior = datalynxfield_behavior::from_name($behaviorname, $this->field->dlx()->id());
+                $behavior = $this->field->dlx()->get_behavior_by_name($behaviorname);
             }
 
             $renderername = isset($matches[3]) ? $matches[3] : false;
             if ($renderername) {
-                $renderer = datalynxfield_layout::get_renderer_by_name($renderername, $this->field->dlx()->id());
+                $renderer = $this->field->dlx()->get_layout_by_name($renderername);
             }
         }
 

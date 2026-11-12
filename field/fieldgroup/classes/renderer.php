@@ -250,7 +250,7 @@ class renderer extends datalynxfield_renderer {
 
                 // Behavior controls visibility, editability, and required.
                 $behavior = $behaviorname
-                    ? datalynxfield_behavior::from_name($behaviorname, $dlxid)
+                    ? $this->field->dlx->get_behavior_by_name($behaviorname)
                     : datalynxfield_behavior::get_default_behavior($this->field->dlx);
                 if ($behavior) {
                     $conditionsmet = $behavior->passes_conditions($entry);
@@ -269,7 +269,7 @@ class renderer extends datalynxfield_renderer {
 
                 // Layout provides edit template and not-editable template.
                 $layout = $layoutname
-                    ? datalynxfield_layout::get_renderer_by_name($layoutname, $dlxid)
+                    ? $this->field->dlx->get_layout_by_name($layoutname)
                     : datalynxfield_layout::get_default_renderer($this->field->dlx);
                 if ($layout) {
                     $edittemplate = $layout->get_edit_template();

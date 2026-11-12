@@ -2119,7 +2119,7 @@ abstract class base {
             }
             foreach ((array) $patterns as $tag) {
                 if (preg_match($pattern, $tag, $matches) && !empty($matches[2])) {
-                    $behavior = datalynxfield_behavior::from_name($matches[2], $this->dlx->id());
+                    $behavior = $this->dlx->get_behavior_by_name($matches[2]);
                     if ($behavior && $behavior->is_editable_after_final()) {
                         $allowed[(int) $fieldid] = (int) $fieldid;
                         // A fieldgroup's rows are stored as contents of its subfields, which never
@@ -2160,7 +2160,7 @@ abstract class base {
             }
             $behaviorname = explode('|', $rest)[1] ?? '';
             if ($behaviorname !== '') {
-                $subbehavior = datalynxfield_behavior::from_name($behaviorname, $this->dlx->id());
+                $subbehavior = $this->dlx->get_behavior_by_name($behaviorname);
                 if ($subbehavior && !$subbehavior->is_editable_after_final()) {
                     continue;
                 }

@@ -124,21 +124,37 @@ class datalynxfield_behavior {
     /**
      * Given the name and tha datalynx id of the behavior instantiate the object.
      *
+     * Rendering code should use datalynx::get_behavior_by_name(), which loads them once per instance.
+     *
      * @param string $name The behavior name.
      * @param int $dataid The datalynx instance ID.
+     * @param mod_datalynx\datalynx|null $dlx The instance object, if at hand, so no new one is built.
      * @return datalynxfield_behavior|false
      * @throws coding_exception
      * @throws dml_exception
      * @throws moodle_exception
      */
-    public static function from_name($name, $dataid): datalynxfield_behavior|false {
+    public static function from_name($name, $dataid, ?mod_datalynx\datalynx $dlx = null): datalynxfield_behavior|false {
         global $DB;
         $record = $DB->get_record('datalynx_behaviors', ['name' => $name, 'dataid' => $dataid]);
         if ($record) {
-            return new datalynxfield_behavior($record);
+            return $dlx ? self::from_record($record, $dlx) : new datalynxfield_behavior($record);
         } else {
             return false; // Return false if behavior not found by name.
         }
+    }
+
+    /**
+     * Build the behavior object from its database record and the instance it belongs to.
+     *
+     * @param stdClass $record The behavior database record.
+     * @param mod_datalynx\datalynx $dlx The datalynx instance of the record.
+     * @return datalynxfield_behavior
+     */
+    public static function from_record(stdClass $record, mod_datalynx\datalynx $dlx): datalynxfield_behavior {
+        $record = clone $record;
+        $record->dlx = $dlx;
+        return new datalynxfield_behavior($record);
     }
 
     /**
@@ -218,8 +234,7 @@ class datalynxfield_behavior {
      * @return bool
      */
     private function user_is_admin($user): bool {
-        $admins = get_admins();
-        return in_array($user->id, array_keys($admins));
+        return is_siteadmin($user);
     }
 
     /**

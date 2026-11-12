@@ -31,6 +31,8 @@ use core_course_category;
 use datalynx_preset_manager;
 use datalynxfield_status\field as datalynxfield_status;
 use html_writer;
+use mod_datalynx\local\field\datalynxfield_behavior;
+use mod_datalynx\local\field\datalynxfield_layout;
 use mod_datalynx\local\filter\datalynx_filter_manager;
 use mod_datalynx\local\rule\manager;
 use mod_datalynx\local\view\base;
@@ -143,6 +145,21 @@ class datalynx {
 
     /** @var array Internal group modes map (name => id). */
     protected $internalgroupmodes = ['separateparticipants' => -1];
+
+    /** @var stdClass[]|null Field behavior records of this instance keyed by name, loaded on first use. */
+    protected ?array $behaviorrecords = null;
+
+    /** @var array Field behavior objects (or false when unknown) built in this request, keyed by name. */
+    protected array $behaviorsbyname = [];
+
+    /** @var stdClass[]|null Field layout records of this instance keyed by name, loaded on first use. */
+    protected ?array $layoutrecords = null;
+
+    /** @var datalynxfield_layout[] Field layout objects built in this request, keyed by name. */
+    protected array $layoutsbyname = [];
+
+    /** @var array Datalynx permissions per user and type, see get_user_datalynx_permissions(). */
+    protected array $userpermissions = [];
 
     /**
      * datalynx constructor
@@ -2794,14 +2811,25 @@ class datalynx {
      * @throws coding_exception
      */
     public function get_user_datalynx_permissions(int $userid = 0, string $type = 'any'): array {
-        global $USER, $DB;
+        global $USER;
 
-        if (!$userid) {
-            $user = $USER;
-        } else {
-            $user = $DB->get_record('user', ['id' => $userid]);
+        // Field behaviors ask this for every field tag of every entry. Capabilities do not change
+        // while a page renders, so answer each user and type once per instance.
+        $key = ($userid ?: (int) $USER->id) . '|' . $type;
+        if (!isset($this->userpermissions[$key])) {
+            $this->userpermissions[$key] = $this->compute_user_datalynx_permissions($userid ?: $USER, $type);
         }
+        return $this->userpermissions[$key];
+    }
 
+    /**
+     * Compute the datalynx permissions of a user, see get_user_datalynx_permissions().
+     *
+     * @param int|stdClass $user user id or record, as has_capability() accepts it
+     * @param string $type 'any', 'both', 'view', or 'edit'
+     * @return int[]
+     */
+    protected function compute_user_datalynx_permissions(int|stdClass $user, string $type): array {
         $edit = $type === 'edit' || $type === 'both';
         $view = $type === 'view' || $type === 'both';
 
@@ -2932,6 +2960,75 @@ class datalynx {
         }
 
         return $permissions;
+    }
+
+    /**
+     * The field behavior of this instance with the given name, as used in [[field|behavior]] tags.
+     *
+     * All behaviors of the instance are read with one query on first use and the objects are
+     * built once, sharing this instance, instead of one lookup and one new datalynx per tag.
+     *
+     * @param string $name
+     * @return datalynxfield_behavior|false False when the instance has no behavior of that name.
+     */
+    public function get_behavior_by_name(string $name): datalynxfield_behavior|false {
+        if (!array_key_exists($name, $this->behaviorsbyname)) {
+            $this->behaviorrecords ??= $this->get_definition_records_by_name('datalynx_behaviors');
+            $record = $this->behaviorrecords[$name] ?? null;
+            $this->behaviorsbyname[$name] = $record
+                ? datalynxfield_behavior::from_record($record, $this)
+                // The database may match names the exact comparison above does not (collation).
+                : datalynxfield_behavior::from_name($name, $this->id(), $this);
+        }
+        return $this->behaviorsbyname[$name];
+    }
+
+    /**
+     * The field layout of this instance with the given name, as used in [[field|behavior|layout]] tags.
+     *
+     * Loaded like get_behavior_by_name().
+     *
+     * @param string $name
+     * @return datalynxfield_layout
+     * @throws \dml_missing_record_exception When the instance has no layout of that name.
+     */
+    public function get_layout_by_name(string $name): datalynxfield_layout {
+        if (!isset($this->layoutsbyname[$name])) {
+            $this->layoutrecords ??= $this->get_definition_records_by_name('datalynx_renderers');
+            $record = $this->layoutrecords[$name] ?? null;
+            $this->layoutsbyname[$name] = $record
+                ? datalynxfield_layout::from_record($record, $this)
+                : datalynxfield_layout::get_renderer_by_name($name, $this->id(), $this);
+        }
+        return $this->layoutsbyname[$name];
+    }
+
+    /**
+     * Forget the behaviors, layouts and permissions loaded by this instance, e.g. after changing them.
+     *
+     * @return void
+     */
+    public function reset_definition_cache(): void {
+        $this->behaviorrecords = null;
+        $this->behaviorsbyname = [];
+        $this->layoutrecords = null;
+        $this->layoutsbyname = [];
+        $this->userpermissions = [];
+    }
+
+    /**
+     * The records of a per-instance definition table keyed by name; the oldest record wins a duplicate name.
+     *
+     * @param string $table datalynx_behaviors or datalynx_renderers
+     * @return stdClass[]
+     */
+    protected function get_definition_records_by_name(string $table): array {
+        global $DB;
+        $records = [];
+        foreach ($DB->get_records($table, ['dataid' => $this->id()], 'id ASC') as $record) {
+            $records[$record->name] ??= $record;
+        }
+        return $records;
     }
 
     /**
