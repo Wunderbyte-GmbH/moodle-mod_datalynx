@@ -57,11 +57,18 @@ class datalynxview_patterns {
     protected static array $allviewrecordcache = [];
 
     /**
-     * Cached visible view objects indexed by the current Datalynx object and user.
+     * Cached visible view records keyed by view name, indexed by the current Datalynx object and user.
+     *
+     * @var array<string, array<string, \stdClass>>
+     */
+    protected static array $namedviewcache = [];
+
+    /**
+     * View objects built for view links, indexed by the current Datalynx object and user, then by view name.
      *
      * @var array<string, array<string, base>>
      */
-    protected static array $namedviewcache = [];
+    protected static array $namedviewobjectcache = [];
 
     /**
      * Cached visible view names indexed by the current Datalynx object and user.
@@ -101,6 +108,7 @@ class datalynxview_patterns {
     public static function reset_static_caches(): void {
         self::$allviewrecordcache = [];
         self::$namedviewcache = [];
+        self::$namedviewobjectcache = [];
         self::$visibleviewnamecache = [];
         self::$allviewnamecache = [];
         self::$fieldcache = [];
@@ -248,14 +256,17 @@ class datalynxview_patterns {
 
         $views = $this->get_cached_named_views();
         if ($views) {
-            foreach ($views as $viewname => $view) {
+            foreach (array_keys($views) as $viewname) {
+                $viewname = (string) $viewname;
                 $viewlink = strpos($tag, "##viewlink:$viewname;");
                 $sesslink = strpos($tag, "##viewsesslink:$viewname;");
                 if ($viewlink === 0 || $sesslink === 0) {
+                    // Only the view the link points to is built.
+                    $view = $this->get_cached_named_view($viewname);
                     // Already editing the entry in this view so do not show link for editing entry in the same view.
                     if (
                         $sesslink === 0 && $currentview && $currentview->user_is_editing() &&
-                        $view->name() === $currentview->name() &&
+                        $viewname === $currentview->name() &&
                         strpos($tag, 'editentries') !== false
                     ) {
                         return '';
@@ -801,10 +812,9 @@ class datalynxview_patterns {
             return $view->get_baseurl()->out(false);
         }
 
-        $views = $this->get_cached_named_views();
-
-        if (!empty($views[$viewname])) {
-            return $views[$viewname]->get_baseurl()->out(false);
+        $targetview = $this->get_cached_named_view($viewname);
+        if ($targetview) {
+            return $targetview->get_baseurl()->out(false);
         }
         return '';
     }
@@ -816,16 +826,16 @@ class datalynxview_patterns {
      * @return string
      */
     protected function get_viewcontent_replacement(?string $viewname = null): string {
-        $views = $this->get_cached_named_views();
+        $targetview = $viewname === null ? null : $this->get_cached_named_view($viewname);
 
-        if (!empty($views[$viewname])) {
+        if ($targetview) {
             // Cannot display current view or else infinite loop.
-            if ($views[$viewname]->id() == $this->view->id()) {
+            if ($targetview->id() == $this->view->id()) {
                 return '';
             }
 
-            $views[$viewname]->set_content();
-            return $views[$viewname]->display(['tohtml' => true]);
+            $targetview->set_content();
+            return $targetview->display(['tohtml' => true]);
         }
         return '';
     }
@@ -1086,20 +1096,42 @@ class datalynxview_patterns {
     }
 
     /**
-     * Get cached visible views keyed by view name.
+     * Get the records of the views visible to the user keyed by view name.
      *
-     * @return array<string, base>
+     * Only records: building a view object is expensive, so view links build just the view they
+     * point to, see get_cached_named_view().
+     *
+     * @return array<string, \stdClass>
      */
     protected function get_cached_named_views(): array {
         $cachekey = $this->get_user_cache_context_key();
         if (!array_key_exists($cachekey, self::$namedviewcache)) {
             self::$namedviewcache[$cachekey] = [];
-            foreach ($this->view->get_dlx()->get_views() as $view) {
-                self::$namedviewcache[$cachekey][$view->name()] = $view;
+            foreach ($this->view->get_dlx()->get_view_records() as $view) {
+                self::$namedviewcache[$cachekey][$view->name] = $view;
             }
         }
 
         return self::$namedviewcache[$cachekey];
+    }
+
+    /**
+     * Get the object of a view visible to the user by its name, built on first use.
+     *
+     * @param string $viewname
+     * @return base|null null if the user cannot see a view of that name
+     */
+    protected function get_cached_named_view(string $viewname): ?base {
+        $records = $this->get_cached_named_views();
+        if (!isset($records[$viewname])) {
+            return null;
+        }
+        $cachekey = $this->get_user_cache_context_key();
+        if (!isset(self::$namedviewobjectcache[$cachekey][$viewname])) {
+            $record = $records[$viewname];
+            self::$namedviewobjectcache[$cachekey][$viewname] = $this->view->get_dlx()->get_view($record->type, $record);
+        }
+        return self::$namedviewobjectcache[$cachekey][$viewname];
     }
 
     /**

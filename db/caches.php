@@ -23,7 +23,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $definitions = [
-    'patterns' => ['mode' => cache_store::MODE_APPLICATION],
+    // Parsed view tags per view id, valid while their signature matches (see view base::set__patterns()).
+    'patterns' => ['mode' => cache_store::MODE_APPLICATION, 'simplekeys' => true],
 
     // Geocoding results, shared site-wide. Caching is not an optimisation here:
     // the Nominatim usage policy requires results to be cached, and reusing a

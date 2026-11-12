@@ -161,6 +161,12 @@ class datalynx {
     /** @var array Datalynx permissions per user and type, see get_user_datalynx_permissions(). */
     protected array $userpermissions = [];
 
+    /** @var string|null Signature of the definitions view tags are parsed against, see get_pattern_signature(). */
+    protected ?string $patternsignature = null;
+
+    /** @var array|null Internal field names keyed by field id, see get_internal_fields_names(). */
+    protected ?array $internalfieldsnames = null;
+
     /**
      * datalynx constructor
      *
@@ -1028,6 +1034,9 @@ class datalynx {
      * @return array
      */
     public function get_internal_fields_names(): array {
+        if ($this->internalfieldsnames !== null) {
+            return $this->internalfieldsnames;
+        }
         $fieldplugins = get_list_of_plugins('mod/datalynx/field/');
         $internalfieldsnames = [];
         foreach ($fieldplugins as $fieldname) {
@@ -1041,7 +1050,7 @@ class datalynx {
             }
         }
 
-        return $internalfieldsnames;
+        return $this->internalfieldsnames = $internalfieldsnames;
     }
 
     /**
@@ -3014,6 +3023,35 @@ class datalynx {
         $this->layoutrecords = null;
         $this->layoutsbyname = [];
         $this->userpermissions = [];
+        $this->patternsignature = null;
+        $this->internalfieldsnames = null;
+    }
+
+    /**
+     * Signature of everything the view tag parsing depends on besides the view itself.
+     *
+     * Parsing a view template looks for the tags of all fields (including their field formats),
+     * of all views (view links) and of the visible custom filters, and internal field names are
+     * localised. The parsed tags of a view are cached under this signature, so any change to one
+     * of these definitions makes the cached tags of every view of the instance obsolete without
+     * explicit invalidation. Computed once per instance object; reset_definition_cache() resets it.
+     *
+     * @return string
+     */
+    public function get_pattern_signature(): string {
+        global $DB;
+
+        if ($this->patternsignature === null) {
+            $instance = ['dataid' => $this->id()];
+            $this->patternsignature = sha1(serialize([
+                current_language(),
+                $DB->get_records('datalynx_fields', $instance, 'id'),
+                $DB->get_records('datalynx_field_formats', $instance, 'id'),
+                $DB->get_records('datalynx_views', $instance, 'id', 'id, type, name, visible'),
+                $DB->get_records('datalynx_customfilters', $instance, 'id', 'id, name, visible'),
+            ]));
+        }
+        return $this->patternsignature;
     }
 
     /**

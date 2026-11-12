@@ -23,6 +23,7 @@
 
 namespace mod_datalynx\local\view;
 
+use cache;
 use calc_formula;
 use coding_exception;
 use datalynxfield_rating\field as datalynxfield_rating;
@@ -463,33 +464,66 @@ abstract class base {
     }
 
     /**
-     * Checks if patterns are cached. If yes patterns are retrieved from cache set in $this->tags
-     * If no cached patterns are found, they are retrieved from the HTML provided in the
-     * view settings section field (definition)
+     * Find the view and field tags used in the view templates and set them in $this->tags.
+     *
+     * Parsing needs every field object of the instance, so the result is kept in the patterns
+     * cache per view. The cache entry is only used while its signature matches the templates,
+     * the view settings and the instance definitions (see datalynx::get_pattern_signature()),
+     * so edits are picked up immediately. Building a view never writes to the database.
      */
     protected function set__patterns(): void {
-        global $DB;
-
-        $patternarray = [];
         $text = '';
         foreach ($this->editors as $editor) {
             $text .= isset($this->view->$editor) ? $this->view->$editor : '';
         }
 
-        if (trim($text)) {
-            // This view patterns.
-            $patternarray['view'] = $this->patternclass()->search($text, false);
+        if (!trim($text)) {
+            $this->tags = [];
+            return;
+        }
 
-            // Field patterns.
-            if ($fields = $this->dlx->get_fields(null, false, true)) {
-                foreach ($fields as $fieldid => $field) {
-                    $patternarray['field'][$fieldid] = $field->renderer()->search($text);
-                }
+        $cache = null;
+        $signature = '';
+        if (!empty($this->view->id)) {
+            $cache = cache::make('mod_datalynx', 'patterns');
+            $signature = $this->get_pattern_cache_signature($text);
+            $cached = $cache->get((int) $this->view->id);
+            if (is_array($cached) && ($cached['signature'] ?? '') === $signature) {
+                $this->tags = $cached['tags'];
+                return;
             }
-            $serializedpatterns = serialize($patternarray);
-            $DB->set_field('datalynx_views', 'patterns', $serializedpatterns, ['id' => $this->view->id]);
+        }
+
+        // This view patterns.
+        $patternarray = ['view' => $this->patternclass()->search($text, false)];
+
+        // Field patterns.
+        if ($fields = $this->dlx->get_fields(null, false, true)) {
+            foreach ($fields as $fieldid => $field) {
+                $patternarray['field'][$fieldid] = $field->renderer()->search($text);
+            }
+        }
+
+        if ($cache) {
+            $cache->set((int) $this->view->id, ['signature' => $signature, 'tags' => $patternarray]);
         }
         $this->tags = $patternarray;
+    }
+
+    /**
+     * Signature of the inputs of set__patterns() for this view.
+     *
+     * @param string $text The concatenated view templates.
+     * @return string
+     */
+    protected function get_pattern_cache_signature(string $text): string {
+        $settings = [];
+        $columns = ['type', 'name', 'section', 'param1', 'param2', 'param3', 'param4', 'param5',
+            'param6', 'param7', 'param8', 'param9', 'param10'];
+        foreach ($columns as $column) {
+            $settings[$column] = isset($this->view->$column) ? (string) $this->view->$column : null;
+        }
+        return sha1(serialize([static::class, $this->dlx->get_pattern_signature(), $settings, $text]));
     }
 
     /**
