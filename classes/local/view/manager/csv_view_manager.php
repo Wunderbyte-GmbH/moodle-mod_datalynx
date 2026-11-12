@@ -123,6 +123,7 @@ class csv_view_manager {
      */
     protected function build_rows(\datalynxview_csv\view $view, array $fields, array $entryrecords): array {
         $columns = $view->get_columns();
+        $columnfields = $this->get_column_fields($view, $fields);
         $rows = [];
 
         foreach ($entryrecords as $entry) {
@@ -132,7 +133,7 @@ class csv_view_manager {
             foreach ($columns as $column) {
                 [$tag, , $class] = $column;
                 $cells[] = [
-                    'valuehtml' => $this->resolve_cell_html($view, $fields, $entry, $tag),
+                    'valuehtml' => $this->resolve_cell_html($view, $columnfields[$tag] ?? null, $entry, $tag),
                     'cellclass' => $class,
                 ];
             }
@@ -164,20 +165,39 @@ class csv_view_manager {
     }
 
     /**
+     * The field each column tag belongs to, as the view's pattern scan assigned it.
+     *
+     * @param \datalynxview_csv\view $view
+     * @param array $fields all fields of the instance keyed by id
+     * @return array tag => field
+     */
+    protected function get_column_fields(\datalynxview_csv\view $view, array $fields): array {
+        $columnfields = [];
+        foreach ($view->get__patterns('field') ?? [] as $fieldid => $patterns) {
+            if (!isset($fields[$fieldid])) {
+                continue;
+            }
+            foreach ((array) $patterns as $pattern) {
+                $columnfields[$pattern] ??= $fields[$fieldid];
+            }
+        }
+        return $columnfields;
+    }
+
+    /**
      * Resolve one configured CSV browse column tag for an entry.
      *
      * @param \datalynxview_csv\view $view
-     * @param array $fields
+     * @param object|null $field the field the tag belongs to, null for view tags
      * @param stdClass $entry
      * @param string $tag
      * @return string
      */
-    protected function resolve_cell_html(\datalynxview_csv\view $view, array $fields, stdClass $entry, string $tag): string {
-        foreach ($fields as $field) {
+    protected function resolve_cell_html(\datalynxview_csv\view $view, ?object $field, stdClass $entry, string $tag): string {
+        if ($field) {
             $definitions = $field->get_definitions([$tag], $entry, ['edit' => false, 'manage' => false]);
-            if (!empty($definitions[$tag][1]) && is_string($definitions[$tag][1])) {
-                return $definitions[$tag][1];
-            }
+            $html = $definitions[$tag][1] ?? '';
+            return is_string($html) ? $html : '';
         }
 
         $replacements = $view->patternclass()->get_replacements([$tag], $entry);

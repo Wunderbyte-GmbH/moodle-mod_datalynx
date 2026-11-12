@@ -122,4 +122,48 @@ final class csv_view_manager_test extends advanced_testcase {
         $this->assertSame('Title', $payload['groups'][0]['columns'][0]['headerhtml']);
         $this->assertStringContainsString('Hello CSV', $payload['groups'][0]['rows'][0]['cells'][0]['valuehtml']);
     }
+
+    /**
+     * Each column shows the value of the field its tag names.
+     *
+     * Regression test: every cell used to be rendered by the first field that returned anything for
+     * the tag, so all columns showed the value of the first field.
+     *
+     * @covers ::get_browse_payload
+     */
+    public function test_get_browse_payload_puts_each_field_in_its_column(): void {
+        global $DB, $USER;
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        $course = $this->getDataGenerator()->create_course();
+        $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
+        $dlx = new datalynx($instance->id);
+        $viewid = (int) $DB->insert_record('datalynx_views', (object) [
+            'dataid' => $dlx->id(), 'type' => 'csv', 'name' => 'Columns', 'description' => '', 'visible' => 7,
+            'filter' => 0, 'perpage' => 0, 'groupby' => '', 'param1' => '',
+            'param2' => "[[Alpha]]|Alpha\n[[Beta]]|Beta\n##author:name##|Author", 'param3' => 'csv',
+            'param5' => 0, 'param10' => 0, 'section' => '',
+        ]);
+        $entryid = (int) $DB->insert_record('datalynx_entries', (object) [
+            'dataid' => $dlx->id(), 'userid' => $USER->id, 'groupid' => 0, 'approved' => 1, 'status' => 0,
+            'timecreated' => time(), 'timemodified' => time(),
+        ]);
+        foreach (['Alpha' => 'value-a', 'Beta' => 'value-b'] as $name => $value) {
+            $fieldid = (int) $DB->insert_record('datalynx_fields', (object) [
+                'dataid' => $dlx->id(), 'type' => 'text', 'name' => $name, 'description' => '',
+            ]);
+            $DB->insert_record('datalynx_contents', (object) [
+                'fieldid' => $fieldid, 'entryid' => $entryid, 'lineid' => 0, 'content' => $value,
+            ]);
+        }
+
+        $payload = (new csv_view_manager())->get_browse_payload($dlx->id(), $viewid);
+
+        $cells = array_column($payload['groups'][0]['rows'][0]['cells'], 'valuehtml');
+        $this->assertCount(3, $cells);
+        $this->assertStringContainsString('value-a', $cells[0]);
+        $this->assertStringContainsString('value-b', $cells[1]);
+        $this->assertStringContainsString(fullname($USER), $cells[2]);
+    }
 }
