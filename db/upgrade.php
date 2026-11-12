@@ -1226,73 +1226,13 @@ function xmldb_datalynx_upgrade($oldversion) {
     }
 
     if ($oldversion < 2026052500) {
-        // Set param3 default to 'entry' and param4 to empty string for backward compatibility in existing grid views.
-        $DB->set_field_select('datalynx_views', 'param3', 'entry', "type = 'grid'");
-        $DB->set_field_select('datalynx_views', 'param4', '', "type = 'grid'");
+        mod_datalynx_upgrade_grid_view_defaults();
 
         upgrade_mod_savepoint(true, 2026052500, 'datalynx');
     }
 
     if ($oldversion < 2026060900) {
-        // Field Formats: single, clean migration from the pre-Field-Format codebase.
-        // The Field Format feature was built up over several incremental upgrade steps
-        // (2026060600-2026060703) that were only ever deployed to development sites. Because the
-        // code has not been released, those steps are collapsed here into one idempotent
-        // migration: production sites (all still < 2026060600) upgrade in a single pass, and
-        // re-running on an already-migrated development site is a no-op.
-
-        // 1. Create the datalynx_field_formats table.
-        $table = new xmldb_table('datalynx_field_formats');
-        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
-        $table->add_field('dataid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
-        $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
-        $table->add_field('fieldtype', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
-        $table->add_field('settings', XMLDB_TYPE_TEXT, null, null, null, null, null);
-        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
-        $table->add_key('dataid', XMLDB_KEY_FOREIGN, ['dataid'], 'datalynx', ['id']);
-        if (!$dbman->table_exists($table)) {
-            $dbman->create_table($table);
-        }
-
-        // 2. Normalise legacy rating tags in the view templates (##ratings:avg:bar## -> avgbar and
-        // avg:star -> avgstar, in both ##...## and [[...]] styles) so the scan in step 4 creates
-        // correctly named rating formats.
-        $textfields = [
-            'patterns', 'section', 'param1', 'param2', 'param3',
-            'param4', 'param5', 'param6', 'param7', 'param8',
-            'param9', 'param10',
-        ];
-        $views = $DB->get_records('datalynx_views');
-        foreach ($views as $view) {
-            $changed = false;
-            foreach ($textfields as $textfield) {
-                if (!empty($view->$textfield)) {
-                    $newtext = str_replace(
-                        ['##ratings:avg:bar##', '##ratings:avg:star##', '[[ratings:avg:bar]]', '[[ratings:avg:star]]'],
-                        ['##ratings:avgbar##', '##ratings:avgstar##', '[[ratings:avgbar]]', '[[ratings:avgstar]]'],
-                        $view->$textfield
-                    );
-                    if ($newtext !== $view->$textfield) {
-                        $view->$textfield = $newtext;
-                        $changed = true;
-                    }
-                }
-            }
-            if ($changed) {
-                $DB->update_record('datalynx_views', $view);
-            }
-        }
-
-        // 3. Migrate legacy `userinfo` fields into entryauthor field formats and drop the field rows.
-        // The userinfo field type has been removed; this converter is pure DB, so it does not
-        // depend on the removed datalynxfield_userinfo classes.
-        \mod_datalynx\local\field_format\manager::migrate_userinfo_fields();
-
-        // 4. Auto-create field formats from all view templates. The scanner names each format after
-        // the legacy tag suffix, applies the field type's inferred default settings, skips field
-        // types whose formats carry no settings (has_options() === false), and skips formats
-        // that already exist (e.g. those created by step 3).
-        \mod_datalynx\local\field_format\manager::auto_create_formats_from_all_instances();
+        mod_datalynx_upgrade_field_formats();
 
         upgrade_mod_savepoint(true, 2026060900, 'datalynx');
     }
@@ -1321,54 +1261,13 @@ function xmldb_datalynx_upgrade($oldversion) {
     }
 
     if ($oldversion < 2026061103) {
-        // Migrate datalynx_rules serialized params to JSON.
-        // param1 (all rules): selected trigger events.
-        // param2 (ftpsyncfiles): SFTP connection settings.
-        // param3 (eventnotification): recipient configuration.
-        // param4 (eventnotification): target views per permission level.
-        $rules = $DB->get_records('datalynx_rules', null, '', 'id, param1, param2, param3, param4');
-        foreach ($rules as $rule) {
-            $update = (object)['id' => $rule->id];
-            $changed = false;
-            foreach (['param1', 'param2', 'param3', 'param4'] as $param) {
-                $value = $rule->$param;
-                if (!empty($value) && is_string($value)) {
-                    $decoded = @unserialize($value);
-                    if (is_array($decoded)) {
-                        $update->$param = json_encode($decoded);
-                        $changed = true;
-                    }
-                }
-            }
-            if ($changed) {
-                $DB->update_record('datalynx_rules', $update);
-            }
-        }
+        mod_datalynx_upgrade_rule_params_to_json();
 
         upgrade_mod_savepoint(true, 2026061103, 'datalynx');
     }
 
     if ($oldversion < 2026061900) {
-        // Migrate datalynx_rules eventnotification param10 condition values to JSON if they are multiple option fields.
-        $sql = "SELECT r.id, r.param5, r.param10
-                  FROM {datalynx_rules} r
-                 WHERE r.type = 'eventnotification'
-                   AND r.param5 IS NOT NULL
-                   AND r.param5 <> '0'
-                   AND r.param10 IS NOT NULL
-                   AND r.param10 <> ''";
-        if ($rules = $DB->get_records_sql($sql)) {
-            foreach ($rules as $rule) {
-                $field = $DB->get_record('datalynx_fields', ['id' => (int)$rule->param5], 'id, type');
-                if ($field && in_array($field->type, ['checkbox', 'multiselect', 'tag'])) {
-                    $value = $rule->param10;
-                    if (json_decode($value) === null) {
-                        $newvalue = json_encode(explode(',', $value));
-                        $DB->set_field('datalynx_rules', 'param10', $newvalue, ['id' => $rule->id]);
-                    }
-                }
-            }
-        }
+        mod_datalynx_upgrade_rule_condition_values_to_json();
 
         upgrade_mod_savepoint(true, 2026061900, 'datalynx');
     }
@@ -1404,80 +1303,13 @@ function xmldb_datalynx_upgrade($oldversion) {
     }
 
     if ($oldversion < 2026062301) {
-        // Migrate eventnotification trigger conditions from the legacy single-condition
-        // param5 (field id) + param10 (value) storage to the multi-condition JSON in param9.
-        $rules = $DB->get_records_select(
-            'datalynx_rules',
-            "type = :type AND param5 IS NOT NULL AND " . $DB->sql_compare_text('param5') . " <> :empty",
-            ['type' => 'eventnotification', 'empty' => '']
-        );
-        foreach ($rules as $rule) {
-            if (!empty($rule->param9)) {
-                continue; // Already migrated.
-            }
-            try {
-                $dlx = new \mod_datalynx\datalynx((int) $rule->dataid);
-                $field = $dlx->get_field_from_id($rule->param5);
-            } catch (\Throwable $e) {
-                $field = false;
-            }
-            if (!$field) {
-                continue;
-            }
-            $value = $rule->param10;
-            $decoded = json_decode((string) $value, true);
-            if (is_array($decoded)) {
-                $value = $decoded;
-            } else if ($field instanceof \mod_datalynx\local\field\datalynxfield_option_multiple) {
-                $value = explode(',', (string) $value);
-            }
-            // Reproduce the legacy exact-match behaviour: multi-option fields use EXACTLY,
-            // everything else '=' (falling back to the first real operator the field offers).
-            if ($field instanceof \mod_datalynx\local\field\datalynxfield_option_multiple) {
-                $operator = 'EXACTLY';
-            } else {
-                $operators = $field->get_supported_search_operators();
-                if (array_key_exists('=', $operators)) {
-                    $operator = '=';
-                } else {
-                    $operator = '';
-                    foreach (array_keys($operators) as $op) {
-                        if ($op !== '') {
-                            $operator = $op;
-                            break;
-                        }
-                    }
-                }
-            }
-            $rule->param9 = json_encode([$rule->param5 => ['AND' => [['', $operator, $value]]]]);
-            $rule->param5 = null;
-            $rule->param10 = null;
-            $DB->update_record('datalynx_rules', $rule);
-        }
+        mod_datalynx_upgrade_rule_conditions_to_param9();
+
         upgrade_mod_savepoint(true, 2026062301, 'datalynx');
     }
 
     if ($oldversion < 2026062700) {
-        // Change timesubmitted field in datalynx_entries to be nullable and have no default.
-        $table = new xmldb_table('datalynx_entries');
-        $field = new xmldb_field(
-            'timesubmitted',
-            XMLDB_TYPE_INTEGER,
-            '10',
-            null,
-            null,
-            null,
-            null,
-            'status'
-        );
-
-        if ($dbman->field_exists($table, $field)) {
-            $dbman->change_field_notnull($table, $field);
-            $dbman->change_field_default($table, $field);
-        }
-
-        // Backfill/migrate any existing 0 values to NULL.
-        $DB->execute("UPDATE {datalynx_entries} SET timesubmitted = NULL WHERE timesubmitted = 0");
+        mod_datalynx_upgrade_timesubmitted_nullable();
 
         upgrade_mod_savepoint(true, 2026062700, 'datalynx');
     }
@@ -1490,55 +1322,19 @@ function xmldb_datalynx_upgrade($oldversion) {
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
-
-        // Migrate existing enforcement into the new model. Locked views (param5 "Allow all filters"
-        // off) with a configured filter become "default + only that filter permitted", so the
-        // restriction is still enforced. Override views (param5 on) are left as live "allow all":
-        // permittedfilters stays null and is ignored while allow-all is on.
-        $rs = $DB->get_recordset_select('datalynx_views', 'filter > 0', null, '', 'id, filter, param5');
-        foreach ($rs as $view) {
-            if (empty($view->param5)) {
-                $value = json_encode([(int) $view->filter]);
-                $DB->set_field('datalynx_views', 'permittedfilters', $value, ['id' => $view->id]);
-            }
-        }
-        $rs->close();
+        mod_datalynx_upgrade_permittedfilters_from_filter();
 
         upgrade_mod_savepoint(true, 2026062900, 'datalynx');
     }
 
     if ($oldversion < 2026063000) {
-        // Retire advancedfilter and personal user filters (now superseded by customfilter).
-        // Purge the leftover per-user filter preferences they stored; the retained quick controls
-        // (##quicksearch##/##quickperpage##) recreate transient rows as needed.
-        $DB->delete_records_select('user_preferences', 'name LIKE ?', ['datalynxfilter-%']);
-        $DB->delete_records_select('user_preferences', 'name LIKE ?', ['datalynxcustomfilter-%']);
+        mod_datalynx_upgrade_purge_filter_preferences();
 
         upgrade_mod_savepoint(true, 2026063000, 'datalynx');
     }
 
     if ($oldversion < 2026081000) {
-        // Ledger of the entry pairs a rule has already announced, so that saving an entry again
-        // does not notify both authors a second time.
-        $table = new xmldb_table('datalynx_rule_matches');
-        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
-        $table->add_field('dataid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
-        $table->add_field('scope', XMLDB_TYPE_CHAR, '64', null, XMLDB_NOTNULL, null, null);
-        $table->add_field('entrylow', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
-        $table->add_field('entryhigh', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
-        $table->add_field('timenotified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
-        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
-        $table->add_key('dataid', XMLDB_KEY_FOREIGN, ['dataid'], 'datalynx', ['id']);
-        $table->add_key('entrylow', XMLDB_KEY_FOREIGN, ['entrylow'], 'datalynx_entries', ['id']);
-        $table->add_key('entryhigh', XMLDB_KEY_FOREIGN, ['entryhigh'], 'datalynx_entries', ['id']);
-        $table->add_index(
-            'dataid-scope-entrylow-entryhigh',
-            XMLDB_INDEX_UNIQUE,
-            ['dataid', 'scope', 'entrylow', 'entryhigh']
-        );
-        if (!$dbman->table_exists($table)) {
-            $dbman->create_table($table);
-        }
+        mod_datalynx_upgrade_rule_matches_table();
 
         upgrade_mod_savepoint(true, 2026081000, 'datalynx');
     }
@@ -1551,7 +1347,132 @@ function xmldb_datalynx_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2026092000, 'datalynx');
     }
 
+    if ($oldversion < 2026111100) {
+        // Sites that ran a maintenance release from the master branch (2026081700, 2026090200)
+        // carry a version above the steps 2026052500-2026081000, so upgrading them to this code
+        // skipped those steps entirely. Repair schema and data where they are still missing.
+        mod_datalynx_upgrade_repair_skipped_steps();
+
+        upgrade_mod_savepoint(true, 2026111100, 'datalynx');
+    }
+
     return true;
+}
+
+/**
+ * Re-apply the upgrade steps 2026052500-2026081000 on sites that skipped them.
+ *
+ * The maintenance releases from the master branch were numbered 2026081700 and 2026090200 but
+ * did not contain those steps, so a site upgrading from them to this code jumped over every one of
+ * them. All schema changes are re-applied when missing. The data migrations only run when the
+ * schema shows that their step never ran: steps run in version order, so the presence of a later
+ * step's column or table proves that the earlier data migrations ran as well. That keeps
+ * migrations which are not idempotent (grid view defaults, permitted filters) from overwriting
+ * data on sites that already went through them.
+ *
+ * @return void
+ */
+function mod_datalynx_upgrade_repair_skipped_steps(): void {
+    global $DB;
+    $dbman = $DB->get_manager();
+
+    // Capture the markers before anything is added.
+    $hadfieldformats = $dbman->table_exists('datalynx_field_formats');
+    $hadtimesubmitted = $dbman->field_exists('datalynx_entries', 'timesubmitted');
+    $hadpermittedfilters = $dbman->field_exists('datalynx_views', 'permittedfilters');
+    $hadrulematches = $dbman->table_exists('datalynx_rule_matches');
+    $timesubmittednullable = false;
+    if ($hadtimesubmitted) {
+        $columns = $DB->get_columns('datalynx_entries', false);
+        $timesubmittednullable = empty($columns['timesubmitted']->not_null);
+    }
+
+    // Schema first, so that the data migrations below run against the final table structure.
+    $table = new xmldb_table('datalynx_behaviors');
+    $field = new xmldb_field('editableafterfinal', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'required');
+    if (!$dbman->field_exists($table, $field)) {
+        $dbman->add_field($table, $field);
+    }
+    $field = new xmldb_field('conditions', XMLDB_TYPE_TEXT, null, null, null, null, null, 'editableafterfinal');
+    if (!$dbman->field_exists($table, $field)) {
+        $dbman->add_field($table, $field);
+    }
+
+    $table = new xmldb_table('datalynx_entries');
+    $field = new xmldb_field('timesubmitted', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'status');
+    if (!$hadtimesubmitted) {
+        $dbman->add_field($table, $field);
+    } else if (!$timesubmittednullable) {
+        $dbman->change_field_notnull($table, $field);
+        $dbman->change_field_default($table, $field);
+    }
+
+    $table = new xmldb_table('datalynx_views');
+    $field = new xmldb_field('permittedfilters', XMLDB_TYPE_TEXT, null, null, null, null, null, 'filter');
+    if (!$hadpermittedfilters) {
+        $dbman->add_field($table, $field);
+    }
+
+    if (!$hadrulematches) {
+        mod_datalynx_upgrade_rule_matches_table();
+    }
+
+    // Data migrations, in the order of the original steps.
+    if (!$hadfieldformats) {
+        mod_datalynx_upgrade_grid_view_defaults();
+        mod_datalynx_upgrade_field_formats();
+    }
+    if (!$hadtimesubmitted) {
+        mod_datalynx_upgrade_rule_params_to_json();
+        mod_datalynx_upgrade_rule_condition_values_to_json();
+        \datalynxfield_teammemberselect\field::normalize_stored_content();
+    }
+    if (!$timesubmittednullable) {
+        mod_datalynx_upgrade_rule_conditions_to_param9();
+    }
+    // Idempotent: no entry keeps 0 as its submission time.
+    $DB->execute("UPDATE {datalynx_entries} SET timesubmitted = NULL WHERE timesubmitted = 0");
+    if (!$hadpermittedfilters) {
+        mod_datalynx_upgrade_permittedfilters_from_filter();
+    }
+    if (!$hadrulematches) {
+        mod_datalynx_upgrade_purge_filter_preferences();
+    }
+}
+
+/**
+ * Default the entry template settings of existing grid views (2026052500).
+ *
+ * @return void
+ */
+function mod_datalynx_upgrade_grid_view_defaults(): void {
+    global $DB;
+
+    // Set param3 default to 'entry' and param4 to empty string for backward compatibility in existing grid views.
+    $DB->set_field_select('datalynx_views', 'param3', 'entry', "type = 'grid'");
+    $DB->set_field_select('datalynx_views', 'param4', '', "type = 'grid'");
+}
+
+/**
+ * Turn the single enforced view filter into the permitted-filters whitelist (2026062900).
+ *
+ * @return void
+ */
+function mod_datalynx_upgrade_permittedfilters_from_filter(): void {
+    global $DB;
+
+    // Migrate existing enforcement into the new model. Locked views (param5 "Allow all filters"
+    // off) with a configured filter become "default + only that filter permitted", so the
+    // restriction is still enforced. Override views (param5 on) are left as live "allow all":
+    // permittedfilters stays null and is ignored while allow-all is on.
+    $rs = $DB->get_recordset_select('datalynx_views', 'filter > 0', null, '', 'id, filter, param5');
+    foreach ($rs as $view) {
+        if (empty($view->param5)) {
+            $value = json_encode([(int) $view->filter]);
+            $DB->set_field('datalynx_views', 'permittedfilters', $value, ['id' => $view->id]);
+        }
+    }
+    $rs->close();
 }
 
 /**
@@ -1753,5 +1674,276 @@ function mod_datalynx_fix_behavior_in_template(): void {
                 $DB->update_record('datalynx_views', $view);
             }
         }
+    }
+}
+
+/**
+ * Field Formats: create the formats table and migrate legacy tags and userinfo fields (2026060900).
+ *
+ * @return void
+ */
+function mod_datalynx_upgrade_field_formats(): void {
+    global $DB;
+    $dbman = $DB->get_manager();
+
+    // Field Formats: single, clean migration from the pre-Field-Format codebase.
+    // The Field Format feature was built up over several incremental upgrade steps
+    // (2026060600-2026060703) that were only ever deployed to development sites. Because the
+    // code has not been released, those steps are collapsed here into one idempotent
+    // migration: production sites (all still < 2026060600) upgrade in a single pass, and
+    // re-running on an already-migrated development site is a no-op.
+
+    // 1. Create the datalynx_field_formats table.
+    $table = new xmldb_table('datalynx_field_formats');
+    $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+    $table->add_field('dataid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+    $table->add_field('name', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+    $table->add_field('fieldtype', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
+    $table->add_field('settings', XMLDB_TYPE_TEXT, null, null, null, null, null);
+    $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+    $table->add_key('dataid', XMLDB_KEY_FOREIGN, ['dataid'], 'datalynx', ['id']);
+    if (!$dbman->table_exists($table)) {
+        $dbman->create_table($table);
+    }
+
+    // 2. Normalise legacy rating tags in the view templates (##ratings:avg:bar## -> avgbar and
+    // avg:star -> avgstar, in both ##...## and [[...]] styles) so the scan in step 4 creates
+    // correctly named rating formats.
+    $textfields = [
+        'patterns', 'section', 'param1', 'param2', 'param3',
+        'param4', 'param5', 'param6', 'param7', 'param8',
+        'param9', 'param10',
+    ];
+    $views = $DB->get_records('datalynx_views');
+    foreach ($views as $view) {
+        $changed = false;
+        foreach ($textfields as $textfield) {
+            if (!empty($view->$textfield)) {
+                $newtext = str_replace(
+                    ['##ratings:avg:bar##', '##ratings:avg:star##', '[[ratings:avg:bar]]', '[[ratings:avg:star]]'],
+                    ['##ratings:avgbar##', '##ratings:avgstar##', '[[ratings:avgbar]]', '[[ratings:avgstar]]'],
+                    $view->$textfield
+                );
+                if ($newtext !== $view->$textfield) {
+                    $view->$textfield = $newtext;
+                    $changed = true;
+                }
+            }
+        }
+        if ($changed) {
+            $DB->update_record('datalynx_views', $view);
+        }
+    }
+
+    // 3. Migrate legacy `userinfo` fields into entryauthor field formats and drop the field rows.
+    // The userinfo field type has been removed; this converter is pure DB, so it does not
+    // depend on the removed datalynxfield_userinfo classes.
+    \mod_datalynx\local\field_format\manager::migrate_userinfo_fields();
+
+    // 4. Auto-create field formats from all view templates. The scanner names each format after
+    // the legacy tag suffix, applies the field type's inferred default settings, skips field
+    // types whose formats carry no settings (has_options() === false), and skips formats
+    // that already exist (e.g. those created by step 3).
+    \mod_datalynx\local\field_format\manager::auto_create_formats_from_all_instances();
+}
+
+/**
+ * Convert serialized rule params to JSON (2026061103).
+ *
+ * @return void
+ */
+function mod_datalynx_upgrade_rule_params_to_json(): void {
+    global $DB;
+
+    // Migrate datalynx_rules serialized params to JSON.
+    // param1 (all rules): selected trigger events.
+    // param2 (ftpsyncfiles): SFTP connection settings.
+    // param3 (eventnotification): recipient configuration.
+    // param4 (eventnotification): target views per permission level.
+    $rules = $DB->get_records('datalynx_rules', null, '', 'id, param1, param2, param3, param4');
+    foreach ($rules as $rule) {
+        $update = (object)['id' => $rule->id];
+        $changed = false;
+        foreach (['param1', 'param2', 'param3', 'param4'] as $param) {
+            $value = $rule->$param;
+            if (!empty($value) && is_string($value)) {
+                $decoded = @unserialize($value);
+                if (is_array($decoded)) {
+                    $update->$param = json_encode($decoded);
+                    $changed = true;
+                }
+            }
+        }
+        if ($changed) {
+            $DB->update_record('datalynx_rules', $update);
+        }
+    }
+}
+
+/**
+ * Convert multi-option eventnotification condition values to JSON (2026061900).
+ *
+ * @return void
+ */
+function mod_datalynx_upgrade_rule_condition_values_to_json(): void {
+    global $DB;
+
+    // Migrate datalynx_rules eventnotification param10 condition values to JSON if they are multiple option fields.
+    $sql = "SELECT r.id, r.param5, r.param10
+              FROM {datalynx_rules} r
+             WHERE r.type = 'eventnotification'
+               AND r.param5 IS NOT NULL
+               AND r.param5 <> '0'
+               AND r.param10 IS NOT NULL
+               AND r.param10 <> ''";
+    if ($rules = $DB->get_records_sql($sql)) {
+        foreach ($rules as $rule) {
+            $field = $DB->get_record('datalynx_fields', ['id' => (int)$rule->param5], 'id, type');
+            if ($field && in_array($field->type, ['checkbox', 'multiselect', 'tag'])) {
+                $value = $rule->param10;
+                if (json_decode($value) === null) {
+                    $newvalue = json_encode(explode(',', $value));
+                    $DB->set_field('datalynx_rules', 'param10', $newvalue, ['id' => $rule->id]);
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Move single eventnotification trigger conditions into the multi-condition param9 (2026062301).
+ *
+ * @return void
+ */
+function mod_datalynx_upgrade_rule_conditions_to_param9(): void {
+    global $DB;
+
+    // Migrate eventnotification trigger conditions from the legacy single-condition
+    // param5 (field id) + param10 (value) storage to the multi-condition JSON in param9.
+    $rules = $DB->get_records_select(
+        'datalynx_rules',
+        "type = :type AND param5 IS NOT NULL AND " . $DB->sql_compare_text('param5') . " <> :empty",
+        ['type' => 'eventnotification', 'empty' => '']
+    );
+    foreach ($rules as $rule) {
+        if (!empty($rule->param9)) {
+            continue; // Already migrated.
+        }
+        try {
+            $dlx = new \mod_datalynx\datalynx((int) $rule->dataid);
+            $field = $dlx->get_field_from_id($rule->param5);
+        } catch (\Throwable $e) {
+            $field = false;
+        }
+        if (!$field) {
+            continue;
+        }
+        $value = $rule->param10;
+        $decoded = json_decode((string) $value, true);
+        if (is_array($decoded)) {
+            $value = $decoded;
+        } else if ($field instanceof \mod_datalynx\local\field\datalynxfield_option_multiple) {
+            $value = explode(',', (string) $value);
+        }
+        // Reproduce the legacy exact-match behaviour: multi-option fields use EXACTLY,
+        // everything else '=' (falling back to the first real operator the field offers).
+        if ($field instanceof \mod_datalynx\local\field\datalynxfield_option_multiple) {
+            $operator = 'EXACTLY';
+        } else {
+            $operators = $field->get_supported_search_operators();
+            if (array_key_exists('=', $operators)) {
+                $operator = '=';
+            } else {
+                $operator = '';
+                foreach (array_keys($operators) as $op) {
+                    if ($op !== '') {
+                        $operator = $op;
+                        break;
+                    }
+                }
+            }
+        }
+        $rule->param9 = json_encode([$rule->param5 => ['AND' => [['', $operator, $value]]]]);
+        $rule->param5 = null;
+        $rule->param10 = null;
+        $DB->update_record('datalynx_rules', $rule);
+    }
+}
+
+/**
+ * Make datalynx_entries.timesubmitted nullable without default and turn 0 into NULL (2026062700).
+ *
+ * @return void
+ */
+function mod_datalynx_upgrade_timesubmitted_nullable(): void {
+    global $DB;
+    $dbman = $DB->get_manager();
+
+    // Change timesubmitted field in datalynx_entries to be nullable and have no default.
+    $table = new xmldb_table('datalynx_entries');
+    $field = new xmldb_field(
+        'timesubmitted',
+        XMLDB_TYPE_INTEGER,
+        '10',
+        null,
+        null,
+        null,
+        null,
+        'status'
+    );
+
+    if ($dbman->field_exists($table, $field)) {
+        $dbman->change_field_notnull($table, $field);
+        $dbman->change_field_default($table, $field);
+    }
+
+    // Backfill/migrate any existing 0 values to NULL.
+    $DB->execute("UPDATE {datalynx_entries} SET timesubmitted = NULL WHERE timesubmitted = 0");
+}
+
+/**
+ * Purge the user preferences of the retired advanced and personal filters (2026063000).
+ *
+ * @return void
+ */
+function mod_datalynx_upgrade_purge_filter_preferences(): void {
+    global $DB;
+
+    // Retire advancedfilter and personal user filters (now superseded by customfilter).
+    // Purge the leftover per-user filter preferences they stored; the retained quick controls
+    // (##quicksearch##/##quickperpage##) recreate transient rows as needed.
+    $DB->delete_records_select('user_preferences', 'name LIKE ?', ['datalynxfilter-%']);
+    $DB->delete_records_select('user_preferences', 'name LIKE ?', ['datalynxcustomfilter-%']);
+}
+
+/**
+ * Create the datalynx_rule_matches ledger table (2026081000).
+ *
+ * @return void
+ */
+function mod_datalynx_upgrade_rule_matches_table(): void {
+    global $DB;
+    $dbman = $DB->get_manager();
+
+    // Ledger of the entry pairs a rule has already announced, so that saving an entry again
+    // does not notify both authors a second time.
+    $table = new xmldb_table('datalynx_rule_matches');
+    $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+    $table->add_field('dataid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+    $table->add_field('scope', XMLDB_TYPE_CHAR, '64', null, XMLDB_NOTNULL, null, null);
+    $table->add_field('entrylow', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+    $table->add_field('entryhigh', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+    $table->add_field('timenotified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+    $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+    $table->add_key('dataid', XMLDB_KEY_FOREIGN, ['dataid'], 'datalynx', ['id']);
+    $table->add_key('entrylow', XMLDB_KEY_FOREIGN, ['entrylow'], 'datalynx_entries', ['id']);
+    $table->add_key('entryhigh', XMLDB_KEY_FOREIGN, ['entryhigh'], 'datalynx_entries', ['id']);
+    $table->add_index(
+        'dataid-scope-entrylow-entryhigh',
+        XMLDB_INDEX_UNIQUE,
+        ['dataid', 'scope', 'entrylow', 'entryhigh']
+    );
+    if (!$dbman->table_exists($table)) {
+        $dbman->create_table($table);
     }
 }
