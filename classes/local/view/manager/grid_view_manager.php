@@ -137,10 +137,13 @@ class grid_view_manager {
         foreach ($entryrecords as $entry) {
             $manageable = $view->get_dlx()->user_can_manage_entry($entry);
             $entry->baseurl = $view->get_navigationurl();
+            $entryhtml = $useentryhtml ? $view->render_entry_html($entry, ['edit' => false, 'manage' => $manageable]) : '';
             $entries[] = [
                 'id' => (int) $entry->id,
-                'entryhtml' => $useentryhtml ? $view->render_entry_html($entry, ['edit' => false, 'manage' => $manageable]) : '',
-                'fields' => $this->build_field_values($fields, $entry),
+                'entryhtml' => $entryhtml,
+                // The browser template lists the fields only when there is no entry html, so do not
+                // render every field of the instance for entries that have it.
+                'fields' => $entryhtml === '' ? $this->build_field_values($fields, $entry) : [],
                 'edithtml' => $useentryhtml ? '' : $this->resolve_definition_html(
                     $entryfield->get_definitions(['##edit##'], $entry, ['manage' => $manageable]),
                     '##edit##'
