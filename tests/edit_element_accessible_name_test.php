@@ -52,15 +52,14 @@ final class edit_element_accessible_name_test extends advanced_testcase {
      * @param string $type field type
      * @param string $name field name
      * @param string $description field description
-     * @param string $param1 field param1 (options for select and checkbox)
+     * @param array $params field params, e.g. ['param1' => options for select and checkbox]
      * @return mixed the field object
      */
-    private function add_field(string $type, string $name, string $description = '', string $param1 = '') {
+    private function add_field(string $type, string $name, string $description = '', array $params = []) {
         global $DB;
-        $id = (int) $DB->insert_record('datalynx_fields', (object) [
+        $id = (int) $DB->insert_record('datalynx_fields', (object) ([
             'dataid' => $this->dlx->id(), 'type' => $type, 'name' => $name, 'description' => $description,
-            'param1' => $param1,
-        ]);
+        ] + $params));
         return $this->dlx->get_field_from_id($id, true);
     }
 
@@ -110,7 +109,7 @@ final class edit_element_accessible_name_test extends advanced_testcase {
      * Without a layout label the select gets the field description, or the field name, as aria-label.
      */
     public function test_fallback_to_description_and_name(): void {
-        $select = $this->add_field('select', 'sektion', 'DocSchool section', "A\nB");
+        $select = $this->add_field('select', 'sektion', 'DocSchool section', ['param1' => "A\nB"]);
         $html = $this->render_field($select, '<div class="mb-3">#input</div>');
         $this->assertMatchesRegularExpression('~<select[^>]+aria-label="DocSchool section"~', $html);
 
@@ -123,11 +122,48 @@ final class edit_element_accessible_name_test extends advanced_testcase {
      * Elements that name themselves (checkbox options) are not touched.
      */
     public function test_checkbox_options_keep_their_text(): void {
-        $field = $this->add_field('checkbox', 'confirm', '', 'I confirm the information.');
+        $field = $this->add_field('checkbox', 'confirm', '', ['param1' => 'I confirm the information.']);
         $html = $this->render_field($field, '<label>Confirmation</label>#input');
 
         $this->assertStringContainsString('I confirm the information.', $html);
         $this->assertStringNotContainsString('aria-label="Confirmation"', $html);
         $this->assertStringNotContainsString('<label for=', substr($html, 0, strpos($html, 'Confirmation') + 20));
+    }
+
+    /**
+     * The url and link text inputs of a url field sit in a group; both are named, the second with its placeholder.
+     */
+    public function test_group_parts_are_named(): void {
+        $field = $this->add_field('url', 'bericht_link', '', ['param5' => 1]);
+        $prefix = 'field_' . $field->id() . '_7';
+        $html = $this->render_field($field, '<label>Report link · Link zum Bericht</label>#input');
+
+        $this->assertStringContainsString('<label for="id_' . $prefix . '_url">Report link · Link zum Bericht</label>', $html);
+        $linktext = get_string('linktext', 'datalynxfield_url');
+        $arialabel = 'aria-label="Report link · Link zum Bericht: ' . preg_quote($linktext) . '"';
+        $this->assertMatchesRegularExpression('~<input[^>]+name="' . $prefix . '_alt"[^>]+' . $arialabel . '~', $html);
+    }
+
+    /**
+     * The masked day, month and year menus of a time field are told apart by their mask option.
+     */
+    public function test_masked_time_menus_get_their_mask_as_hint(): void {
+        $field = $this->add_field('time', 'reisedatum', '', ['param1' => 1, 'param5' => 1]);
+        $html = $this->render_field($field, '<label>Travel date · Reisedatum</label>#input');
+
+        $this->assertMatchesRegularExpression('~<label for="id_field_' . $field->id() . '_7_day"~', $html);
+        $this->assertStringContainsString('aria-label="Travel date · Reisedatum: ' . get_string('month') . '"', $html);
+        $this->assertStringContainsString('aria-label="Travel date · Reisedatum: ' . get_string('year') . '"', $html);
+    }
+
+    /**
+     * The parts of a standard date selector have their own labels and stay untouched.
+     */
+    public function test_date_selector_parts_are_untouched(): void {
+        $field = $this->add_field('time', 'termin', '', ['param1' => 1]);
+        $html = $this->render_field($field, '<label>Date · Datum</label>#input');
+
+        $this->assertStringNotContainsString('aria-label="Date · Datum', $html);
+        $this->assertStringNotContainsString('<label for=', substr($html, 0, strpos($html, 'Date · Datum') + 20));
     }
 }

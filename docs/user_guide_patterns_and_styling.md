@@ -85,6 +85,7 @@ Datalynx attaches that first `<label>` to the input automatically (it adds `for=
 - Use a real `<label>` element, not a `<div>` or `<strong>`. Text in other elements is shown, but it is not linked to the input.
 - If you write `for="…"` yourself, Datalynx leaves the label as it is and gives the input the label text as `aria-label` instead.
 - If the template has no `<label>`, or the field is used without a layout, the input gets the field **description** as its accessible name, or the field **name** if the description is empty. Give fields a readable description when you use them without a labelled layout.
+- Fields with several inputs (a url with link text, a time field with separate day, month and year menus) get the label on the first input; the other inputs get the label text plus their placeholder or menu caption, for example "Report link: Link text" or "Travel date: Month".
 - Checkbox and radio options, date selectors and file pickers label themselves and are not changed.
 
 ### Fieldgroups

@@ -484,13 +484,16 @@ abstract class datalynxfield_renderer {
      * element itself is added without a label, so screen readers could not tell which field an input
      * belongs to. The first unnamed element gets the template's first `<label>` attached with `for`;
      * any further unnamed element gets an aria-label with the same text, or with the field description
-     * or name when the template has no label.
+     * or name when the template has no label. Elements inside groups (url and link text, the day, month
+     * and year menus of a time field) are named the same way; when a field has several unnamed elements
+     * the aria-label adds the element's placeholder or mask option ("Report: Link text", "Date: Month").
      *
      * @param array $elements form elements added by {@see render_edit_mode()}
      * @param \HTML_QuickForm_static|null $prefixelement the html element holding the layout prefix
      */
     protected function name_edit_elements(array $elements, ?\HTML_QuickForm_static $prefixelement): void {
-        $unnamed = array_values(array_filter($elements, [$this, 'element_needs_name']));
+        $unnamed = array_values(array_filter($this->expand_groups($elements), [$this, 'element_needs_name']));
+        $addhint = count($unnamed) > 1;
         if (!$unnamed) {
             return;
         }
@@ -529,15 +532,57 @@ abstract class datalynxfield_renderer {
             );
         }
         foreach ($unnamed as $element) {
-            $element->updateAttributes(['aria-label' => $labeltext]);
+            $hint = $addhint ? $this->element_hint($element) : '';
+            $element->updateAttributes(['aria-label' => $hint !== '' ? "$labeltext: $hint" : $labeltext]);
         }
+    }
+
+    /**
+     * Replaces each group by its elements, so that the parts of a group can be named.
+     *
+     * @param array $elements form elements
+     * @return array
+     */
+    protected function expand_groups(array $elements): array {
+        $expanded = [];
+        foreach ($elements as $element) {
+            if ($element instanceof \HTML_QuickForm_group) {
+                array_push($expanded, ...$this->expand_groups($element->getElements()));
+            } else {
+                $expanded[] = $element;
+            }
+        }
+        return $expanded;
+    }
+
+    /**
+     * What tells one element of a field apart from the others: its placeholder, or the text of the
+     * empty mask option of a menu ("Month").
+     *
+     * @param \HTML_QuickForm_element $element
+     * @return string
+     */
+    protected function element_hint(\HTML_QuickForm_element $element): string {
+        $placeholder = trim((string) $element->getAttribute('placeholder'));
+        if ($placeholder !== '') {
+            return $placeholder;
+        }
+        if ($element instanceof \HTML_QuickForm_select) {
+            foreach ($element->_options as $option) {
+                $value = (string) ($option['attr']['value'] ?? '');
+                if ($value === '0' || $value === '') {
+                    return trim(strip_tags((string) $option['text']));
+                }
+            }
+        }
+        return '';
     }
 
     /**
      * Whether a form element would be announced without a name.
      *
-     * Groups (date selectors, checkbox and radio groups) label their parts themselves, checkboxes
-     * carry their own text, and layout, hidden and button elements need no name.
+     * Checkboxes and radio buttons carry their own text, the parts of date selectors have labels, and
+     * layout, hidden and button elements need no name. Groups are expanded by {@see expand_groups()}.
      *
      * @param mixed $element a QuickForm element
      * @return bool
