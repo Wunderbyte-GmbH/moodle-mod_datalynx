@@ -111,4 +111,33 @@ final class fieldgroup_accessibility_test extends advanced_testcase {
         $this->assertStringContainsString('>' . get_string('addline', 'datalynx', 'Kosten') . '</button>', $html1);
         $this->assertStringContainsString('>Add receipt</button>', $html2);
     }
+
+    /**
+     * A subfield whose own layout labels its input keeps that label; the fieldgroup's label is not put on top.
+     */
+    public function test_subfield_keeps_its_own_layout_label(): void {
+        global $DB;
+        $DB->insert_record('datalynx_renderers', (object) [
+            'dataid' => $this->dlx->id(), 'type' => '', 'name' => 'r_pos', 'description' => '',
+            'notvisibletemplate' => '___0___', 'displaytemplate' => '#value', 'novaluetemplate' => '___0___',
+            'edittemplate' => '<label>Item · Position</label>#input', 'noteditabletemplate' => '___1___',
+        ]);
+        $groupid = (int) $DB->insert_record('datalynx_fields', (object) [
+            'dataid' => $this->dlx->id(), 'type' => 'fieldgroup', 'name' => 'Kosten', 'description' => '',
+            'param1' => json_encode([$this->subfieldid . ':||r_pos']), 'param2' => '2', 'param3' => '2', 'param4' => '0',
+        ]);
+        $group = (new datalynx($this->dlx->id()))->get_field_from_id($groupid, true);
+        $mform = new \MoodleQuickForm('fgnested', 'post', 'index.php');
+        $group->renderer()->prerender_edit_mode($mform, (object) ['id' => 7], [
+            'editable' => true,
+            'template' => '<div><label>Financing plan</label>#input</div>',
+        ]);
+        $html = $mform->toHtml();
+
+        $this->assertSame(2, substr_count($html, '>Item · Position</label>'));
+        $inputid = 'id_field_' . $this->subfieldid . '_7_fieldgroup_' . $groupid;
+        $this->assertSame(2, preg_match_all('~<label for="' . $inputid . '_[01]">Item~', $html));
+        $this->assertStringNotContainsString('aria-label="Financing plan"', $html);
+        $this->assertStringContainsString('<label>Financing plan</label>', $html);
+    }
 }

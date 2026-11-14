@@ -94,6 +94,9 @@ A **fieldgroup** bundles several subfields into one repeatable block (think of r
 
 - Give each **subfield its own field layout and behavior**, using the usual `[[Subfield|behavior|layout]]` pattern, so a repeated row looks exactly how you want.
 - Add a **totals row** for numeric subfields by putting a field format on the fieldgroup tag, for example `[[Mygroup:totals]]`. The format’s **Totals label** setting sets the text shown next to the totals (default “Total”).
+- Set **Text of the add button** in the fieldgroup settings (for example “Add receipt”). Left empty, the button reads “Add” followed by the field name.
+
+For screen reader users, each row of a fieldgroup in the entry form is a named group (“Financing plan, row 2”), and its delete button says which row it deletes. The name comes from the first `<label>` or heading in the fieldgroup’s edit layout, otherwise from the field description, otherwise from the field name, so give the layout a visible label or heading. After adding a row, the cursor moves to the new row; after deleting one, it moves to the previous row’s delete button.
 
 ---
 

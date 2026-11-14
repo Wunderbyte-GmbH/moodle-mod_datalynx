@@ -45,6 +45,9 @@ abstract class datalynxfield_renderer {
     /** @var datalynxfield_base The field object. */
     protected $field = null; // phpcs:ignore
 
+    /** @var \WeakMap|null Form elements already named by a layout label, e.g. subfields inside a fieldgroup. */
+    protected static $namedelements = null;
+
     /**
      * Constructor
      *
@@ -505,6 +508,7 @@ abstract class datalynxfield_renderer {
                 $labeltext = trim(strip_tags($match[2][0]));
                 if (!preg_match('~\bfor\s*=~i', $match[1][0])) {
                     $element = array_shift($unnamed);
+                    self::named_elements()[$element] = true;
                     $element->_generateId();
                     $labeltag = '<label for="' . s($element->getAttribute('id')) . '"' . $match[1][0] . '>';
                     $labelstart = $match[0][1];
@@ -534,7 +538,21 @@ abstract class datalynxfield_renderer {
         foreach ($unnamed as $element) {
             $hint = $addhint ? $this->element_hint($element) : '';
             $element->updateAttributes(['aria-label' => $hint !== '' ? "$labeltext: $hint" : $labeltext]);
+            self::named_elements()[$element] = true;
         }
+    }
+
+    /**
+     * Elements named by an earlier pass. A fieldgroup renders its subfields with their own layouts first;
+     * their inputs must keep that label and not get the fieldgroup's label on top.
+     *
+     * @return \WeakMap
+     */
+    protected static function named_elements(): \WeakMap {
+        if (self::$namedelements === null) {
+            self::$namedelements = new \WeakMap();
+        }
+        return self::$namedelements;
     }
 
     /**
@@ -595,7 +613,8 @@ abstract class datalynxfield_renderer {
         if (in_array($element->getType(), $skip, true)) {
             return false;
         }
-        $named = (string) $element->getLabel() !== ''
+        $named = isset(self::named_elements()[$element])
+            || (string) $element->getLabel() !== ''
             || $element->getAttribute('aria-label')
             || $element->getAttribute('aria-labelledby');
         if ($named) {
