@@ -443,10 +443,13 @@ abstract class datalynxfield_renderer {
                 '<div class="' . $wrapperclass . '" data-field-type="' . $this->field->type .
                 '" data-field-name="' . $this->field->field->name . '">'
             );
+            $prefixelement = null;
             if (isset($options['prefix'])) {
-                $mform->addElement('html', $options['prefix']);
+                $prefixelement = $mform->addElement('html', $options['prefix']);
             }
+            $firstelement = count($mform->_elements);
             $this->render_edit_mode($mform, $entry, $options);
+            $this->name_edit_elements(array_slice($mform->_elements, $firstelement), $prefixelement);
             if (isset($options['suffix'])) {
                 $mform->addElement('html', $options['suffix']);
             }
@@ -472,6 +475,91 @@ abstract class datalynxfield_renderer {
             }
             $mform->addElement('html', '</div>');
         }
+    }
+
+    /**
+     * Gives every form element this field added an accessible name.
+     *
+     * Custom layouts put the visible label into the template (`<label>Purpose</label>#input`) and the
+     * element itself is added without a label, so screen readers could not tell which field an input
+     * belongs to. The first unnamed element gets the template's first `<label>` attached with `for`;
+     * any further unnamed element gets an aria-label with the same text, or with the field description
+     * or name when the template has no label.
+     *
+     * @param array $elements form elements added by {@see render_edit_mode()}
+     * @param \HTML_QuickForm_static|null $prefixelement the html element holding the layout prefix
+     */
+    protected function name_edit_elements(array $elements, ?\HTML_QuickForm_static $prefixelement): void {
+        $unnamed = array_values(array_filter($elements, [$this, 'element_needs_name']));
+        if (!$unnamed) {
+            return;
+        }
+
+        $labeltext = '';
+        if ($prefixelement !== null) {
+            $prefix = $prefixelement->toHtml();
+            if (preg_match('~<label\b([^>]*)>(.*?)</label>~is', $prefix, $match, PREG_OFFSET_CAPTURE)) {
+                $labeltext = trim(strip_tags($match[2][0]));
+                if (!preg_match('~\bfor\s*=~i', $match[1][0])) {
+                    $element = array_shift($unnamed);
+                    $element->_generateId();
+                    $labeltag = '<label for="' . s($element->getAttribute('id')) . '"' . $match[1][0] . '>';
+                    $labelstart = $match[0][1];
+                    $prefixelement->setText(substr_replace(
+                        $prefix,
+                        $labeltag,
+                        $labelstart,
+                        $match[2][1] - $labelstart
+                    ));
+                }
+            }
+        }
+        if (!$unnamed) {
+            return;
+        }
+
+        $context = $this->field->dlx()->context;
+        $labeltext = format_string($labeltext, true, ['context' => $context, 'escape' => false]);
+        if ($labeltext === '') {
+            $description = trim(strip_tags((string) ($this->field->field->description ?? '')));
+            $labeltext = format_string(
+                $description !== '' ? $description : $this->field->field->name,
+                true,
+                ['context' => $context, 'escape' => false]
+            );
+        }
+        foreach ($unnamed as $element) {
+            $element->updateAttributes(['aria-label' => $labeltext]);
+        }
+    }
+
+    /**
+     * Whether a form element would be announced without a name.
+     *
+     * Groups (date selectors, checkbox and radio groups) label their parts themselves, checkboxes
+     * carry their own text, and layout, hidden and button elements need no name.
+     *
+     * @param mixed $element a QuickForm element
+     * @return bool
+     */
+    protected function element_needs_name($element): bool {
+        if (!$element instanceof \HTML_QuickForm_element || $element instanceof \HTML_QuickForm_group) {
+            return false;
+        }
+        $skip = ['html', 'static', 'hidden', 'header', 'submit', 'button', 'cancel', 'reset'];
+        if (in_array($element->getType(), $skip, true)) {
+            return false;
+        }
+        $named = (string) $element->getLabel() !== ''
+            || $element->getAttribute('aria-label')
+            || $element->getAttribute('aria-labelledby');
+        if ($named) {
+            return false;
+        }
+        if (method_exists($element, 'getText') && trim((string) $element->getText()) !== '') {
+            return false;
+        }
+        return true;
     }
 
     /**

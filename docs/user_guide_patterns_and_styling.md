@@ -70,6 +70,23 @@ The field-layout editor includes a set of curated **Bootstrap-5 presets** so you
 > **Pro-Tip**  
 > Apply a preset, save, and view it with a real entry before refining. Starting from a preset keeps spacing and responsive behavior consistent across your activity.
 
+### Labels in edit layouts (accessibility)
+
+When an edit template wraps the input with `#input`, put the visible label into the template as a `<label>` element before `#input`, for example:
+
+```html
+<label class="form-label fw-semibold">Purpose · Zweck</label>
+<div class="form-text">Short description of the activity.</div>
+#input
+```
+
+Datalynx attaches that first `<label>` to the input automatically (it adds `for="…"`), so screen readers announce the label and clicking it focuses the input. You do not need to know the input's id.
+
+- Use a real `<label>` element, not a `<div>` or `<strong>`. Text in other elements is shown, but it is not linked to the input.
+- If you write `for="…"` yourself, Datalynx leaves the label as it is and gives the input the label text as `aria-label` instead.
+- If the template has no `<label>`, or the field is used without a layout, the input gets the field **description** as its accessible name, or the field **name** if the description is empty. Give fields a readable description when you use them without a labelled layout.
+- Checkbox and radio options, date selectors and file pickers label themselves and are not changed.
+
 ### Fieldgroups
 
 A **fieldgroup** bundles several subfields into one repeatable block (think of repeatable line items). Inside an entry template you can:
