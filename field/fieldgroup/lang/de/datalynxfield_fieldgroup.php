@@ -22,6 +22,8 @@
  * @copyright  2026 David Bogner
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+$string['addbuttontext'] = 'Text der Hinzufügen-Schaltfläche';
+$string['addbuttontext_help'] = 'Text der Schaltfläche, mit der im Eintragsformular eine Zeile hinzugefügt wird, zum Beispiel "Beleg hinzufügen". Leer lassen, um "Füge <Feldname> hinzu" zu verwenden.';
 $string['fieldformataggavg'] = 'Durchschnitt';
 $string['fieldformataggcount'] = 'Anzahl';
 $string['fieldformataggmax'] = 'Maximum';
@@ -36,3 +38,7 @@ $string['fieldformatlabel_help'] = 'Text, der neben der Summenzeile angezeigt wi
 $string['fieldformattotal'] = 'Summe';
 $string['pluginname'] = 'Feldgruppe';
 $string['privacy:metadata'] = 'Feldgruppen speichern keine personenbezogenen Daten.';
+$string['rowadded'] = '{$a} hinzugefügt';
+$string['rowcleared'] = '{$a} geleert';
+$string['rowdeleted'] = '{$a} gelöscht';
+$string['rowlabel'] = '{$a->group}, Zeile {$a->line}';

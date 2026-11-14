@@ -118,6 +118,11 @@ class form extends datalynxfield_form {
         $mform->addRule('param4', null, 'numeric', null, 'client');
         $mform->setType('param4', PARAM_INT);
 
+        // Text of the button that adds a row.
+        $mform->addElement('text', 'param5', get_string('addbuttontext', 'datalynxfield_fieldgroup'), ['size' => 48]);
+        $mform->setType('param5', PARAM_TEXT);
+        $mform->addHelpButton('param5', 'addbuttontext', 'datalynxfield_fieldgroup');
+
         // MDL-0000 TODO: Select displaymode.
     }
 

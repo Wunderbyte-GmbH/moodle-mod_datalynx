@@ -104,6 +104,57 @@ const fieldGroups = {
         return wrapper.querySelector('.fieldgroup-addline');
     },
 
+    isVisible(element) {
+        return !!element && window.getComputedStyle(element).display !== 'none' && element.getClientRects().length > 0;
+    },
+
+    /**
+     * Name the row and its delete button after the row number, using the templates from the renderer.
+     *
+     * @param {HTMLElement} line the row
+     * @param {Object} labels label templates ({line} = row number, {row} = row label)
+     */
+    labelLine(line, labels) {
+        if (!labels) {
+            return;
+        }
+        const rowlabel = labels.row.split('{line}').join(line.dataset.line);
+        line.setAttribute('aria-label', rowlabel);
+        const removeButton = line.querySelector('[data-removeline]');
+        if (removeButton) {
+            removeButton.setAttribute('aria-label', labels.delete.split('{row}').join(rowlabel));
+        }
+    },
+
+    /**
+     * Announce a change in the fieldgroup's polite live region.
+     *
+     * @param {HTMLElement} wrapper the fieldgroup wrapper
+     * @param {string} template message template with {row}
+     * @param {number} lineNumber the row number
+     */
+    announce(wrapper, template, lineNumber) {
+        const config = this.getConfig(wrapper);
+        const status = wrapper.querySelector('.fieldgroup-status');
+        if (!config?.labels || !status || !template) {
+            return;
+        }
+        const rowlabel = config.labels.row.split('{line}').join(lineNumber);
+        // Clear first so that the same message is announced again.
+        status.textContent = '';
+        window.setTimeout(() => {
+            status.textContent = template.split('{row}').join(rowlabel);
+        }, 50);
+    },
+
+    focusFirstInput(line) {
+        const target = Array.from(line.querySelectorAll(
+            'input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled]), ' +
+            'button:not([disabled]):not([data-removeline]), [contenteditable="true"]'
+        )).find(element => this.isVisible(element));
+        (target || line.querySelector('[data-removeline]'))?.focus();
+    },
+
     replaceLineIndex(value, fieldgroupname, oldline, newline) {
         if (!value || !fieldgroupname || oldline === newline) {
             return value;
@@ -241,6 +292,11 @@ const fieldGroups = {
             });
         }
 
+        if (config.labels?.group) {
+            wrapper.setAttribute('role', 'group');
+            wrapper.setAttribute('aria-label', config.labels.group);
+        }
+
         this.updateAddButtonState(wrapper, config.maxlines);
         wrapper.dataset.fieldgroupInitialised = '1';
     },
@@ -277,6 +333,12 @@ const fieldGroups = {
         }
 
         this.updateAddButtonState(wrapper, config.maxlines);
+
+        // Move focus into the new row and announce it.
+        if (firstHiddenLine) {
+            this.focusFirstInput(firstHiddenLine);
+            this.announce(wrapper, config.labels?.added, firstHiddenLine.dataset.line);
+        }
     },
 
     handleRemoveLine(removeButton, event) {
@@ -300,7 +362,9 @@ const fieldGroups = {
         this.clearLine(thisLine);
 
         if (currentVisibleLines <= config.requiredlines) {
+            // Required rows are only cleared; focus stays on the delete button.
             this.updateAddButtonState(parentContainer, config.maxlines);
+            this.announce(parentContainer, config.labels?.cleared, lineId);
             return;
         }
 
@@ -318,22 +382,39 @@ const fieldGroups = {
                 } else if (currentLineId === lineId) {
                     this.renumberLine(line, fieldgroupname, currentVisibleLines);
                 }
+                this.labelLine(line, config.labels);
             });
 
+            // The rows and the add button are siblings, but a custom layout may wrap them in its own element.
             const rowElements = Array.from(parentContainer.querySelectorAll('.lines[data-line]'));
             const footerAnchor = parentContainer.querySelector('.fieldgroup-addline-wrapper');
+            const rowParent = footerAnchor?.parentNode || rowElements[0]?.parentNode || parentContainer;
             rowElements
                 .sort((first, second) => parseInt(first.dataset.line, 10) - parseInt(second.dataset.line, 10))
                 .forEach(line => {
                     if (footerAnchor) {
-                        parentContainer.insertBefore(line, footerAnchor);
+                        rowParent.insertBefore(line, footerAnchor);
                     } else {
-                        parentContainer.appendChild(line);
+                        rowParent.appendChild(line);
                     }
                 });
         }
 
         this.updateAddButtonState(parentContainer, config.maxlines);
+
+        // The focused delete button is gone: go to the previous row's delete button, else the add button,
+        // else the first row. Then announce the deletion.
+        const visibleRows = this.getRows(parentContainer).filter(line => this.isVisible(line));
+        const previousRow = visibleRows.find(line => parseInt(line.dataset.line, 10) === lineId - 1);
+        const addButton = this.getAddButton(parentContainer);
+        if (previousRow?.querySelector('[data-removeline]')) {
+            previousRow.querySelector('[data-removeline]').focus();
+        } else if (addButton && this.isVisible(addButton) && !addButton.disabled) {
+            addButton.focus();
+        } else if (visibleRows.length) {
+            this.focusFirstInput(visibleRows[0]);
+        }
+        this.announce(parentContainer, config.labels?.deleted, lineId);
     },
 
     registerDelegatedHandlers() {
@@ -368,11 +449,12 @@ const fieldGroups = {
         }
     },
 
-    init(fieldgroupname, defaultlines, maxlines, requiredlines) {
+    init(fieldgroupname, defaultlines, maxlines, requiredlines, labels = null) {
         fieldGroupConfigs.set(fieldgroupname, {
             defaultlines: parseInt(defaultlines, 10),
             maxlines: parseInt(maxlines, 10),
             requiredlines: parseInt(requiredlines, 10),
+            labels,
         });
 
         this.registerDelegatedHandlers();

@@ -22,6 +22,8 @@
  * @copyright  2018 michael pollak <moodle@michaelpollak.org>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+$string['addbuttontext'] = 'Text of the add button';
+$string['addbuttontext_help'] = 'Text of the button that adds a row in the entry form, for example "Add receipt". Leave empty to use "Add" followed by the field name.';
 $string['fieldformataggavg'] = 'Average';
 $string['fieldformataggcount'] = 'Count';
 $string['fieldformataggmax'] = 'Maximum';
@@ -36,3 +38,7 @@ $string['fieldformatlabel_help'] = 'Text shown next to the totals row. Leave emp
 $string['fieldformattotal'] = 'Total';
 $string['pluginname'] = 'Fieldgroup';
 $string['privacy:metadata'] = 'Fieldgroups do not store personal data.';
+$string['rowadded'] = '{$a} added';
+$string['rowcleared'] = '{$a} cleared';
+$string['rowdeleted'] = '{$a} deleted';
+$string['rowlabel'] = '{$a->group}, row {$a->line}';

@@ -198,6 +198,10 @@ class renderer extends datalynxfield_renderer {
         $maxlines = isset($this->field->field->param2) ? $this->field->field->param2 : 3;
         $requiredlines = isset($this->field->field->param4) ? $this->field->field->param4 : 0;
 
+        // Accessible names: the group is named after the layout's label or heading, each row after the group.
+        $grouplabel = $this->group_label($options['prefix'] ?? '');
+        $labels = $this->row_label_templates($grouplabel);
+
         $mform->addElement(
             'html',
             html_writer::empty_tag('input', [
@@ -222,7 +226,12 @@ class renderer extends datalynxfield_renderer {
                 unset($options['required']);
             }
             // Instead of collapsing header we use simple divs.
-            $mform->addElement('html', '<div class="row mb-4 lines" data-line="' . $thisline . '">');
+            $rowlabel = str_replace('{line}', $thisline, $labels['row']);
+            $mform->addElement('html', html_writer::start_div('row mb-4 lines', [
+                'data-line' => $thisline,
+                'role' => 'group',
+                'aria-label' => $rowlabel,
+            ]));
             $counter = 0;
             foreach ($fieldgroupfields as $key => $subfield) {
                 $parts = explode(':', $key, 2);
@@ -316,10 +325,15 @@ class renderer extends datalynxfield_renderer {
             }
 
             $mform->addElement('html', '<div class="w-100 p-10"></div>');
-            $elementstring = '<div class="col text-center">';
-            $elementstring .= '<button class="btn btn-secondary btn-danger btn-delete" type="button" data-removeline="';
-            $mform->addElement('html', $elementstring . $thisline . '">
-                ' . get_string('delete') . '</button></div>');
+            $mform->addElement('html', html_writer::div(
+                html_writer::tag('button', get_string('delete'), [
+                    'class' => 'btn btn-secondary btn-danger btn-delete',
+                    'type' => 'button',
+                    'data-removeline' => $thisline,
+                    'aria-label' => str_replace('{row}', $rowlabel, $labels['delete']),
+                ]),
+                'col text-center'
+            ));
             // End of row.
             $mform->addElement('html', '</div>');
         }
@@ -345,7 +359,7 @@ class renderer extends datalynxfield_renderer {
         $PAGE->requires->js_call_amd(
             'mod_datalynx/fieldgroups',
             'init',
-            [$this->field->field->name, $defaultlines, $maxlines, $requiredlines]
+            [$this->field->field->name, $defaultlines, $maxlines, $requiredlines, $labels]
         );
 
         // Show a button to add one more line.
@@ -357,11 +371,11 @@ class renderer extends datalynxfield_renderer {
                     'div',
                     html_writer::tag(
                         'button',
-                        get_string('addline', 'datalynx', $this->field->field->name),
+                        $this->add_button_text(),
                         [
                             'class' => 'btn btn-secondary ms-0 fieldgroup-addline',
-                            'name' => 'addline',
-                            'id' => 'id_addline',
+                            'name' => 'addline_' . $fgfieldid,
+                            'id' => 'id_addline_' . $fgfieldid,
                             'type' => 'button',
                             'data-fieldgroup' => $fieldname,
                         ]
@@ -374,6 +388,66 @@ class renderer extends datalynxfield_renderer {
                 ['class' => 'mb-3 row fitem femptylabel fieldgroup-addline-wrapper']
             )
         );
+
+        // Polite live region: the script announces added, deleted and cleared rows here.
+        $mform->addElement('html', html_writer::div('', 'fieldgroup-status sr-only visually-hidden', [
+            'role' => 'status',
+            'aria-live' => 'polite',
+        ]));
+    }
+
+    /**
+     * The accessible name of the fieldgroup: the text of the first label or heading in the layout,
+     * else the field description, else the field name.
+     *
+     * @param string $prefix the part of the edit layout before #input
+     * @return string plain text
+     */
+    protected function group_label(string $prefix): string {
+        $label = '';
+        if (preg_match('~<(label|h[1-6])\b[^>]*>(.*?)</\1>~is', $prefix, $match)) {
+            $label = trim(html_entity_decode(strip_tags($match[2]), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+        }
+        if ($label === '') {
+            $label = trim(strip_tags((string) ($this->field->field->description ?? '')));
+        }
+        if ($label === '') {
+            $label = (string) $this->field->field->name;
+        }
+        $context = $this->field->dlx->context;
+        return format_string($label, true, ['context' => $context, 'escape' => false]);
+    }
+
+    /**
+     * Label templates for rows, shared with the fieldgroups script. {line} is the row number,
+     * {row} the row label.
+     *
+     * @param string $grouplabel accessible name of the fieldgroup
+     * @return array with keys group, row, delete, added, deleted, cleared
+     */
+    protected function row_label_templates(string $grouplabel): array {
+        $component = 'datalynxfield_fieldgroup';
+        return [
+            'group' => $grouplabel,
+            'row' => get_string('rowlabel', $component, ['group' => $grouplabel, 'line' => '{line}']),
+            'delete' => get_string('delete') . ': {row}',
+            'added' => get_string('rowadded', $component, '{row}'),
+            'deleted' => get_string('rowdeleted', $component, '{row}'),
+            'cleared' => get_string('rowcleared', $component, '{row}'),
+        ];
+    }
+
+    /**
+     * Text of the button that adds a row: the configured text, else "Add <field name>".
+     *
+     * @return string
+     */
+    protected function add_button_text(): string {
+        $text = trim((string) ($this->field->field->param5 ?? ''));
+        if ($text === '') {
+            return get_string('addline', 'datalynx', $this->field->field->name);
+        }
+        return format_string($text, true, ['context' => $this->field->dlx->context]);
     }
     // phpcs:enable moodle.PHP.ForbiddenGlobalUse.BadGlobal
 
