@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/datalynx/db" VERSION="20181017" COMMENT="XMLDB file for Moodle mod/datalynx"
+<XMLDB PATH="mod/datalynx/db" VERSION="20261115" COMMENT="XMLDB file for Moodle mod/datalynx"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -176,6 +176,10 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="dataid" TYPE="foreign" FIELDS="dataid" REFTABLE="datalynx" REFFIELDS="id"/>
       </KEYS>
+      <INDEXES>
+        <INDEX NAME="dataid-status" UNIQUE="false" FIELDS="dataid, status" COMMENT="Entries of an instance by status"/>
+        <INDEX NAME="dataid-userid" UNIQUE="false" FIELDS="dataid, userid" COMMENT="Entries of an instance by author"/>
+      </INDEXES>
     </TABLE>
     <TABLE NAME="datalynx_contents" COMMENT="the content of each entry">
       <FIELDS>
@@ -187,13 +191,15 @@
         <FIELD NAME="content2" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="content3" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="content4" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="lineid" TYPE="int" LENGTH="20" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="entryid" TYPE="foreign" FIELDS="entryid" REFTABLE="datalynx_entries" REFFIELDS="id"/>
         <KEY NAME="fieldid" TYPE="foreign" FIELDS="fieldid" REFTABLE="datalynx_fields" REFFIELDS="id"/>
       </KEYS>
+      <INDEXES>
+        <INDEX NAME="entryid-fieldid" UNIQUE="false" FIELDS="entryid, fieldid" COMMENT="Content of given fields of given entries; several rows per pair for fieldgroup lines"/>
+      </INDEXES>
     </TABLE>
     <TABLE NAME="datalynx_behaviors" COMMENT="Governs behavior of fields">
       <FIELDS>
@@ -211,6 +217,9 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="dataid" TYPE="foreign" FIELDS="dataid" REFTABLE="datalynx" REFFIELDS="id"/>
       </KEYS>
+      <INDEXES>
+        <INDEX NAME="dataid-name" UNIQUE="true" FIELDS="dataid, name" COMMENT="Behaviors are referenced by name in field tags"/>
+      </INDEXES>
     </TABLE>
     <TABLE NAME="datalynx_renderers" COMMENT="Governs visual representation of fields">
       <FIELDS>
@@ -229,6 +238,9 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="dataid" TYPE="foreign" FIELDS="dataid" REFTABLE="datalynx" REFFIELDS="id"/>
       </KEYS>
+      <INDEXES>
+        <INDEX NAME="dataid-name" UNIQUE="true" FIELDS="dataid, name" COMMENT="Field layouts are referenced by name in field tags"/>
+      </INDEXES>
     </TABLE>
     <TABLE NAME="datalynx_customfilters" COMMENT="Predefined customfilter forms">
       <FIELDS>

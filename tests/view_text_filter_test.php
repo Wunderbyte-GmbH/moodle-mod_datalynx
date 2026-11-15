@@ -138,7 +138,6 @@ final class view_text_filter_test extends advanced_testcase {
         $DB->insert_record('datalynx_contents', (object) [
             'fieldid' => $field->id,
             'entryid' => $entryid,
-            'lineid' => 0,
             'content' => 'Entry value',
         ]);
 

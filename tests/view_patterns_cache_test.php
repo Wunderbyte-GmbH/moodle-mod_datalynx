@@ -201,7 +201,7 @@ final class view_patterns_cache_test extends advanced_testcase {
             'timecreated' => time(), 'timemodified' => time(),
         ]);
         $DB->insert_record('datalynx_contents', (object) [
-            'fieldid' => $alphaid, 'entryid' => $entryid, 'lineid' => 0, 'content' => 'value',
+            'fieldid' => $alphaid, 'entryid' => $entryid, 'content' => 'value',
         ]);
 
         $manager = new grid_view_manager();

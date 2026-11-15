@@ -439,14 +439,10 @@ class datalynx_entries {
                     // If this has multiples we see a fieldgroup. Set as array and append.
                     if (isset($entry->{$varcontentid})) {
                         $varcontentids = "c{$fieldid}_id_fieldgroup";
-                        $varcontentlineids = "c{$fieldid}_lineid_fieldgroup";
                         if (!isset($entry->{$varcontentids})) {
                             $entry->{$varcontentids} = [$entry->{$varcontentid}];
-                            // TODO: MDL-66151 We start with line 0, this is up for debate.
-                            $entry->{$varcontentlineids} = [0];
                         }
                         $entry->{$varcontentids}[] = $contentid;
-                        $entry->{$varcontentlineids}[] = $content->lineid;
                     } else {
                         $entry->{$varcontentid} = $contentid; // Normal case, only one content item.
                     }

@@ -114,19 +114,16 @@ final class report_view_manager_test extends advanced_testcase {
         $DB->insert_record('datalynx_contents', (object) [
             'fieldid' => $selectfield->id,
             'entryid' => $entryone,
-            'lineid' => 0,
             'content' => '1',
         ]);
         $DB->insert_record('datalynx_contents', (object) [
             'fieldid' => $selectfield->id,
             'entryid' => $entrytwo,
-            'lineid' => 0,
             'content' => '2',
         ]);
         $DB->insert_record('datalynx_contents', (object) [
             'fieldid' => $selectfield->id,
             'entryid' => $entrythree,
-            'lineid' => 0,
             'content' => '1',
         ]);
 

@@ -97,7 +97,6 @@ final class get_csv_view_data_test extends advanced_testcase {
         $DB->insert_record('datalynx_contents', (object) [
             'fieldid' => $field->id,
             'entryid' => $entryid,
-            'lineid' => 0,
             'content' => 'Hello External CSV',
         ]);
 
@@ -192,25 +191,21 @@ final class get_csv_view_data_test extends advanced_testcase {
         $DB->insert_record('datalynx_contents', (object) [
             'fieldid' => $textfield->id,
             'entryid' => $entryone,
-            'lineid' => 0,
             'content' => 'Entry one',
         ]);
         $DB->insert_record('datalynx_contents', (object) [
             'fieldid' => $textfield->id,
             'entryid' => $entrytwo,
-            'lineid' => 0,
             'content' => 'Entry two',
         ]);
         $DB->insert_record('datalynx_contents', (object) [
             'fieldid' => $multiselectfield->id,
             'entryid' => $entryone,
-            'lineid' => 0,
             'content' => '#1#',
         ]);
         $DB->insert_record('datalynx_contents', (object) [
             'fieldid' => $multiselectfield->id,
             'entryid' => $entrytwo,
-            'lineid' => 0,
             'content' => '#2#,#3#',
         ]);
 
@@ -287,13 +282,11 @@ final class get_csv_view_data_test extends advanced_testcase {
         $DB->insert_record('datalynx_contents', (object) [
             'fieldid' => $field->id,
             'entryid' => $entryone,
-            'lineid' => 0,
             'content' => 'Alpha entry',
         ]);
         $DB->insert_record('datalynx_contents', (object) [
             'fieldid' => $field->id,
             'entryid' => $entrytwo,
-            'lineid' => 0,
             'content' => 'Beta entry',
         ]);
 

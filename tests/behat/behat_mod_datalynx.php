@@ -400,7 +400,6 @@ class behat_mod_datalynx extends behat_base {
                 $DB->insert_record('datalynx_contents', (object) [
                     'fieldid' => $field->field->id,
                     'entryid' => $entryid,
-                    'lineid' => 0,
                     'content' => $content,
                 ]);
             }

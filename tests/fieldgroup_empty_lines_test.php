@@ -144,7 +144,7 @@ final class fieldgroup_empty_lines_test extends advanced_testcase {
         foreach ($lines as $fieldid => $values) {
             foreach ($values as $value) {
                 $DB->insert_record('datalynx_contents', (object) [
-                    'fieldid' => $fieldid, 'entryid' => $entryid, 'lineid' => 0, 'content' => $value,
+                    'fieldid' => $fieldid, 'entryid' => $entryid, 'content' => $value,
                 ]);
             }
         }

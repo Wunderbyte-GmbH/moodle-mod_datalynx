@@ -106,19 +106,19 @@ final class csv_view_customfilter_test extends advanced_testcase {
         // Text content.
         foreach ([[$entryone, 'Entry one'], [$entrytwo, 'Entry two'], [$entrythree, 'Entry three']] as [$eid, $text]) {
             $DB->insert_record('datalynx_contents', (object) [
-                'fieldid' => $textfield->id, 'entryid' => $eid, 'lineid' => 0, 'content' => $text,
+                'fieldid' => $textfield->id, 'entryid' => $eid, 'content' => $text,
             ]);
         }
 
         // Multiselect content: option keys 1, 2, 3 stored as '#1#', '#2#', '#3#'.
         $DB->insert_record('datalynx_contents', (object) [
-            'fieldid' => $multifield->id, 'entryid' => $entryone, 'lineid' => 0, 'content' => '#1#',
+            'fieldid' => $multifield->id, 'entryid' => $entryone, 'content' => '#1#',
         ]);
         $DB->insert_record('datalynx_contents', (object) [
-            'fieldid' => $multifield->id, 'entryid' => $entrytwo, 'lineid' => 0, 'content' => '#2#',
+            'fieldid' => $multifield->id, 'entryid' => $entrytwo, 'content' => '#2#',
         ]);
         $DB->insert_record('datalynx_contents', (object) [
-            'fieldid' => $multifield->id, 'entryid' => $entrythree, 'lineid' => 0, 'content' => '#3#',
+            'fieldid' => $multifield->id, 'entryid' => $entrythree, 'content' => '#3#',
         ]);
 
         return [$dlx, $view, $multifield->id, $entryone, $entrytwo, $entrythree];

@@ -87,7 +87,6 @@ final class datalynxview_field_renderer_test extends advanced_testcase {
         $DB->insert_record('datalynx_contents', (object) [
             'fieldid' => $remotetextfield->id,
             'entryid' => $remoteentryid,
-            'lineid' => 0,
             'content' => 'Inline remote entry',
         ]);
 

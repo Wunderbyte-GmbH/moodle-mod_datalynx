@@ -119,7 +119,6 @@ final class field_layout_dependent_test extends advanced_testcase {
         $DB->insert_record('datalynx_contents', (object) [
             'fieldid' => $fieldrecord->id,
             'entryid' => $entrywithval->id,
-            'lineid' => 0,
             'content' => 'Hello World',
         ]);
         // Also populate entry content property.

@@ -1356,7 +1356,111 @@ function xmldb_datalynx_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2026111100, 'datalynx');
     }
 
+    if ($oldversion < 2026111500) {
+        // The unused datalynx_contents.lineid goes (#302) and the hot tables get composite
+        // indexes (#294). Behavior and field layout names become unique per instance.
+        mod_datalynx_upgrade_drop_content_lineid();
+        mod_datalynx_upgrade_unique_definition_names('datalynx_behaviors');
+        mod_datalynx_upgrade_unique_definition_names('datalynx_renderers');
+        mod_datalynx_upgrade_composite_indexes();
+
+        upgrade_mod_savepoint(true, 2026111500, 'datalynx');
+    }
+
     return true;
+}
+
+/**
+ * Drop datalynx_contents.lineid (2026111500).
+ *
+ * The column was added in 2019 to number the lines of fieldgroups, but nothing ever wrote it:
+ * every row holds 0 and fieldgroup lines are ordered by content id.
+ *
+ * @return void
+ */
+function mod_datalynx_upgrade_drop_content_lineid(): void {
+    global $DB;
+    $dbman = $DB->get_manager();
+
+    $table = new xmldb_table('datalynx_contents');
+    $field = new xmldb_field('lineid');
+    if ($dbman->field_exists($table, $field)) {
+        $dbman->drop_field($table, $field);
+    }
+}
+
+/**
+ * Rename behaviors or field layouts that share a name within an instance (2026111500).
+ *
+ * Tags refer to behaviors and layouts by name, and the lookup takes the record with the lowest id,
+ * so further records of the same name are never used. Applying a preset to an instance again
+ * created such copies. The lowest id keeps its name; the others get a numbered suffix so the
+ * unique index (dataid, name) can be added and nothing is lost. Names are compared by the
+ * database, so duplicates by collation (e.g. case on MySQL/MariaDB) are caught as well.
+ *
+ * @param string $table datalynx_behaviors or datalynx_renderers
+ * @return void
+ */
+function mod_datalynx_upgrade_unique_definition_names(string $table): void {
+    global $DB;
+
+    $groups = $DB->get_records_sql(
+        "SELECT MIN(id) AS keepid, dataid
+           FROM {{$table}}
+       GROUP BY dataid, name
+         HAVING COUNT(1) > 1"
+    );
+    foreach ($groups as $group) {
+        $name = $DB->get_field($table, 'name', ['id' => $group->keepid]);
+        $duplicates = $DB->get_records_select(
+            $table,
+            'dataid = ? AND name = ? AND id <> ?',
+            [$group->dataid, $name, $group->keepid],
+            'id ASC',
+            'id, name'
+        );
+        foreach ($duplicates as $duplicate) {
+            $i = 1;
+            do {
+                $i++;
+                $suffix = " ($i)";
+                $newname = core_text::substr($duplicate->name, 0, 255 - core_text::strlen($suffix)) . $suffix;
+            } while ($DB->record_exists($table, ['dataid' => $group->dataid, 'name' => $newname]));
+            $DB->set_field($table, 'name', $newname, ['id' => $duplicate->id]);
+        }
+    }
+}
+
+/**
+ * Add the composite indexes of the frequently queried tables (2026111500).
+ *
+ * datalynx_contents allows several rows per entry and field (one per fieldgroup line), so its
+ * index is not unique. Behavior and field layout names must be unique per instance first, see
+ * mod_datalynx_upgrade_unique_definition_names().
+ *
+ * @return void
+ */
+function mod_datalynx_upgrade_composite_indexes(): void {
+    global $DB;
+    $dbman = $DB->get_manager();
+
+    $indexes = [
+        'datalynx_contents' => [new xmldb_index('entryid-fieldid', XMLDB_INDEX_NOTUNIQUE, ['entryid', 'fieldid'])],
+        'datalynx_entries' => [
+            new xmldb_index('dataid-status', XMLDB_INDEX_NOTUNIQUE, ['dataid', 'status']),
+            new xmldb_index('dataid-userid', XMLDB_INDEX_NOTUNIQUE, ['dataid', 'userid']),
+        ],
+        'datalynx_behaviors' => [new xmldb_index('dataid-name', XMLDB_INDEX_UNIQUE, ['dataid', 'name'])],
+        'datalynx_renderers' => [new xmldb_index('dataid-name', XMLDB_INDEX_UNIQUE, ['dataid', 'name'])],
+    ];
+    foreach ($indexes as $tablename => $tableindexes) {
+        $table = new xmldb_table($tablename);
+        foreach ($tableindexes as $index) {
+            if (!$dbman->index_exists($table, $index)) {
+                $dbman->add_index($table, $index);
+            }
+        }
+    }
 }
 
 /**

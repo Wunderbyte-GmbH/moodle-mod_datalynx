@@ -265,7 +265,7 @@ final class rule_test extends advanced_testcase {
         $selectfield = $this->dlx->get_field_from_id($this->selectid);
         $key = array_search($optionlabel, $selectfield->get_options(), true);
         $DB->insert_record('datalynx_contents', (object) [
-            'fieldid' => $this->selectid, 'entryid' => $entryid, 'lineid' => 0, 'content' => (string) $key,
+            'fieldid' => $this->selectid, 'entryid' => $entryid, 'content' => (string) $key,
         ]);
         return $entryid;
     }
@@ -280,7 +280,7 @@ final class rule_test extends advanced_testcase {
     private function set_team(int $teamid, int $entryid, array $userids): void {
         global $DB;
         $DB->insert_record('datalynx_contents', (object) [
-            'fieldid' => $teamid, 'entryid' => $entryid, 'lineid' => 0, 'content' => json_encode($userids),
+            'fieldid' => $teamid, 'entryid' => $entryid, 'content' => json_encode($userids),
         ]);
     }
 
@@ -296,7 +296,7 @@ final class rule_test extends advanced_testcase {
         $content = $DB->get_field(
             'datalynx_contents',
             'content',
-            ['entryid' => $entryid, 'fieldid' => $teamid, 'lineid' => 0]
+            ['entryid' => $entryid, 'fieldid' => $teamid]
         );
         $ids = $content ? array_map('intval', json_decode($content, true)) : [];
         sort($ids);

@@ -59,7 +59,7 @@ final class teammember_can_edit_test extends advanced_testcase {
             'status' => 2, 'timecreated' => time(), 'timemodified' => time(),
         ]);
         $DB->insert_record('datalynx_contents', (object) [
-            'entryid' => $entryid, 'fieldid' => $teamfieldid, 'content' => json_encode([(int) $member->id]), 'lineid' => 0,
+            'entryid' => $entryid, 'fieldid' => $teamfieldid, 'content' => json_encode([(int) $member->id]),
         ]);
         $dlx = new datalynx($instance->id);
         $entry = (object) ['id' => $entryid, 'userid' => $author->id, 'status' => 2];

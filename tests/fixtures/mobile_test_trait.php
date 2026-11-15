@@ -149,7 +149,6 @@ trait mobile_test_trait {
             $DB->insert_record('datalynx_contents', (object) [
                 'fieldid' => $fieldid,
                 'entryid' => $entryid,
-                'lineid' => 0,
                 'content' => $content,
             ]);
         }

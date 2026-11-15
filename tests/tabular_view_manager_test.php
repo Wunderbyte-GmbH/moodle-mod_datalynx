@@ -87,7 +87,6 @@ final class tabular_view_manager_test extends advanced_testcase {
         $DB->insert_record('datalynx_contents', (object) [
             'fieldid' => $field->id,
             'entryid' => $entryid,
-            'lineid' => 0,
             'content' => 'Hello Tabular',
         ]);
 
@@ -207,7 +206,6 @@ final class tabular_view_manager_test extends advanced_testcase {
         $DB->insert_record('datalynx_contents', (object) [
             'fieldid' => $fieldid,
             'entryid' => $entry1id,
-            'lineid' => 0,
             'content' => 7200,
         ]);
 
@@ -223,7 +221,6 @@ final class tabular_view_manager_test extends advanced_testcase {
         $DB->insert_record('datalynx_contents', (object) [
             'fieldid' => $fieldid,
             'entryid' => $entry2id,
-            'lineid' => 0,
             'content' => 3600,
         ]);
 

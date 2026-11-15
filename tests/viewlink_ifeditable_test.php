@@ -178,7 +178,7 @@ final class viewlink_ifeditable_test extends advanced_testcase {
         $entry->id = $DB->insert_record('datalynx_entries', $entry);
         if ($phase !== null) {
             $DB->insert_record('datalynx_contents', (object) [
-                'fieldid' => $this->selectid, 'entryid' => $entry->id, 'lineid' => 0, 'content' => $phase,
+                'fieldid' => $this->selectid, 'entryid' => $entry->id, 'content' => $phase,
             ]);
             $entry->{"c{$this->selectid}_content"} = $phase;
         }

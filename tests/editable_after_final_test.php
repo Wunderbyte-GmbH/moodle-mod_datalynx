@@ -293,7 +293,7 @@ final class editable_after_final_test extends advanced_testcase {
         foreach ($content as $fieldid => $value) {
             $DB->insert_record(
                 'datalynx_contents',
-                (object) ['fieldid' => $fieldid, 'entryid' => $entryid, 'lineid' => 0, 'content' => $value]
+                (object) ['fieldid' => $fieldid, 'entryid' => $entryid, 'content' => $value]
             );
         }
         return $entryid;
@@ -328,7 +328,7 @@ final class editable_after_final_test extends advanced_testcase {
         return $DB->get_field(
             'datalynx_contents',
             'content',
-            ['fieldid' => $fieldid, 'entryid' => $entryid, 'lineid' => 0]
+            ['fieldid' => $fieldid, 'entryid' => $entryid]
         );
     }
 }

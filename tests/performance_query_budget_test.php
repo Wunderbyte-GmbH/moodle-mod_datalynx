@@ -93,7 +93,7 @@ final class performance_query_budget_test extends advanced_testcase {
             ]);
             foreach ($fieldids as $name => $fieldid) {
                 $DB->insert_record('datalynx_contents', (object) [
-                    'fieldid' => $fieldid, 'entryid' => $entryid, 'lineid' => 0, 'content' => "$name-$e",
+                    'fieldid' => $fieldid, 'entryid' => $entryid, 'content' => "$name-$e",
                 ]);
             }
         }

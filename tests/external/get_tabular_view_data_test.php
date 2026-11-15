@@ -95,7 +95,6 @@ final class get_tabular_view_data_test extends advanced_testcase {
         $DB->insert_record('datalynx_contents', (object) [
             'fieldid' => $field->id,
             'entryid' => $entryid,
-            'lineid' => 0,
             'content' => 'Hello External Tabular',
         ]);
 

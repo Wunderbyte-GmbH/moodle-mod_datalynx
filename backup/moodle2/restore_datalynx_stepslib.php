@@ -699,7 +699,8 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
         }
 
         // Insert the datalynx_behaviors record.
-        $newitemid = $DB->insert_record('datalynx_behaviors', $data);
+        $newitemid = $this->find_definition_by_name('datalynx_behaviors', $data)
+            ?: $DB->insert_record('datalynx_behaviors', $data);
         $this->set_mapping('datalynx_behavior', $oldid, $newitemid, false); // No files.
     }
 
@@ -716,9 +717,33 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
 
         $data->dataid = $this->get_new_parentid('datalynx');
 
-        // Insert the datalynx_fields record.
-        $newitemid = $DB->insert_record('datalynx_renderers', $data);
+        // Insert the datalynx_renderers record.
+        $newitemid = $this->find_definition_by_name('datalynx_renderers', $data)
+            ?: $DB->insert_record('datalynx_renderers', $data);
         $this->set_mapping('datalynx_renderer', $oldid, $newitemid, false); // No files.
+    }
+
+    /**
+     * The id of a behavior or field layout of the target instance with the name of the restored one.
+     *
+     * Names are unique per instance. Applying a preset to an instance that already has a behavior
+     * or layout of that name, or restoring a backup taken before names were unique, keeps the
+     * existing record: tags resolve by name, and the first record of a name was always the one in
+     * use.
+     *
+     * @param string $table datalynx_behaviors or datalynx_renderers
+     * @param stdClass $data The restored record, dataid already mapped.
+     * @return int The existing record's id, 0 when there is none.
+     */
+    protected function find_definition_by_name(string $table, stdClass $data): int {
+        global $DB;
+        return (int) $DB->get_field_select(
+            $table,
+            'id',
+            'dataid = ? AND name = ?',
+            [$data->dataid, $data->name],
+            IGNORE_MULTIPLE
+        );
     }
 
     /**

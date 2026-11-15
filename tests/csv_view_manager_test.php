@@ -89,7 +89,6 @@ final class csv_view_manager_test extends advanced_testcase {
         $DB->insert_record('datalynx_contents', (object) [
             'fieldid' => $field->id,
             'entryid' => $entryid,
-            'lineid' => 0,
             'content' => 'Hello CSV',
         ]);
 
@@ -154,7 +153,7 @@ final class csv_view_manager_test extends advanced_testcase {
                 'dataid' => $dlx->id(), 'type' => 'text', 'name' => $name, 'description' => '',
             ]);
             $DB->insert_record('datalynx_contents', (object) [
-                'fieldid' => $fieldid, 'entryid' => $entryid, 'lineid' => 0, 'content' => $value,
+                'fieldid' => $fieldid, 'entryid' => $entryid, 'content' => $value,
             ]);
         }
 
