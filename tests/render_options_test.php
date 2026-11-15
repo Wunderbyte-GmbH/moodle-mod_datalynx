@@ -150,4 +150,21 @@ final class render_options_test extends advanced_testcase {
 
         $this->assertTrue($mform->elementExists("field_{$this->titleid}_-1"));
     }
+
+    /**
+     * A field editable only by the author is editable in a new entry, which the current user is
+     * filling in, and in the user's own entries - not in other users' entries.
+     */
+    public function test_author_permission_applies_to_new_entries(): void {
+        $this->add_mobile_behavior($this->dlx, 'Author only', ['editableby' => [datalynx::PERMISSION_AUTHOR]]);
+        $student = $this->create_mobile_student($this->course);
+        $other = $this->create_mobile_student($this->course);
+        $this->setUser($student);
+        $tag = '[[Title|Author only]]';
+
+        $this->assertTrue($this->resolve($tag, (object) ['id' => -1], ['edit' => true])['editable']);
+        $this->assertTrue($this->resolve($tag, (object) ['id' => -2], ['edit' => true])['editable']);
+        $this->assertTrue($this->resolve($tag, (object) ['id' => 5, 'userid' => $student->id], ['edit' => true])['editable']);
+        $this->assertFalse($this->resolve($tag, (object) ['id' => 5, 'userid' => $other->id], ['edit' => true])['editable']);
+    }
 }

@@ -313,9 +313,13 @@ abstract class datalynxfield_renderer {
      */
     protected function behavior_allows_edit(datalynxfield_behavior $behavior, stdClass $entry, bool $conditionsmet): bool {
         global $USER;
-        // Pass isentryauthor: for new entries the current user will be the author;
-        // for existing entries compare entry userid with current user.
-        $isentryauthor = empty($entry->id) || (isset($entry->userid) && (string)$entry->userid === (string)$USER->id);
+        // Whether the current user counts as the entry's author. A new entry - rendered and
+        // submitted with a negative id (-1, -2, ...), or none - is being filled in by the current
+        // user, who becomes its author. (A manager may choose another author through an author
+        // format set to "edit"; that does not change who fills in the form, and managers edit by
+        // their own permission anyway.) For an existing entry compare its author with the user.
+        $isnew = empty($entry->id) || (is_numeric($entry->id) && (int) $entry->id < 0);
+        $isentryauthor = $isnew || (isset($entry->userid) && (string) $entry->userid === (string) $USER->id);
         $editable = $behavior->is_editable_by_user(null, $isentryauthor) && $conditionsmet;
         // Once an entry reaches final submission, only fields whose behavior explicitly allows it
         // stay editable for users without editfinalsubmission. The status field itself is never excepted,
