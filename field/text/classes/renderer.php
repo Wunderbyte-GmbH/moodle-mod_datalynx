@@ -280,33 +280,24 @@ class renderer extends datalynxfield_renderer {
         $param8 = $this->field->get('param8');
 
         $errors = [];
-        foreach ($tags as $tag) {
-            [, $behavior, ] = $this->process_tag($tag);
-            // Variable $behavior datalynx_field_behavior.
-            if ($behavior->is_required() && isset($formdata->$formfieldname)) {
-                if (!clean_param($formdata->$formfieldname, PARAM_NOTAGS)) {
-                    $errors[$formfieldname] = get_string('fieldrequired', 'datalynx');
-                }
-            }
-
-            if (!empty($param8) && isset($formdata->$formfieldname)) {
-                // Check uniquenes!
-                if (
-                    $DB->record_exists_sql(
-                        "SELECT id
-                                              FROM {datalynx_contents} c
-                                             WHERE c.fieldid = :fieldid
-                                               AND c.entryid <> :entryid
-                                               AND c.content LIKE :content",
-                        ['fieldid' => $fieldid,
-                                // A fieldgroup line is "{entryid}_fieldgroup_{id}_{line}": its entry is the leading id.
-                                'entryid' => (int) $entryid,
-                        'content' => $formdata->$formfieldname]
-                    )
-                ) {
-                    // It's not the first of it's kind!
-                    $errors[$formfieldname] = get_string('uniquerequired', 'datalynx');
-                }
+        // Whether a value is required is checked by the entry submission service; a value given must
+        // be unique if the field says so.
+        if (!empty($param8) && isset($formdata->$formfieldname) && $formdata->$formfieldname !== '') {
+            $exists = $DB->record_exists_sql(
+                "SELECT id
+                   FROM {datalynx_contents} c
+                  WHERE c.fieldid = :fieldid
+                    AND c.entryid <> :entryid
+                    AND c.content LIKE :content",
+                [
+                    'fieldid' => $fieldid,
+                    // A fieldgroup line is "{entryid}_fieldgroup_{id}_{line}": its entry is the leading id.
+                    'entryid' => (int) $entryid,
+                    'content' => $formdata->$formfieldname,
+                ]
+            );
+            if ($exists) {
+                $errors[$formfieldname] = get_string('uniquerequired', 'datalynx');
             }
         }
 

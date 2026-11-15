@@ -49,6 +49,19 @@ use stdClass;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class field extends datalynxfield_base {
+    /**
+     * Empty unless the submitted parts make up a valid schedule.
+     *
+     * @param string $name
+     * @param stdClass $data
+     * @return bool
+     */
+    public function is_submitted_value_empty(string $name, stdClass $data): bool {
+        $entryid = substr($name, strlen("field_{$this->field->id}_"));
+        $values = $this->get_content_from_data($entryid, $data);
+        return !$values || !self::schedule_from_values($values)->is_valid();
+    }
+
     /** @var string Field type */
     public $type = 'schedule';
 

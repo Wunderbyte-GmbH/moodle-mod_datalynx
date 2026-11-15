@@ -36,6 +36,16 @@ use stdClass;
  */
 class renderer extends datalynxfield_renderer {
     /**
+     * The group is chosen in field_{fieldid}_{entryid}_group.
+     *
+     * @param string $name
+     * @return string
+     */
+    public function get_error_element(string $name): string {
+        return $name . '_group';
+    }
+
+    /**
      * Returns replacement values for coursegroup tags.
      *
      * @param ?array $tags Array of tag strings to replace.
@@ -49,7 +59,13 @@ class renderer extends datalynxfield_renderer {
         $replacements = array_fill_keys($tags, '');
 
         foreach ($tags as $tag) {
-            if ($edit) {
+            // Like every field, the behavior of the tag decides whether it is shown and editable.
+            [$tagoptions] = $this->resolve_render_options($tag, $entry, $options);
+            if (!$tagoptions['visible']) {
+                $replacements[$tag] = ['html', ''];
+                continue;
+            }
+            if ($edit && $tagoptions['editable']) {
                 $replacements[$tag] = ['', [[$this, 'display_edit'], [$entry]]];
                 break;
             } else {

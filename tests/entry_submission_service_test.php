@@ -56,6 +56,8 @@ final class entry_submission_service_test extends advanced_testcase {
         parent::setUp();
         $this->resetAfterTest();
         $this->setAdminUser();
+        // Ids repeat from test to test; the per-request condition cache must not carry over.
+        \mod_datalynx\local\field\datalynxfield_behavior::reset_condition_cache();
 
         [$this->course, $this->dlx] = $this->create_mobile_instance();
         foreach (['Title', 'Notes', 'Secret', 'Elsewhere'] as $name) {
@@ -264,5 +266,144 @@ final class entry_submission_service_test extends advanced_testcase {
         $this->assertTrue(\datalynxfield_teammemberselect\field::is_fieldvalue_empty([-1 => '-999']));
         $this->assertTrue(\datalynxfield_teammemberselect\field::is_fieldvalue_empty([]));
         $this->assertFalse(\datalynxfield_teammemberselect\field::is_fieldvalue_empty([-1 => '-999', 0 => '7']));
+    }
+
+    /**
+     * Required is decided by the service for every field type; each field says when its value is
+     * empty and where the error shows.
+     *
+     * @dataProvider required_field_provider
+     * @param string $type field type
+     * @param array $params field settings
+     * @param string $suffix what follows field_{fieldid}_{entryid} in the error element ('grp…' prefixes)
+     * @param array $empty submission values that leave the field empty, by element suffix
+     * @param array $filled submission values that fill it, by element suffix
+     */
+    public function test_required_per_field_type(string $type, array $params, string $suffix, array $empty, array $filled): void {
+        $fieldid = $this->add_mobile_field($this->dlx, $type, 'Typed', $params);
+        $service = new entry_submission_service($this->view('[[Typed|Required]]'));
+        $name = "field_{$fieldid}_-1";
+        $element = str_starts_with($suffix, 'grp') ? "grp{$name}" : $name . $suffix;
+        $values = function (array $bysuffix) use ($name): array {
+            $data = [];
+            foreach ($bysuffix as $key => $value) {
+                $data[$name . $key] = $value;
+            }
+            return $data;
+        };
+
+        $errors = $service->validate([-1], $values($empty));
+        $this->assertArrayHasKey($element, $errors, json_encode($errors));
+        $this->assertCount(1, $errors);
+        $this->assertSame([], $service->validate([-1], $values($filled)));
+        // Left out entirely is as empty as submitted empty.
+        $this->assertArrayHasKey($element, $service->validate([-1], []));
+    }
+
+    /**
+     * Field types with their empty and filled submissions.
+     *
+     * @return array
+     */
+    public static function required_field_provider(): array {
+        $options = ['param1' => "One\nTwo\nThree"];
+        return [
+            'text' => ['text', [], '', ['' => '  '], ['' => 'x']],
+            'number' => ['number', [], '', ['' => ''], ['' => '0']],
+            'select' => ['select', $options, '', ['' => '0'], ['' => '2']],
+            'radiobutton' => ['radiobutton', $options, '_group', [], ['' => '1']],
+            'multiselect' => ['multiselect', $options, '', ['' => [-1 => '-999']], ['' => [-1 => '-999', 0 => '3']]],
+            'checkbox' => ['checkbox', $options, '', ['' => [1 => '', 2 => '', 3 => '']], ['' => [1 => '', 2 => '2', 3 => '']]],
+            'url' => ['url', [], '_grp', ['_url' => '', '_alt' => 'Link'], ['_url' => 'https://example.org']],
+            'editor' => ['editor', [], '_editor', ['_editor' => ['text' => '<p></p>', 'format' => 1]],
+                ['_editor' => ['text' => '<p>Hi</p>', 'format' => 1]]],
+            'time' => ['time', [], '', ['' => 0], ['' => 1700000000]],
+            'teammemberselect' => ['teammemberselect', ['param1' => 5, 'param3' => 1], '', ['' => [-1 => '-999']],
+                ['' => [-1 => '-999', 0 => '2']]],
+            'location' => ['location', [], '_address', ['_address' => '', '_lat' => '', '_lng' => ''],
+                ['_address' => 'Graz', '_lat' => '47.07', '_lng' => '15.44']],
+        ];
+    }
+
+    /**
+     * A number that is given must be a number, required or not.
+     */
+    public function test_number_must_be_numeric_when_given(): void {
+        $fieldid = $this->add_mobile_field($this->dlx, 'number', 'Amount');
+        $service = new entry_submission_service($this->view('[[Amount]]'));
+
+        $this->assertSame([], $service->validate([-1], ["field_{$fieldid}_-1" => '']));
+        $this->assertSame(
+            ["field_{$fieldid}_-1" => get_string('errnumeric', 'datalynx')],
+            $service->validate([-1], ["field_{$fieldid}_-1" => 'ten'])
+        );
+    }
+
+    /**
+     * Saving runs the fields' after-save step only for a submission that is saved.
+     */
+    public function test_after_save_step_runs_only_for_saved_entries(): void {
+        global $DB, $USER;
+        $proffield = $this->getDataGenerator()->create_custom_profile_field([
+            'datatype' => 'text', 'shortname' => 'phone', 'name' => 'Phone',
+        ]);
+        \mod_datalynx\local\field_format\manager::save_format((object) [
+            'dataid' => $this->dlx->id(),
+            'name' => 'myphone',
+            'fieldtype' => 'entryauthor',
+            'settings' => json_encode(['option' => 'phone', 'editable' => 1, 'mandatory' => 0]),
+        ]);
+        $service = new entry_submission_service($this->view('[[Title|Required]] ##author:myphone##'));
+        $phone = fn() => $DB->get_field('user_info_data', 'data', ['userid' => $USER->id, 'fieldid' => $proffield->id]);
+
+        // The title is missing: nothing is saved, the profile stays as it was.
+        $result = $service->save([-1], (object) ['field_myphone_-1' => '0316 1234']);
+        $this->assertNotEmpty($result['errors']);
+        $this->assertFalse($phone());
+
+        $result = $service->save([-1], (object) ['field_myphone_-1' => '0316 1234', $this->name('Title', -1) => 'Saved']);
+        $this->assertSame([], $result['errors']);
+        $this->assertSame('0316 1234', $phone());
+    }
+
+    /**
+     * The course group field shows nothing where its behavior hides it, and no input where it is
+     * not editable, like every other field.
+     */
+    public function test_coursegroup_follows_behaviors(): void {
+        $this->add_mobile_behavior($this->dlx, 'Hidden', ['visibletopermission' => []]);
+        $fieldid = $this->add_mobile_field($this->dlx, 'coursegroup', 'Group');
+        $field = (new datalynx($this->dlx->id()))->get_field_from_id($fieldid);
+        $entry = (object) ['id' => -1];
+
+        $editable = $field->renderer()->replacements(['[[Group]]'], $entry, ['edit' => true]);
+        $this->assertIsArray($editable['[[Group]]'][1]);
+
+        $this->setUser($this->create_mobile_student($this->course));
+        $hidden = $field->renderer()->replacements(['[[Group|Hidden]]'], $entry, ['edit' => true]);
+        $this->assertSame(['html', ''], $hidden['[[Group|Hidden]]']);
+        $readonly = $field->renderer()->replacements(['[[Group|Read only]]'], $entry, ['edit' => true]);
+        $this->assertSame('html', $readonly['[[Group|Read only]]'][0]);
+    }
+
+    /**
+     * The upgrade turns the legacy ##*status## tag into ##status##, also inside serialized settings.
+     */
+    public function test_upgrade_replaces_legacy_required_status_tag(): void {
+        global $CFG, $DB;
+        require_once($CFG->dirroot . '/mod/datalynx/db/upgrade.php');
+        $viewid = $this->add_mobile_view($this->dlx, 'grid', 'Old', '<div>##*status##</div>', [
+            'section' => '##*status## ##entries##',
+            'param5' => serialize(['tpl' => 'x ##*status## y']),
+            'patterns' => 'cached',
+        ]);
+
+        mod_datalynx_upgrade_replace_view_tag('##*status##', '##status##');
+
+        $view = $DB->get_record('datalynx_views', ['id' => $viewid]);
+        $this->assertSame('<div>##status##</div>', $view->param2);
+        $this->assertSame('##status## ##entries##', $view->section);
+        $this->assertSame(['tpl' => 'x ##status## y'], unserialize($view->param5));
+        $this->assertNull($view->patterns);
     }
 }

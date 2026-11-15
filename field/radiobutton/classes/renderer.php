@@ -32,6 +32,16 @@ use stdClass;
  */
 class renderer extends SelectRenderer {
     /**
+     * The radio buttons sit in the group field_{fieldid}_{entryid}_group.
+     *
+     * @param string $name
+     * @return string
+     */
+    public function get_error_element(string $name): string {
+        return $name . '_group';
+    }
+
+    /**
      * @var datalynxfield_radiobutton The field object.
      */
     protected $field = null; // phpcs:ignore

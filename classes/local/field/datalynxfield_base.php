@@ -973,6 +973,55 @@ abstract class datalynxfield_base {
     }
 
     /**
+     * Whether a submission leaves this field without a value, for the required check.
+     *
+     * The entry submission service asks this for every editable field whose behavior makes it
+     * required, so that "required" is decided in one place and means the same for the web form and
+     * the web services. A field whose input is named or shaped differently from a single
+     * field_{fieldid}_{entryid} value overrides it.
+     *
+     * @param string $name the element name of the value: field_{fieldid}_{entryid}, or with a
+     *                     fieldgroup line appended
+     * @param stdClass $data the submission
+     * @return bool
+     */
+    public function is_submitted_value_empty(string $name, stdClass $data): bool {
+        return self::is_blank_submission($data->$name ?? null);
+    }
+
+    /**
+     * Whether a submitted value is blank: null, an empty or whitespace string, or a list of those.
+     *
+     * @param mixed $value
+     * @return bool
+     */
+    protected static function is_blank_submission($value): bool {
+        if (is_array($value)) {
+            foreach ($value as $item) {
+                if (!self::is_blank_submission($item)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        return trim((string) $value) === '';
+    }
+
+    /**
+     * Store what a submission holds for this field outside the entry's contents.
+     *
+     * Called by the entry submission service once the entries are saved, for every field the view
+     * let the user edit. Most fields keep everything in datalynx_contents and do nothing here.
+     *
+     * @param int $entryid the submitted entry id; negative for a new entry
+     * @param stdClass $data the submission, filtered to the editable fields
+     * @return void
+     */
+    public function after_entry_saved(int $entryid, stdClass $data): void {
+    }
+
+    /**
      * Returns operators supported by this field.
      * It contains all operators present in the previous
      * version and should therefore be overridden by a concrete

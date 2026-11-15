@@ -25,12 +25,24 @@
 
 namespace datalynxfield_gradeitem;
 
+use stdClass;
 use mod_datalynx\local\field\datalynxfield_base;
 
 /**
  * Datalynx gradeitem field class.
  */
 class field extends datalynxfield_base {
+    /**
+     * Never empty. The grade is read from the gradebook; there is nothing to enter.
+     *
+     * @param string $name
+     * @param stdClass $data
+     * @return bool
+     */
+    public function is_submitted_value_empty(string $name, stdClass $data): bool {
+        return false;
+    }
+
     /** @var string Plugin type. */
     public $type = 'gradeitem';
 

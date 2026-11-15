@@ -49,6 +49,18 @@ use stdClass;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class field extends datalynxfield_base {
+    /**
+     * A journey is its stops, posted as JSON in field_{fieldid}_{entryid}_waypoints.
+     *
+     * @param string $name
+     * @param stdClass $data
+     * @return bool
+     */
+    public function is_submitted_value_empty(string $name, stdClass $data): bool {
+        $json = (string) ($data->{$name . '_waypoints'} ?? '');
+        return $json === '' || itinerary::from_json($json, $this->get_max_waypoints())->count() === 0;
+    }
+
     /** @var string Field type */
     public $type = 'itinerary';
 

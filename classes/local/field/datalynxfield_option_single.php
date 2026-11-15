@@ -32,6 +32,18 @@ use stdClass;
  */
 class datalynxfield_option_single extends datalynxfield_option {
     /**
+     * Empty when no option is chosen: options are numbered from 1, the "choose" entry posts 0.
+     *
+     * @param string $name
+     * @param stdClass $data
+     * @return bool
+     */
+    public function is_submitted_value_empty(string $name, stdClass $data): bool {
+        $value = $data->$name ?? null;
+        return is_array($value) || (int) $value < 1;
+    }
+
+    /**
      * A single-choice option can be the same as, or different from, another entry's choice.
      *
      * The exact-value operator this field type offers is ANY_OF rather than '=', so the default

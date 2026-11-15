@@ -220,9 +220,11 @@ final class entry_submission_service {
     /**
      * Validate a submission: every editable field of every submitted entry, as the view shows it.
      *
-     * Each field's own validation runs with the tags it is editable under, so their behaviors
-     * decide what is required. A field that is required but not submitted at all is an error,
-     * so leaving a field out of a request is not a way around it.
+     * Whether a field is required is decided here, from the behaviors of the tags it is editable
+     * under (availability conditions included); the field only says when its submitted value is
+     * empty. A required field that is left out of the submission is empty, so leaving it out of a
+     * request is no way around it. Each field's own validation then checks the rest: formats,
+     * uniqueness, limits.
      *
      * @param int[] $entryids
      * @param stdClass|array $data
@@ -244,9 +246,8 @@ final class entry_submission_service {
                     continue;
                 }
                 $errors = array_merge($errors, $field->renderer()->validate($entryid, $state['tags'], $data));
-                $name = "field_{$fieldid}_{$entryid}";
-                if ($state['required'] && !$field->is_internal() && !self::has_input($name, $data)) {
-                    $errors[$name] ??= get_string('fieldrequired', 'datalynx');
+                if ($state['required'] && !$field->is_internal()) {
+                    $errors = array_merge($errors, self::required_error($field, "field_{$fieldid}_{$entryid}", $data, $errors));
                 }
             }
         }
@@ -301,10 +302,9 @@ final class entry_submission_service {
                     $errors,
                     $substate['field']->renderer()->validate($lineentryid, [$substate['tag']], $data)
                 );
-                $name = "field_{$subfieldid}_{$lineentryid}";
-                $required = $line < $requiredlines || $substate['required'];
-                if ($required && !self::has_value($name, $data)) {
-                    $errors[$name] ??= get_string('fieldrequired', 'datalynx');
+                if ($line < $requiredlines || $substate['required']) {
+                    $name = "field_{$subfieldid}_{$lineentryid}";
+                    $errors = array_merge($errors, self::required_error($substate['field'], $name, $data, $errors));
                 }
             }
         }
@@ -347,6 +347,17 @@ final class entry_submission_service {
         $update = $isnew ? (string) $entryids[0] : implode(',', $entryids);
         $processed = $entries->process_entries('update', $update, $data, true);
 
+        // What fields keep outside the entry's contents, e.g. a profile field of the author.
+        if (!empty($processed[1])) {
+            foreach (self::expand_entry_ids($entryids) as $entryid) {
+                foreach ($this->get_field_states($entryid) as $state) {
+                    if ($state['editable']) {
+                        $state['field']->after_entry_saved($entryid, $data);
+                    }
+                }
+            }
+        }
+
         return [
             'entryids' => array_map('intval', $processed[1] ?? []),
             'errors' => [],
@@ -355,66 +366,27 @@ final class entry_submission_service {
     }
 
     /**
-     * Whether a submission carries any element of a field value.
+     * The error of a required field the submission leaves empty.
      *
-     * @param string $name the element name of the value, field_{fieldid}_{entryid}[...]
-     * @param stdClass $data
-     * @return bool
+     * The field says when its value is empty and which element shows the error. A field that has an
+     * error already keeps that one.
+     *
+     * @param object $field the field
+     * @param string $name the element name of its value
+     * @param stdClass $data the submission
+     * @param array $errors the errors found so far
+     * @return array element name => message, empty if the field has a value
      */
-    private static function has_input(string $name, stdClass $data): bool {
-        foreach (array_keys((array) $data) as $key) {
-            if ($key === $name || strpos((string) $key, $name . '_') === 0) {
-                return true;
-            }
+    private static function required_error(object $field, string $name, stdClass $data, array $errors): array {
+        if (!$field->is_submitted_value_empty($name, $data)) {
+            return [];
+        }
+        $renderer = $field->renderer();
+        $element = $renderer->get_error_element($name);
+        if (isset($errors[$element]) || isset($errors[$name])) {
+            return [];
         }
 
-        return false;
-    }
-
-    /**
-     * Whether a submission carries a non-empty value for a field.
-     *
-     * Values the form posts for "nothing chosen" count as empty: an empty string, an empty list,
-     * the placeholder of an empty multiple selection.
-     *
-     * @param string $name the element name of the value
-     * @param stdClass $data
-     * @return bool
-     */
-    private static function has_value(string $name, stdClass $data): bool {
-        foreach ((array) $data as $key => $value) {
-            if (($key === $name || strpos((string) $key, $name . '_') === 0) && !self::is_blank($value)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Whether a submitted value means "nothing entered".
-     *
-     * @param mixed $value
-     * @return bool
-     */
-    private static function is_blank($value): bool {
-        if (is_array($value)) {
-            if (array_key_exists('text', $value)) {
-                // An editor: only its text counts.
-                return trim(strip_tags((string) $value['text'])) === '';
-            }
-            foreach ($value as $key => $item) {
-                if ($key === 'andor' || $key === 'enabled') {
-                    continue;
-                }
-                if (!self::is_blank($item)) {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        $value = trim((string) $value);
-        return $value === '' || $value === '-999' || $value === '_qf__force_multiselect_submission';
+        return [$element => $renderer->get_required_message()];
     }
 }

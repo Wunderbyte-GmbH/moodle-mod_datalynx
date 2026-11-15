@@ -32,6 +32,17 @@ use stdClass;
  * Field class for the fieldgroup field type.
  */
 class field extends datalynxfield_base {
+    /**
+     * Never empty. A fieldgroup holds no value itself; its lines are checked subfield by subfield.
+     *
+     * @param string $name
+     * @param stdClass $data
+     * @return bool
+     */
+    public function is_submitted_value_empty(string $name, stdClass $data): bool {
+        return false;
+    }
+
     /** @var string The field type identifier. */
     public $type = 'fieldgroup';
 

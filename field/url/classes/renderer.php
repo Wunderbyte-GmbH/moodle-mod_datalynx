@@ -34,6 +34,16 @@ use stdClass;
  */
 class renderer extends datalynxfield_renderer {
     /**
+     * Address and link text sit in the group field_{fieldid}_{entryid}_grp.
+     *
+     * @param string $name
+     * @return string
+     */
+    public function get_error_element(string $name): string {
+        return $name . '_grp';
+    }
+
+    /**
      * Render the field in edit mode.
      *
      * @param MoodleQuickForm $mform
@@ -194,20 +204,11 @@ class renderer extends datalynxfield_renderer {
 
         $formfieldname = "field_{$fieldid}_{$entryid}_url";
         $errors = [];
-        foreach ($tags as $tag) {
-            [, $behavior, ] = $this->process_tag($tag);
-            // Variable $behavior datalynx_field_behavior.
-            $value = \datalynxfield_url\field::normalise_url((string) ($formdata->$formfieldname ?? ''));
-            if ($value === '') {
-                if ($behavior->is_required()) {
-                    $errors["field_{$fieldid}_{$entryid}_grp"] = get_string('fieldrequired', 'datalynx');
-                }
-                continue;
-            }
-            // Validate that the (normalised) input is a URL.
-            if (!filter_var($value, FILTER_VALIDATE_URL)) {
-                $errors["field_{$fieldid}_{$entryid}_grp"] = get_string('invalidurl', 'datalynxfield_url');
-            }
+        // Whether a value is required is checked by the entry submission service; a value given
+        // must be a URL.
+        $value = \datalynxfield_url\field::normalise_url((string) ($formdata->$formfieldname ?? ''));
+        if ($value !== '' && !filter_var($value, FILTER_VALIDATE_URL)) {
+            $errors["field_{$fieldid}_{$entryid}_grp"] = get_string('invalidurl', 'datalynxfield_url');
         }
 
         return $errors;

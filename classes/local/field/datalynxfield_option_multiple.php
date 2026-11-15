@@ -28,6 +28,24 @@ use stdClass;
  */
 class datalynxfield_option_multiple extends datalynxfield_option {
     /**
+     * Empty unless an option is chosen, the placeholders of an empty selection aside: the -999 of
+     * an empty autocomplete, the unchecked boxes (''), QuickForm's submission marker.
+     *
+     * @param string $name
+     * @param stdClass $data
+     * @return bool
+     */
+    public function is_submitted_value_empty(string $name, stdClass $data): bool {
+        foreach ((array) ($data->$name ?? []) as $option) {
+            $option = trim((string) $option);
+            if (!in_array($option, ['', '0', '-999', '_qf__force_multiselect_submission'], true)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * A multiple-choice option set can be the same as, or different from, another entry's set.
      *
      * "Same" means the identical set of options, which is what the EXACTLY operator expresses.

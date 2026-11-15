@@ -273,15 +273,11 @@ class renderer extends TextRenderer {
         $formfieldname = "field_{$fieldid}_{$entryid}";
 
         $errors = [];
-        foreach ($tags as $tag) {
-            [, $behavior, ] = $this->process_tag($tag);
-            // Variable $behavior datalynx_field_behavior.
-            if ($behavior->is_required() && isset($formdata->$formfieldname)) {
-                $value = optional_param($formfieldname, '', PARAM_RAW);
-                if (!is_numeric($value)) {
-                    $errors[$formfieldname] = get_string('errnumeric', 'datalynx');
-                }
-            }
+        // Whether a value is required is checked by the entry submission service; a value given
+        // must be a number.
+        $value = trim((string) ($formdata->$formfieldname ?? ''));
+        if ($value !== '' && !is_numeric($value)) {
+            $errors[$formfieldname] = get_string('errnumeric', 'datalynx');
         }
 
         return $errors;

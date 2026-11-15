@@ -38,6 +38,40 @@ use stdClass;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class field extends datalynxfield_no_content {
+    /**
+     * The inline profile editor writes the author's profile field once the entry is saved.
+     *
+     * Its value lives in the user profile, never in datalynx content. It used to be written while
+     * validating, so a submission that failed on another field still changed the profile.
+     *
+     * @param int $entryid
+     * @param stdClass $data
+     * @return void
+     */
+    public function after_entry_saved(int $entryid, stdClass $data): void {
+        global $CFG;
+
+        if ($this->get('internalname') !== 'profileeditor' || empty($this->get('editable'))) {
+            return;
+        }
+        $name = "field_{$this->id()}_{$entryid}";
+        if (!property_exists($data, $name)) {
+            return;
+        }
+        $renderer = $this->renderer();
+        $userid = $renderer->get_profile_userid($entryid);
+        if (!$renderer->may_edit_profile($userid)) {
+            return;
+        }
+        $value = $data->$name;
+        if (!empty($this->get('mandatory')) && ($value === '' || $value === null)) {
+            return;
+        }
+
+        require_once("$CFG->dirroot/user/profile/lib.php");
+        profile_save_data((object) ['id' => $userid, "profile_field_{$this->get('infoshortname')}" => $value]);
+    }
+
     /** @var string The field type. */
     public $type = 'entryauthor';
 

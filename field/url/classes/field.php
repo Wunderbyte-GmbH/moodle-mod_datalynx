@@ -32,6 +32,17 @@ use stdClass;
  * URL field class.
  */
 class field extends datalynxfield_base {
+    /**
+     * The address is posted as field_{fieldid}_{entryid}_url; the link text alone is no value.
+     *
+     * @param string $name
+     * @param stdClass $data
+     * @return bool
+     */
+    public function is_submitted_value_empty(string $name, stdClass $data): bool {
+        return self::normalise_url((string) ($data->{$name . '_url'} ?? '')) === '';
+    }
+
     /** @var string CSS class */
     public $class;
 

@@ -178,16 +178,12 @@ class renderer extends datalynxfield_renderer {
         $formfieldname = "field_{$fieldid}_{$entryid}";
 
         $errors = [];
-        foreach ($tags as $tag) {
-            [, $behavior, ] = $this->process_tag($tag);
-            // Variable $behavior datalynx_field_behavior.
-            if ($behavior->is_required() && isset($formdata->$formfieldname)) {
-                $value = optional_param_array($formfieldname, [], PARAM_RAW)['number'];
-                $intvalue = intval($value);
-                if ($value !== "$intvalue") {
-                    $errors[$formfieldname] = get_string('fieldrequired', 'datalynx');
-                }
-            }
+        // Whether a value is required is checked by the entry submission service; a number given
+        // must be a whole number.
+        $value = $formdata->$formfieldname ?? null;
+        $number = trim((string) (is_array($value) ? ($value['number'] ?? '') : $value));
+        if ($number !== '' && !preg_match('/^-?\d+$/', $number)) {
+            $errors[$formfieldname] = get_string('errnumeric', 'datalynx');
         }
 
         return $errors;

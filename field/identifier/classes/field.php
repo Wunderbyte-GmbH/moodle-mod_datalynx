@@ -35,6 +35,17 @@ use stdClass;
  * @package datalynxfield_identifier
  */
 class field extends datalynxfield_base {
+    /**
+     * Never empty. The identifier is generated on save; there is nothing to enter.
+     *
+     * @param string $name
+     * @param stdClass $data
+     * @return bool
+     */
+    public function is_submitted_value_empty(string $name, stdClass $data): bool {
+        return false;
+    }
+
     /** @var string The field type. */
     public $type = 'identifier';
 

@@ -35,6 +35,25 @@ use stdClass;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class renderer extends datalynxfield_renderer {
+    /**
+     * A schedule is incomplete rather than empty.
+     *
+     * @return string
+     */
+    public function get_required_message(): string {
+        return get_string('errnoschedule', 'datalynxfield_schedule');
+    }
+
+    /**
+     * A missing schedule is pointed at its start time.
+     *
+     * @param string $name
+     * @return string
+     */
+    public function get_error_element(string $name): string {
+        return $name . '_start';
+    }
+
     // This is a datalynx field renderer, not a core_renderer: $this->page and
     // $this->output do not exist here.
     // phpcs:disable moodle.PHP.ForbiddenGlobalUse.BadGlobal
@@ -307,9 +326,9 @@ class renderer extends datalynxfield_renderer {
             $errors["{$prefix}_until"] = get_string('erruntilbeforefrom', 'datalynxfield_schedule');
         } else if ($current->mode() === schedule::MODE_ONCE && $current->date() === '') {
             $errors["{$prefix}_date"] = get_string('errnodate', 'datalynxfield_schedule');
-        } else if (!empty($this->field->get('required'))) {
-            $errors["{$prefix}_start"] = get_string('errnoschedule', 'datalynxfield_schedule');
         }
+        // A schedule left out entirely is an error only if required, which the entry submission
+        // service checks from the behavior.
 
         return $errors;
     }

@@ -56,22 +56,15 @@ class renderer extends datalynxfield_renderer {
 
         foreach ($tags as $tag) {
             if ($edit && $statuslocked) {
-                if (trim($tag, '@') == "##status##" || trim($tag, '@') == "##*status##") {
+                if (trim($tag, '@') == "##status##") {
                     $replacements[$tag] = ['html', $this->display_locked($entry)];
                 }
             } else if (!$entry || $edit) {
-                if (trim($tag, '@') == "##status##" || trim($tag, '@') == "##*status##") {
-                    $required = trim($tag, '@') === "##*status##";
-                    $replacements[$tag] = ['',
-                            [[$this, 'display_edit',
-                            ], [$entry, ['required' => $required,
-                            ],
-                            ],
-                            ],
-                    ];
+                if (trim($tag, '@') == "##status##") {
+                    $replacements[$tag] = ['', [[$this, 'display_edit'], [$entry, []]]];
                 }
             } else {
-                if (trim($tag, '@') == "##status##" || trim($tag, '@') == "##*status##") {
+                if (trim($tag, '@') == "##status##") {
                     $replacements[$tag] = ['html', $this->display_browse($entry),
                     ];
                 }
@@ -93,8 +86,6 @@ class renderer extends datalynxfield_renderer {
         $fieldid = $field->id();
         $entryid = $entry->id;
         $status = isset($entry->status) ? $entry->status : field::STATUS_NOT_SET;
-        // Note: the ##*status## (required) variant no longer needs a "nonzero" rule because the switch's
-        // off value is Draft (1), which is always a valid, non-empty status.
 
         $fieldname = "field_{$fieldid}_{$entryid}";
         $mform->addElement('html', '<div class="datalynx-no-fitem-wrapper">');
@@ -228,7 +219,6 @@ class renderer extends datalynxfield_renderer {
 
         $patterns = [];
         $patterns["##status##"] = [true, $cat];
-        $patterns["##*status##"] = [true, $cat];
 
         return $patterns;
     }

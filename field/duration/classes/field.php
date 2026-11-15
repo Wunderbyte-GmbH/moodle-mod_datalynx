@@ -25,6 +25,7 @@
 
 namespace datalynxfield_duration;
 
+use stdClass;
 use mod_datalynx\local\field\datalynxfield_base;
 use mod_datalynx\local\rule\match_compiler;
 
@@ -36,6 +37,19 @@ use mod_datalynx\local\rule\match_compiler;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class field extends datalynxfield_base {
+    /**
+     * The duration element posts {number, timeunit}; the number is the value.
+     *
+     * @param string $name
+     * @param stdClass $data
+     * @return bool
+     */
+    public function is_submitted_value_empty(string $name, stdClass $data): bool {
+        $value = $data->$name ?? null;
+        $number = is_array($value) ? ($value['number'] ?? '') : $value;
+        return trim((string) $number) === '';
+    }
+
     /**
      * @var string
      */

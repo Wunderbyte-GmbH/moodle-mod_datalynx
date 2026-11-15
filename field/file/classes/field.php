@@ -38,6 +38,22 @@ require_once("$CFG->dirroot/lib/resourcelib.php");
  * Datalynx file field class.
  */
 class field extends datalynxfield_base {
+    /**
+     * Files arrive in a draft area of the current user, posted as field_{fieldid}_{entryid}_filemanager.
+     *
+     * @param string $name
+     * @param stdClass $data
+     * @return bool
+     */
+    public function is_submitted_value_empty(string $name, stdClass $data): bool {
+        global $USER;
+        $itemid = (int) ($data->{$name . '_filemanager'} ?? 0);
+        if ($itemid <= 0) {
+            return true;
+        }
+        return get_file_storage()->is_area_empty(context_user::instance($USER->id)->id, 'user', 'draft', $itemid);
+    }
+
     /** @var string Plugin type. */
     public $type = 'file';
 

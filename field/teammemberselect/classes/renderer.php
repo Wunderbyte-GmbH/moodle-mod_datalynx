@@ -314,31 +314,11 @@ class renderer extends datalynxfield_renderer {
         }
 
         $errors = [];
-        foreach ($tags as $tag) {
-            [, $behavior, ] = $this->process_tag($tag);
-            // Variable $behavior datalynx_field_behavior.
-            if ($behavior->is_required()) {
-                $userfound = false;
-                if (isset($formdata->$formfieldname)) {
-                    foreach ($formdata->$formfieldname as $userid) {
-                        if ($userid != 0) {
-                            $userfound = true;
-                            break;
-                        }
-                    }
-                }
-                if (!$userfound) {
-                    $errors[$formfieldname] = get_string('fieldrequired', 'datalynx');
-                }
-            }
-            if (isset($formdata->$formfieldname)) {
-                // Get rid of Dummy value -999 to correct calculations.
-                if (isset($formdata->{$formfieldname}[0]) && $formdata->{$formfieldname}[0] == -999) {
-                    array_shift($formdata->{$formfieldname});
-                }
-
-                // Limit chosen users to max teamsize and ensure min teamsize users are chosen!
-                $teamsize = count($formdata->$formfieldname);
+        // Whether a value is required is checked by the entry submission service. The team size is
+        // counted in chosen users; the form adds -999 for an empty selection.
+        if (isset($formdata->$formfieldname)) {
+            $teamsize = count(array_filter((array) $formdata->$formfieldname, fn($userid) => (int) $userid > 0));
+            if ($teamsize > 0) {
                 if ($teamsize > $this->field->teamsize) {
                     $errors[$formfieldname] = get_string(
                         'maxteamsizeerrorform',

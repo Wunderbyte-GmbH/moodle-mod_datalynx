@@ -27,6 +27,17 @@ use stdClass;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class field extends datalynxfield_base {
+    /**
+     * A location is its address, posted as field_{fieldid}_{entryid}_address.
+     *
+     * @param string $name
+     * @param stdClass $data
+     * @return bool
+     */
+    public function is_submitted_value_empty(string $name, stdClass $data): bool {
+        return trim((string) ($data->{$name . '_address'} ?? '')) === '';
+    }
+
     /** @var string Field type */
     public $type = 'location';
 

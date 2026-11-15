@@ -39,6 +39,17 @@ require_once($CFG->dirroot . '/mod/datalynx/field/datalynxfield_no_content_can_j
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class field extends datalynxfield_no_content_can_join {
+    /**
+     * Never empty. The value is read from the profiles of the team members; there is nothing to enter.
+     *
+     * @param string $name
+     * @param stdClass $data
+     * @return bool
+     */
+    public function is_submitted_value_empty(string $name, stdClass $data): bool {
+        return false;
+    }
+
     /** @var string The field type. */
     public $type = 'entryteammemberprofilefield';
 

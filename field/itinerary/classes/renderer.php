@@ -38,6 +38,16 @@ use stdClass;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class renderer extends datalynxfield_renderer {
+    /**
+     * The stops are posted as field_{fieldid}_{entryid}_waypoints.
+     *
+     * @param string $name
+     * @return string
+     */
+    public function get_error_element(string $name): string {
+        return $name . '_waypoints';
+    }
+
     // This is a datalynx field renderer, not a core_renderer: $this->page and
     // $this->output do not exist here.
     // phpcs:disable moodle.PHP.ForbiddenGlobalUse.BadGlobal

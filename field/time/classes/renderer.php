@@ -34,6 +34,16 @@ use stdClass;
  */
 class renderer extends datalynxfield_renderer {
     /**
+     * The masked selectors sit in the group grpfield_{fieldid}_{entryid}.
+     *
+     * @param string $name
+     * @return string
+     */
+    public function get_error_element(string $name): string {
+        return $this->field->masked ? "grp{$name}" : $name;
+    }
+
+    /**
      * Render the edit mode for the time field.
      *
      * @param MoodleQuickForm $mform
@@ -423,22 +433,8 @@ class renderer extends datalynxfield_renderer {
      * @return array
      */
     public function validate($entryid, $tags, $formdata): array {
-        $fieldid = $this->field->id();
-
-        $formfieldname = "field_{$fieldid}_{$entryid}";
-
-        $errors = [];
-        foreach ($tags as $tag) {
-            [, $behavior, ] = $this->process_tag($tag);
-            // Variable $behavior datalynx_field_behavior.
-            if (
-                $behavior->is_required() &&
-                    !isset(optional_param_array($formfieldname, [], PARAM_RAW)['enabled'])
-            ) {
-                $errors[$formfieldname] = get_string('checkenable', 'datalynx');
-            }
-        }
-
-        return $errors;
+        // Whether a value is required is checked by the entry submission service; the selectors
+        // only offer valid dates.
+        return [];
     }
 }

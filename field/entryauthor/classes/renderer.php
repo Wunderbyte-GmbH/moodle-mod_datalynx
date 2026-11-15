@@ -608,8 +608,6 @@ class renderer extends datalynxfield_renderer {
      * @return array Validation errors keyed by form element name.
      */
     public function validate($entryid, $tags, $formdata): array {
-        global $USER, $DB, $CFG;
-
         $field = $this->field;
         $errors = [];
 
@@ -624,33 +622,45 @@ class renderer extends datalynxfield_renderer {
         }
         $value = $formdata->{$formfieldname};
 
-        // Resolve the entry author whose profile will be written.
-        if (!is_numeric($entryid) || (int) $entryid < 0) {
-            $userid = (int) $USER->id;
-        } else {
-            $entry = $DB->get_record('datalynx_entries', ['id' => $entryid], 'userid', IGNORE_MISSING);
-            $userid = $entry ? (int) $entry->userid : 0;
-        }
-
-        // Enforce the site-level capability to edit this user's profile.
+        // Only a profile the user may edit is validated (and later written, see
+        // field::after_entry_saved()); validation itself writes nothing.
+        $userid = $this->get_profile_userid($entryid);
         if (!$userid || !$this->profile_edit_allowed_for_user($userid)) {
-            unset($formdata->{$formfieldname});
             return $errors;
         }
 
         if (!empty($field->get('mandatory')) && ($value === '' || $value === null)) {
             $errors[$formfieldname] = get_string('fieldrequired', 'datalynx');
-            return $errors;
         }
 
-        require_once("$CFG->dirroot/user/profile/lib.php");
-        $user = ['id' => $userid, "profile_field_{$field->get('infoshortname')}" => $value];
-        profile_save_data((object) $user);
-
-        // The value lives in the user profile, never in datalynx content.
-        unset($formdata->{$formfieldname});
-
         return $errors;
+    }
+
+    /**
+     * The user whose profile the inline profile editor writes for an entry: its author, or the
+     * current user for a new entry.
+     *
+     * @param int|string $entryid
+     * @return int 0 if the entry does not exist
+     */
+    public function get_profile_userid($entryid): int {
+        global $DB, $USER;
+        if (!is_numeric($entryid) || (int) $entryid < 0) {
+            return (int) $USER->id;
+        }
+        $entry = $DB->get_record('datalynx_entries', ['id' => $entryid], 'userid', IGNORE_MISSING);
+
+        return $entry ? (int) $entry->userid : 0;
+    }
+
+    /**
+     * Whether the current user may write the given user's profile through the profile editor.
+     *
+     * @param int $userid
+     * @return bool
+     */
+    public function may_edit_profile(int $userid): bool {
+        return $userid && $this->profile_edit_allowed_for_user($userid);
     }
 
     /**

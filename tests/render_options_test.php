@@ -52,6 +52,8 @@ final class render_options_test extends advanced_testcase {
         parent::setUp();
         $this->resetAfterTest();
         $this->setAdminUser();
+        // Ids repeat from test to test; the per-request condition cache must not carry over.
+        \mod_datalynx\local\field\datalynxfield_behavior::reset_condition_cache();
 
         [$this->course, $this->dlx] = $this->create_mobile_instance();
         $this->titleid = $this->add_mobile_field($this->dlx, 'text', 'Title');

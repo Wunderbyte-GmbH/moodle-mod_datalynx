@@ -257,35 +257,8 @@ class renderer extends datalynxfield_renderer {
      * @return array Associative array of field name => error message.
      */
     public function validate($entryid, $tags, $formdata): array {
-        $fieldid = $this->field->id();
-        $formfieldname = "field_{$fieldid}_{$entryid}";
-
-        $errors = [];
-        foreach ($tags as $tag) {
-            [, $behavior, ] = $this->process_tag($tag);
-
-            // Remove placeholder for empty autocomplete.
-            if (isset($formdata->{$formfieldname}[0]) && $formdata->{$formfieldname}[0] == -999) {
-                unset($formdata->{$formfieldname}[0]);
-            }
-
-            // Variable $behavior datalynx_field_behavior.
-            if ($behavior->is_required()) {
-                if (empty($formdata->$formfieldname)) {
-                    $errors[$formfieldname] = get_string('fieldrequired', 'datalynx');
-                } else {
-                    $empty = true;
-                    foreach ($formdata->$formfieldname as $value) {
-                        $empty = $empty && empty($value);
-                    }
-                    if ($empty) {
-                        $errors[$formfieldname] = get_string('fieldrequired', 'datalynx');
-                    }
-                }
-            }
-        }
-
-        return $errors;
+        // Whether a value is required is checked by the entry submission service.
+        return [];
     }
 
     /**

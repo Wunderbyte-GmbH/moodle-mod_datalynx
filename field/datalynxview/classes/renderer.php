@@ -350,19 +350,7 @@ class renderer extends datalynxfield_renderer {
      * @see datalynxfield_renderer::validate()
      */
     public function validate($entryid, $tags, $formdata): array {
-        $fieldid = $this->field->id();
-
-        $formfieldname = "field_{$fieldid}_{$entryid}";
-
-        $errors = [];
-        foreach ($tags as $tag) {
-            [, $behavior, ] = $this->process_tag($tag);
-            // Variable $behavior datalynx_field_behavior.
-            if ($behavior->is_required() && (!isset($formdata->$formfieldname))) {
-                $errors[$formfieldname] = get_string('fieldrequired', 'datalynx');
-            }
-        }
-
-        return $errors;
+        // Whether a value is required is checked by the entry submission service.
+        return [];
     }
 }

@@ -32,6 +32,16 @@ use stdClass;
  */
 class renderer extends datalynxfield_renderer {
     /**
+     * The editor element is field_{fieldid}_{entryid}_editor.
+     *
+     * @param string $name
+     * @return string
+     */
+    public function get_error_element(string $name): string {
+        return $name . '_editor';
+    }
+
+    /**
      * render the editor form for adding content to the editor field
      * TODO: improve editor rendering for including images from repositories
      *
@@ -161,21 +171,7 @@ class renderer extends datalynxfield_renderer {
      * @return array Array of error messages.
      */
     public function validate($entryid, $tags, $formdata): array {
-        $fieldid = $this->field->id();
-
-        $formfieldname = "field_{$fieldid}_{$entryid}";
-
-        $errors = [];
-        foreach ($tags as $tag) {
-            [, $behavior, ] = $this->process_tag($tag);
-            // Variable $behavior datalynx_field_behavior.
-            if ($behavior->is_required() && isset($formdata->$formfieldname)) {
-                if (!clean_param($formdata->$formfieldname, PARAM_NOTAGS)) {
-                    $errors[$formfieldname] = get_string('fieldrequired', 'datalynx');
-                }
-            }
-        }
-
-        return $errors;
+        // Whether a value is required is checked by the entry submission service.
+        return [];
     }
 }

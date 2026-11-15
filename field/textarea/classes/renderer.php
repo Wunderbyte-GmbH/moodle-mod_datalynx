@@ -128,17 +128,8 @@ class renderer extends datalynxfield_renderer {
         $formfieldname = "field_{$fieldid}_{$entryid}";
 
         $errors = [];
-        foreach ($tags as $tag) {
-            [, $behavior, ] = $this->process_tag($tag);
-            // Variable $behavior datalynx_field_behavior.
-            if ($behavior->is_required() && isset($formdata->$formfieldname)) {
-                if (!clean_param($formdata->$formfieldname, PARAM_NOTAGS)) {
-                    $errors[$formfieldname] = get_string('fieldrequired', 'datalynx');
-                }
-            }
-        }
-
-        if (empty($errors[$formfieldname]) && isset($formdata->$formfieldname)) {
+        // Whether a value is required is checked by the entry submission service.
+        if (isset($formdata->$formfieldname) && trim((string) $formdata->$formfieldname) !== '') {
             $error = $this->validate_word_count((string) $formdata->$formfieldname);
             if ($error !== null) {
                 $errors[$formfieldname] = $error;

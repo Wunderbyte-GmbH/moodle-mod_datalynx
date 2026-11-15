@@ -40,6 +40,19 @@ require_once($CFG->dirroot . '/repository/lib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class field extends datalynxfield_base {
+    /**
+     * The editor posts {text, format, itemid} as field_{fieldid}_{entryid}_editor; only text counts.
+     *
+     * @param string $name
+     * @param stdClass $data
+     * @return bool
+     */
+    public function is_submitted_value_empty(string $name, stdClass $data): bool {
+        $value = $data->{$name . '_editor'} ?? null;
+        $text = is_array($value) ? (string) ($value['text'] ?? '') : (string) $value;
+        return trim(strip_tags($text, '<img><video><audio><iframe><object>')) === '';
+    }
+
     /** @var string Field type. */
     public $type = 'editor';
 

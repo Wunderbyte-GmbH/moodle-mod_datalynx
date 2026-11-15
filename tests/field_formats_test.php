@@ -276,7 +276,7 @@ final class field_formats_test extends advanced_testcase {
     /**
      * Test that editing an entryauthor profile-editor format saves to the author's user profile field.
      */
-    public function test_entryauthor_profile_editor_validation_saves_profile(): void {
+    public function test_entryauthor_profile_editor_saves_profile_after_saving(): void {
         global $DB;
 
         $this->setAdminUser();
@@ -314,11 +314,13 @@ final class field_formats_test extends advanced_testcase {
 
         $errors = $renderer->validate($entryid, ['##author:mybirthday##'], $formdata);
         $this->assertEmpty($errors);
+        $profilevalue = fn() => $DB->get_field('user_info_data', 'data', ['userid' => $user->id, 'fieldid' => $proffield->id]);
+        // Validating writes nothing: a submission failing on another field must not change the profile.
+        $this->assertEquals('1990-01-01', $profilevalue());
 
-        // The value is saved to the user profile field (never to datalynx content) and stripped from form data.
-        $updatedval = $DB->get_field('user_info_data', 'data', ['userid' => $user->id, 'fieldid' => $proffield->id]);
-        $this->assertEquals('1995-05-05', $updatedval);
-        $this->assertFalse(property_exists($formdata, $formfieldname));
+        // Once the entry is saved the value goes to the user profile field, never to datalynx content.
+        $fields['mybirthday']->after_entry_saved($entryid, $formdata);
+        $this->assertEquals('1995-05-05', $profilevalue());
     }
 
     /**

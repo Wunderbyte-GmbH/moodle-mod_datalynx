@@ -36,6 +36,16 @@ use stored_file;
  */
 class renderer extends datalynxfield_renderer {
     /**
+     * The file manager element is field_{fieldid}_{entryid}_filemanager.
+     *
+     * @param string $name
+     * @return string
+     */
+    public function get_error_element(string $name): string {
+        return $name . '_filemanager';
+    }
+
+    /**
      * Renders the edit mode form elements for this field.
      *
      * @param MoodleQuickForm $mform The Moodle form object.

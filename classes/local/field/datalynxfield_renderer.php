@@ -737,6 +737,28 @@ abstract class datalynxfield_renderer {
     }
 
     /**
+     * The form element that shows an error about a field value.
+     *
+     * Errors are keyed by element name, and the form shows an error only at an element it has.
+     * A field whose input is a group, or is named with a suffix, says which element that is.
+     *
+     * @param string $name the element name of the value: field_{fieldid}_{entryid}[...]
+     * @return string
+     */
+    public function get_error_element(string $name): string {
+        return $name;
+    }
+
+    /**
+     * The message shown when a required field is left empty.
+     *
+     * @return string
+     */
+    public function get_required_message(): string {
+        return get_string('fieldrequired', 'datalynx');
+    }
+
+    /**
      * Whether this field's availability conditions are met for the given entry.
      *
      * Conditionally-hidden fields render no input and must not be validated (e.g. a hidden but

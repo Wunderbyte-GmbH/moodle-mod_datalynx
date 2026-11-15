@@ -34,6 +34,17 @@ use stdClass;
  * Team member select field class.
  */
 class field extends datalynxfield_base {
+    /**
+     * Empty unless a user is chosen; the form posts -999 for an empty selection.
+     *
+     * @param string $name
+     * @param stdClass $data
+     * @return bool
+     */
+    public function is_submitted_value_empty(string $name, stdClass $data): bool {
+        return static::is_fieldvalue_empty($data->$name ?? []);
+    }
+
     /** @var string Field type */
     public $type = 'teammemberselect';
 

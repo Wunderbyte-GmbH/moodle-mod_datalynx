@@ -32,6 +32,18 @@ use stdClass;
  * Coursegroup field class.
  */
 class field extends datalynxfield_base {
+    /**
+     * A course group is chosen in field_{fieldid}_{entryid}_group, or typed as an id in _groupid.
+     *
+     * @param string $name
+     * @param stdClass $data
+     * @return bool
+     */
+    public function is_submitted_value_empty(string $name, stdClass $data): bool {
+        $groupid = (int) ($data->{$name . '_groupid'} ?? 0) ?: (int) ($data->{$name . '_group'} ?? 0);
+        return $groupid <= 0 && empty($this->group);
+    }
+
     /** @var string Field type. */
     public $type = 'coursegroup';
 

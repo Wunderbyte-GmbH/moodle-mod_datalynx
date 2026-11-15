@@ -34,6 +34,22 @@ use IntlDateFormatter;
  * Time field class.
  */
 class field extends datalynxfield_base {
+    /**
+     * The date selectors post a timestamp, 0 for none; the masked selectors post their parts, 0 for
+     * a part not chosen.
+     *
+     * @param string $name
+     * @param stdClass $data
+     * @return bool
+     */
+    public function is_submitted_value_empty(string $name, stdClass $data): bool {
+        $value = $data->$name ?? null;
+        if (is_array($value)) {
+            return empty($value['day']) && empty($value['month']) && empty($value['year']);
+        }
+        return (int) $value === 0;
+    }
+
     /** @var string Field type */
     public $type = 'time';
 

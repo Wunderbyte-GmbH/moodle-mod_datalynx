@@ -1375,6 +1375,14 @@ function xmldb_datalynx_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2026111501, 'datalynx');
     }
 
+    if ($oldversion < 2026111502) {
+        // Required is a behavior setting only: the ##*status## tag, a "required" status switch that
+        // could never be left empty, becomes ##status## (#266).
+        mod_datalynx_upgrade_replace_view_tag('##*status##', '##status##');
+
+        upgrade_mod_savepoint(true, 2026111502, 'datalynx');
+    }
+
     return true;
 }
 
@@ -2140,4 +2148,50 @@ function mod_datalynx_upgrade_rule_matches_table(): void {
     if (!$dbman->table_exists($table)) {
         $dbman->create_table($table);
     }
+}
+
+/**
+ * Replace a tag in the templates of all views (2026111502).
+ *
+ * Templates live in the section and the param columns; a param column may hold serialized data,
+ * which is unserialized, replaced in and serialized again so that string lengths stay right. The
+ * cached pattern list of a changed view is cleared, the view builds it again.
+ *
+ * @param string $search
+ * @param string $replace
+ * @return void
+ */
+function mod_datalynx_upgrade_replace_view_tag(string $search, string $replace): void {
+    global $DB;
+
+    $columns = array_merge(['section'], array_map(fn($i) => "param$i", range(1, 10)));
+    $like = [];
+    $params = [];
+    foreach ($columns as $i => $column) {
+        $like[] = $DB->sql_like($column, ":tag$i");
+        $params["tag$i"] = '%' . $DB->sql_like_escape($search) . '%';
+    }
+    $views = $DB->get_recordset_select('datalynx_views', implode(' OR ', $like), $params, 'id', 'id, ' . implode(', ', $columns));
+    foreach ($views as $view) {
+        $update = ['id' => $view->id, 'patterns' => null];
+        foreach ($columns as $column) {
+            $value = $view->$column;
+            if ($value === null || strpos($value, $search) === false) {
+                continue;
+            }
+            $unserialized = preg_match('/^a:\d+:\{/', $value) ? unserialize($value, ['allowed_classes' => false]) : false;
+            if (is_array($unserialized)) {
+                array_walk_recursive($unserialized, function (&$item) use ($search, $replace) {
+                    if (is_string($item)) {
+                        $item = str_replace($search, $replace, $item);
+                    }
+                });
+                $update[$column] = serialize($unserialized);
+            } else {
+                $update[$column] = str_replace($search, $replace, $value);
+            }
+        }
+        $DB->update_record('datalynx_views', (object) $update);
+    }
+    $views->close();
 }
