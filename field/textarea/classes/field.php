@@ -37,6 +37,16 @@ require_once($CFG->dirroot . '/repository/lib.php');
  * Textarea field class.
  */
 class field extends datalynxfield_base {
+    /**
+     * Plain text; tags are removed, as when the content is stored.
+     *
+     * @param array $options
+     * @return array
+     */
+    public function get_input_contract(array $options = []): array {
+        return ['' => PARAM_NOTAGS];
+    }
+
     /** @var string Field type */
     public $type = 'textarea';
 

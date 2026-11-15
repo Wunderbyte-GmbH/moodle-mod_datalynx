@@ -103,7 +103,8 @@ final class entry_submission_service_test extends advanced_testcase {
 
         $data = (object) [
             $this->name('Title', -1) => 'Kept',
-            $this->name('Notes', -1) . '_extra' => 'Kept too',
+            $this->name('Notes', -1) => 'Kept too',
+            $this->name('Notes', -1) . '_extra' => 'Not an input of the field',
             $this->name('Secret', -1) => 'Not editable',
             $this->name('Elsewhere', -1) => 'Not in the view',
             $this->name('Title', 99) => 'Another entry',
@@ -113,9 +114,37 @@ final class entry_submission_service_test extends advanced_testcase {
 
         $this->assertEquals((object) [
             $this->name('Title', -1) => 'Kept',
-            $this->name('Notes', -1) . '_extra' => 'Kept too',
+            $this->name('Notes', -1) => 'Kept too',
             'submitbutton' => 'Save',
         ], $service->filter_data([-1], $data));
+    }
+
+    /**
+     * Values are cleaned by the field's input contract, and dropped where they lack its shape.
+     */
+    public function test_filter_cleans_by_input_contract(): void {
+        $choiceid = $this->add_mobile_field($this->dlx, 'select', 'Choice', ['param1' => "One\nTwo"]);
+        $tagsid = $this->add_mobile_field($this->dlx, 'multiselect', 'Tags', ['param1' => "Red\nBlue"]);
+        $editorid = $this->add_mobile_field($this->dlx, 'editor', 'Body');
+        $service = new entry_submission_service($this->view('[[Title]] [[Choice]] [[Tags]] [[Body]]'));
+
+        $filtered = (array) $service->filter_data([-1], (object) [
+            $this->name('Title', -1) => '<script>alert(1)</script>Text',
+            "field_{$choiceid}_-1" => '2 OR 1=1',
+            "field_{$tagsid}_-1" => ['1', 'evil', '-999'],
+            "field_{$editorid}_-1_editor" => ['text' => '<p>Hi</p>', 'format' => '1', 'itemid' => '5x', 'other' => 'dropped'],
+        ]);
+        $this->assertSame('alert(1)Text', $filtered[$this->name('Title', -1)]);
+        $this->assertSame(2, $filtered["field_{$choiceid}_-1"]);
+        $this->assertSame([1, 0, -999], $filtered["field_{$tagsid}_-1"]);
+        $this->assertSame(['text' => '<p>Hi</p>', 'format' => 1, 'itemid' => 5], $filtered["field_{$editorid}_-1_editor"]);
+
+        // A list where one value is expected, or a value where a list is, is dropped.
+        $filtered = (array) $service->filter_data([-1], (object) [
+            "field_{$choiceid}_-1" => ['1', '2'],
+            "field_{$tagsid}_-1" => '1',
+        ]);
+        $this->assertSame([], $filtered);
     }
 
     /**

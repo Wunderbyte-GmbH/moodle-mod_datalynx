@@ -35,6 +35,16 @@ use mod_datalynx\local\field\datalynxfield_base;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class field extends datalynxfield_base {
+    /**
+     * The chosen values of the referenced instance.
+     *
+     * @param array $options
+     * @return array
+     */
+    public function get_input_contract(array $options = []): array {
+        return ['' => ['list' => PARAM_NOTAGS]];
+    }
+
     /** @var string Field type. */
     public $type = 'datalynxview';
 

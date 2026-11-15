@@ -93,8 +93,9 @@ class renderer extends datalynxfield_renderer {
             $selected = $field->default_values();
         }
 
-        // Normally we just pass integer, option for addnew.
-        $paramtype = PARAM_INT;
+        // Option numbers, or their text where the tag allows adding options; the entry submission
+        // service cleans the value by the same contract.
+        $paramtype = $field->get_input_contract($options)['']['list'];
 
         // Render as autocomplete field (param6 not empty) or select field.
         if ($autocomplete) {
@@ -107,7 +108,6 @@ class renderer extends datalynxfield_renderer {
             $format = $options['field_format'] ?? null;
             if (isset($options['addnew']) || ($format && $format->get_setting('addnew'))) {
                 $fieldattr['tags'] = true;
-                $paramtype = PARAM_NOTAGS;
             }
 
             $select = &$mform->addElement('autocomplete', $fieldname, null, $menuoptions, $fieldattr);

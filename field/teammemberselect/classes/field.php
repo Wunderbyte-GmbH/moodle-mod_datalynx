@@ -35,6 +35,16 @@ use stdClass;
  */
 class field extends datalynxfield_base {
     /**
+     * The ids of the chosen users.
+     *
+     * @param array $options
+     * @return array
+     */
+    public function get_input_contract(array $options = []): array {
+        return ['' => ['list' => PARAM_INT]];
+    }
+
+    /**
      * Empty unless a user is chosen; the form posts -999 for an empty selection.
      *
      * @param string $name

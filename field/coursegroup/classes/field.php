@@ -33,6 +33,16 @@ use stdClass;
  */
 class field extends datalynxfield_base {
     /**
+     * The course, the group chosen from it, or a group id typed in.
+     *
+     * @param array $options
+     * @return array
+     */
+    public function get_input_contract(array $options = []): array {
+        return ['course' => PARAM_INT, 'group' => PARAM_INT, 'groupid' => PARAM_TEXT];
+    }
+
+    /**
      * A course group is chosen in field_{fieldid}_{entryid}_group, or typed as an id in _groupid.
      *
      * @param string $name

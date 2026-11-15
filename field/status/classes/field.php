@@ -36,6 +36,16 @@ use mod_datalynx\local\field\datalynxfield_no_content;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class field extends datalynxfield_no_content {
+    /**
+     * The status number.
+     *
+     * @param array $options
+     * @return array
+     */
+    public function get_input_contract(array $options = []): array {
+        return ['' => PARAM_INT];
+    }
+
     /** @var string Field type. */
     public $type = 'status';
 

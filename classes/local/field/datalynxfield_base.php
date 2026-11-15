@@ -973,6 +973,88 @@ abstract class datalynxfield_base {
     }
 
     /**
+     * What a submission for this field may hold, and of which type.
+     *
+     * The keys are the content names that follow field_{fieldid}_{entryid}: '' for that element
+     * itself, 'url' for field_{fieldid}_{entryid}_url and so on. A value is a PARAM_* type for a
+     * single value, ['list' => PARAM_*] for a list of values, or ['fields' => [key => PARAM_*]] for
+     * a structure such as an editor's {text, format, itemid}.
+     *
+     * This is the one declaration of a field's input. The entry submission service cleans every
+     * submitted value by it, for the entry form and the web services alike, and drops anything it
+     * does not name; the entry form sets the same types on its elements.
+     *
+     * @param array $options the resolved render options of the tag the field is edited under; a
+     *                       few fields take a different input depending on them (e.g. addnew)
+     * @return array content name => type; empty for a field without input
+     */
+    public function get_input_contract(array $options = []): array {
+        return ['' => PARAM_NOTAGS];
+    }
+
+    /**
+     * Clean one submitted value of this field by its input contract.
+     *
+     * @param string $contentname what follows field_{fieldid}_{entryid}_ in the element name, '' for none
+     * @param mixed $value the submitted value
+     * @param array $options the resolved render options of the tag the field is edited under
+     * @return mixed the cleaned value, or null if the contract has no such input or the value
+     *               does not have its shape
+     */
+    public function clean_submitted_value(string $contentname, $value, array $options = []) {
+        $contract = $this->get_input_contract($options);
+        if (!array_key_exists($contentname, $contract)) {
+            return null;
+        }
+
+        return self::clean_by_type($contract[$contentname], $value);
+    }
+
+    /**
+     * Clean a value by one entry of an input contract.
+     *
+     * @param string|array $type a PARAM_* type, ['list' => PARAM_*] or ['fields' => [key => PARAM_*]]
+     * @param mixed $value
+     * @return mixed the cleaned value, null if the value does not have the shape of the type
+     */
+    public static function clean_by_type($type, $value) {
+        if (is_array($type) && isset($type['list'])) {
+            if (!is_array($value)) {
+                return null;
+            }
+            $clean = [];
+            foreach ($value as $key => $item) {
+                if (!is_scalar($item) && $item !== null) {
+                    return null;
+                }
+                $clean[clean_param((string) $key, PARAM_ALPHANUMEXT)] = clean_param((string) $item, $type['list']);
+            }
+            return $clean;
+        }
+        if (is_array($type) && isset($type['fields'])) {
+            if (!is_array($value)) {
+                return null;
+            }
+            $clean = [];
+            foreach ($type['fields'] as $key => $itemtype) {
+                if (!array_key_exists($key, $value)) {
+                    continue;
+                }
+                if (!is_scalar($value[$key]) && $value[$key] !== null) {
+                    return null;
+                }
+                $clean[$key] = clean_param((string) $value[$key], $itemtype);
+            }
+            return $clean;
+        }
+        if (!is_scalar($value) && $value !== null) {
+            return null;
+        }
+
+        return clean_param((string) $value, $type);
+    }
+
+    /**
      * Whether a submission leaves this field without a value, for the required check.
      *
      * The entry submission service asks this for every editable field whose behavior makes it

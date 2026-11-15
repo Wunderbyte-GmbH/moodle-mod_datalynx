@@ -33,6 +33,16 @@ use stdClass;
  */
 class field extends datalynxfield_base {
     /**
+     * No input: nothing to enter.
+     *
+     * @param array $options
+     * @return array
+     */
+    public function get_input_contract(array $options = []): array {
+        return [];
+    }
+
+    /**
      * Never empty. A fieldgroup holds no value itself; its lines are checked subfield by subfield.
      *
      * @param string $name

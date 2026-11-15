@@ -38,6 +38,16 @@ use mod_datalynx\local\rule\match_compiler;
  */
 class field extends datalynxfield_base {
     /**
+     * The duration in seconds, as the duration element exports it.
+     *
+     * @param array $options
+     * @return array
+     */
+    public function get_input_contract(array $options = []): array {
+        return ['' => PARAM_INT];
+    }
+
+    /**
      * The duration element posts {number, timeunit}; the number is the value.
      *
      * @param string $name

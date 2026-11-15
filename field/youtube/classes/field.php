@@ -31,6 +31,16 @@ use stdClass;
  * Field class for the youtube field type.
  */
 class field extends datalynxfield_base {
+    /**
+     * A video address; validate() checks it is a URL.
+     *
+     * @param array $options
+     * @return array
+     */
+    public function get_input_contract(array $options = []): array {
+        return ['' => PARAM_TEXT];
+    }
+
     /** @var string The field type. */
     public $type = 'youtube';
 

@@ -32,6 +32,16 @@ use stdClass;
  */
 class datalynxfield_option_single extends datalynxfield_option {
     /**
+     * The number of the chosen option, 0 for none.
+     *
+     * @param array $options
+     * @return array
+     */
+    public function get_input_contract(array $options = []): array {
+        return ['' => PARAM_INT];
+    }
+
+    /**
      * Empty when no option is chosen: options are numbered from 1, the "choose" entry posts 0.
      *
      * @param string $name

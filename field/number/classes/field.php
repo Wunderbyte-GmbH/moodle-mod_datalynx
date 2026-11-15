@@ -36,6 +36,16 @@ use stdClass;
  * @package datalynxfield_number
  */
 class field extends TextField {
+    /**
+     * A number as typed; validate() checks it is numeric.
+     *
+     * @param array $options
+     * @return array
+     */
+    public function get_input_contract(array $options = []): array {
+        return ['' => PARAM_RAW_TRIMMED];
+    }
+
     /** @var string The field type. */
     public $type = 'number';
 

@@ -34,6 +34,16 @@ use stdClass;
  * @package mod_datalynx
  */
 class field extends datalynxfield_no_content {
+    /**
+     * No input: nothing to enter.
+     *
+     * @param array $options
+     * @return array
+     */
+    public function get_input_contract(array $options = []): array {
+        return [];
+    }
+
     /** @var string Field type. */
     public $type = 'comment';
 

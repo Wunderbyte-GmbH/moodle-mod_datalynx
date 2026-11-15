@@ -472,6 +472,7 @@ abstract class datalynxfield_renderer {
             }
             $firstelement = count($mform->_elements);
             $this->render_edit_mode($mform, $entry, $options);
+            $this->set_input_types($mform, "field_{$this->field->id()}_{$entry->id}", $options);
             $this->name_edit_elements(array_slice($mform->_elements, $firstelement), $prefixelement);
             if (isset($options['suffix'])) {
                 $mform->addElement('html', $options['suffix']);
@@ -734,6 +735,30 @@ abstract class datalynxfield_renderer {
      */
     public function validate($entryid, $tags, $data): array {
         return [];
+    }
+
+    /**
+     * Set the types of the field's form elements from its input contract.
+     *
+     * The form then cleans the submission by the same types as the entry submission service, which
+     * cleans by the contract again for every submission, through the form or a web service.
+     *
+     * @param MoodleQuickForm $mform
+     * @param string $fieldname the element name of the value, field_{fieldid}_{entryid}
+     * @param array $options the render options the field is edited under
+     * @return void
+     */
+    protected function set_input_types(MoodleQuickForm $mform, string $fieldname, array $options): void {
+        foreach ($this->field->get_input_contract($options) as $contentname => $type) {
+            $element = $contentname === '' ? $fieldname : "{$fieldname}_{$contentname}";
+            if (is_array($type) && isset($type['fields'])) {
+                foreach ($type['fields'] as $key => $itemtype) {
+                    $mform->setType("{$element}[{$key}]", $itemtype);
+                }
+            } else {
+                $mform->setType($element, is_array($type) ? $type['list'] : $type);
+            }
+        }
     }
 
     /**

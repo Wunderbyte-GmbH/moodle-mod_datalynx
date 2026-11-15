@@ -41,6 +41,16 @@ require_once($CFG->dirroot . '/repository/lib.php');
  */
 class field extends datalynxfield_base {
     /**
+     * The editor posts its text, format and draft item as field_{fieldid}_{entryid}_editor.
+     *
+     * @param array $options
+     * @return array
+     */
+    public function get_input_contract(array $options = []): array {
+        return ['editor' => ['fields' => ['text' => PARAM_RAW, 'format' => PARAM_INT, 'itemid' => PARAM_INT]]];
+    }
+
+    /**
      * The editor posts {text, format, itemid} as field_{fieldid}_{entryid}_editor; only text counts.
      *
      * @param string $name

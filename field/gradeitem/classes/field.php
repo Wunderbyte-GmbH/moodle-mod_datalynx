@@ -33,6 +33,16 @@ use mod_datalynx\local\field\datalynxfield_base;
  */
 class field extends datalynxfield_base {
     /**
+     * No input: nothing to enter.
+     *
+     * @param array $options
+     * @return array
+     */
+    public function get_input_contract(array $options = []): array {
+        return [];
+    }
+
+    /**
      * Never empty. The grade is read from the gradebook; there is nothing to enter.
      *
      * @param string $name

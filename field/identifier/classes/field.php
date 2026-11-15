@@ -36,6 +36,16 @@ use stdClass;
  */
 class field extends datalynxfield_base {
     /**
+     * A flag that asks for an identifier to be generated.
+     *
+     * @param array $options
+     * @return array
+     */
+    public function get_input_contract(array $options = []): array {
+        return ['' => PARAM_NOTAGS];
+    }
+
+    /**
      * Never empty. The identifier is generated on save; there is nothing to enter.
      *
      * @param string $name

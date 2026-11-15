@@ -31,6 +31,27 @@ use mod_datalynx\local\field\datalynxfield_base;
  * Text field class.
  */
 class field extends datalynxfield_base {
+    /**
+     * One line of text, typed by its format setting (param4); an autocomplete takes plain text.
+     *
+     * @param array $options
+     * @return array
+     */
+    public function get_input_contract(array $options = []): array {
+        $formats = [
+            'alphanumeric' => PARAM_ALPHANUM,
+            'numeric' => PARAM_INT,
+            'email' => PARAM_EMAIL,
+            'lettersonly' => PARAM_TEXT,
+            'iban' => PARAM_TEXT,
+            'bicswift' => PARAM_TEXT,
+            'ipv4' => PARAM_TEXT,
+            'phone' => PARAM_TEXT,
+        ];
+        $default = $this->get('param9') ? PARAM_NOTAGS : PARAM_TEXT;
+        return ['' => $formats[(string) $this->get('param4')] ?? $default];
+    }
+
     /** @var string Field type */
     public $type = 'text';
 

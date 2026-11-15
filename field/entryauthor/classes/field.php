@@ -39,6 +39,17 @@ use stdClass;
  */
 class field extends datalynxfield_no_content {
     /**
+     * The id of the author; the inline profile editor takes the profile field value, which the
+     * profile field cleans when it is saved.
+     *
+     * @param array $options
+     * @return array
+     */
+    public function get_input_contract(array $options = []): array {
+        return ['' => $this->get('internalname') === 'profileeditor' ? PARAM_RAW : PARAM_INT];
+    }
+
+    /**
      * The inline profile editor writes the author's profile field once the entry is saved.
      *
      * Its value lives in the user profile, never in datalynx content. It used to be written while

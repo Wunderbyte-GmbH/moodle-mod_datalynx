@@ -37,6 +37,16 @@ use stdClass;
  * @package datalynxfield_tag
  */
 class field extends datalynxfield_option_multiple {
+    /**
+     * The names of the tags.
+     *
+     * @param array $options
+     * @return array
+     */
+    public function get_input_contract(array $options = []): array {
+        return ['' => ['list' => PARAM_TAG]];
+    }
+
     /** @var string The field type. */
     public $type = 'tag';
 

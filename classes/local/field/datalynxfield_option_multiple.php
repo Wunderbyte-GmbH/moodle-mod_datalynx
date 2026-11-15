@@ -28,6 +28,16 @@ use stdClass;
  */
 class datalynxfield_option_multiple extends datalynxfield_option {
     /**
+     * The numbers of the chosen options.
+     *
+     * @param array $options
+     * @return array
+     */
+    public function get_input_contract(array $options = []): array {
+        return ['' => ['list' => PARAM_INT]];
+    }
+
+    /**
      * Empty unless an option is chosen, the placeholders of an empty selection aside: the -999 of
      * an empty autocomplete, the unchecked boxes (''), QuickForm's submission marker.
      *

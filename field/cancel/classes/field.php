@@ -27,6 +27,16 @@ use mod_datalynx\local\field\datalynxfield_no_content;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class field extends datalynxfield_no_content {
+    /**
+     * No input: nothing to enter.
+     *
+     * @param array $options
+     * @return array
+     */
+    public function get_input_contract(array $options = []): array {
+        return [];
+    }
+
     /** @var string Field type. */
     public $type = 'cancel';
 

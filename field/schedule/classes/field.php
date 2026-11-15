@@ -50,6 +50,18 @@ use stdClass;
  */
 class field extends datalynxfield_base {
     /**
+     * The mode, and dates (timestamps), times (minutes of the day) and weekdays as numbers.
+     *
+     * @param array $options
+     * @return array
+     */
+    public function get_input_contract(array $options = []): array {
+        $numbers = array_merge(['date', 'start', 'end', 'from', 'until'], array_map(fn($day) => "day{$day}", range(1, 7)));
+        $types = array_fill_keys($numbers, PARAM_INT);
+        return ['mode' => PARAM_ALPHA] + $types;
+    }
+
+    /**
      * Empty unless the submitted parts make up a valid schedule.
      *
      * @param string $name

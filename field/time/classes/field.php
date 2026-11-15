@@ -35,6 +35,20 @@ use IntlDateFormatter;
  */
 class field extends datalynxfield_base {
     /**
+     * A timestamp; the masked selectors post their parts instead.
+     *
+     * @param array $options
+     * @return array
+     */
+    public function get_input_contract(array $options = []): array {
+        if ($this->masked) {
+            $parts = array_fill_keys(['day', 'month', 'year', 'hour', 'minute', 'enabled'], PARAM_INT);
+            return ['' => ['fields' => $parts]];
+        }
+        return ['' => PARAM_INT];
+    }
+
+    /**
      * The date selectors post a timestamp, 0 for none; the masked selectors post their parts, 0 for
      * a part not chosen.
      *

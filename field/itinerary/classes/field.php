@@ -50,6 +50,16 @@ use stdClass;
  */
 class field extends datalynxfield_base {
     /**
+     * The stops and the route as JSON, which the field parses and checks itself.
+     *
+     * @param array $options
+     * @return array
+     */
+    public function get_input_contract(array $options = []): array {
+        return ['waypoints' => PARAM_RAW, 'route' => PARAM_RAW];
+    }
+
+    /**
      * A journey is its stops, posted as JSON in field_{fieldid}_{entryid}_waypoints.
      *
      * @param string $name

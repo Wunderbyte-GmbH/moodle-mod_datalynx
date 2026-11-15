@@ -36,6 +36,18 @@ use stdClass;
  * @package datalynxfield_multiselect
  */
 class field extends datalynxfield_option_multiple {
+    /**
+     * The numbers of the chosen options; where the tag allows adding options (addnew), their text.
+     *
+     * @param array $options
+     * @return array
+     */
+    public function get_input_contract(array $options = []): array {
+        $format = $options['field_format'] ?? null;
+        $addnew = isset($options['addnew']) || ($format && $format->get_setting('addnew'));
+        return ['' => ['list' => $addnew ? PARAM_NOTAGS : PARAM_INT]];
+    }
+
     /** @var string The field type. */
     public $type = 'multiselect';
 

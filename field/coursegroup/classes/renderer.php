@@ -174,6 +174,8 @@ class renderer extends datalynxfield_renderer {
             $mform->setType("{$fieldname}_groupid", PARAM_TEXT);
             $mform->setDefault("{$fieldname}_groupid", $groupid);
         }
+        // Rendered outside prerender_edit_mode(), so the types are set from the contract here.
+        $this->set_input_types($mform, $fieldname, $options ?? []);
         $mform->addElement('html', '</div>');
     }
     // phpcs:enable moodle.PHP.ForbiddenGlobalUse.BadGlobal

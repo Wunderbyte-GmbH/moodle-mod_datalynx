@@ -103,9 +103,10 @@ final class entry_submission_service {
      * What the view's entry template lets the current user do with each of its fields in an entry.
      *
      * @param int $entryid
-     * @return array fieldid => ['field' => field, 'tags' => editable tags, 'visible' => bool,
-     *               'editable' => bool, 'required' => bool, 'subfields' => for a fieldgroup:
-     *               subfieldid => ['field', 'tag', 'editable', 'required']]
+     * @return array fieldid => ['field' => field, 'tags' => editable tags, 'options' => render
+     *               options of the first editable tag, 'visible' => bool, 'editable' => bool,
+     *               'required' => bool, 'subfields' => for a fieldgroup:
+     *               subfieldid => ['field', 'options', 'tag', 'editable', 'required']]
      */
     public function get_field_states(int $entryid): array {
         if (isset($this->states[$entryid])) {
@@ -120,11 +121,14 @@ final class entry_submission_service {
                 continue;
             }
             $field = $fields[$fieldid];
-            $state = ['field' => $field, 'tags' => [], 'visible' => false, 'editable' => false, 'required' => false];
+            $state = ['field' => $field, 'tags' => [], 'options' => [], 'visible' => false, 'editable' => false,
+                'required' => false];
             foreach ((array) $tags as $tag) {
                 [$options] = $field->renderer()->resolve_render_options($tag, $entry, ['edit' => true, 'manage' => true]);
                 $state['visible'] = $state['visible'] || $options['visible'];
                 if ($options['visible'] && $options['editable']) {
+                    // The input contract follows the tag the field is edited under.
+                    $state['options'] = $state['editable'] ? $state['options'] : $options;
                     $state['editable'] = true;
                     $state['required'] = $state['required'] || $options['required'];
                     $state['tags'][] = $tag;
@@ -144,7 +148,7 @@ final class entry_submission_service {
      *
      * @param fieldgroup_field $fieldgroup
      * @param stdClass $entry
-     * @return array subfieldid => ['field', 'tag', 'editable', 'required']
+     * @return array subfieldid => ['field', 'options', 'tag', 'editable', 'required']
      */
     private function get_subfield_states(fieldgroup_field $fieldgroup, stdClass $entry): array {
         $renderer = $fieldgroup->renderer();
@@ -154,6 +158,7 @@ final class entry_submission_service {
             $modifiers = explode('|', explode(':', $key, 2)[1] ?? '', 3);
             $states[(int) $subfield->id()] = [
                 'field' => $subfield,
+                'options' => $options,
                 // The tag the subfield's own validation reads its behavior from.
                 'tag' => '[[' . $subfield->name() . '|' . ($modifiers[1] ?? '') . '|' . ($modifiers[2] ?? '') . ']]',
                 'editable' => !empty($options['visible']) && !empty($options['editable']),
@@ -165,11 +170,15 @@ final class entry_submission_service {
     }
 
     /**
-     * Keep only the values of fields the view lets the current user edit in the submitted entries.
+     * Keep only the values of fields the view lets the current user edit in the submitted entries,
+     * cleaned by each field's input contract.
      *
      * Anything else that looks like a field value is dropped: a field the view does not show, a
      * field its behavior does not let this user edit, a subfield of a fieldgroup that is not
-     * editable, or an entry that is not part of the submission. Other keys are kept.
+     * editable, an entry that is not part of the submission, an input the field's contract does
+     * not name or a value without the shape it declares
+     * ({@see \mod_datalynx\local\field\datalynxfield_base::get_input_contract()}). Other keys
+     * are kept.
      *
      * @param int[] $entryids
      * @param stdClass $data
@@ -179,12 +188,19 @@ final class entry_submission_service {
         $entryids = self::expand_entry_ids($entryids);
         $filtered = new stdClass();
         foreach ((array) $data as $name => $value) {
-            if (strpos((string) $name, 'field_') !== 0) {
+            $name = (string) $name;
+            if (strpos($name, 'field_') !== 0) {
                 $filtered->$name = $value;
                 continue;
             }
-            if ($this->is_editable_element((string) $name, $entryids)) {
-                $filtered->$name = $value;
+            $input = $this->get_editable_input($name, $entryids);
+            if ($input === null) {
+                continue;
+            }
+            [$field, $contentname, $options] = $input;
+            $clean = $field->clean_submitted_value($contentname, $value, $options);
+            if ($clean !== null) {
+                $filtered->$name = $clean;
             }
         }
 
@@ -192,29 +208,40 @@ final class entry_submission_service {
     }
 
     /**
-     * Whether a submitted element belongs to a field the current user may edit.
+     * The field a submitted element is an input of, if the current user may edit it.
      *
      * @param string $name element name
      * @param int[] $entryids the entries of the submission
-     * @return bool
+     * @return array|null [$field, $contentname, $options]: the field, the content name that
+     *                    follows its element name ('' for none) and the render options it is
+     *                    edited under; null if the element is not an editable input
      */
-    private function is_editable_element(string $name, array $entryids): bool {
+    private function get_editable_input(string $name, array $entryids): ?array {
         if (!preg_match(self::ELEMENT_REGEX, $name, $matches)) {
-            return false;
+            return null;
         }
         [, $fieldid, $entryid] = $matches;
         $rest = $matches[3] ?? '';
         if (!in_array((int) $entryid, array_map('intval', $entryids), true)) {
-            return false;
+            return null;
         }
 
         $states = $this->get_field_states((int) $entryid);
         if (preg_match(self::LINE_REGEX, $rest, $line)) {
             $group = $states[$line[1]] ?? null;
-            return $group && $group['editable'] && !empty($group['subfields'][(int) $fieldid]['editable']);
+            $substate = $group['subfields'][(int) $fieldid] ?? null;
+            if (!$group || !$group['editable'] || !$substate || !$substate['editable']) {
+                return null;
+            }
+            return [$substate['field'], ltrim(substr($rest, strlen($line[0])), '_'), $substate['options']];
         }
 
-        return !empty($states[$fieldid]['editable']);
+        $state = $states[$fieldid] ?? null;
+        if (!$state || !$state['editable']) {
+            return null;
+        }
+
+        return [$state['field'], $rest, $state['options']];
     }
 
     /**

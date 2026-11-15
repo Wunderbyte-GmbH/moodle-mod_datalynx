@@ -99,11 +99,11 @@ class renderer extends datalynxfield_renderer {
         if ($autocomplete) {  // Render as autocomplete field if param9 is not empty.
             $fieldattr['tags'] = true;
             $mform->addElement('autocomplete', $fieldname, null, $menu, $fieldattr);
-            $mform->setType($fieldname, PARAM_NOTAGS);
         } else {
             $mform->addElement('text', $fieldname, null, $fieldattr);
-            $mform->setType($fieldname, PARAM_TEXT);
         }
+        // The type the entry submission service cleans the value by, too.
+        $mform->setType($fieldname, $field->get_input_contract($options)['']);
         $mform->setDefault($fieldname, $content);
         if ($required) {
             $mform->addRule($fieldname, null, 'required', null, 'client');
@@ -151,25 +151,6 @@ class renderer extends datalynxfield_renderer {
                 );
             } else {
                 $mform->addRule($fieldname, null, $format, null, 'client');
-            }
-            // Adjust type.
-            switch ($format) {
-                case 'alphanumeric':
-                    $mform->setType($fieldname, PARAM_ALPHANUM);
-                    break;
-                case 'lettersonly':
-                case 'iban':
-                case 'bicswift':
-                case 'ipv4':
-                case 'phone':
-                    $mform->setType($fieldname, PARAM_TEXT); // Use PARAM_TEXT to allow symbols/spaces.
-                    break;
-                case 'numeric':
-                    $mform->setType($fieldname, PARAM_INT);
-                    break;
-                case 'email':
-                    $mform->setType($fieldname, PARAM_EMAIL);
-                    break;
             }
         }
         // Length rule.

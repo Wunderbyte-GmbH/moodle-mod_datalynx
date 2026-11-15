@@ -28,6 +28,16 @@ use stdClass;
  */
 class field extends datalynxfield_base {
     /**
+     * An address and its coordinates; empty coordinates stay empty.
+     *
+     * @param array $options
+     * @return array
+     */
+    public function get_input_contract(array $options = []): array {
+        return ['address' => PARAM_TEXT, 'lat' => PARAM_RAW_TRIMMED, 'lng' => PARAM_RAW_TRIMMED];
+    }
+
+    /**
      * A location is its address, posted as field_{fieldid}_{entryid}_address.
      *
      * @param string $name

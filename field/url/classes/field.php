@@ -33,6 +33,16 @@ use stdClass;
  */
 class field extends datalynxfield_base {
     /**
+     * An address and an optional link text.
+     *
+     * @param array $options
+     * @return array
+     */
+    public function get_input_contract(array $options = []): array {
+        return ['url' => PARAM_URL, 'alt' => PARAM_TEXT];
+    }
+
+    /**
      * The address is posted as field_{fieldid}_{entryid}_url; the link text alone is no value.
      *
      * @param string $name

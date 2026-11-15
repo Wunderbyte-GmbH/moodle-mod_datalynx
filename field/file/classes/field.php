@@ -39,6 +39,16 @@ require_once("$CFG->dirroot/lib/resourcelib.php");
  */
 class field extends datalynxfield_base {
     /**
+     * The draft area of the current user that holds the files.
+     *
+     * @param array $options
+     * @return array
+     */
+    public function get_input_contract(array $options = []): array {
+        return ['filemanager' => PARAM_INT];
+    }
+
+    /**
      * Files arrive in a draft area of the current user, posted as field_{fieldid}_{entryid}_filemanager.
      *
      * @param string $name

@@ -40,6 +40,16 @@ require_once($CFG->dirroot . '/mod/datalynx/field/datalynxfield_no_content_can_j
  */
 class field extends datalynxfield_no_content_can_join {
     /**
+     * No input: nothing to enter.
+     *
+     * @param array $options
+     * @return array
+     */
+    public function get_input_contract(array $options = []): array {
+        return [];
+    }
+
+    /**
      * Never empty. The value is read from the profiles of the team members; there is nothing to enter.
      *
      * @param string $name
