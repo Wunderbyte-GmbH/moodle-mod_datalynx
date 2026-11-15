@@ -1367,7 +1367,97 @@ function xmldb_datalynx_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2026111500, 'datalynx');
     }
 
+    if ($oldversion < 2026111501) {
+        // File and picture field criteria follow the standard [not, operator, value] pattern:
+        // "empty" means no file, NOT empty a file (#303).
+        mod_datalynx_upgrade_file_search_criteria();
+
+        upgrade_mod_savepoint(true, 2026111501, 'datalynx');
+    }
+
     return true;
+}
+
+/**
+ * Rewrite stored search criteria of file and picture fields to the standard pattern (2026111501).
+ *
+ * Until now the file field read only the value of a criterion: 1 meant "has no file", anything
+ * else "has a file", whatever the negation and operator said. It now reads the criterion like
+ * every field: the operator '' (empty) finds entries without a file, NOT empty those with one.
+ * Saved filters, rule conditions and legacy single-condition notification rules are rewritten
+ * so that each keeps finding what it found before.
+ *
+ * @return void
+ */
+function mod_datalynx_upgrade_file_search_criteria(): void {
+    global $DB;
+
+    [$insql, $params] = $DB->get_in_or_equal(['file', 'picture']);
+    $fileids = array_flip(array_map('intval', $DB->get_fieldset_select('datalynx_fields', 'id', "type $insql", $params)));
+    if (!$fileids) {
+        return;
+    }
+
+    $filters = $DB->get_recordset_select(
+        'datalynx_filters',
+        "customsearch IS NOT NULL AND customsearch <> ''",
+        null,
+        'id',
+        'id, customsearch'
+    );
+    foreach ($filters as $filter) {
+        $search = unserialize($filter->customsearch, ['allowed_classes' => false]);
+        if (is_array($search) && ($converted = mod_datalynx_upgrade_convert_file_criteria($search, $fileids)) !== null) {
+            $DB->set_field('datalynx_filters', 'customsearch', serialize($converted), ['id' => $filter->id]);
+        }
+    }
+    $filters->close();
+
+    $rules = $DB->get_recordset('datalynx_rules', null, 'id', 'id, type, param5, param9, param10');
+    foreach ($rules as $rule) {
+        if ($rule->param9 !== null && $rule->param9 !== '') {
+            $search = json_decode($rule->param9, true);
+            if (is_array($search) && ($converted = mod_datalynx_upgrade_convert_file_criteria($search, $fileids)) !== null) {
+                $DB->set_field('datalynx_rules', 'param9', json_encode($converted), ['id' => $rule->id]);
+            }
+        } else if ($rule->type === 'eventnotification' && isset($fileids[(int) $rule->param5])) {
+            // A notification rule not saved since conditions moved to param9: its one condition is
+            // built from param5 and param10 at run time, so it is stored in param9 instead.
+            $search = [(int) $rule->param5 => ['AND' => [['', '', (string) $rule->param10]]]];
+            $converted = mod_datalynx_upgrade_convert_file_criteria($search, $fileids);
+            $DB->set_field('datalynx_rules', 'param9', json_encode($converted), ['id' => $rule->id]);
+        }
+    }
+    $rules->close();
+}
+
+/**
+ * Convert the file and picture field criteria of one customsearch to the standard pattern.
+ *
+ * @param array $search customsearch aggregated by field id
+ * @param array $fileids ids of file and picture fields, as keys
+ * @return array|null the converted customsearch, null if it has no file criteria
+ */
+function mod_datalynx_upgrade_convert_file_criteria(array $search, array $fileids): ?array {
+    $changed = false;
+    foreach ($search as $fieldid => $conjunctions) {
+        if (!is_numeric($fieldid) || !isset($fileids[(int) $fieldid]) || !is_array($conjunctions)) {
+            continue;
+        }
+        foreach ($conjunctions as $andor => $criteria) {
+            if (!is_array($criteria)) {
+                continue;
+            }
+            foreach ($criteria as $key => $criterion) {
+                $value = is_array($criterion) ? ($criterion[2] ?? '') : '';
+                $nofile = is_scalar($value) && (int) $value === 1;
+                $search[$fieldid][$andor][$key] = $nofile ? ['', '', ''] : ['NOT', '', ''];
+                $changed = true;
+            }
+        }
+    }
+
+    return $changed ? $search : null;
 }
 
 /**

@@ -326,55 +326,30 @@ class field extends datalynxfield_base {
     }
 
     /**
-     * Parses the submitted "has a file / has not a file" selector for this field.
+     * The only search a file field offers: whether it is empty, i.e. holds no file.
      *
-     * The selector value (0 = has a file, 1 = has not a file) may legitimately be 0, so it is read
-     * with isset() rather than the base !empty() check. The "choose" sentinel (-1) and an empty
-     * value mean "no filter".
+     * Negated with NOT, as for every field, it finds the entries that have a file.
      *
-     * @param object $formdata The submitted form data.
-     * @param int    $i        The search field index.
-     * @return mixed The parsed selector value, or false when no filter is set.
+     * @return array
      */
-    public function parse_search($formdata, $i) {
-        $fieldid = $this->field->id;
-        $key = "f_{$i}_$fieldid";
-        if (!isset($formdata->$key)) {
-            return false;
-        }
-        $value = $formdata->$key;
-        if ($value === '' || (int) $value === -1) {
-            return false;
-        }
-        return $value;
+    public function get_supported_search_operators(): array {
+        return ['' => get_string('empty', 'datalynx')];
     }
 
     /**
-     *
      * {@inheritDoc}
      * @see datalynxfield_base::get_search_sql()
      *
-     * The exists/missing selector is authoritative: value 0 means "has a file" (content column
-     * equals 1), value 1 means "has not a file" (entries without a file). The incoming not/operator
-     * are ignored because the selector alone drives the comparison.
+     * The field's content is '1' while it holds a file and '0' (or no content at all) once it holds
+     * none, so "empty" means "content is not 1", not the base "no content". NOT finds the entries
+     * that have a file.
      *
-     * @param array $search Search parameters array with [not, operator, value].
+     * @param array $search [not, operator, value]; the operator is '' (empty) and no value is used
      * @return array SQL fragments array.
      */
     public function get_search_sql(array $search): array {
-        [, , $value] = $search;
-        // Value 1 = "has not a file" -> negate the "content equals 1" match; 0 = "has a file".
-        $not = ((int) $value === 1) ? 'NOT' : '';
-        return parent::get_search_sql([$not, '=', '1']);
-    }
-
-    /**
-     * The custom filter's has-file selector, which get_search_sql() reads from the value alone.
-     *
-     * @return string[]
-     */
-    public function get_accepted_search_operators(): array {
-        return [''];
+        [$not] = $search;
+        return parent::get_search_sql([$not ? '' : 'NOT', '=', '1']);
     }
 
     /**

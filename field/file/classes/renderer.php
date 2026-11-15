@@ -149,32 +149,35 @@ class renderer extends datalynxfield_renderer {
     }
 
     /**
-     * Renders the search mode form elements for this field.
+     * The search element of a file field.
+     *
+     * In a view filter or a rule condition the criterion is "is empty" or "not empty", set with
+     * the is/not control every field row has; there is no value to enter. A custom filter has no
+     * is/not control, so it offers both states as one choice, which the filter manager turns
+     * into the same criterion.
      *
      * @param MoodleQuickForm $mform
      * @param int $i
      * @param string $value
-     * @return array
+     * @return array [elements, separators]
      */
     public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = ''): array {
-        $fieldid = $this->field->id();
-        $fieldname = "f_{$i}_$fieldid";
+        $fieldname = "f_{$i}_{$this->field->id()}";
 
-        // The exists/missing selector is the sole control, so it is used in every filter form.
+        if ($mform->_formName !== 'mod_datalynx_form_datalynx_customfilter_frontend_form') {
+            return [[$mform->createElement('static', $fieldname, '', get_string('empty', 'datalynx'))], null];
+        }
+
         $options = [
-                -1 => get_string('choose'),
-                0 => get_string('fileexist', 'datalynx'),
-                1 => get_string('filemissing', 'datalynx'),
+            -1 => get_string('choose'),
+            0 => get_string('fileexist', 'datalynx'),
+            1 => get_string('filemissing', 'datalynx'),
         ];
-        $arr = [];
-        $arr[] = $mform->createElement('select', $fieldname, '', $options);
+        $element = $mform->createElement('select', $fieldname, '', $options);
         $mform->setType($fieldname, PARAM_INT);
         $mform->setDefault($fieldname, $value === '' ? -1 : $value);
-        // The selector replaces the generic not/operator inputs; disable them where they exist.
-        $mform->disabledIf("searchnot$i", $fieldname, 'neq', 2);
-        $mform->disabledIf("searchoperator$i", $fieldname, 'neq', 2);
 
-        return [$arr, null];
+        return [[$element], null];
     }
 
     /**

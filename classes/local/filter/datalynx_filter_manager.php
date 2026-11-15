@@ -15,6 +15,7 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 namespace mod_datalynx\local\filter;
+use datalynxfield_file\field as file_field;
 use html_table;
 use html_writer;
 use mod_datalynx\form\datalynx_customfilter_frontend_form;
@@ -553,11 +554,13 @@ class datalynx_filter_manager {
                                 if ($value) {
                                     $searchfields[$fieldname]['AND'][] = ['', $operator, $value];
                                 }
-                            } else if ($type == "file") {
-                                if ($value == '0') {
-                                    $searchfields[$fieldname]['AND'][] = ['', '', false];
-                                } else if ($value == '1') {
-                                    $searchfields[$fieldname]['AND'][] = ['NOT', '', false];
+                            } else if ($fields[$fieldname] instanceof file_field) {
+                                // File and picture fields: the choice "exists" (0) or "missing" (1)
+                                // is the criterion "not empty" or "empty", as a view filter writes it.
+                                if ((string) $value === '0') {
+                                    $searchfields[$fieldname]['AND'][] = ['NOT', '', ''];
+                                } else if ((string) $value === '1') {
+                                    $searchfields[$fieldname]['AND'][] = ['', '', ''];
                                 }
                             } else {
                                 // Analog to advanced filter form:

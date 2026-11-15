@@ -11,6 +11,13 @@ mod_datalynx changes
   refused with an invalid parameter error instead of being passed to the filter
   or silently ignored. A view that forces its filter ignores a client's filter
   id, search and criteria in these services, as the app service already did.
+- Fix (#303): the custom filter choice "missing" on a file or picture field
+  found the entries that have a file. File and picture fields are now searched
+  like every other field: the operator "empty" finds the entries without a
+  file, NOT empty those with one. View filters and rule conditions show the
+  usual is/not control for them; custom filters keep the exists/missing choice.
+  The upgrade rewrites stored file criteria so that every saved filter and rule
+  keeps finding what it found before.
 - Fix: custom filters no longer put their "any of / all of" toggle among the
   selected options of multiple-choice fields.
 - Fix: field values of "0" are shown in the AJAX grid, tabular and CSV views

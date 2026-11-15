@@ -105,7 +105,8 @@ final class field_filter_capabilities_test extends advanced_testcase {
     }
 
     /**
-     * The file field's "has a file / has not a file" selector returns the correct entries.
+     * A file field is searched like any field: "empty" finds the entries without a file, NOT empty
+     * those with one (#303).
      */
     public function test_file_has_file_search(): void {
         global $DB, $USER;
@@ -117,40 +118,41 @@ final class field_filter_capabilities_test extends advanced_testcase {
         $fileid = $this->create_field($dlx->id(), 'file', 'FileField', ['param2' => '2']);
         $dlx->get_fields(null, false, true);
 
-        // Entry with a file: content column holds '1'. Entry without a file: holds '0'.
+        // Entry with a file: content column holds '1'. Entry whose file was removed: holds '0'.
         $withfile = $this->create_entry($dlx->id(), $USER->id);
         $DB->insert_record('datalynx_contents', (object) [
             'fieldid' => $fileid, 'entryid' => $withfile, 'content' => '1',
         ]);
-        $withoutfile = $this->create_entry($dlx->id(), $USER->id);
+        $removedfile = $this->create_entry($dlx->id(), $USER->id);
         $DB->insert_record('datalynx_contents', (object) [
-            'fieldid' => $fileid, 'entryid' => $withoutfile, 'content' => '0',
+            'fieldid' => $fileid, 'entryid' => $removedfile, 'content' => '0',
         ]);
+        // Entry that never had a file: no content row at all.
+        $neverfile = $this->create_entry($dlx->id(), $USER->id);
 
-        // Has a file => selector value 0.
-        $hasfile = $this->run_file_search($dlx, $fileid, '0');
-        $this->assertEquals([$withfile], array_keys($hasfile));
-
-        // Has not a file => selector value 1.
-        $nofile = $this->run_file_search($dlx, $fileid, '1');
-        $this->assertEquals([$withoutfile], array_keys($nofile));
+        $operators = $dlx->get_field_from_id($fileid)->get_supported_search_operators();
+        $this->assertSame(['' => get_string('empty', 'datalynx')], $operators);
+        $this->assertEquals([$withfile], array_keys($this->run_file_search($dlx, $fileid, ['NOT', '', ''])));
+        $this->assertEqualsCanonicalizing(
+            [$removedfile, $neverfile],
+            array_keys($this->run_file_search($dlx, $fileid, ['', '', '']))
+        );
     }
 
     /**
-     * Build a filter that searches the file field for the given selector value and return its entries.
+     * Build a filter with one file field criterion and return its entries.
      *
      * @param datalynx $dlx The datalynx instance.
      * @param int $fileid The file field id.
-     * @param string $selectorvalue '0' = has a file, '1' = has not a file.
+     * @param array $criterion [not, operator, value]
      * @return array entryid => entry.
      */
-    private function run_file_search(datalynx $dlx, int $fileid, string $selectorvalue): array {
+    private function run_file_search(datalynx $dlx, int $fileid, array $criterion): array {
         global $DB;
-        // The file field's operator select is empty/disabled, so the stored operator is ''.
-        $customsearch = [$fileid => ['AND' => [['', '', $selectorvalue]]]];
+        $customsearch = [$fileid => ['AND' => [$criterion]]];
         $filterid = (int) $DB->insert_record('datalynx_filters', (object) [
             'dataid' => $dlx->id(),
-            'name' => 'FileFilter' . $selectorvalue,
+            'name' => 'FileFilter' . $criterion[0],
             'description' => '',
             'customsort' => '',
             'customsearch' => serialize($customsearch),
@@ -164,7 +166,7 @@ final class field_filter_capabilities_test extends advanced_testcase {
         $filter = new datalynx_filter($DB->get_record('datalynx_filters', ['id' => $filterid]));
         $filter->contentfields = [$fileid];
         $entriesclass = new datalynx_entries($dlx, $filter);
-        return $entriesclass->get_entries()->entries;
+        return $entriesclass->get_entries()->entries ?? [];
     }
 
     /**
