@@ -28,11 +28,22 @@ namespace datalynxfield_entryteammemberprofilefield;
 
 use mod_datalynx\local\field\datalynxfield_renderer;
 use MoodleQuickForm;
+use stdClass;
 
 /**
  * Renderer for the entryteammemberprofilefield field type.
  */
 class renderer extends datalynxfield_renderer {
+    /**
+     * Nothing to enter: the value is read from the profiles of the entry's team members.
+     *
+     * @param MoodleQuickForm $mform
+     * @param stdClass $entry
+     * @param array $options
+     */
+    public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options): void {
+    }
+
     /**
      * Renders the search mode form elements for this field.
      *

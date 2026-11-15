@@ -99,6 +99,51 @@ abstract class datalynxfield_renderer {
     }
 
     /**
+     * What a field tag means for an entry: whether the field is visible, editable and required,
+     * and the behavior and field layout the tag names.
+     *
+     * This is the one place that decides it, from the behavior alone (its permissions, availability
+     * conditions and required flag), the final-submission lock and the single-choice lock. The HTML
+     * rendering ({@see replacements()}) and the entry submission service
+     * ({@see \mod_datalynx\local\entry\entry_submission_service}) both read it, so what a user may
+     * see or change cannot differ between the web form and a web service.
+     *
+     * @param string $tag the field tag, e.g. [[name|behavior|layout]] or [[name:format]]
+     * @param stdClass|null $entry the entry; an object without id for a new entry
+     * @param array|null $options render options to start from, e.g. ['edit' => true]
+     * @return array [$options, $behavior, $layout]: the options with visible, editable, required and
+     *               internal set, the datalynxfield_behavior and the datalynxfield_layout of the tag
+     */
+    public function resolve_render_options(string $tag, ?stdClass $entry, ?array $options = null): array {
+        $options = array_merge(self::$defaultoptions, $options ?? []);
+        $entry ??= new stdClass();
+        [$fieldname, $behavior, $layout] = $this->process_tag($tag);
+
+        $splitfieldname = explode(':', (string) $fieldname);
+        if (isset($splitfieldname[1])) {
+            $format = \mod_datalynx\local\field_format\manager::get_format_by_name(
+                $this->field->dlx()->id(),
+                $splitfieldname[1]
+            );
+            if ($format && $format->get_fieldtype() === $this->field->type) {
+                $options['field_format'] = $format;
+            } else {
+                $options[$splitfieldname[1]] = true;
+            }
+        }
+
+        // Availability conditions (based on other fields' values) gate visibility and editability:
+        // when not met the field is hidden in both view and edit mode, and cannot be required.
+        $conditionsmet = $behavior->passes_conditions($entry);
+        $options['visible'] = $behavior->is_visible_to_user($entry) && $conditionsmet;
+        $options['editable'] = $this->behavior_allows_edit($behavior, $entry, $conditionsmet);
+        $options['required'] = $behavior->is_required() && $conditionsmet;
+        $options['internal'] = $this->field->is_internal();
+
+        return [$options, $behavior, $layout];
+    }
+
+    /**
      * Returns array of replacements for the field patterns
      * The label pattern should always be first where applicable
      * so that it is processed first in view templates
@@ -111,33 +156,8 @@ abstract class datalynxfield_renderer {
      */
     public function replacements(?array $tags = null, ?stdClass $entry = null, ?array $options = null): ?array {
         $replacements = [];
-        foreach ($tags as $tag) {
-            $currentoptions = array_merge(self::$defaultoptions, $options);
-            [$fieldname, $behavior, $renderer] = $this->process_tag($tag);
-            // Variable $field datalynxfield_base
-            // Variable $behavior datalynx_field_behavior
-            // Variable $renderer datalynx_field_renderer.
-
-            $splitfieldname = explode(':', $fieldname);
-            if (isset($splitfieldname[1])) {
-                $format = \mod_datalynx\local\field_format\manager::get_format_by_name(
-                    $this->field->dlx()->id(),
-                    $splitfieldname[1]
-                );
-                if ($format && $format->get_fieldtype() === $this->field->type) {
-                    $currentoptions['field_format'] = $format;
-                } else {
-                    $currentoptions[$splitfieldname[1]] = true;
-                }
-            }
-
-            // Availability conditions (based on other fields' values) gate visibility and editability:
-            // when not met the field is hidden in both view and edit mode, and cannot be required.
-            $conditionsmet = $behavior->passes_conditions($entry);
-            $currentoptions['visible'] = $behavior->is_visible_to_user($entry) && $conditionsmet;
-            $currentoptions['editable'] = $this->behavior_allows_edit($behavior, $entry, $conditionsmet);
-            $currentoptions['required'] = $behavior->is_required() && $conditionsmet;
-            $currentoptions['internal'] = $this->field->is_internal();
+        foreach ($tags ?? [] as $tag) {
+            [$currentoptions, , $renderer] = $this->resolve_render_options($tag, $entry, $options);
 
             if (!$currentoptions['visible']) {
                 // NOT VISIBLE ===.
@@ -638,22 +658,19 @@ abstract class datalynxfield_renderer {
      */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options): void {
         $fieldid = $this->field->id();
-
-        $fieldname = "f_{$entry->id}_$fieldid";
+        // The element name every field uses and process_entries() reads back.
+        $fieldname = "field_{$fieldid}_{$entry->id}";
 
         $content = '';
         if ($entry->id > 0 && !empty($entry->{"c{$fieldid}_content"})) {
             $content = $entry->{"c{$fieldid}_content"};
         }
 
-        $arr = [];
-        $arr[] = &$mform->createElement(
-            'text',
-            $fieldname,
-            null,
-            ['size' => '32', 'disabled' => ($options['disabled'] ? 'disabled' : null),
-            ]
-        );
+        $attributes = ['size' => '32'];
+        if (!empty($options['disabled'])) {
+            $attributes['disabled'] = 'disabled';
+        }
+        $mform->addElement('text', $fieldname, null, $attributes);
         $mform->setType($fieldname, PARAM_NOTAGS);
         $mform->setDefault($fieldname, $content);
     }

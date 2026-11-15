@@ -124,6 +124,38 @@ trait mobile_test_trait {
     }
 
     /**
+     * Add a behavior.
+     *
+     * @param datalynx $dlx
+     * @param string $name the name field tags refer to, as in [[field|name]]
+     * @param array $settings form values of the behavior form: visibletopermission, editableby,
+     *                        editable, required, editableafterfinal, conditions
+     * @return int behavior id
+     */
+    private function add_mobile_behavior(datalynx $dlx, string $name, array $settings = []): int {
+        global $DB;
+
+        $record = \mod_datalynx\local\field\datalynxfield_behavior::form_to_db((object) ($settings + [
+            'id' => 0,
+            'd' => $dlx->id(),
+            'name' => $name,
+            'description' => '',
+            'visibletopermission' => [datalynx::PERMISSION_MANAGER, datalynx::PERMISSION_TEACHER,
+                datalynx::PERMISSION_STUDENT, datalynx::PERMISSION_AUTHOR],
+            'visibletouser' => [],
+            'visibletoteammember' => [],
+            'editableby' => [datalynx::PERMISSION_MANAGER, datalynx::PERMISSION_TEACHER,
+                datalynx::PERMISSION_AUTHOR],
+            'editable' => 1,
+            'required' => 0,
+            'editableafterfinal' => 0,
+            'conditions' => ['match' => 'all', 'rules' => []],
+        ]));
+
+        return (int) $DB->insert_record('datalynx_behaviors', $record);
+    }
+
+    /**
      * Add an approved entry.
      *
      * @param datalynx $dlx
