@@ -285,6 +285,9 @@ class datalynx_entries {
                 // Content (including ratings and comments if required).
                 $whatcontent;
         $count = ' COUNT(e.id) ';
+        // The search joins content rows: one per matching field, and one per fieldgroup line.
+        // Count each entry once, like the SELECT DISTINCT of the entries themselves (#293).
+        $searchcountsql = ' COUNT(DISTINCT e.id) ';
         $tables = ' {datalynx_entries} e
                     JOIN {user} u ON u.id = e.userid
                     LEFT JOIN {groups} g ON g.id = e.groupid ';
@@ -311,7 +314,7 @@ class datalynx_entries {
         // Total number of entries the user is authorized to view (without additional filtering).
         $sqlmax = "SELECT $count FROM $tables WHERE $wheredfid $whereoptions $whereuser $wheregroup $whereapprove $wherestatus";
         // Number of entries in this particular view call (with filtering).
-        $sqlcount = "SELECT $count FROM $fromsql WHERE $wheresql";
+        $sqlcount = "SELECT $searchcountsql FROM $fromsql WHERE $wheresql";
         // Base params + search params.
         $baseparams = [];
         foreach ($params as $paramset) {
