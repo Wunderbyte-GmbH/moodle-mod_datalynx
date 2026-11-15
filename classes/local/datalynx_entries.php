@@ -244,7 +244,7 @@ class datalynx_entries {
                         SQL_PARAMS_NAMED,
                         'groups'
                     );
-                    $whereuser .= " AND e.userid $ingroups ";
+                    $wheregroup .= " AND e.groupid $ingroups ";
                     $params = array_merge($params, ['groups' => $groupparams]);
                 }
             }
