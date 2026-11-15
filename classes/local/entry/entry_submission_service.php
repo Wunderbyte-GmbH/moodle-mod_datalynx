@@ -125,6 +125,12 @@ final class entry_submission_service {
                 'required' => false];
             foreach ((array) $tags as $tag) {
                 [$options] = $field->renderer()->resolve_render_options($tag, $entry, ['edit' => true, 'manage' => true]);
+                // Internal fields (status, approval, author, group) have no behaviors; a tag of
+                // theirs is an input only where its renderer says so, e.g. ##author:edit## but not
+                // ##author:name##, and only for users who may change the value.
+                if ($field->is_internal()) {
+                    $options['editable'] = $field->renderer()->accepts_input($tag, $entry);
+                }
                 $state['visible'] = $state['visible'] || $options['visible'];
                 if ($options['visible'] && $options['editable']) {
                     // The input contract follows the tag the field is edited under.
@@ -373,9 +379,11 @@ final class entry_submission_service {
         $entries = $this->view->get_entries_manager();
         $update = $isnew ? (string) $entryids[0] : implode(',', $entryids);
         $processed = $entries->process_entries('update', $update, $data, true);
+        // With no entry the user may change, the ids come back as ''.
+        $savedids = is_array($processed[1] ?? null) ? array_map('intval', $processed[1]) : [];
 
         // What fields keep outside the entry's contents, e.g. a profile field of the author.
-        if (!empty($processed[1])) {
+        if ($savedids) {
             foreach (self::expand_entry_ids($entryids) as $entryid) {
                 foreach ($this->get_field_states($entryid) as $state) {
                     if ($state['editable']) {
@@ -386,7 +394,7 @@ final class entry_submission_service {
         }
 
         return [
-            'entryids' => array_map('intval', $processed[1] ?? []),
+            'entryids' => $savedids,
             'errors' => [],
             'message' => (string) ($processed[0] ?? ''),
         ];

@@ -34,6 +34,23 @@ use stdClass;
  */
 class renderer extends datalynxfield_renderer {
     /**
+     * The status switch takes input unless the entry is final and the user may not change that.
+     *
+     * @param string $tag
+     * @param stdClass $entry
+     * @return bool
+     */
+    public function accepts_input(string $tag, stdClass $entry): bool {
+        if (trim($tag, '@') !== '##status##') {
+            return false;
+        }
+        $final = !empty($entry->id) && $entry->id > 0 && isset($entry->status)
+            && (int) $entry->status === field::STATUS_FINAL_SUBMISSION;
+
+        return !$final || has_capability('mod/datalynx:editfinalsubmission', $this->field->dlx()->context);
+    }
+
+    /**
      * Performs replacements of supported patterns depending on the given parameters
      *
      * @param ?array $tags unused

@@ -2703,17 +2703,8 @@ class datalynx {
     public function user_num_entries($perinterval = false): int {
         global $USER, $DB;
 
-        static $numentries = null;
-        static $numentriesintervaled = null;
-
-        if (!$perinterval && !is_null($numentries)) {
-            return $numentries;
-        }
-
-        if ($perinterval && !is_null($numentriesintervaled)) {
-            return $numentriesintervaled;
-        }
-
+        // Not cached: a request may count for several instances or users, and must see an entry
+        // it has just added.
         $params = [];
         $params['dataid'] = $this->id();
 
@@ -2746,15 +2737,7 @@ class datalynx {
         $sql = "SELECT COUNT(*)
                 FROM {datalynx_entries}
                 WHERE dataid = :dataid $andwhereuserorgroup $andwhereinterval";
-        $entriescount = $DB->count_records_sql($sql, $params);
-
-        if (!$perinterval) {
-            $numentries = $entriescount;
-        } else {
-            $numentriesintervaled = $entriescount;
-        }
-
-        return $entriescount;
+        return $DB->count_records_sql($sql, $params);
     }
 
     /**

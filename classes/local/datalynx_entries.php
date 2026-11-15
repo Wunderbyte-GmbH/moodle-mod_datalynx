@@ -782,12 +782,12 @@ class datalynx_entries {
                             ];
 
                             $skipnotification = [];
-                            $drafttofinal = [];
 
                             // Iterate the data and extract entry and fields content.
                             foreach ($data as $name => $value) {
-                                // Assuming only field names contain field_.
-                                if (strpos($name, 'field_') !== false) {
+                                // Field values are named field_{fieldid}_{entryid}[...]; a key that only
+                                // contains "field_" somewhere is not one.
+                                if (strpos((string) $name, 'field_') === 0) {
                                     // If we don't see the iterator we are backwards compatible and fill with null.
                                     [, $fieldid, $entryid, $iterator] = array_pad(explode('_', $name, 4), 4, null);
 
@@ -806,7 +806,7 @@ class datalynx_entries {
                                         continue;
                                     }
                                     // Entry info.
-                                    if (in_array($fieldid, $entryinfo)) {
+                                    if (in_array($fieldid, $entryinfo, true)) {
                                         // TODO: MDL-66151.
                                         if (
                                                 $fieldid == datalynxfield_entryauthor::_USERID ||
@@ -821,14 +821,6 @@ class datalynx_entries {
                                                 $value == datalynxfield_status::STATUS_DRAFT
                                         ) {
                                             $skipnotification[] = $entryid;
-                                        }
-                                        if (
-                                                $fieldid == datalynxfield_status::_STATUS &&
-                                                $value == datalynxfield_status::STATUS_FINAL_SUBMISSION &&
-                                                isset($entry->status) &&
-                                                $entry->status == datalynxfield_status::STATUS_DRAFT
-                                        ) {
-                                            $drafttofinal[] = $entryid;
                                         }
 
                                         $contents[$entryid]['info'][$entryvar] = $value;

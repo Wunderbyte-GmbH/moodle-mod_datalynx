@@ -136,7 +136,8 @@ final class entry_submission_service_test extends advanced_testcase {
         ]);
         $this->assertSame('alert(1)Text', $filtered[$this->name('Title', -1)]);
         $this->assertSame(2, $filtered["field_{$choiceid}_-1"]);
-        $this->assertSame([1, 0, -999], $filtered["field_{$tagsid}_-1"]);
+        // Only options the field has: no injected text, no placeholder of an empty selection.
+        $this->assertSame([0 => 1], $filtered["field_{$tagsid}_-1"]);
         $this->assertSame(['text' => '<p>Hi</p>', 'format' => 1, 'itemid' => 5], $filtered["field_{$editorid}_-1_editor"]);
 
         // A list where one value is expected, or a value where a list is, is dropped.

@@ -37,6 +37,35 @@ use stdClass;
  */
 class field extends datalynxfield_option_multiple {
     /**
+     * Keep only chosen options the field has, and, where the tag allows adding options, the text
+     * of new ones.
+     *
+     * update_content() adds any value it does not know as a new option, so without this a
+     * submission could add options to a field that does not allow it, or store the -999 of an
+     * empty selection as one.
+     *
+     * @param string $contentname
+     * @param mixed $value
+     * @param array $options
+     * @return mixed
+     */
+    public function clean_submitted_value(string $contentname, $value, array $options = []) {
+        $clean = parent::clean_submitted_value($contentname, $value, $options);
+        if ($contentname !== '' || !is_array($clean)) {
+            return $clean;
+        }
+        $known = $this->options_menu();
+        $addnew = $this->get_input_contract($options)['']['list'] !== PARAM_INT;
+
+        return array_filter($clean, function ($option) use ($known, $addnew): bool {
+            if (is_int($option) || ctype_digit((string) $option)) {
+                return isset($known[(int) $option]);
+            }
+            return $addnew && trim((string) $option) !== '' && !is_numeric($option);
+        });
+    }
+
+    /**
      * The numbers of the chosen options; where the tag allows adding options (addnew), their text.
      *
      * @param array $options

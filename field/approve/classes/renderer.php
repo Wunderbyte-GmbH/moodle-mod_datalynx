@@ -24,6 +24,7 @@
  */
 namespace datalynxfield_approve;
 
+use stdClass;
 use html_writer;
 use mod_datalynx\local\field\datalynxfield_renderer;
 use MoodleQuickForm;
@@ -39,6 +40,20 @@ use MoodleQuickForm;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class renderer extends datalynxfield_renderer {
+    /**
+     * The approval box takes input where approval is on, for users who may approve.
+     *
+     * @param string $tag
+     * @param stdClass $entry
+     * @return bool
+     */
+    public function accepts_input(string $tag, stdClass $entry): bool {
+        $dlx = $this->field->dlx();
+
+        return trim($tag, '@') === '##approve##' && $dlx->data->approval
+            && has_capability('mod/datalynx:approve', $dlx->context);
+    }
+
     /**
      * Returns tag replacement pairs for the approve field patterns.
      *

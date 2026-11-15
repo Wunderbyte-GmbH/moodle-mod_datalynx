@@ -33,6 +33,25 @@ use stdClass;
  */
 class renderer extends datalynxfield_renderer {
     /**
+     * Only ##group:edit## takes input, for users who manage entries.
+     *
+     * @param string $tag
+     * @param stdClass $entry
+     * @return bool
+     */
+    public function accepts_input(string $tag, stdClass $entry): bool {
+        $stripped = trim($tag, '@');
+        if (strpos($stripped, '##group:') !== 0) {
+            return false;
+        }
+        $suffix = substr($stripped, strlen('##group:'), -2);
+        $format = \mod_datalynx\local\field_format\manager::get_format_by_name($this->field->dlx()->id(), $suffix);
+        $displayfield = ($format && $format->get_fieldtype() === 'entrygroup') ? $format->get_name() : $suffix;
+
+        return $displayfield === 'edit' && has_capability('mod/datalynx:manageentries', $this->field->dlx()->context);
+    }
+
+    /**
      * Get replacements for the given tags.
      *
      * @param ?array $tags

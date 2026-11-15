@@ -336,6 +336,21 @@ abstract class datalynxfield_renderer {
     }
 
     /**
+     * Whether a field tag takes a submitted value for the entry, as the entry submission service
+     * asks it of internal fields (status, approval, author, group), which have no behaviors.
+     *
+     * By default the same as {@see is_tag_editable()}. Internal fields whose tags are inputs
+     * override it; is_tag_editable() keeps deciding the edit links, unchanged.
+     *
+     * @param string $tag The field tag as found in the view template.
+     * @param stdClass $entry The entry.
+     * @return bool
+     */
+    public function accepts_input(string $tag, stdClass $entry): bool {
+        return $this->is_tag_editable($tag, $entry);
+    }
+
+    /**
      * Whether a field tag of a view would render as an editable input for the entry.
      *
      * Used to decide whether an edit link to a view is worth showing, see

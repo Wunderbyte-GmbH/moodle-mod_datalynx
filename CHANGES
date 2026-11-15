@@ -4,6 +4,25 @@ mod_datalynx changes
 2026-11-15
 ----------
 
+- Entries (#266): the entry form and a new web service, mod_datalynx_submit_entry
+  (also in the Moodle App service), save entries through one submission service
+  with the same rules: only fields the view lets the user edit are taken, every
+  value is cleaned by its field's input contract, required is decided by the
+  behaviors alone (availability conditions included, and also for a field left
+  out of the submission), and each field validates its value. Fieldgroup lines
+  are now validated on the server; before, their validation never ran.
+- Behavior change: required select, radio, file, location and editor fields are
+  checked on the server, not only by the form's own rules; the editor check
+  never worked. A number that is given must be numeric even if not required.
+- Removed: the ##*status## tag (the upgrade turns it into ##status##) and the
+  schedule field's own "required"; required is a behavior setting only. The
+  course group field now follows behaviors like every field.
+- Fix: the inline profile editor wrote the author's profile while validating,
+  also when the submission then failed. It now writes after saving.
+- Fix: a multiple choice field no longer takes values that are not its options
+  unless the tag allows adding options; the count of a user's entries includes
+  entries added in the same request.
+
 - Security: the view browse web services (grid, tabular, CSV, PDF, report) take
   search and sort criteria only as JSON that passes the strict criteria check
   the Moodle App service uses: fields of this instance, operators those fields
