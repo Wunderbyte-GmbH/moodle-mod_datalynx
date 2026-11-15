@@ -633,6 +633,8 @@ form.mform div.entry div.datalynx-field-wrapper {
     flex-wrap: wrap;
     justify-content: space-between;
     width: 100%;
+    padding-left: 0;
+    list-style: none;
     margin-top: 1.5rem;
     margin-bottom: 1.5rem;
 }
@@ -701,8 +703,11 @@ form.mform div.entry div.datalynx-field-wrapper {
 }
 
 .datalynx-stepper .step .step-title {
+    min-width: 0;
     margin-top: 0.75rem;
     margin-bottom: 0;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
     color: #606975;
     font-size: 0.875rem;
     font-weight: 500;

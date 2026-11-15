@@ -65,8 +65,11 @@ const renderPage = (page, canvasContainer, customScale) => {
 
     canvas.height = desiredHeight * customScale;
     canvas.width = desiredWidth * customScale;
+    // Full size where there is room, scaled down (keeping the aspect ratio) in narrow columns.
     canvas.style.width = `${desiredWidth * customScale}px`;
-    canvas.style.height = `${desiredHeight * customScale}px`;
+    canvas.style.maxWidth = '100%';
+    canvas.style.height = 'auto';
+    canvas.setAttribute('aria-hidden', 'true');
 
     canvasContainer.appendChild(canvas);
 

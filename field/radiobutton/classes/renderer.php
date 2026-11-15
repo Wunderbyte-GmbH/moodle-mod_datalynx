@@ -149,10 +149,20 @@ class renderer extends SelectRenderer {
                 }
 
                 $isspecial = $current && $i === $reachedindex;
+                $iscurrent = $i === $reachedindex;
+                if ($iscurrent) {
+                    $statustext = get_string('stepcurrent', 'datalynxfield_radiobutton');
+                } else if ($i < $reachedindex) {
+                    $statustext = get_string('stepcompleted', 'datalynxfield_radiobutton');
+                } else {
+                    $statustext = get_string('stepnotreached', 'datalynxfield_radiobutton');
+                }
                 $steps[] = [
                     'label' => format_string($menuoptions[$key]),
                     // A special state marks its step instead of completing it.
                     'completed' => $reachedindex !== -1 && ($i < $reachedindex || ($i === $reachedindex && !$current)),
+                    'current' => $iscurrent,
+                    'statustext' => $statustext,
                     'special' => $isspecial,
                     'style' => $isspecial ? $current['style'] : '',
                     'statuslabel' => $isspecial ? $statuslabel : '',
@@ -162,7 +172,10 @@ class renderer extends SelectRenderer {
                 ];
             }
 
+            $description = trim(strip_tags((string) $field->field->description));
+            $label = get_string('stepperlabel', 'datalynxfield_radiobutton');
             $mustachecontext = [
+                'label' => $description === '' ? $label : $label . ': ' . format_string($description),
                 'steps' => $steps,
             ];
             // A special state without a step of its own is shown below the stepper.

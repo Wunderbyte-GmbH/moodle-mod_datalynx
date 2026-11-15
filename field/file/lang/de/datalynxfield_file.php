@@ -24,5 +24,6 @@
 
 $string['alttext'] = 'Alternativtext';
 $string['clearcontent'] = 'Inhalt löschen';
+$string['pdfpreviewalt'] = 'Bilddarstellung des PDF-Dokuments {$a}. Um auf den Inhalt zuzugreifen, öffnen Sie das PDF über den Download-Link darüber.';
 $string['pluginname'] = 'Datei';
 $string['privacy:metadata'] = 'Das Datei-Feld speichert selbst keine personenbezogenen Daten.';

@@ -23,8 +23,13 @@
     style and its label instead of completing it. A special state without a step is shown as
     a notice below the stepper.
 
+    The steps are an ordered list. Each step carries a visually hidden status text (completed,
+    current step, not yet reached) and the reached step has aria-current="step", so the progress
+    is not conveyed by colour alone.
+
     Example context (json):
     {
+        "label": "Progress",
         "steps": [
             {
                 "label": "Step 1",
@@ -32,7 +37,9 @@
                 "icon": "fa fa-shopping-cart",
                 "hasicon": true,
                 "number": 1,
-                "special": false
+                "special": false,
+                "current": false,
+                "statustext": "completed"
             },
             {
                 "label": "Step 2",
@@ -41,6 +48,8 @@
                 "hasicon": false,
                 "number": 2,
                 "special": true,
+                "current": true,
+                "statustext": "current step",
                 "style": "warning",
                 "statuslabel": "Information needed"
             }
@@ -48,10 +57,10 @@
         "notice": null
     }
 }}
-<div class="datalynx-stepper steps d-flex flex-wrap flex-sm-nowrap justify-content-between my-4">
+<ol class="datalynx-stepper steps d-flex flex-wrap flex-sm-nowrap justify-content-between my-4" aria-label="{{label}}">
     {{#steps}}
-        <div class="step{{#completed}} completed{{/completed}}{{#special}} special special-{{style}}{{/special}}"{{#special}} aria-current="step"{{/special}}>
-            <div class="step-icon-wrap">
+        <li class="step{{#completed}} completed{{/completed}}{{#special}} special special-{{style}}{{/special}}"{{#current}} aria-current="step"{{/current}}>
+            <div class="step-icon-wrap" aria-hidden="true">
                 <div class="step-icon">
                     {{#hasicon}}
                         <i class="{{icon}}" aria-hidden="true"></i>
@@ -61,13 +70,13 @@
                     {{/hasicon}}
                 </div>
             </div>
-            <h5 class="step-title">
-                {{label}}
+            <span class="step-title d-block">
+                {{label}}<span class="sr-only visually-hidden">, {{statustext}}</span>
                 {{#special}}<span class="step-status d-block">{{statuslabel}}</span>{{/special}}
-            </h5>
-        </div>
+            </span>
+        </li>
     {{/steps}}
-</div>
+</ol>
 {{#notice}}
     <div class="datalynx-stepper-notice alert alert-{{style}} py-2 px-3" role="status">{{label}}</div>
 {{/notice}}

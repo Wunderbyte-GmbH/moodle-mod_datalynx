@@ -46,3 +46,7 @@ $string['fieldformatoptionstepperspecialerror'] = 'Ungültige Zeilen: {$a}. Bitt
 $string['fieldformatscope'] = 'Dieses Format ändert die Darstellung des Feldes <strong>nur in Ansichten (Anzeigemodus)</strong>. Im Eintragsformular ist das Feld immer eine Gruppe von Auswahlknöpfen, einer pro definierter Option — daran kann ein Format nichts ändern, und insbesondere die Fortschrittsanzeige ist nie anklickbar.';
 $string['pluginname'] = 'Auswahlknopf (Radiobutton)';
 $string['privacy:metadata'] = 'Auswahlknöpfe speichern keine personenbezogenen Daten.';
+$string['stepcompleted'] = 'abgeschlossen';
+$string['stepcurrent'] = 'aktueller Schritt';
+$string['stepnotreached'] = 'noch nicht erreicht';
+$string['stepperlabel'] = 'Fortschritt';

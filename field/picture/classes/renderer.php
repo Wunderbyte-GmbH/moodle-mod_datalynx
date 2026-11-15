@@ -192,7 +192,9 @@ class renderer extends FileRenderer {
             $mode = $settings['mode'] ?? '';
         }
 
-        $imgattr = ['style' => []];
+        // The alt text is the field's link text; without one the file name, so the image is never unnamed.
+        $alt = $altname !== '' ? htmlspecialchars_decode($altname, ENT_QUOTES) : $file->get_filename();
+        $imgattr = ['style' => [], 'alt' => $alt];
         if ((isset($params['lightbox']) && $params['lightbox']) || $mode === 'lightbox') {
             $imgattr['class'] = 'zoomable';
         }

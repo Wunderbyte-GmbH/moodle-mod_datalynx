@@ -581,9 +581,18 @@ final class field_formats_test extends advanced_testcase {
         $this->assertStringContainsString('Processing', $html);
         $this->assertStringContainsString('Delivered', $html);
 
-        // Third step should not be completed.
-        $this->assertStringContainsString('<div class="step completed">', $html);
-        $this->assertStringContainsString('<div class="step">', $html);
+        // Steps are list items; the reached step is the current one, the third is not reached.
+        $this->assertStringContainsString('<ol class="datalynx-stepper', $html);
+        $this->assertStringContainsString('aria-label="' . get_string('stepperlabel', 'datalynxfield_radiobutton') . '"', $html);
+        $this->assertStringContainsString('<li class="step completed">', $html);
+        $this->assertStringContainsString('<li class="step completed" aria-current="step">', $html);
+        $this->assertStringContainsString('<li class="step">', $html);
+        $this->assertSame(1, substr_count($html, 'aria-current'));
+        foreach (['stepcompleted', 'stepcurrent', 'stepnotreached'] as $status) {
+            $text = ', ' . get_string($status, 'datalynxfield_radiobutton') . '</span>';
+            $this->assertSame(1, substr_count($html, $text), $status);
+        }
+        $this->assertStringNotContainsString('<h5', $html);
     }
 
     /**
@@ -620,7 +629,7 @@ final class field_formats_test extends advanced_testcase {
         // The state "Information needed" marks step 1 (warning is the default style) and completes nothing.
         $html = $render(5);
         $this->assertStringNotContainsString('step completed', $html);
-        $this->assertStringContainsString('step special special-warning', $html);
+        $this->assertStringContainsString('step special special-warning" aria-current="step"', $html);
         $this->assertStringContainsString('Information needed', $html);
         $this->assertStringNotContainsString('datalynx-stepper-notice', $html);
 
@@ -630,6 +639,7 @@ final class field_formats_test extends advanced_testcase {
         $this->assertStringNotContainsString('step special', $html);
         $this->assertStringContainsString('datalynx-stepper-notice alert alert-danger', $html);
         $this->assertStringContainsString('Rejected', $html);
+        $this->assertStringNotContainsString('aria-current', $html);
 
         // Invalid lines are reported, valid ones parsed.
         $invalid = [];

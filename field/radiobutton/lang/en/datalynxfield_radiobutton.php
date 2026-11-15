@@ -47,3 +47,7 @@ $string['fieldformatoptionstepperspecialerror'] = 'Invalid lines: {$a}. Use opti
 $string['fieldformatscope'] = 'This format changes how the field is shown <strong>in views (display mode) only</strong>. On the entry form the field is always a group of radio buttons, one per option defined for the field — a format cannot change that, and the stepper in particular is never clickable.';
 $string['pluginname'] = 'Radio button';
 $string['privacy:metadata'] = 'Radiobuttons do not store personal data.';
+$string['stepcompleted'] = 'completed';
+$string['stepcurrent'] = 'current step';
+$string['stepnotreached'] = 'not yet reached';
+$string['stepperlabel'] = 'Progress';

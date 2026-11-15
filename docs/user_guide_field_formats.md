@@ -281,6 +281,8 @@ When **Stepper progress** is selected, an extra setting appears:
 > **Pro-Tip**  
 > The stepper turns a status-like radio field (for example *Draft → In review → Approved*) into a clear visual progress indicator in your views.
 
+The stepper is an ordered list named “Progress” (plus the field description, if it has one). Screen readers hear each step with its state (“completed”, “current step”, “not yet reached”), so the progress does not depend on colour. Do not put the stepper tag inside a heading (`<h4>[[status:stepper]] …</h4>`): the whole list would then be read as one heading. Place it in its own `<div>` next to the heading instead.
+
 ---
 
 ### Rating (`rating`)

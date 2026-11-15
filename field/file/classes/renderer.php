@@ -233,7 +233,7 @@ class renderer extends datalynxfield_renderer {
         if ($mimetype === 'application/pdf') {
             // PDF document.
             $moodleurl = moodle_url::make_file_url($pluginfileurl, "$path/$filename");
-            return $this->embed_pdf($moodleurl->out(), $fieldname);
+            return $this->embed_pdf($moodleurl->out(), $fieldname, $filename);
         }
 
         // For all other file types, display as link.
@@ -242,12 +242,17 @@ class renderer extends datalynxfield_renderer {
 
     // phpcs:disable moodle.PHP.ForbiddenGlobalUse.BadGlobal
     /**
-     * Returns general link or pdf embedding html.
+     * Returns the pdf embedding html: a download link and the pages rendered as images by pdf.js.
+     *
+     * The rendering is an image of the pages, so screen readers get an alt text that says so and
+     * points to the PDF itself for the content. It fits the column instead of a fixed width.
+     *
      * @param string $fullurl
      * @param string $fieldname
+     * @param string $filename name of the PDF file
      * @return string html
      */
-    protected function embed_pdf(string $fullurl, string $fieldname): string {
+    protected function embed_pdf(string $fullurl, string $fieldname, string $filename = ''): string {
         global $PAGE;
         $customscale = $this->field->get('param4');
         if (empty($customscale)) {
@@ -255,12 +260,18 @@ class renderer extends datalynxfield_renderer {
         }
         $PAGE->requires->js_call_amd('mod_datalynx/pdfembed', 'init');
 
-        return '<div><a href="' . $fullurl . '" target="_blank" class="btn btn-primary">' .
-                get_string('download', 'core_repository') . ' ' .
-                get_string('application/pdf', 'core_mimetypes') . '</a></div><br>
-        <div style="width: 1800px; min-height: 1400px;" class="datalynx-pdf-embed" ' .
-                'data-pdf-url="' . s($fullurl) . '" data-custom-scale="' . s($customscale) . '" ' .
-                'id="' . $fieldname . '"></div>';
+        $link = html_writer::link(
+            $fullurl,
+            get_string('download', 'core_repository') . ' ' . get_string('application/pdf', 'core_mimetypes'),
+            ['target' => '_blank', 'class' => 'btn btn-primary']
+        );
+        return html_writer::div($link) . '<br>' . html_writer::div('', 'datalynx-pdf-embed', [
+            'id' => $fieldname,
+            'role' => 'img',
+            'aria-label' => get_string('pdfpreviewalt', 'datalynxfield_file', $filename),
+            'data-pdf-url' => $fullurl,
+            'data-custom-scale' => $customscale,
+        ]);
     }
     // phpcs:enable moodle.PHP.ForbiddenGlobalUse.BadGlobal
 
