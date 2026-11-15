@@ -707,7 +707,7 @@ form.mform div.entry div.datalynx-field-wrapper {
     margin-top: 0.75rem;
     margin-bottom: 0;
     line-height: 1.2;
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
     color: #606975;
     font-size: 0.875rem;
     font-weight: 500;
