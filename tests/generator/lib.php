@@ -45,7 +45,7 @@ class mod_datalynx_generator extends testing_module_generator {
                 'timeavailable' => 0, 'timedue' => 0, 'timeinterval' => 0, 'intervalcount' => 1,
                 'allowlate' => 0, 'grade' => 0, 'grademethod' => 0, 'anonymous' => 0,
                 'notification' => 0, 'notificationformat' => 1, 'entriesrequired' => 0,
-                'entriestoview' => 0, 'maxentries' => 0, 'timelimit' => -1, 'approval' => 0,
+                'entriestoview' => 0, 'maxentries' => -1, 'timelimit' => -1, 'approval' => 0,
                 'grouped' => 0, 'rating' => 0, 'singleedit' => 0, 'singleview' => 0, 'rssarticles' => 0,
                 'rss' => 0, 'css' => null, 'cssincludes' => null, 'js' => null, 'jsincludes' => null,
                 'defaultview' => 0, 'defaultfilter' => 0, 'completionentries' => 0];

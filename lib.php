@@ -66,6 +66,31 @@ function datalynx_supports($feature) {
 }
 
 /**
+ * The maximum number of entries of an instance, within the limit the site sets.
+ *
+ * The site setting datalynx_maxentries is the admin's upper limit: -1 for no limit, 0 for no
+ * entries at all, otherwise the most entries an instance may allow. The instance keeps its own
+ * value (-1 for unlimited) as long as it stays within that limit.
+ *
+ * @param int|string|null $maxentries the instance's setting, null or '' if not given
+ * @return int
+ */
+function datalynx_limit_maxentries($maxentries): int {
+    global $CFG;
+
+    $sitemax = isset($CFG->datalynx_maxentries) ? (int) $CFG->datalynx_maxentries : -1;
+    $maxentries = ($maxentries === null || $maxentries === '') ? -1 : (int) $maxentries;
+    if ($sitemax < 0) {
+        return $maxentries;
+    }
+    if ($sitemax === 0) {
+        return 0;
+    }
+
+    return ($maxentries < 0 || $maxentries > $sitemax) ? $sitemax : $maxentries;
+}
+
+/**
  * Adds an instance of a datalynx
  *
  * @param object $data
@@ -98,9 +123,7 @@ function datalynx_add_instance($data) {
         $data->rating = 0;
     }
 
-    if ($CFG->datalynx_maxentries) {
-        $data->maxentries = $CFG->datalynx_maxentries;
-    }
+    $data->maxentries = datalynx_limit_maxentries($data->maxentries ?? null);
     $data->id = $DB->insert_record('datalynx', $data);
     if (!$data->id) {
         return false;
@@ -117,7 +140,7 @@ function datalynx_add_instance($data) {
  * @return bool
  */
 function datalynx_update_instance($data) {
-    global $DB;
+    global $CFG, $DB;
 
     $data->id = $data->instance;
 
@@ -143,6 +166,11 @@ function datalynx_update_instance($data) {
         $data->rating = $data->scale;
     } else {
         $data->rating = 0;
+    }
+
+    // The form leaves the setting out when the site allows no entries.
+    if (isset($data->maxentries) || (int) ($CFG->datalynx_maxentries ?? -1) === 0) {
+        $data->maxentries = datalynx_limit_maxentries($data->maxentries ?? null);
     }
 
     if (!$DB->update_record('datalynx', $data)) {
