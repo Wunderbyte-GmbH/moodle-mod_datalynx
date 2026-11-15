@@ -176,6 +176,54 @@ class renderer extends datalynxfield_renderer {
 
     // phpcs:disable moodle.PHP.ForbiddenGlobalUse.BadGlobal
     /**
+     * What a subfield of this fieldgroup allows in an entry: visible, editable, required.
+     *
+     * A subfield has no tag of its own; the fieldgroup's definition names its format, behavior and
+     * layout as "fieldid:format|behavior|layout". This is the one place that reads that definition,
+     * for the edit form ({@see render_edit_mode()}) and for the entry submission service.
+     * Whether the fieldgroup itself is editable is decided by its own tag; once an entry is final,
+     * which subfields may still be saved is decided by the view
+     * ({@see \mod_datalynx\local\view\base::get_editable_after_final_fieldids()}).
+     *
+     * @param string $key the subfield's definition, as get_subfields() keys it
+     * @param stdClass $entry the entry
+     * @param array $options the fieldgroup's options for this line; 'required' set on required lines
+     * @return array [$options, $layout]: the subfield's options and its datalynxfield_layout (or null)
+     */
+    public function resolve_subfield_options(string $key, stdClass $entry, array $options): array {
+        $modifiers = explode('|', explode(':', $key, 2)[1] ?? '', 3);
+        $formatname = $modifiers[0] ?? '';
+        $behaviorname = $modifiers[1] ?? '';
+        $layoutname = $modifiers[2] ?? '';
+
+        if ($formatname) {
+            $fmt = manager::get_format_by_name($this->field->dlx->id(), $formatname);
+            if ($fmt) {
+                $options['field_format'] = $fmt;
+            }
+        }
+
+        // Behavior controls visibility, editability, and required.
+        $behavior = $behaviorname
+            ? $this->field->dlx->get_behavior_by_name($behaviorname)
+            : datalynxfield_behavior::get_default_behavior($this->field->dlx);
+        if ($behavior) {
+            $conditionsmet = $behavior->passes_conditions($entry);
+            $options['visible'] = $behavior->is_visible_to_user($entry) && $conditionsmet;
+            $options['editable'] = $behavior->is_editable_by_user(null, true) && $conditionsmet;
+            if ($behavior->is_required() && $conditionsmet) {
+                $options['required'] = true;
+            }
+        }
+
+        $layout = $layoutname
+            ? $this->field->dlx->get_layout_by_name($layoutname)
+            : datalynxfield_layout::get_default_renderer($this->field->dlx);
+
+        return [$options, $layout ?: null];
+    }
+
+    /**
      *
      * {@inheritDoc}
      * @see datalynxfield_renderer::render_edit_mode()
@@ -234,41 +282,14 @@ class renderer extends datalynxfield_renderer {
             ]));
             $counter = 0;
             foreach ($fieldgroupfields as $key => $subfield) {
-                $parts = explode(':', $key, 2);
-                $subfieldid = (int)$parts[0];
-                $modifiers = explode('|', $parts[1] ?? '', 3);
-                $formatname   = $modifiers[0] ?? '';
-                $behaviorname = $modifiers[1] ?? '';
-                $layoutname   = $modifiers[2] ?? '';
+                $subfieldid = (int) explode(':', $key, 2)[0];
 
                 // Keep contentid in _id for later.
                 $resetcontentid = isset($entry->{"c{$subfieldid}_id"}) ? $entry->{"c{$subfieldid}_id"} : false;
 
                 $lastlinewithcontent = $this->renderer_split_content($entry, $subfieldid, $line, $lastlinewithcontent);
 
-                // Resolve format, behavior, and layout into $suboptions.
-                $suboptions = $options;
-                $dlxid = $this->field->dlx->id();
-
-                if ($formatname) {
-                    $fmt = manager::get_format_by_name($dlxid, $formatname);
-                    if ($fmt) {
-                        $suboptions['field_format'] = $fmt;
-                    }
-                }
-
-                // Behavior controls visibility, editability, and required.
-                $behavior = $behaviorname
-                    ? $this->field->dlx->get_behavior_by_name($behaviorname)
-                    : datalynxfield_behavior::get_default_behavior($this->field->dlx);
-                if ($behavior) {
-                    $conditionsmet = $behavior->passes_conditions($entry);
-                    $suboptions['visible']  = $behavior->is_visible_to_user($entry) && $conditionsmet;
-                    $suboptions['editable'] = $behavior->is_editable_by_user(null, true) && $conditionsmet;
-                    if ($behavior->is_required() && $conditionsmet) {
-                        $suboptions['required'] = true;
-                    }
-                }
+                [$suboptions, $layout] = $this->resolve_subfield_options($key, $entry, $options);
 
                 // Skip invisible subfields entirely.
                 if (isset($suboptions['visible']) && !$suboptions['visible']) {
@@ -277,9 +298,6 @@ class renderer extends datalynxfield_renderer {
                 }
 
                 // Layout provides edit template and not-editable template.
-                $layout = $layoutname
-                    ? $this->field->dlx->get_layout_by_name($layoutname)
-                    : datalynxfield_layout::get_default_renderer($this->field->dlx);
                 if ($layout) {
                     $edittemplate = $layout->get_edit_template();
                     if ($edittemplate !== datalynxfield_layout::EDIT_MODE_TEMPLATE_NONE) {

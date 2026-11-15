@@ -307,8 +307,8 @@ class renderer extends datalynxfield_renderer {
         if (!is_numeric($entryid)) {
             $linenumber = explode("_", $entryid)[3];
             $lastvisible = "fieldgroup_" . explode("_", $entryid)[2] . "_lastvisible";
-            $lastvisibleline = $formdata->$lastvisible;
-            if ($linenumber >= $lastvisibleline) {
+            $lastvisibleline = $formdata->$lastvisible ?? null;
+            if ($lastvisibleline !== null && $linenumber >= $lastvisibleline) {
                 return [];
             }
         }

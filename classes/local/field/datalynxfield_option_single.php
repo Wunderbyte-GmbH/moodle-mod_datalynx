@@ -143,7 +143,7 @@ class datalynxfield_option_single extends datalynxfield_option {
         GROUP BY dc.content
         HAVING COUNT(dc.id) >= :selectlimit";
         $params = ['dataid' => $this->dlx->id(), 'fieldid' => $this->field->id,
-                'selectlimit' => $this->field->param5, 'entryid' => $entryid];
+                'selectlimit' => $this->field->param5, 'entryid' => (int) $entryid];
 
         $results = $DB->get_records_sql($sql, $params);
 

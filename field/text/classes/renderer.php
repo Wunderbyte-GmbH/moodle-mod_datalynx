@@ -299,7 +299,8 @@ class renderer extends datalynxfield_renderer {
                                                AND c.entryid <> :entryid
                                                AND c.content LIKE :content",
                         ['fieldid' => $fieldid,
-                                'entryid' => $entryid,
+                                // A fieldgroup line is "{entryid}_fieldgroup_{id}_{line}": its entry is the leading id.
+                                'entryid' => (int) $entryid,
                         'content' => $formdata->$formfieldname]
                     )
                 ) {

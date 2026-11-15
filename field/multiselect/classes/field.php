@@ -116,12 +116,15 @@ class field extends datalynxfield_option_multiple {
      * @return bool
      */
     public static function is_fieldvalue_empty($value): bool {
-        // If array > 1 entry we see actual input from the user, next to -999.
-        // TODO: MDL-0000 This needs to consider alternative renderers with the select field.
-        if (count($value) < 2) {
-            return true;
+        // Empty unless something besides the placeholders of an empty selection is chosen: the
+        // -999 the autocomplete posts when nothing is selected, and QuickForm's submission marker.
+        foreach ((array) $value as $option) {
+            $option = trim((string) $option);
+            if ($option !== '' && $option !== '-999' && $option !== '_qf__force_multiselect_submission') {
+                return false;
+            }
         }
-        return false;
+        return true;
     }
 
     /**

@@ -804,16 +804,13 @@ class field extends datalynxfield_base {
      * @return bool
      */
     public static function is_fieldvalue_empty($value): bool {
-
-        if (empty($value)) {
-            return true;
+        // Empty unless a user is chosen. The form posts -999 (under the key -1) for an empty
+        // selection, so it is a placeholder wherever it sits.
+        foreach ((array) $value as $userid) {
+            if ((int) $userid > 0) {
+                return false;
+            }
         }
-
-        // Backwards compatible, we added -999 to pass empty values.
-        if (count($value) === 1 && isset($value[0]) && $value[0] == -999) {
-            return true;
-        }
-
-        return false;
+        return true;
     }
 }

@@ -28,6 +28,7 @@ use calc_formula;
 use coding_exception;
 use datalynxfield_rating\field as datalynxfield_rating;
 use datalynxfield_status\field as datalynxfield_status;
+use mod_datalynx\local\entry\entry_submission_service;
 use mod_datalynx\local\field\datalynxfield_behavior;
 use HTML_QuickForm;
 use html_writer;
@@ -2759,16 +2760,9 @@ abstract class base {
                 // Process the form if not cancelled.
                 if (!$entriesform->is_cancelled()) {
                     if ($data = $entriesform->get_data()) {
-                        // Tell the save gate which fields this view keeps editable after final submission,
-                        // so a final entry's lock is enforced server-side per field (not via the form).
-                        $data->editablefinalfieldids = $this->get_editable_after_final_fieldids();
-                        // Validated successfully so process request.
-                        $processed = $this->entries->process_entries(
-                            'update',
-                            $update,
-                            $data,
-                            true
-                        );
+                        // The form validated the submission through the same service.
+                        $saved = (new entry_submission_service($this))->save($this->editentries, $data, true);
+                        $processed = [$saved['message'], $saved['entryids']];
 
                         if (!$processed) {
                             $this->returntoentriesform = true;

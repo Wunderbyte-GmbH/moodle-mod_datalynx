@@ -22,6 +22,7 @@
  */
 
 namespace mod_datalynx\local\view;
+use mod_datalynx\local\entry\entry_submission_service;
 use moodleform;
 
 defined('MOODLE_INTERNAL') || die();
@@ -104,65 +105,15 @@ class datalynxview_entries_form extends moodleform {
      */
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
-
-        if (empty($errors)) {
-            $view = $this->_customdata['view'];
-            $patterns = $view->get_entry_form_patterns();
-            $fields = $view->get_entry_form_fields();
-            $entryids = explode(',', $this->_customdata['update']);
-
-            if (empty($patterns) || empty($fields)) {
-                return $errors;
-            }
-
-            foreach ($entryids as $entryid) {
-                $currentpatterns = $patterns;
-                // If we see a fieldgroup loop through all visible lines.
-                $fieldgroupmarkers = preg_grep('/^fieldgroup_/', array_keys($data));
-                if (count($fieldgroupmarkers) > 0) {
-                    $fieldgroupid = $data[reset($fieldgroupmarkers)];
-
-                    // Append the correct patterns to match.
-                    if (!isset($fields[$fieldgroupid])) {
-                        continue;
-                    }
-                    $currentpatterns = $fields[$fieldgroupid]->renderer()->get_fieldgroup_patterns($patterns);
-
-                    $maxlines = $fields[$fieldgroupid]->field->param2;
-                    for ($i = 0; $i < $maxlines; $i++) {
-                        $thisentryid = "{$entryid}_fieldgroup_{$fieldgroupid}_{$i}";
-                        foreach ($fields as $fid => $field) {
-                            if (!isset($currentpatterns[$fid])) {
-                                continue;
-                            }
-                            // Skip conditionally-hidden fields: they render no input and must not be validated.
-                            if (!$field->renderer()->conditions_met($currentpatterns[$fid], $thisentryid)) {
-                                continue;
-                            }
-                            $newerrors = $field->renderer()->validate($thisentryid, $currentpatterns[$fid], (object) $data);
-                            $errors = array_merge($errors, $newerrors);
-                        }
-                    }
-                } else {
-                    // If no fieldgroup use standard behaviour.
-                    foreach ($fields as $fid => $field) {
-                        if (!isset($patterns[$fid])) {
-                            continue;
-                        }
-                        // Skip conditionally-hidden fields: they render no input and must not be validated.
-                        if (!$field->renderer()->conditions_met($patterns[$fid], $entryid)) {
-                            continue;
-                        }
-                        $errors = array_merge(
-                            $errors,
-                            $field->renderer()->validate($entryid, $patterns[$fid], (object) $data)
-                        );
-                    }
-                }
-            }
+        if ($errors) {
+            return $errors;
         }
 
-        return $errors;
+        // The entry submission service validates for the web form and the web services alike.
+        $service = new entry_submission_service($this->_customdata['view']);
+        $entryids = explode(',', (string) $this->_customdata['update']);
+
+        return $service->validate($entryids, $service->filter_data($entryids, (object) $data));
     }
 
     /**
