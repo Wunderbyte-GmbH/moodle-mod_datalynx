@@ -98,6 +98,35 @@ final class search_criteria_test extends advanced_testcase {
     }
 
     /**
+     * Criteria the engine runs and that saved and custom filters carry are accepted, although
+     * the search forms do not offer their operator: '=' on a single choice field (treated as
+     * ANY_OF) and on the author (the custom filter's author search).
+     */
+    public function test_decode_search_accepts_criteria_of_saved_and_custom_filters(): void {
+        $choiceid = $this->add_mobile_field($this->dlx, 'radiobutton', 'Choice', ['param1' => "Yes\nNo"]);
+        $json = json_encode([
+            $choiceid => ['AND' => [['', '=', '1']]],
+            'userid' => ['AND' => [['', '=', '2']]],
+            'status' => ['AND' => [['', '=', 0]]],
+        ]);
+
+        $criteria = search_criteria::decode_search($json, $this->dlx);
+
+        $this->assertSame([['', '=', '1']], $criteria[$choiceid]['AND']);
+        $this->assertSame([['', '=', '2']], $criteria['userid']['AND']);
+        $this->assertSame([['', '=', '0']], $criteria['status']['AND']);
+    }
+
+    /**
+     * Fields without search operators still take none, '=' included.
+     */
+    public function test_accepted_operators_extend_only_searchable_fields(): void {
+        $fields = $this->dlx->get_fields();
+
+        $this->assertSame([], $fields['userpicture']->get_accepted_search_operators());
+    }
+
+    /**
      * Empty input means no criteria.
      */
     public function test_empty_input_means_no_criteria(): void {

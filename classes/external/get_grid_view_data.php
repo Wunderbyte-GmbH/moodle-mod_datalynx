@@ -16,7 +16,6 @@
 
 namespace mod_datalynx\external;
 
-use context_module;
 use core_external\external_api;
 use core_external\external_function_parameters;
 use core_external\external_multiple_structure;
@@ -39,21 +38,7 @@ class get_grid_view_data extends external_api {
      * @return external_function_parameters
      */
     public static function execute_parameters(): external_function_parameters {
-        return new external_function_parameters([
-            'd' => new external_value(PARAM_INT, 'Datalynx instance ID'),
-            'view' => new external_value(PARAM_INT, 'Grid view ID'),
-            'filterid' => new external_value(PARAM_INT, 'Active filter ID', VALUE_DEFAULT, 0),
-            'page' => new external_value(PARAM_INT, 'Page number', VALUE_DEFAULT, 0),
-            'perpage' => new external_value(PARAM_INT, 'Entries per page override', VALUE_DEFAULT, 0),
-            'eids' => new external_value(PARAM_SEQUENCE, 'Optional entry ids filter', VALUE_DEFAULT, ''),
-            'users' => new external_value(PARAM_SEQUENCE, 'Optional user ids filter', VALUE_DEFAULT, ''),
-            'groups' => new external_value(PARAM_SEQUENCE, 'Optional group ids filter', VALUE_DEFAULT, ''),
-            'groupby' => new external_value(PARAM_RAW, 'Optional group-by field', VALUE_DEFAULT, ''),
-            'selection' => new external_value(PARAM_INT, 'Optional selection mode override', VALUE_DEFAULT, 0),
-            'customsort' => new external_value(PARAM_RAW, 'Optional JSON-encoded custom sort options', VALUE_DEFAULT, ''),
-            'customsearch' => new external_value(PARAM_RAW, 'Optional JSON-encoded custom search options', VALUE_DEFAULT, ''),
-            'search' => new external_value(PARAM_RAW, 'Optional search string', VALUE_DEFAULT, ''),
-        ]);
+        return new external_function_parameters(browse_request::parameters('Grid view ID'));
     }
 
     /**
@@ -107,48 +92,11 @@ class get_grid_view_data extends external_api {
             'search' => $search,
         ]);
 
-        $cm = get_coursemodule_from_instance('datalynx', $params['d'], 0, false, MUST_EXIST);
-        $context = context_module::instance($cm->id);
-
-        require_login($cm->course, true, $cm);
-        require_capability('mod/datalynx:viewentry', $context);
-
-        $filteroptions = [
-            'filterid' => $params['filterid'],
-            'page' => $params['page'],
-        ];
-        if (!empty($params['perpage'])) {
-            $filteroptions['perpage'] = $params['perpage'];
-        }
-        if (!empty($params['eids'])) {
-            $filteroptions['eids'] = $params['eids'];
-        }
-        if (!empty($params['users'])) {
-            $filteroptions['users'] = $params['users'];
-        }
-        if (!empty($params['groups'])) {
-            $filteroptions['groups'] = $params['groups'];
-        }
-        if (!empty($params['groupby'])) {
-            $filteroptions['groupby'] = $params['groupby'];
-        }
-        if (!empty($params['selection'])) {
-            $filteroptions['selection'] = $params['selection'];
-        }
-        if (!empty($params['customsort'])) {
-            $customsort = json_decode($params['customsort'], true);
-            $filteroptions['customsort'] = is_array($customsort) ? $customsort : [];
-        }
-        if (!empty($params['customsearch'])) {
-            $customsearch = json_decode($params['customsearch'], true);
-            $filteroptions['customsearch'] = is_array($customsearch) ? $customsearch : [];
-        }
-        if ($params['search'] !== '') {
-            $filteroptions['search'] = $params['search'];
-        }
+        $dlx = browse_request::require_access($params['d']);
+        $filteroptions = browse_request::filter_options($params, $dlx);
 
         $manager = new grid_view_manager();
-        $payload = $manager->get_browse_payload($params['d'], $params['view'], $filteroptions);
+        $payload = $manager->get_browse_payload($dlx, $params['view'], $filteroptions);
         $renderable = new grid_view_browser($payload);
 
         return $renderable->export_for_template($OUTPUT);

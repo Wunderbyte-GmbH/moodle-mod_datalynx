@@ -16,14 +16,12 @@
 
 namespace mod_datalynx\local\view\manager;
 
-use coding_exception;
 use datalynxfield_approve\field as approve_field;
 use datalynxfield_entry\field as entry_field;
 use datalynxfield_entryauthor\field as entryauthor_field;
 use mod_datalynx\datalynx;
-use mod_datalynx\local\datalynx_entries;
-use stdClass;
 use mod_datalynx\local\view\base;
+use stdClass;
 
 /**
  * Builds the structured browse payload for the Tabular view.
@@ -32,108 +30,69 @@ use mod_datalynx\local\view\base;
  * @copyright  2026 David Bogner
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class tabular_view_manager {
+class tabular_view_manager extends view_manager {
+    /**
+     * The view type this manager handles.
+     *
+     * @return string
+     */
+    protected function get_view_type(): string {
+        return 'tabular';
+    }
+
     /**
      * Build the browse payload for one Tabular view page.
      *
-     * @param int $datalynxid
+     * @param datalynx|int $datalynx the instance, or its id
      * @param int $viewid
      * @param array $filteroptions
      * @return array
      */
-    public function get_browse_payload(int $datalynxid, int $viewid, array $filteroptions = []): array {
-        $dlx = new datalynx($datalynxid);
-        $viewrecords = $dlx->get_view_records(true);
+    public function get_browse_payload(datalynx|int $datalynx, int $viewid, array $filteroptions = []): array {
+        $view = $this->open_view($datalynx, $viewid, $filteroptions);
+        $entries = $this->load_entries($view);
+        $payload = $this->build_payload($view, $entries);
 
-        if (empty($viewrecords[$viewid])) {
-            throw new coding_exception('Invalid view id for tabular browse payload.');
-        }
-
-        $viewrecord = $viewrecords[$viewid];
-        if ($viewrecord->type !== 'tabular') {
-            throw new coding_exception('Tabular browse payload manager only supports Tabular views.');
-        }
-
-        $view = $dlx->get_view($viewrecord->type, $viewrecord, false);
-        if (!empty($filteroptions)) {
-            $view->set_filter($filteroptions, $view->is_forcing_filter());
-        }
-
-        $allfields = $view->get_dlx()->get_fields();
-        $fields = $view->remove_duplicates($allfields);
-        $view->get_filter()->contentfields = array_keys($fields);
-
-        $entries = new datalynx_entries($dlx, $view->get_filter());
-        $entries->set_content();
         $entryrecords = $entries->entries();
-        $showentryactions = $this->has_manageable_entries($view, $entryrecords);
-
-        $payload = [
-            'datalynxid' => $dlx->id(),
-            'viewid' => (int) $viewrecord->id,
-            'viewname' => format_string($view->name()),
-            'viewtype' => $view->type(),
-            'entriescount' => (int) $entries->get_count(),
-            'entriesfiltercount' => (int) $entries->get_count(true),
-            'hasentries' => false,
-            'groups' => [],
-            'emptycontent' => get_string('noentries', 'datalynx'),
-        ];
-
         if (empty($entryrecords)) {
             return $payload;
         }
 
+        $fields = $this->get_content_fields($view);
+        $showentryactions = $this->has_manageable_entries($view, $entryrecords);
         $payload['hasentries'] = true;
         $payload['groups'][] = [
             'name' => '',
             'hasname' => false,
             'columns' => $this->build_columns($view, $fields, $showentryactions),
-            'rows' => array_values($this->build_rows($view, $allfields, $fields, $entryrecords)),
+            'rows' => array_values($this->build_rows($view, $view->get_dlx()->get_fields(), $fields, $entryrecords)),
         ];
 
         return $payload;
     }
 
     /**
-     * Determine whether any visible entry is manageable by the current user.
-     *
-     * @param \mod_datalynx\local\view\base $view
-     * @param stdClass[] $entryrecords
-     * @return bool
-     */
-    protected function has_manageable_entries(\mod_datalynx\local\view\base $view, array $entryrecords): bool {
-        foreach ($entryrecords as $entry) {
-            if ($view->get_dlx()->user_can_manage_entry($entry)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
      * Build ordered tabular browse columns.
      *
-     * @param \mod_datalynx\local\view\base $view
+     * @param base $view
      * @param array $fields
      * @param bool $showentryactions
      * @return array
      */
-    protected function build_columns(\mod_datalynx\local\view\base $view, array $fields, bool $showentryactions): array {
+    protected function build_columns(base $view, array $fields, bool $showentryactions): array {
         $columns = [
             ['headerhtml' => '', 'alignclass' => 'text-center'],
             ['headerhtml' => '', 'alignclass' => 'text-left'],
         ];
 
         foreach ($fields as $field) {
-            if (!is_numeric($field->field->id) || (int) $field->field->id <= 0) {
+            if (!self::is_content_field($field)) {
                 continue;
             }
 
             $fieldname = format_string($field->field->name);
             $bulkedittag = "%%{$field->field->name}:bulkedit%%";
-            $bulkedit = $this->resolve_pattern_html($view, $bulkedittag, ['showentryactions' => $showentryactions]);
+            $bulkedit = self::pattern_html($view, $bulkedittag, null, ['showentryactions' => $showentryactions]);
             $columns[] = [
                 'headerhtml' => trim($fieldname . ' ' . $bulkedit),
                 'alignclass' => 'text-left',
@@ -149,7 +108,7 @@ class tabular_view_manager {
             ] as $tag
         ) {
             $columns[] = [
-                'headerhtml' => $this->resolve_pattern_html($view, $tag, ['showentryactions' => $showentryactions]),
+                'headerhtml' => self::pattern_html($view, $tag, null, ['showentryactions' => $showentryactions]),
                 'alignclass' => 'text-center',
             ];
         }
@@ -168,14 +127,14 @@ class tabular_view_manager {
     /**
      * Build ordered tabular browse rows.
      *
-     * @param \mod_datalynx\local\view\base $view
+     * @param base $view
      * @param array $allfields
      * @param array $fields
      * @param stdClass[] $entryrecords
      * @return array
      */
     protected function build_rows(
-        \mod_datalynx\local\view\base $view,
+        base $view,
         array $allfields,
         array $fields,
         array $entryrecords
@@ -193,7 +152,7 @@ class tabular_view_manager {
 
             $cells[] = [
                 'valuehtml' => $authorpicturefield
-                    ? $this->resolve_definition_html(
+                    ? self::definition_html(
                         $authorpicturefield->get_definitions(['##author:picture##'], $entry, ['edit' => false, 'manage' => false]),
                         '##author:picture##'
                     )
@@ -202,7 +161,7 @@ class tabular_view_manager {
             ];
             $cells[] = [
                 'valuehtml' => $authornamefield
-                    ? $this->resolve_definition_html(
+                    ? self::definition_html(
                         $authornamefield->get_definitions(['##author:name##'], $entry, ['edit' => false, 'manage' => false]),
                         '##author:name##'
                     )
@@ -211,14 +170,14 @@ class tabular_view_manager {
             ];
 
             foreach ($fields as $field) {
-                if (!is_numeric($field->field->id) || (int) $field->field->id <= 0) {
+                if (!self::is_content_field($field)) {
                     continue;
                 }
 
                 $tag = base::FIELD_TAG_OPEN . $field->field->name . base::FIELD_TAG_CLOSE;
 
                 $cells[] = [
-                    'valuehtml' => $this->resolve_definition_html(
+                    'valuehtml' => self::definition_html(
                         $field->get_definitions([$tag], $entry, ['edit' => false, 'manage' => false]),
                         $tag
                     ),
@@ -233,7 +192,7 @@ class tabular_view_manager {
                 ] as $tag
             ) {
                 $cells[] = [
-                    'valuehtml' => $this->resolve_definition_html(
+                    'valuehtml' => self::definition_html(
                         $entryfield->get_definitions([$tag], $entry, ['edit' => false, 'manage' => $manageable]),
                         $tag
                     ),
@@ -243,7 +202,7 @@ class tabular_view_manager {
 
             $cells[] = [
                 'valuehtml' => $approvefield
-                    ? $this->resolve_definition_html(
+                    ? self::definition_html(
                         $approvefield->get_definitions(['##approve##'], $entry, [
                             'edit' => false,
                             'manage' => $manageable,
@@ -255,7 +214,7 @@ class tabular_view_manager {
                 'alignclass' => 'text-center',
             ];
             $cells[] = [
-                'valuehtml' => $this->resolve_definition_html(
+                'valuehtml' => self::definition_html(
                     $entryfield->get_definitions(['##select##'], $entry, ['edit' => false, 'manage' => $manageable]),
                     '##select##'
                 ),
@@ -278,33 +237,5 @@ class tabular_view_manager {
         }
 
         return $rows;
-    }
-
-    /**
-     * Resolve a rendered field definition to HTML.
-     *
-     * @param array $definitions
-     * @param string $tag
-     * @return string
-     */
-    protected function resolve_definition_html(array $definitions, string $tag): string {
-        if (empty($definitions[$tag][1]) || !is_string($definitions[$tag][1])) {
-            return '';
-        }
-
-        return $definitions[$tag][1];
-    }
-
-    /**
-     * Resolve a view pattern replacement to HTML.
-     *
-     * @param \mod_datalynx\local\view\base $view
-     * @param string $tag
-     * @param array $options
-     * @return string
-     */
-    protected function resolve_pattern_html(\mod_datalynx\local\view\base $view, string $tag, array $options = []): string {
-        $replacements = $view->patternclass()->get_replacements([$tag], null, $options);
-        return $replacements[$tag] ?? '';
     }
 }

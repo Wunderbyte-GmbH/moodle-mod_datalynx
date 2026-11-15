@@ -16,14 +16,12 @@
 
 namespace mod_datalynx\external;
 
-use context_module;
 use core_external\external_api;
 use core_external\external_function_parameters;
 use core_external\external_multiple_structure;
 use core_external\external_single_structure;
 use core_external\external_value;
 use core_external\external_warnings;
-use mod_datalynx\datalynx;
 use mod_datalynx\local\mobile\entries_payload_builder;
 
 /**
@@ -94,12 +92,7 @@ class get_mobile_entries extends external_api {
             'eids' => $eids,
         ]);
 
-        $cm = get_coursemodule_from_instance('datalynx', $params['d'], 0, false, MUST_EXIST);
-        $context = context_module::instance($cm->id);
-        self::validate_context($context);
-        require_capability('mod/datalynx:viewentry', $context);
-
-        $builder = new entries_payload_builder(new datalynx($params['d']));
+        $builder = new entries_payload_builder(browse_request::require_access($params['d']));
         $payload = $builder->build($params);
         $payload['warnings'] = [];
 

@@ -16,9 +16,8 @@
 
 namespace mod_datalynx\local\view\manager;
 
-use coding_exception;
 use mod_datalynx\datalynx;
-use mod_datalynx\local\datalynx_entries;
+use mod_datalynx\local\view\base;
 
 /**
  * Builds the structured browse payload for the PDF view.
@@ -27,66 +26,62 @@ use mod_datalynx\local\datalynx_entries;
  * @copyright  2026 David Bogner
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class pdf_view_manager {
+class pdf_view_manager extends view_manager {
+    /**
+     * The view type this manager handles.
+     *
+     * @return string
+     */
+    protected function get_view_type(): string {
+        return 'pdf';
+    }
+
+    /**
+     * The view type as it appears in exception messages.
+     *
+     * @return string
+     */
+    protected function get_view_label(): string {
+        return 'PDF';
+    }
+
+    /**
+     * The fields the PDF view's templates use, or all fields when they use none.
+     *
+     * @param base $view
+     * @return array field id => field
+     */
+    public function get_content_fields(base $view): array {
+        // A PDF view, as get_browse_payload() opened it.
+        $fields = $view instanceof \datalynxview_pdf\view ? $view->get_view_fields() : [];
+
+        return $fields ?: parent::get_content_fields($view);
+    }
+
     /**
      * Build the browse payload for one PDF view page.
      *
-     * @param int $datalynxid
+     * @param datalynx|int $datalynx the instance, or its id
      * @param int $viewid
      * @param array $filteroptions
      * @return array
      */
-    public function get_browse_payload(int $datalynxid, int $viewid, array $filteroptions = []): array {
-        $dlx = new datalynx($datalynxid);
-        $viewrecords = $dlx->get_view_records(true);
-
-        if (empty($viewrecords[$viewid])) {
-            throw new coding_exception('Invalid view id for PDF browse payload.');
-        }
-
-        $viewrecord = $viewrecords[$viewid];
-        if ($viewrecord->type !== 'pdf') {
-            throw new coding_exception('PDF browse payload manager only supports PDF views.');
-        }
-
+    public function get_browse_payload(datalynx|int $datalynx, int $viewid, array $filteroptions = []): array {
         /** @var \datalynxview_pdf\view $view */
-        $view = $dlx->get_view($viewrecord->type, $viewrecord, false);
-        if (!empty($filteroptions)) {
-            $view->set_filter($filteroptions, $view->is_forcing_filter());
-        }
-
-        $contentfields = $view->get_view_fields();
-        if (empty($contentfields)) {
-            $contentfields = $view->remove_duplicates($view->get_dlx()->get_fields());
-        }
-        $view->get_filter()->contentfields = array_keys($contentfields);
-
-        $entries = new datalynx_entries($dlx, $view->get_filter());
-        $entries->set_content();
-
-        $payload = [
-            'datalynxid' => (int) $dlx->id(),
-            'viewid' => (int) $viewrecord->id,
-            'viewname' => format_string($view->name()),
-            'viewtype' => $view->type(),
-            'entriescount' => (int) $entries->get_count(),
-            'entriesfiltercount' => (int) $entries->get_count(true),
-            'hasentries' => false,
-            'groups' => [],
-            'emptycontent' => get_string('noentries', 'datalynx'),
-        ];
+        $view = $this->open_view($datalynx, $viewid, $filteroptions);
+        $entries = $this->load_entries($view);
+        $payload = $this->build_payload($view, $entries);
 
         $entryrecords = $entries->entries();
         if (empty($entryrecords)) {
             return $payload;
         }
 
-        $showentryactions = $this->has_manageable_entries($view, $entryrecords);
         $view->set_view_tags([
             'entriescount' => $payload['entriescount'],
             'entriesfiltercount' => $payload['entriesfiltercount'],
             'hidenewentry' => 0,
-            'showentryactions' => $showentryactions,
+            'showentryactions' => $this->has_manageable_entries($view, $entryrecords),
         ]);
 
         $payload['hasentries'] = true;
@@ -97,23 +92,6 @@ class pdf_view_manager {
         ];
 
         return $payload;
-    }
-
-    /**
-     * Determine whether any visible entry is manageable by the current user.
-     *
-     * @param \datalynxview_pdf\view $view
-     * @param array $entryrecords
-     * @return bool
-     */
-    protected function has_manageable_entries(\datalynxview_pdf\view $view, array $entryrecords): bool {
-        foreach ($entryrecords as $entry) {
-            if ($view->get_dlx()->user_can_manage_entry($entry)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**

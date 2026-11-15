@@ -359,27 +359,22 @@ final class get_csv_view_data_test extends advanced_testcase {
      * A PHP-serialized payload in customsort/customsearch must not be unserialized (see issue #238).
      *
      * The pre-fix code passed these request parameters straight to unserialize(), an object-injection
-     * sink. They are now JSON-decoded, so a serialized-object blob is invalid input: it is ignored
-     * rather than instantiated, and no filtering is applied.
+     * sink. Criteria now go through search_criteria, which takes JSON only and rejects anything else
+     * rather than ignoring it, so the request fails instead of listing entries for a question the
+     * user did not ask (#264).
      *
      * @covers ::execute
      */
-    public function test_execute_ignores_serialized_object_payload(): void {
+    public function test_execute_rejects_serialized_object_payload(): void {
         $this->resetAfterTest();
         $this->setAdminUser();
 
-        [$dlx, $view, , $entryone, $entrytwo] = $this->create_csv_multiselect_fixture();
+        [$dlx, $view] = $this->create_csv_multiselect_fixture();
         // A PHP-serialized object string — the pre-fix code would have unserialized this.
         $payload = serialize((object) ['injected' => true]);
 
-        $result = get_csv_view_data::execute($dlx->id(), $view->id, 0, 0, 0, '', '', '', '', 0, $payload, $payload);
-        $result = external_api::clean_returnvalue(get_csv_view_data::execute_returns(), $result);
-
-        // The serialized blob is not valid JSON, so both sort and search are ignored: all entries returned.
-        $this->assertCount(2, $result['groups'][0]['rows']);
-        $ids = [$result['groups'][0]['rows'][0]['id'], $result['groups'][0]['rows'][1]['id']];
-        $this->assertContains($entryone, $ids);
-        $this->assertContains($entrytwo, $ids);
+        $this->expectException(\invalid_parameter_exception::class);
+        get_csv_view_data::execute($dlx->id(), $view->id, 0, 0, 0, '', '', '', '', 0, $payload, $payload);
     }
 
     /**

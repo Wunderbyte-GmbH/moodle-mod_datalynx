@@ -356,4 +356,19 @@ class field extends datalynxfield_no_content {
                 return parent::get_supported_search_operators();
         }
     }
+
+    /**
+     * For the author id and name also '=', which the custom filter's author search writes.
+     *
+     * get_search_sql() compares the author with the value for every operator but ME.
+     *
+     * @return string[]
+     */
+    public function get_accepted_search_operators(): array {
+        $operators = parent::get_accepted_search_operators();
+        if ($operators) {
+            $operators[] = '=';
+        }
+        return $operators;
+    }
 }

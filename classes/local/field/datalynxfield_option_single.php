@@ -282,4 +282,13 @@ class datalynxfield_option_single extends datalynxfield_option {
     public function get_supported_search_operators(): array {
         return ['ANY_OF' => get_string('anyof', 'datalynx'), '' => get_string('empty', 'datalynx')];
     }
+
+    /**
+     * Also '=', which get_search_sql() treats as ANY_OF and saved filters use.
+     *
+     * @return string[]
+     */
+    public function get_accepted_search_operators(): array {
+        return array_merge(parent::get_accepted_search_operators(), ['=']);
+    }
 }

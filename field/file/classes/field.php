@@ -369,6 +369,15 @@ class field extends datalynxfield_base {
     }
 
     /**
+     * The custom filter's has-file selector, which get_search_sql() reads from the value alone.
+     *
+     * @return string[]
+     */
+    public function get_accepted_search_operators(): array {
+        return [''];
+    }
+
+    /**
      * Are fields of this field type suitable for use in customfilters?
      * @return bool
      */

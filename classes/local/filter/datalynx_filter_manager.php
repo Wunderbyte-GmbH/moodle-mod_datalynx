@@ -543,10 +543,16 @@ class datalynx_filter_manager {
                                 if ($value) {
                                     $searchfields[$fieldname]['AND'][] = ['', 'LIKE', $value];
                                 }
-                            } else if (($type == "multiselect" || $type == "checkbox") && $value['andor'] == -2) {
-                                // If andor is set to -2 operator is ALL_OF.
+                            } else if ($type == "multiselect" || $type == "checkbox") {
+                                // The any/all toggle travels with the selected options; it is not
+                                // an option itself. -2 means ALL_OF.
+                                $value = (array) $value;
+                                $operator = ($value['andor'] ?? 0) == -2 ? 'ALL_OF' : 'ANY_OF';
                                 unset($value['andor']);
-                                $searchfields[$fieldname]['AND'][] = ['', 'ALL_OF', $value];
+                                $value = array_values(array_filter($value, fn($option) => (int) $option > 0));
+                                if ($value) {
+                                    $searchfields[$fieldname]['AND'][] = ['', $operator, $value];
+                                }
                             } else if ($type == "file") {
                                 if ($value == '0') {
                                     $searchfields[$fieldname]['AND'][] = ['', '', false];

@@ -16,12 +16,14 @@
 
 namespace mod_datalynx\local\mobile;
 
-use datalynxfield_fieldgroup\field as fieldgroup_field;
 use invalid_parameter_exception;
 use mod_datalynx\datalynx;
-use mod_datalynx\local\datalynx_entries;
+use mod_datalynx\external\browse_request;
 use mod_datalynx\local\filter\search_criteria;
 use mod_datalynx\local\view\base;
+use mod_datalynx\local\view\manager\grid_view_manager;
+use mod_datalynx\local\view\manager\tabular_view_manager;
+use mod_datalynx\local\view\manager\view_manager;
 use moodle_url;
 use stdClass;
 
@@ -32,9 +34,11 @@ use stdClass;
  * (\mod_datalynx\external\get_mobile_entries) go through this one builder, so what the app shows
  * after a search, a view switch or a pull-to-refresh is exactly what it showed on opening.
  *
- * Grid and tabular views are browsable. Their desktop browse payloads differ in shape (grouped
- * entries vs. rows of cells) and carry Bootstrap classes and action links, so they are not passed
- * through. The builder projects both onto one mobile shape instead:
+ * Grid and tabular views are browsable. The entries are opened, filtered and loaded by the same
+ * view managers the desktop browse services use, so the app lists exactly what the web lists.
+ * Their desktop payloads differ in shape (grouped entries vs. rows of cells) and carry Bootstrap
+ * classes and action links, so they are not passed through. The builder projects both onto one
+ * mobile shape instead:
  * - `html`: the entry rendered with the view's own entry template, so an entry looks in the app
  *   the way its author designed it. Action tags render empty (manage => false), and markup the
  *   app cannot use is removed by html_sanitiser.
@@ -50,8 +54,11 @@ use stdClass;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class entries_payload_builder {
-    /** @var string[] View types the app can browse. */
-    const SUPPORTED_TYPES = ['grid', 'tabular'];
+    /** @var string[] View types the app can browse, with the manager that loads their entries. */
+    const MANAGERS = [
+        'grid' => grid_view_manager::class,
+        'tabular' => tabular_view_manager::class,
+    ];
 
     /** @var int Most entries one request may ask for; the app grows its window up to this. */
     const MAX_PERPAGE = 200;
@@ -91,7 +98,7 @@ final class entries_payload_builder {
             'viewid' => $record ? (int) $record->id : 0,
             'viewname' => $record ? format_string($record->name, true, ['context' => $this->dlx->context]) : '',
             'viewtype' => $record ? $record->type : '',
-            'supported' => $record && in_array($record->type, self::SUPPORTED_TYPES, true),
+            'supported' => $record && isset(self::MANAGERS[$record->type]),
             'browserurl' => $this->browser_url($record),
             'canfilter' => false,
             'filterid' => 0,
@@ -113,57 +120,45 @@ final class entries_payload_builder {
             return $payload;
         }
 
-        $view = $this->dlx->get_view($record->type, $record, false);
+        $request['perpage'] = (int) $request['perpage'];
+        $options = browse_request::filter_options([
+            'filterid' => (int) $request['filterid'],
+            'page' => (int) $request['page'],
+            'perpage' => $request['perpage'] > 0 ? min($request['perpage'], self::MAX_PERPAGE) : 0,
+            'eids' => (string) $request['eids'],
+            'search' => trim((string) $request['search']),
+            'customsearch' => (string) $request['criteria'],
+            'customsort' => (string) $request['sort'],
+        ], $this->dlx);
+
+        $managerclass = self::MANAGERS[$record->type];
+        /** @var view_manager $manager */
+        $manager = new $managerclass();
+        // A view that forces its filter offers no search on the desktop either, so the manager
+        // ignores what the client sends for it rather than letting it widen what the view lists.
+        $view = $manager->open_view($this->dlx, (int) $record->id, $options);
         $canfilter = !$view->is_forcing_filter();
         $filtermenu = $canfilter ? $this->get_filter_menu($view) : [];
-
-        $filterid = (int) $request['filterid'];
-        if ($filterid && !array_key_exists($filterid, $filtermenu)) {
+        if ($options['filterid'] && !array_key_exists($options['filterid'], $filtermenu)) {
             throw new invalid_parameter_exception('Filter not available in this view.');
         }
 
-        $options = [
-            'filterid' => $filterid,
-            'page' => max(0, (int) $request['page']),
-            // Always set, so an eids value the request happens to carry under that name is not
-            // picked up from the URL by set_filter().
-            'eids' => clean_param((string) $request['eids'], PARAM_SEQUENCE),
-        ];
-        if ((int) $request['perpage'] > 0) {
-            $options['perpage'] = min((int) $request['perpage'], self::MAX_PERPAGE);
-        }
-        // A view that forces its filter offers no search on the desktop either, so whatever the
-        // client sends for it is ignored rather than allowed to widen what the view lists.
-        $criteria = $sort = [];
-        if ($canfilter) {
-            $options['search'] = trim((string) $request['search']);
-            $criteria = search_criteria::decode_search((string) $request['criteria'], $this->dlx);
-            $sort = search_criteria::decode_sort((string) $request['sort'], $this->dlx);
-            $options['customsearch'] = $criteria;
-            $options['customsort'] = $sort;
-        }
-
-        $view->set_filter($options, true);
         $filter = $view->get_filter();
         $filter->perpage = min((int) $filter->perpage, self::MAX_PERPAGE);
-        $fields = $view->remove_duplicates($this->dlx->get_fields());
-        $filter->contentfields = $this->expand_content_field_ids($fields);
-
-        $entries = new datalynx_entries($this->dlx, $filter);
-        $entries->set_content();
+        $entries = $manager->load_entries($view);
 
         $payload['canfilter'] = $canfilter;
         $payload['filterid'] = (int) ($filter->id ?? 0);
         $payload['page'] = (int) $filter->page;
         $payload['perpage'] = (int) $filter->perpage;
         $payload['search'] = $canfilter ? (string) $filter->search : '';
-        $payload['criteria'] = search_criteria::encode($criteria);
-        $payload['sort'] = search_criteria::encode($sort);
+        $payload['criteria'] = $canfilter ? search_criteria::encode($options['customsearch'] ?? []) : '';
+        $payload['sort'] = $canfilter ? search_criteria::encode($options['customsort'] ?? []) : '';
         $payload['entriescount'] = $entries->get_count();
         $payload['entriesfiltercount'] = $entries->get_count(true);
         $payload['hasmore'] = $filter->perpage > 0
             && ($payload['page'] + 1) * $payload['perpage'] < $payload['entriesfiltercount'];
-        $payload['entries'] = $this->build_entries($view, $fields, $entries->entries() ?? []);
+        $payload['entries'] = $this->build_entries($manager, $view, $entries->entries() ?? []);
         $payload['filters'] = $this->build_filters($filtermenu, $payload['filterid']);
 
         return $payload;
@@ -189,11 +184,11 @@ final class entries_payload_builder {
         }
 
         $default = $records[$this->dlx->get_default_view_id()] ?? null;
-        if ($default && in_array($default->type, self::SUPPORTED_TYPES, true)) {
+        if ($default && isset(self::MANAGERS[$default->type])) {
             return $default;
         }
         foreach ($records as $record) {
-            if (in_array($record->type, self::SUPPORTED_TYPES, true)) {
+            if (isset(self::MANAGERS[$record->type])) {
                 return $record;
             }
         }
@@ -230,7 +225,7 @@ final class entries_payload_builder {
                 'id' => (int) $record->id,
                 'name' => format_string($record->name, true, ['context' => $this->dlx->context]),
                 'type' => $record->type,
-                'supported' => in_array($record->type, self::SUPPORTED_TYPES, true),
+                'supported' => isset(self::MANAGERS[$record->type]),
                 'active' => $current && (int) $current->id === (int) $record->id,
             ];
         }
@@ -276,14 +271,14 @@ final class entries_payload_builder {
     /**
      * Project the entries of one page onto the mobile entry shape.
      *
+     * @param view_manager $manager the manager that loaded the entries
      * @param base $view
-     * @param array $fields all fields of the instance, fieldgroup members removed
      * @param stdClass[] $records
      * @return array
      */
-    private function build_entries(base $view, array $fields, array $records): array {
-        $usetemplate = $view->type() === 'grid' && trim((string) ($view->view->eparam2 ?? '')) !== '';
-        $shown = $this->get_shown_fields($view, $fields);
+    private function build_entries(view_manager $manager, base $view, array $records): array {
+        $usetemplate = $manager->uses_entry_template($view);
+        $shown = $this->get_shown_fields($view, $manager->get_content_fields($view));
         $entries = [];
 
         foreach ($records as $record) {
@@ -295,7 +290,7 @@ final class entries_payload_builder {
             $entries[] = [
                 'id' => (int) $record->id,
                 'html' => $html,
-                'fields' => $this->build_field_values($shown, $record),
+                'fields' => $this->build_field_values($manager, $shown, $record),
                 'userid' => (int) $record->userid,
                 'author' => fullname($record),
                 'approved' => !empty($record->approved),
@@ -317,7 +312,7 @@ final class entries_payload_builder {
      * @return array
      */
     private function get_shown_fields(base $view, array $fields): array {
-        $fields = array_filter($fields, fn($field) => is_numeric($field->field->id) && (int) $field->field->id > 0);
+        $fields = array_filter($fields, [view_manager::class, 'is_content_field']);
         $used = array_intersect_key($fields, $view->get__patterns('field') ?? []);
 
         return $used ?: $fields;
@@ -329,18 +324,15 @@ final class entries_payload_builder {
      * The field's own display path is used, so behaviors (visibility, conditions) and field
      * layouts apply exactly as on the web.
      *
+     * @param view_manager $manager
      * @param array $fields
      * @param stdClass $entry
      * @return array
      */
-    private function build_field_values(array $fields, stdClass $entry): array {
+    private function build_field_values(view_manager $manager, array $fields, stdClass $entry): array {
         $values = [];
         foreach ($fields as $field) {
-            $tag = base::FIELD_TAG_OPEN . $field->field->name . base::FIELD_TAG_CLOSE;
-            $definitions = $field->get_definitions([$tag], $entry, ['edit' => false, 'manage' => false]);
-            $html = isset($definitions[$tag][1]) && is_string($definitions[$tag][1])
-                ? html_sanitiser::for_app($definitions[$tag][1])
-                : '';
+            $html = html_sanitiser::for_app($manager->render_field($field, $entry));
             $text = trim(html_to_text($html, 0, false));
             if ($text === '' && !str_contains($html, '<img')) {
                 continue;
@@ -354,23 +346,5 @@ final class entries_payload_builder {
         }
 
         return $values;
-    }
-
-    /**
-     * The field ids whose content the entries query must load, fieldgroup members included.
-     *
-     * @param array $fields
-     * @return array
-     */
-    private function expand_content_field_ids(array $fields): array {
-        $ids = [];
-        foreach ($fields as $fieldid => $field) {
-            $ids[] = is_numeric($fieldid) ? (int) $fieldid : $fieldid;
-            if ($field instanceof fieldgroup_field) {
-                $ids = array_merge($ids, array_map('intval', $field->fieldids));
-            }
-        }
-
-        return array_values(array_unique($ids));
     }
 }

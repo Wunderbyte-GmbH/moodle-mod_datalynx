@@ -985,6 +985,20 @@ abstract class datalynxfield_base {
     }
 
     /**
+     * Operators a search criterion for this field may carry, as search_criteria checks them.
+     *
+     * The operators a search form offers, plus any the field's get_search_sql() also handles
+     * because saved or built criteria carry them (e.g. '=' that custom filters write). Without
+     * these, criteria the filter engine runs correctly would be rejected when a client sends
+     * them back.
+     *
+     * @return string[]
+     */
+    public function get_accepted_search_operators(): array {
+        return array_map('strval', array_keys($this->get_supported_search_operators()));
+    }
+
+    /**
      * Relations this field can express against the value another entry holds for it.
      *
      * A rule that looks for entries matching the one an event just touched compares field by

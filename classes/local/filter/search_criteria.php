@@ -88,7 +88,7 @@ final class search_criteria {
                 throw self::invalid("field '$fieldid' carries no criteria");
             }
 
-            $operators = array_map('strval', array_keys($field->get_supported_search_operators()));
+            $operators = $field->get_accepted_search_operators();
             foreach ($conjunctions as $conjunction => $list) {
                 if (!in_array($conjunction, self::CONJUNCTIONS, true)) {
                     throw self::invalid("unknown conjunction '$conjunction'");

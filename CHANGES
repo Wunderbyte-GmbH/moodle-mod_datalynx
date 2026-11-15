@@ -1,6 +1,28 @@
 mod_datalynx changes
 ====================
 
+2026-11-15
+----------
+
+- Security: the view browse web services (grid, tabular, CSV, PDF, report) take
+  search and sort criteria only as JSON that passes the strict criteria check
+  the Moodle App service uses: fields of this instance, operators those fields
+  take, scalar values. Anything else, including PHP-serialized strings, is now
+  refused with an invalid parameter error instead of being passed to the filter
+  or silently ignored. A view that forces its filter ignores a client's filter
+  id, search and criteria in these services, as the app service already did.
+- Fix: custom filters no longer put their "any of / all of" toggle among the
+  selected options of multiple-choice fields.
+- Fix: field values of "0" are shown in the AJAX grid, tabular and CSV views
+  instead of being dropped as empty.
+- Code: the browse steps of all view managers and the Moodle App payload live in
+  one base class, `view\manager\view_manager`, and the web services share their
+  parameters and filter handling in `external\browse_request`. Tabular, CSV and
+  PDF views now also load the content of fields inside a fieldgroup, as grid
+  views did. `get_browse_payload()` takes a datalynx instance or its id.
+  Fields can accept search operators beyond those their search forms offer
+  (`datalynxfield_base::get_accepted_search_operators()`).
+
 2026-11-04
 ----------
 

@@ -16,57 +16,42 @@
 
 namespace mod_datalynx\local\view\manager;
 
-use coding_exception;
 use datalynxfield_entry\field as entry_field;
-use datalynxfield_fieldgroup\field as fieldgroup_field;
 use mod_datalynx\datalynx;
-use mod_datalynx\local\datalynx_entries;
-use stdClass;
 use mod_datalynx\local\view\base;
+use stdClass;
 
 /**
- * Builds the structured browse payload for the Grid view pilot.
- *
- * This manager is the first step in separating view data assembly from direct
- * server-side HTML rendering in the legacy view classes.
+ * Builds the structured browse payload for Grid views.
  *
  * @package    mod_datalynx
  * @copyright  2026 David Bogner
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class grid_view_manager {
+class grid_view_manager extends view_manager {
+    /**
+     * The view type this manager handles.
+     *
+     * @return string
+     */
+    protected function get_view_type(): string {
+        return 'grid';
+    }
+
     /**
      * Build the browse payload for one Grid view page.
      *
-     * @param int $datalynxid
+     * @param datalynx|int $datalynx the instance, or its id
      * @param int $viewid
      * @param array $filteroptions
      * @return array
      */
-    public function get_browse_payload(int $datalynxid, int $viewid, array $filteroptions = []): array {
-        $dlx = new datalynx($datalynxid);
-        $viewrecords = $dlx->get_view_records(true);
+    public function get_browse_payload(datalynx|int $datalynx, int $viewid, array $filteroptions = []): array {
+        $view = $this->open_view($datalynx, $viewid, $filteroptions);
+        $entries = $this->load_entries($view);
 
-        if (empty($viewrecords[$viewid])) {
-            throw new coding_exception('Invalid view id for grid browse payload.');
-        }
-        $viewrecord = $viewrecords[$viewid];
-        if ($viewrecord->type !== 'grid') {
-            throw new coding_exception('Grid browse payload manager only supports Grid views.');
-        }
-
-        $view = $dlx->get_view($viewrecord->type, $viewrecord, false);
-        if (!empty($filteroptions)) {
-            $view->set_filter($filteroptions, $view->is_forcing_filter());
-        }
-        $fields = $view->remove_duplicates($view->get_dlx()->get_fields());
-        $view->get_filter()->contentfields = $this->expand_content_field_ids($fields);
-
-        $entries = new datalynx_entries($dlx, $view->get_filter());
-        $entries->set_content();
-
-        $param3 = isset($viewrecord->param3) ? trim($viewrecord->param3) : '';
-        $param4 = isset($viewrecord->param4) ? trim($viewrecord->param4) : '';
+        $param3 = trim((string) ($view->view->param3 ?? ''));
+        $param4 = trim((string) ($view->view->param4 ?? ''));
 
         // Default to 'entry' for existing views where no setting is saved.
         if ($param3 === '') {
@@ -91,19 +76,10 @@ class grid_view_manager {
             $groupclass = 'row g-4';
         }
 
-        $payload = [
-            'datalynxid' => $dlx->id(),
-            'viewid' => (int) $viewrecord->id,
-            'viewname' => format_string($view->name()),
-            'viewtype' => $view->type(),
+        $payload = $this->build_payload($view, $entries) + [
             'nowrapper' => $nowrapper,
             'entrywrapperclass' => $entrywrapperclass,
             'groupclass' => $groupclass,
-            'entriescount' => (int) $entries->get_count(),
-            'entriesfiltercount' => (int) $entries->get_count(true),
-            'hasentries' => false,
-            'groups' => [],
-            'emptycontent' => get_string('noentries', 'datalynx'),
         ];
 
         $entryrecords = $entries->entries();
@@ -115,27 +91,45 @@ class grid_view_manager {
         $payload['groups'][] = [
             'name' => '',
             'hasname' => false,
-            'entries' => array_values($this->build_entries($view, $fields, $entryrecords)),
+            'entries' => array_values($this->build_entries($view, $this->get_content_fields($view), $entryrecords)),
         ];
 
         return $payload;
     }
 
     /**
-     * Build the structured entry payloads for the Grid pilot.
+     * Whether entries are rendered with the view's entry template.
      *
-     * @param \mod_datalynx\local\view\base $view
+     * Any non-empty entry template is rendered through the template itself so that the template
+     * fully controls the entry output (which field tags appear, in which order, and any surrounding
+     * markup or action tags). Only a genuinely empty template falls back to the generic structured
+     * field loop. Previously a "tag only" template (one stripped to whitespace once field and action
+     * tags were removed) was discarded in favour of that generic loop, which rendered every field
+     * regardless of the template, so edits to such a template had no visible effect.
+     *
+     * @param base $view
+     * @return bool
+     */
+    public function uses_entry_template(base $view): bool {
+        return trim((string) ($view->view->eparam2 ?? '')) !== '';
+    }
+
+    /**
+     * Build the structured entry payloads.
+     *
+     * @param base $view
      * @param array $fields
      * @param stdClass[] $entryrecords
      * @return array
      */
-    protected function build_entries(\mod_datalynx\local\view\base $view, array $fields, array $entryrecords): array {
+    protected function build_entries(base $view, array $fields, array $entryrecords): array {
         $entryfield = new entry_field($view->get_dlx());
-        $useentryhtml = $this->requires_rendered_entry_html($view);
+        $useentryhtml = $this->uses_entry_template($view);
         $entries = [];
 
         foreach ($entryrecords as $entry) {
             $manageable = $view->get_dlx()->user_can_manage_entry($entry);
+            $actionoptions = ['manage' => $manageable];
             $entry->baseurl = $view->get_navigationurl();
             $entryhtml = $useentryhtml ? $view->render_entry_html($entry, ['edit' => false, 'manage' => $manageable]) : '';
             $entries[] = [
@@ -144,14 +138,8 @@ class grid_view_manager {
                 // The browser template lists the fields only when there is no entry html, so do not
                 // render every field of the instance for entries that have it.
                 'fields' => $entryhtml === '' ? $this->build_field_values($fields, $entry) : [],
-                'edithtml' => $useentryhtml ? '' : $this->resolve_definition_html(
-                    $entryfield->get_definitions(['##edit##'], $entry, ['manage' => $manageable]),
-                    '##edit##'
-                ),
-                'deletehtml' => $useentryhtml ? '' : $this->resolve_definition_html(
-                    $entryfield->get_definitions(['##delete##'], $entry, ['manage' => $manageable]),
-                    '##delete##'
-                ),
+                'edithtml' => $useentryhtml ? '' : $this->render_field($entryfield, $entry, '##edit##', $actionoptions),
+                'deletehtml' => $useentryhtml ? '' : $this->render_field($entryfield, $entry, '##delete##', $actionoptions),
                 'hasactions' => !$useentryhtml && $manageable,
             ];
         }
@@ -170,75 +158,16 @@ class grid_view_manager {
         $values = [];
 
         foreach ($fields as $field) {
-            if (!is_numeric($field->field->id) || (int) $field->field->id <= 0) {
+            if (!self::is_content_field($field)) {
                 continue;
             }
-
-            $name = format_string($field->field->name);
-            $tag = base::FIELD_TAG_OPEN .
-                $field->field->name .
-                base::FIELD_TAG_CLOSE;
-
-            $definitions = $field->get_definitions([$tag], $entry, ['edit' => false, 'manage' => false]);
             $values[] = [
-                'name' => $name,
+                'name' => format_string($field->field->name),
                 'size' => 3,
-                'valuehtml' => $this->resolve_definition_html($definitions, $tag),
+                'valuehtml' => $this->render_field($field, $entry),
             ];
         }
 
         return $values;
-    }
-
-    /**
-     * Expand displayed field ids to include composite subfields needed for rendering.
-     *
-     * @param array $fields
-     * @return int[]
-     */
-    protected function expand_content_field_ids(array $fields): array {
-        $contentfieldids = [];
-
-        foreach ($fields as $fieldid => $field) {
-            $contentfieldids[] = is_numeric($fieldid) ? (int) $fieldid : $fieldid;
-
-            if ($field instanceof fieldgroup_field) {
-                $contentfieldids = array_merge($contentfieldids, array_map('intval', $field->fieldids));
-            }
-        }
-
-        return array_values(array_unique($contentfieldids));
-    }
-
-    /**
-     * Determine whether the configured entry template needs full rendered HTML.
-     *
-     * Any non-empty entry template is rendered through the template itself so that the template
-     * fully controls the entry output (which field tags appear, in which order, and any surrounding
-     * markup or action tags). Only a genuinely empty template falls back to the generic structured
-     * field loop. Previously a "tag only" template (one stripped to whitespace once field and action
-     * tags were removed) was discarded in favour of that generic loop, which rendered every field
-     * regardless of the template, so edits to such a template had no visible effect.
-     *
-     * @param \mod_datalynx\local\view\base $view
-     * @return bool
-     */
-    protected function requires_rendered_entry_html(\mod_datalynx\local\view\base $view): bool {
-        return trim((string) ($view->view->eparam2 ?? '')) !== '';
-    }
-
-    /**
-     * Resolve the rendered HTML string from a field definition map.
-     *
-     * @param array $definitions
-     * @param string $tag
-     * @return string
-     */
-    protected function resolve_definition_html(array $definitions, string $tag): string {
-        if (empty($definitions[$tag][1]) || !is_string($definitions[$tag][1])) {
-            return '';
-        }
-
-        return $definitions[$tag][1];
     }
 }

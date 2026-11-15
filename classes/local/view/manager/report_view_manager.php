@@ -16,7 +16,6 @@
 
 namespace mod_datalynx\local\view\manager;
 
-use coding_exception;
 use mod_datalynx\datalynx;
 
 /**
@@ -26,36 +25,30 @@ use mod_datalynx\datalynx;
  * @copyright  2026 David Bogner
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class report_view_manager {
+class report_view_manager extends view_manager {
+    /**
+     * The view type this manager handles.
+     *
+     * @return string
+     */
+    protected function get_view_type(): string {
+        return 'report';
+    }
+
     /**
      * Build the browse payload for one Report view page.
      *
-     * @param int $datalynxid
+     * @param datalynx|int $datalynx the instance, or its id
      * @param int $viewid
-     * @param array $filteroptions
+     * @param array $filteroptions filter options, plus 'timescope' for the report's time scope
      * @return array
      */
-    public function get_browse_payload(int $datalynxid, int $viewid, array $filteroptions = []): array {
-        $dlx = new datalynx($datalynxid);
-        $viewrecords = $dlx->get_view_records(true);
-
-        if (empty($viewrecords[$viewid])) {
-            throw new coding_exception('Invalid view id for report browse payload.');
-        }
-
-        $viewrecord = $viewrecords[$viewid];
-        if ($viewrecord->type !== 'report') {
-            throw new coding_exception('Report browse payload manager only supports Report views.');
-        }
-
+    public function get_browse_payload(datalynx|int $datalynx, int $viewid, array $filteroptions = []): array {
         $timescope = $filteroptions['timescope'] ?? null;
         unset($filteroptions['timescope']);
 
         /** @var \datalynxview_report\view $view */
-        $view = $dlx->get_view($viewrecord->type, $viewrecord, false);
-        if (!empty($filteroptions)) {
-            $view->set_filter($filteroptions, $view->is_forcing_filter());
-        }
+        $view = $this->open_view($datalynx, $viewid, $filteroptions);
         if (!empty($timescope)) {
             $view->set_report_scope($timescope);
         }

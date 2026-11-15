@@ -540,6 +540,15 @@ class field extends datalynxfield_base {
     }
 
     /**
+     * Also ANY_OF, which the custom filter writes and get_search_sql() treats like OTHER_USER.
+     *
+     * @return string[]
+     */
+    public function get_accepted_search_operators(): array {
+        return array_merge(parent::get_accepted_search_operators(), ['ANY_OF']);
+    }
+
+    /**
      * Check if group by is supported.
      *
      * @return bool

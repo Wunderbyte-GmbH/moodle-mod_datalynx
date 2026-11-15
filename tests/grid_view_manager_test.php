@@ -116,7 +116,7 @@ final class grid_view_manager_test extends advanced_testcase {
         $manager = new grid_view_manager();
         $payload = $manager->get_browse_payload($dlx->id(), $view->id);
 
-        $this->assertSame($dlx->id(), $payload['datalynxid']);
+        $this->assertSame((int) $dlx->id(), $payload['datalynxid']);
         $this->assertSame($view->id, $payload['viewid']);
         $this->assertTrue($payload['hasentries']);
         $this->assertCount(1, $payload['groups']);

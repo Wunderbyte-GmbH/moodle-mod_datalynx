@@ -411,6 +411,15 @@ class field extends datalynxfield_base {
     }
 
     /**
+     * Also ANY_OF, which the custom filter writes and get_search_sql() reads as a range.
+     *
+     * @return string[]
+     */
+    public function get_accepted_search_operators(): array {
+        return array_merge(parent::get_accepted_search_operators(), ['ANY_OF']);
+    }
+
+    /**
      * Is $value a valid content or do we see an empty input?
      * @param mixed $value Field value to check.
      * @return bool

@@ -16,9 +16,7 @@
 
 namespace mod_datalynx\local\view\manager;
 
-use coding_exception;
 use mod_datalynx\datalynx;
-use mod_datalynx\local\datalynx_entries;
 use stdClass;
 
 /**
@@ -28,52 +26,38 @@ use stdClass;
  * @copyright  2026 David Bogner
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class csv_view_manager {
+class csv_view_manager extends view_manager {
+    /**
+     * The view type this manager handles.
+     *
+     * @return string
+     */
+    protected function get_view_type(): string {
+        return 'csv';
+    }
+
+    /**
+     * The view type as it appears in exception messages.
+     *
+     * @return string
+     */
+    protected function get_view_label(): string {
+        return 'CSV';
+    }
+
     /**
      * Build the browse payload for one CSV view page.
      *
-     * @param int $datalynxid
+     * @param datalynx|int $datalynx the instance, or its id
      * @param int $viewid
      * @param array $filteroptions
      * @return array
      */
-    public function get_browse_payload(int $datalynxid, int $viewid, array $filteroptions = []): array {
-        $dlx = new datalynx($datalynxid);
-        $viewrecords = $dlx->get_view_records(true);
-
-        if (empty($viewrecords[$viewid])) {
-            throw new coding_exception('Invalid view id for CSV browse payload.');
-        }
-
-        $viewrecord = $viewrecords[$viewid];
-        if ($viewrecord->type !== 'csv') {
-            throw new coding_exception('CSV browse payload manager only supports CSV views.');
-        }
-
+    public function get_browse_payload(datalynx|int $datalynx, int $viewid, array $filteroptions = []): array {
         /** @var \datalynxview_csv\view $view */
-        $view = $dlx->get_view($viewrecord->type, $viewrecord, false);
-        if (!empty($filteroptions)) {
-            $view->set_filter($filteroptions, $view->is_forcing_filter());
-        }
-
-        $allfields = $view->get_dlx()->get_fields();
-        $contentfields = $view->remove_duplicates($allfields);
-        $view->get_filter()->contentfields = array_keys($contentfields);
-
-        $entries = new datalynx_entries($dlx, $view->get_filter());
-        $entries->set_content();
-
-        $payload = [
-            'datalynxid' => (int) $dlx->id(),
-            'viewid' => (int) $viewrecord->id,
-            'viewname' => format_string($view->name()),
-            'viewtype' => $view->type(),
-            'entriescount' => (int) $entries->get_count(),
-            'entriesfiltercount' => (int) $entries->get_count(true),
-            'hasentries' => false,
-            'groups' => [],
-            'emptycontent' => get_string('noentries', 'datalynx'),
-        ];
+        $view = $this->open_view($datalynx, $viewid, $filteroptions);
+        $entries = $this->load_entries($view);
+        $payload = $this->build_payload($view, $entries);
 
         $entryrecords = $entries->entries();
         if (empty($entryrecords)) {
@@ -86,7 +70,7 @@ class csv_view_manager {
             'hasname' => false,
             'hasheaders' => $view->has_headers_for_browser(),
             'columns' => $this->build_columns($view),
-            'rows' => array_values($this->build_rows($view, $allfields, $entryrecords)),
+            'rows' => array_values($this->build_rows($view, $view->get_dlx()->get_fields(), $entryrecords)),
         ];
 
         return $payload;
@@ -194,17 +178,6 @@ class csv_view_manager {
      * @return string
      */
     protected function resolve_cell_html(\datalynxview_csv\view $view, ?object $field, stdClass $entry, string $tag): string {
-        if ($field) {
-            $definitions = $field->get_definitions([$tag], $entry, ['edit' => false, 'manage' => false]);
-            $html = $definitions[$tag][1] ?? '';
-            return is_string($html) ? $html : '';
-        }
-
-        $replacements = $view->patternclass()->get_replacements([$tag], $entry);
-        if (!empty($replacements[$tag]) && is_string($replacements[$tag])) {
-            return $replacements[$tag];
-        }
-
-        return '';
+        return $field ? $this->render_field($field, $entry, $tag) : self::pattern_html($view, $tag, $entry);
     }
 }
