@@ -271,6 +271,16 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
             $data->customsearch = serialize($searchfields);
         }
 
+        // User ids in team member criteria, e.g. "any of" these members, point to the restored users.
+        // On the same site a user who is not part of the backup keeps their id; elsewhere the
+        // criterion drops them.
+        $samesite = $this->get_task()->is_samesite();
+        \mod_datalynx\local\filter\stored_criteria::normalise_filter_record(
+            $data,
+            \mod_datalynx\local\filter\stored_criteria::field_types((int) $data->dataid),
+            fn(int $userid): int => (int) $this->get_mappingid('user', $userid) ?: ($samesite ? $userid : 0)
+        );
+
         // Insert the datalynx_filters record.
         $newitemid = $DB->insert_record('datalynx_filters', $data);
         $this->set_mapping('datalynx_filter', $oldid, $newitemid, false); // No files associated.
@@ -948,18 +958,15 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
             }
         }
 
-        // Update teammmemberselect reference field ids.
-        $sqllike = $DB->sql_like('df.type', ':type', false);
-        $sql = "SELECT df.id, df.param5
-                  FROM {datalynx_fields} df
-                 WHERE $sqllike
-                   AND df.dataid = :dataid
-                   AND " .
-                $DB->sql_cast_char2int('df.param5') . " NOT IN (0, -1)";
-        $results = $DB->get_records_sql_menu(
-            $sql,
-            ['type' => 'teammemberselect', 'dataid' => $datalynxnewid]
+        // Update teammmemberselect reference field ids. The setting may be empty, so it is read
+        // as text: casting '' to a number fails on some databases.
+        $results = $DB->get_records_menu(
+            'datalynx_fields',
+            ['type' => 'teammemberselect', 'dataid' => $datalynxnewid],
+            '',
+            'id, param5'
         );
+        $results = array_filter($results, fn($referencefieldid) => (int) $referencefieldid > 0);
 
         foreach ($results as $id => $referencefieldid) {
             $newreferencefieldid = $this->get_mappingid('datalynx_field', $referencefieldid);

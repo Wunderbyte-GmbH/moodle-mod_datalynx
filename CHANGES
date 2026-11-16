@@ -55,6 +55,21 @@ mod_datalynx changes
   longer enrolled) cannot be kept by the edit form. Saving the entry for any
   reason removed them silently; the edit form now warns at the field that they
   will be removed, and saving names who was removed.
+- Fix (#305, continued): filters on the institution or department of team
+  members found nothing, because they looked for the member ids in a stored
+  form that is no longer written. They now read the member lists. "My
+  department" with an empty own department matches nothing (before it would
+  have matched almost every team); deleted users are not members; NOT selects
+  the entries without such a member.
+- Saved filters keep their criteria in one form; saving, the upgrade and restore
+  write it: "I am a team member" stores no user (it always means the current
+  user; the filter settings showed whoever saved the filter as selected), user
+  ids as numbers, no criteria or sort entries on fields that no longer exist
+  (they made the view fail in the browse services). Restore maps the users in
+  team member criteria. Team member lists are normalised once more. Leftover
+  search and sort user preferences, which nothing reads, are removed.
+- A team member select field whose institution or department a filter searches
+  cannot be deleted, like any other field a filter uses.
 
 2026-11-15
 ----------

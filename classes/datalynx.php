@@ -34,6 +34,7 @@ use html_writer;
 use mod_datalynx\local\field\datalynxfield_behavior;
 use mod_datalynx\local\field\datalynxfield_layout;
 use mod_datalynx\local\filter\datalynx_filter_manager;
+use mod_datalynx\local\filter\stored_criteria;
 use mod_datalynx\local\rule\manager;
 use mod_datalynx\local\view\base;
 use moodle_exception;
@@ -1259,11 +1260,17 @@ class datalynx {
         $usedfilters = [];
         $fieldids = array_keys($fields);
         foreach ($filters as $filter) {
-            $custormsort = unserialize($filter->customsort);
+            $custormsort = unserialize((string) $filter->customsort);
             $custormsort = $custormsort ? array_keys($custormsort) : [];
 
-            $customsearch = unserialize($filter->customsearch);
+            $customsearch = unserialize((string) $filter->customsearch);
             $customsearch = $customsearch ? array_keys($customsearch) : [];
+            // A criterion on a team member's profile field uses the team member select field.
+            foreach ($customsearch as $key) {
+                if (preg_match(stored_criteria::PROFILE_KEY, (string) $key, $matches)) {
+                    $customsearch[] = (int) $matches[1];
+                }
+            }
 
             if (array_intersect($fieldids, $customsearch) || array_intersect($fieldids, $custormsort)) {
                 $usedfilters[] = $filter;

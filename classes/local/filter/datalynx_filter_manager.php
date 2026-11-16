@@ -414,6 +414,9 @@ class datalynx_filter_manager {
     public function save_filter($filter): datalynx_filter|stdClass {
         global $DB;
 
+        // Saved criteria have one form, whichever form or service wrote them.
+        stored_criteria::normalise_filter_record($filter, stored_criteria::field_types((int) $this->dlx->id()));
+
         if ($filter->id) {
             $DB->update_record('datalynx_filters', $filter);
             $eventclass = '\mod_datalynx\event\field_updated';
@@ -583,6 +586,7 @@ class datalynx_filter_manager {
                 }
             }
         }
+        $searchfields = stored_criteria::normalise_search($searchfields, stored_criteria::field_types((int) $this->dlx->id()));
         if ($searchfields) {
             $filter->customsearch = serialize($searchfields);
         }

@@ -72,6 +72,9 @@ class field extends datalynxfield_no_content_can_join {
     /** Operator constant for matching a literal value. */
     const OPERATOR_LITERAL_VALUE = 'LITERAL_VALUE';
 
+    /** @var string[] The profile fields of team members that can be searched. */
+    const PROFILE_FIELDS = ['institution', 'department'];
+
     /**
      * Returns false to indicate this field does not support group by.
      *
@@ -102,7 +105,7 @@ class field extends datalynxfield_no_content_can_join {
             return $field instanceof datalynxfield_teammemberselect;
         });
 
-        $userprofilefields = ['institution', 'department'];
+        $userprofilefields = self::PROFILE_FIELDS;
 
         foreach ($teammemberselectfields as $field) {
             $fieldname = $field->field->name;
@@ -136,15 +139,8 @@ class field extends datalynxfield_no_content_can_join {
      * @return string
      */
     public function get_search_from_sql(): string {
-        $fieldidcomponents = $this->get_field_id_components();
-        $queriedfieldid = $fieldidcomponents["queriedfieldid"];
-
-        if (is_numeric($queriedfieldid) && $queriedfieldid > 0) {
-            return " LEFT JOIN {datalynx_contents} c$queriedfieldid"
-                . " ON c$queriedfieldid.entryid = e.id AND c$queriedfieldid.fieldid = $queriedfieldid ";
-        } else {
-            return "";
-        }
+        // The search selects entry ids from the decoded member lists; it needs no join.
+        return '';
     }
 
     /**
@@ -169,88 +165,70 @@ class field extends datalynxfield_no_content_can_join {
 
     /**
      * {@inheritDoc}
+     *
+     * An entry matches when its team holds a user whose profile field has the value: a literal
+     * value, or the current user's own value. The member lists are decoded, so they match in
+     * whatever form they are stored. An empty value matches nothing (an empty own profile field
+     * must not open up every team); deleted users are not members. NOT selects the entries
+     * whose team holds no such user, entries without a team included.
+     *
      * @param array $search Search parameters array [not, operator, value].
      * @return array SQL fragment, params, and join flag.
      * @see datalynxfield_base::get_search_sql()
      */
     public function get_search_sql(array $search): array {
         global $DB;
+        static $i = 0;
+        $i++;
 
         [$not, $operator, $value] = $search;
-
-        $fieldidcomponents = $this->get_field_id_components();
-        $queriedfieldid = $fieldidcomponents["queriedfieldid"];
-        $profilefieldname = $fieldidcomponents["profilefieldname"];
-
-        $paramprefix = "eid_";
-
-        $userswithprofilefieldvalue = $this->get_users_with_profile_field_value($profilefieldname, $operator, $value, $not);
-
-        if (empty($userswithprofilefieldvalue)) {
-            $sql = self::SQL_NEVERTRUE;
-            $params = [];
-        } else {
-            $userids = array_keys($userswithprofilefieldvalue);
-            // Get entryids for the users that have the selected field value.
-            $conditions = [];
-            $params = [
-                    'dataid' => $this->dlx->id(),
-                    'fieldid' => $queriedfieldid,
-            ];
-
-            foreach ($userids as $key => $userid) {
-                // Use placeholders for user IDs to prevent SQL injection.
-                $conditions[] = $DB->sql_like('dc.content', ':userid' . $key, false, false, false);
-                // Add user ID to the parameters array.
-                $params['userid' . $key] = '%"' . $userid . '"%';
-            }
-
-            $like = implode(' OR ', $conditions);
-
-            $eidsql = "
-                SELECT dc.entryid
-                FROM {datalynx_contents} dc
-                JOIN {datalynx_fields} df ON dc.fieldid = df.id
-                WHERE df.dataid = :dataid
-                  AND dc.fieldid = :fieldid
-                  AND ($like)
-            ";
-
-            $eids = $DB->get_fieldset_sql($eidsql, $params);
-            if (empty($eids)) {
-                return [self::SQL_NEVERTRUE, [], false];
-            }
-            [$insql, $inparams] = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED, $paramprefix);
-            $sql = "e.id $insql";
-            $params = $inparams;
+        if ($operator !== self::OPERATOR_LITERAL_VALUE && $operator !== self::OPERATOR_MY_PROFILE_FIELD) {
+            return ['', [], false];
         }
-        $usecontent = false;
-        return [$sql, $params, $usecontent];
+
+        $entryids = [];
+        $userids = $this->get_users_with_profile_field_value($operator, (string) $value);
+        $teamfield = $userids ? $this->dlx->get_field_from_id($this->get_field_id_components()['queriedfieldid']) : null;
+        if ($teamfield instanceof datalynxfield_teammemberselect) {
+            $members = $teamfield->get_all_userids_in_all_entries();
+            foreach ($userids as $userid) {
+                foreach ($members[$userid] ?? [] as $entryid) {
+                    $entryids[$entryid] = (int) $entryid;
+                }
+            }
+        }
+
+        if (!$entryids) {
+            return [$not ? ' 1 = 1 ' : ' 1 = 0 ', [], false];
+        }
+        [$insql, $params] = $DB->get_in_or_equal(array_values($entryids), SQL_PARAMS_NAMED, "etmpf{$i}_", !$not);
+        return [" e.id $insql ", $params, false];
     }
 
     /**
-     * Returns users whose profile field matches the given value.
+     * The ids of the active users whose profile field has the searched value.
      *
-     * @param string $profilefieldname
-     * @param string $operator
-     * @param mixed $value
-     * @param bool $not
-     * @return array
+     * @param string $operator LITERAL_VALUE or MY_PROFILE_FIELD
+     * @param string $value the literal value
+     * @return int[]
      */
-    private function get_users_with_profile_field_value($profilefieldname, $operator, $value, $not): array {
+    private function get_users_with_profile_field_value(string $operator, string $value): array {
         global $DB, $USER;
 
-        $sql = $not ?
-                "SELECT u.id
-                FROM {user} u
-                WHERE u.$profilefieldname != ?"
-                : "SELECT u.id
-                FROM {user} u
-                WHERE u.$profilefieldname = ?";
-
-        $searchvalue = ($operator == self::OPERATOR_MY_PROFILE_FIELD) ? $USER->$profilefieldname : $value;
-
-        return $DB->get_records_sql($sql, [$searchvalue]);
+        $profilefield = $this->get_field_id_components()['profilefieldname'];
+        if (!in_array($profilefield, self::PROFILE_FIELDS, true)) {
+            return [];
+        }
+        $searchvalue = $operator === self::OPERATOR_MY_PROFILE_FIELD ? (string) ($USER->$profilefield ?? '') : $value;
+        if (trim($searchvalue) === '') {
+            return [];
+        }
+        return array_map('intval', $DB->get_fieldset_select(
+            'user',
+            'id',
+            "deleted = 0 AND $profilefield = :value",
+            ['value' => trim($searchvalue)]
+        ));
     }
 
     /**

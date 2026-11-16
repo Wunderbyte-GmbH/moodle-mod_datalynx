@@ -1399,6 +1399,22 @@ function xmldb_datalynx_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2026111601, 'datalynx');
     }
 
+    if ($oldversion < 2026111602) {
+        // Team member lists are JSON arrays of user ids, also on sites that skipped versions (#305).
+        \datalynxfield_teammemberselect\field::normalize_stored_content();
+        // Saved filter criteria in one form: no user id for "I am a team member", user ids as
+        // numbers, no criteria or sort entries on fields that no longer exist (#305).
+        \mod_datalynx\local\filter\stored_criteria::normalize_stored_filters();
+        // Search and sort criteria were once kept as user preferences; nothing reads them any more.
+        $DB->delete_records_select(
+            'user_preferences',
+            $DB->sql_like('name', ':search') . ' OR ' . $DB->sql_like('name', ':sort'),
+            ['search' => 'datalynx\\_%\\_customsearch', 'sort' => 'datalynx\\_%\\_customsort']
+        );
+
+        upgrade_mod_savepoint(true, 2026111602, 'datalynx');
+    }
+
     return true;
 }
 
