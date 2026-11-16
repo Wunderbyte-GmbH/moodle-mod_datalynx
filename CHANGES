@@ -25,6 +25,13 @@ mod_datalynx changes
   broke are repaired; unreadable ones fall back to the defaults with a
   debugging message. Stored settings no longer instantiate classes other than
   stdClass.
+- Fieldgroups: the list of subfields is stored in one form, "fieldid" or
+  "fieldid:format|behavior|layout". The upgrade and restore convert older lists
+  (bare numbers, empty slots that showed as "#NaN" rows in the subfield
+  settings). Restore now also maps a subfield created after its fieldgroup;
+  before, its id was lost. Deleting a field used in a fieldgroup with a
+  behavior or layout is blocked like any other subfield, and such subfields are
+  expanded correctly in views.
 
 2026-11-15
 ----------

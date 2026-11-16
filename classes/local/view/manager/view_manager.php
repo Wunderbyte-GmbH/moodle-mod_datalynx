@@ -128,7 +128,7 @@ abstract class view_manager {
         foreach ($fields as $fieldid => $field) {
             $ids[] = is_numeric($fieldid) ? (int) $fieldid : $fieldid;
             if ($field instanceof fieldgroup_field) {
-                $ids = array_merge($ids, array_map('intval', $field->fieldids));
+                $ids = array_merge($ids, $field->get_subfield_ids());
             }
         }
 

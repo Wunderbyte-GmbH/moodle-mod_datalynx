@@ -1383,6 +1383,14 @@ function xmldb_datalynx_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2026111502, 'datalynx');
     }
 
+    if ($oldversion < 2026111600) {
+        // Fieldgroups list their subfields as "fieldid" or "fieldid:format|behavior|layout"
+        // strings; older versions stored bare numbers and empty slots.
+        \datalynxfield_fieldgroup\field::normalize_stored_subfields();
+
+        upgrade_mod_savepoint(true, 2026111600, 'datalynx');
+    }
+
     return true;
 }
 

@@ -1284,7 +1284,7 @@ class datalynx {
         $fieldids = array_keys($fields);
         foreach ($fieldgroups as $fieldgroup) {
             if (!empty($fieldgroup->fieldids)) {
-                if (array_intersect($fieldids, $fieldgroup->fieldids)) {
+                if (array_intersect($fieldids, $fieldgroup->get_subfield_ids())) {
                     $usedfieldgroups[] = $fieldgroup;
                 }
             }

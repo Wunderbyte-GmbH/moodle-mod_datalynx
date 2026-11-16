@@ -3014,7 +3014,7 @@ abstract class base {
     public function remove_duplicates($fields): array {
         foreach ($fields as $field) {
             if ($field->type == 'fieldgroup') {
-                foreach ($field->fieldids as $fieldwithin) {
+                foreach ($field->get_subfield_ids() as $fieldwithin) {
                     unset($fields[$fieldwithin]);
                 }
             }

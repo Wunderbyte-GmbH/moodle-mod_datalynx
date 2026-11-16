@@ -172,26 +172,8 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
 
         $data->dataid = $this->get_new_parentid('datalynx');
 
-        // In case we restore a fieldgroup we need to update mapping of param1.
-        if ($data->type == 'fieldgroup') {
-            $oldsubfields = json_decode($data->param1, true) ?: [];
-            $newsubfields = [];
-            foreach ($oldsubfields as $oldsubfield) {
-                // Support both legacy bare-integer format and new "fieldid:format|behavior|layout" format.
-                $entry     = (string) $oldsubfield;
-                $colonpos  = strpos($entry, ':');
-                if ($colonpos !== false) {
-                    $oldfieldid = (int) substr($entry, 0, $colonpos);
-                    $modifiers  = substr($entry, $colonpos); // Includes the leading ':' separator.
-                } else {
-                    $oldfieldid = (int) $entry;
-                    $modifiers  = '';
-                }
-                $newfieldid   = $this->get_mappingid('datalynx_field', $oldfieldid);
-                $newsubfields[] = $newfieldid . $modifiers;
-            }
-            $data->param1 = json_encode($newsubfields);
-        }
+        // The subfield list of a fieldgroup is remapped in after_execute(), once every field of the
+        // instance has its new id: a subfield may come after its fieldgroup in the backup.
 
         // When datalynxview restored on the same site, keep the reference to the datalynx
         // instance unchanged.
@@ -836,6 +818,22 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
         }
 
         $datalynxnewid = $this->get_new_parentid('datalynx');
+
+        // Subfields of fieldgroups get their new ids here, once every field is restored. The list
+        // is brought into the current form in the task's after_restore().
+        $fieldgroups = $DB->get_records('datalynx_fields', ['dataid' => $datalynxnewid, 'type' => 'fieldgroup'], '', 'id, param1');
+        foreach ($fieldgroups as $fieldgroup) {
+            $entries = json_decode((string) $fieldgroup->param1, true);
+            if (!is_array($entries)) {
+                continue;
+            }
+            foreach ($entries as $key => $entry) {
+                [$oldfieldid, $modifiers] = array_pad(explode(':', (string) $entry, 2), 2, null);
+                $newfieldid = (int) $oldfieldid ? (int) $this->get_mappingid('datalynx_field', (int) $oldfieldid) : 0;
+                $entries[$key] = ($newfieldid ?: '') . ($modifiers !== null ? ":$modifiers" : '');
+            }
+            $DB->set_field('datalynx_fields', 'param1', json_encode(array_values($entries)), ['id' => $fieldgroup->id]);
+        }
 
         // Default view.
         if (

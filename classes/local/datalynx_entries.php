@@ -33,6 +33,7 @@ use datalynxfield_entry\field as datalynxfield_entry;
 use datalynxfield_entryauthor\field as datalynxfield_entryauthor;
 use datalynxfield_entrygroup\field as datalynxfield_entrygroup;
 use datalynxfield_entrytime\field as datalynxfield_entrytime;
+use datalynxfield_fieldgroup\field as fieldgroup_field;
 use datalynxfield_status\field as datalynxfield_status;
 use dml_exception;
 use invalid_parameter_exception;
@@ -1053,8 +1054,8 @@ class datalynx_entries {
                                     foreach ($fglines as $fieldgroup => $lines) {
                                         $groupid = (int) substr($fieldgroup, strlen('fieldgroup_'));
                                         $subfieldids = [];
-                                        if (isset($fields[$groupid]) && !empty($fields[$groupid]->fieldids)) {
-                                            $subfieldids = array_map('intval', $fields[$groupid]->fieldids);
+                                        if (isset($fields[$groupid]) && $fields[$groupid] instanceof fieldgroup_field) {
+                                            $subfieldids = $fields[$groupid]->get_subfield_ids();
                                         }
                                         foreach ($lines as $i => $line) {
                                             if (!empty($line['hasvalue'])) {
