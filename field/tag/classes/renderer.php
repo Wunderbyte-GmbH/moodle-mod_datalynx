@@ -133,7 +133,8 @@ class renderer extends datalynxfield_renderer {
         $field = $this->field;
         $fieldid = $field->id();
 
-        $selected = $value;
+        // The tags of a saved criterion arrive JSON-encoded.
+        $selected = self::decode_saved_search_value($value);
 
         $fieldname = "f_{$i}_$fieldid";
         $select = &$mform->createElement(

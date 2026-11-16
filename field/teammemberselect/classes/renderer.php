@@ -280,7 +280,8 @@ class renderer extends datalynxfield_renderer {
         $elements = [];
         $elements[] = $mform->createElement('autocomplete', $fieldname, null, $menu, $options);
         $mform->setType($fieldname, PARAM_INT);
-        $mform->setDefault($fieldname, $value);
+        // The users of a saved criterion arrive JSON-encoded; the autocomplete needs a list.
+        $mform->setDefault($fieldname, self::decode_saved_search_value($value));
         $mform->disabledIf($fieldname, "searchoperator{$i}", 'eq', '');
         $mform->disabledIf($fieldname, "searchoperator{$i}", 'eq', 'USER');
 

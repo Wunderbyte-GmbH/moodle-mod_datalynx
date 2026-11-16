@@ -36,6 +36,10 @@ mod_datalynx changes
   updates the views; a sorted filter keeps its sort by internal fields (time
   created, ...) when read back from its URL; the tag index lets authors see
   their own tagged entries.
+- Fix (#318): editing a saved filter or a behavior condition shows the saved
+  values of number, time, team member and tag criteria (they arrived as JSON
+  text and were read character by character); saving it again no longer loses
+  them.
 
 2026-11-16
 ----------

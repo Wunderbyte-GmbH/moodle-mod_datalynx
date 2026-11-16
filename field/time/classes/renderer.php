@@ -122,6 +122,8 @@ class renderer extends datalynxfield_renderer {
      * @return array
      */
     public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = ''): array {
+        // The bounds of a saved criterion arrive JSON-encoded.
+        $value = $value === '' ? [] : (array) self::decode_saved_search_value($value);
         $field = $this->field;
         $fieldid = $field->id();
         $fieldname = "f_{$i}_{$fieldid}";

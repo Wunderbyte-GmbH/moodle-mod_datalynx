@@ -218,11 +218,7 @@ class renderer extends datalynxfield_renderer {
         $elements[] = $mform->createElement('autocomplete', $fieldname, null, $menu, $options);
         // The condition value arrives JSON-encoded (the form contract types it as a string),
         // but a multiple-selection autocomplete needs its default as an array of option keys.
-        $default = $value;
-        if (is_string($value) && $value !== '') {
-            $decoded = json_decode($value, true);
-            $default = is_array($decoded) ? $decoded : $value;
-        }
+        $default = self::decode_saved_search_value($value);
         $mform->setType($fieldname, PARAM_INT);
         $mform->setDefault($fieldname, $default);
 

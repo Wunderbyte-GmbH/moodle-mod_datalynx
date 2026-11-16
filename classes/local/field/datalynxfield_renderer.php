@@ -696,6 +696,23 @@ abstract class datalynxfield_renderer {
     }
 
     /**
+     * The stored value of a search criterion as render_search_mode() gets it.
+     *
+     * The filter and behavior forms pass the value as a string; a value that is a list (bounds of a
+     * range, chosen options, users, tags) arrives JSON-encoded and is decoded here.
+     *
+     * @param string $value
+     * @return array|string the decoded list, or the value itself
+     */
+    protected static function decode_saved_search_value(string $value): array|string {
+        if ($value === '' || !in_array($value[0], ['[', '{'], true)) {
+            return $value;
+        }
+        $decoded = json_decode($value, true);
+        return is_array($decoded) ? $decoded : $value;
+    }
+
+    /**
      * TODO: make abstract once all field types have been updated
      *
      * @param MoodleQuickForm $mform
