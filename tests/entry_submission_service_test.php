@@ -38,6 +38,7 @@ use ReflectionClass;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \mod_datalynx\local\entry\entry_submission_service
  * @covers     \mod_datalynx\local\view\datalynxview_entries_form::validation
+ * @covers     \mod_datalynx\local\view\datalynxview_entries_form::get_page_errors
  */
 final class entry_submission_service_test extends advanced_testcase {
     use mobile_test_trait;
@@ -214,6 +215,34 @@ final class entry_submission_service_test extends advanced_testcase {
         $service = new entry_submission_service($view);
         $this->assertSame($service->validate([-1], $data), $form->validation($data, []));
         $this->assertArrayHasKey($this->element_name('Title', -1), $form->validation($data, []));
+    }
+
+    /**
+     * An empty required date in a required fieldgroup line yields one error, at the date's element
+     * in the entry form, so the page repeats nothing; an error without an element is named by its
+     * field on the page (mod_datalynx#310).
+     */
+    public function test_errors_are_shown_at_their_element_or_named(): void {
+        $timer = $this->add_mobile_field($this->dlx, 'time', 'Timer');
+        $group = $this->add_mobile_field($this->dlx, 'fieldgroup', 'Group', [
+            'param1' => json_encode([(string) $this->fieldids['Title'], (string) $timer]),
+            'param2' => '3', 'param3' => '1', 'param4' => '1',
+        ]);
+        $view = $this->view('[[Group]]');
+        $reflection = new ReflectionClass($view);
+        $editentries = $reflection->getProperty('editentries');
+        $editentries->setAccessible(true);
+        $editentries->setValue($view, [-1]);
+        $definition = $reflection->getMethod('set_display_definition');
+        $definition->setAccessible(true);
+        $definition->invoke($view);
+        $form = new datalynxview_entries_form(new moodle_url('/mod/datalynx/view.php'), ['view' => $view, 'update' => '-1']);
+
+        $errors = $form->validation(['new' => 1, "field_{$this->fieldids['Title']}_-1_fieldgroup_{$group}_0" => 'Given'], []);
+
+        $this->assertSame(["field_{$timer}_-1_fieldgroup_{$group}_0"], array_keys($errors));
+        $this->assertSame([], $form->get_page_errors($errors));
+        $this->assertSame(['Timer: Not shown'], $form->get_page_errors(["field_{$timer}_-1_elsewhere" => 'Not shown']));
     }
 
     /**

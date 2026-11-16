@@ -2787,7 +2787,8 @@ abstract class base {
                         // Form validation failed so return to form.
                         $this->returntoentriesform = true;
                         $formdata = (array) $entriesform->get_submitted_data();
-                        $errors = $entriesform->validation($formdata, []);
+                        // The errors are shown at their elements; the page names only the others.
+                        $errors = $entriesform->get_page_errors($entriesform->validation($formdata, []));
                         return [implode('<br>', $errors), []];
                     }
                 } else {

@@ -35,6 +35,10 @@ mod_datalynx changes
 - Fix (#307): saving an entry no longer stores the empty lines of a fieldgroup
   with a file, picture or masked date subfield. Whether a line holds a value is
   decided by its subfields' own empty check, for saving and for validation.
+- Fix (#310): when the entry form fails validation, the page no longer repeats
+  every message without a field name above the form. Messages are shown at
+  their fields; only one that no field shows appears on the page, named by its
+  field.
 
 2026-11-15
 ----------

@@ -117,6 +117,29 @@ class datalynxview_entries_form extends moodleform {
     }
 
     /**
+     * The validation errors that no element of the form shows, each named by its field.
+     *
+     * An error is shown at its element; only an error whose element the form does not hold needs
+     * a message on the page, and that message has to say which field it is about.
+     *
+     * @param array $errors element name => message, as validation() returns them
+     * @return string[]
+     */
+    public function get_page_errors(array $errors): array {
+        $fields = $this->_customdata['view']->get_dlx()->get_fields();
+        $messages = [];
+        foreach ($errors as $element => $message) {
+            if ($this->_form->elementExists((string) $element)) {
+                continue;
+            }
+            $field = preg_match(entry_submission_service::ELEMENT_REGEX, (string) $element, $matches)
+                ? ($fields[$matches[1]] ?? null) : null;
+            $messages[] = $field ? format_string($field->name()) . ': ' . $message : $message;
+        }
+        return $messages;
+    }
+
+    /**
      * Returns an HTML version of the form
      *
      * @return string HTML version of the form
