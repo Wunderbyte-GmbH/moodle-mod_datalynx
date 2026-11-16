@@ -176,7 +176,7 @@ class field extends FileField {
                             global $DB;
                             $record = $DB->get_record('files', ['id' => $file->get_id()]);
                             $fs->convert_image($record, $record->id, $maxwidth, $maxheight, true);
-                        } catch (Exception $e) {
+                        } catch (\Exception $e) {
                             return false;
                         }
                     }
@@ -202,7 +202,7 @@ class field extends FileField {
 
                         try {
                             $fs->convert_image($filerecord, $file, $thumbwidth, $thumbheight, true);
-                        } catch (Exception $e) {
+                        } catch (\Exception $e) {
                             return false;
                         }
                     }
