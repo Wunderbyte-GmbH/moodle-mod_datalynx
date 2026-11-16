@@ -882,6 +882,19 @@ abstract class datalynxfield_base {
     }
 
     /**
+     * Whether a stored content row holds no value of the field.
+     *
+     * The value is in the content column for almost every field type; a type that keeps it in
+     * another column as well overrides this (the course group field keeps the group in content1).
+     *
+     * @param stdClass $row datalynx_contents record with content and content1..content4
+     * @return bool
+     */
+    public static function is_stored_row_empty(stdClass $row): bool {
+        return ($row->content ?? null) === null || in_array($row->content, static::get_empty_contents(), true);
+    }
+
+    /**
      * SQL stating that the content holds a value: it is neither NULL nor an empty content.
      *
      * The stored text is compared, not a cast of it: the empty contents need not be numbers.
@@ -911,12 +924,12 @@ abstract class datalynxfield_base {
     public function drop_empty_content(int $entryid): bool {
         global $DB;
 
-        $rows = $DB->get_records('datalynx_contents', ['fieldid' => $this->id(), 'entryid' => $entryid], '', 'id, content');
+        $rows = $DB->get_records('datalynx_contents', ['fieldid' => $this->id(), 'entryid' => $entryid]);
         if (count($rows) !== 1) {
             return false;
         }
         $row = reset($rows);
-        if (!$this->is_stored_content_empty($row->content)) {
+        if (!$this->is_stored_content_empty($row->content) || !static::is_stored_row_empty($row)) {
             return false;
         }
         get_file_storage()->delete_area_files($this->dlx->context->id, 'mod_datalynx', 'content', $row->id);
@@ -962,8 +975,8 @@ abstract class datalynxfield_base {
             }
             [$insql, $params] = $DB->get_in_or_equal($class::get_empty_contents(), SQL_PARAMS_NAMED, 'empty');
             $params['fieldid'] = $field->id;
-            $ids = $DB->get_fieldset_sql(
-                "SELECT c.id
+            $rows = $DB->get_records_sql(
+                "SELECT c.*
                    FROM {datalynx_contents} c
                   WHERE c.fieldid = :fieldid
                     AND (c.content IS NULL OR $content $insql)
@@ -971,6 +984,8 @@ abstract class datalynxfield_base {
                           WHERE c2.fieldid = c.fieldid AND c2.entryid = c.entryid) = 1",
                 $params
             );
+            // The field decides on the whole row: a value may sit in another column.
+            $ids = array_keys(array_filter($rows, fn($row) => $class::is_stored_row_empty($row)));
             if (!$ids) {
                 continue;
             }

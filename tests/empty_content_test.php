@@ -175,6 +175,30 @@ final class empty_content_test extends advanced_testcase {
     }
 
     /**
+     * A course group field with a fixed course keeps the group in content1 and leaves content
+     * empty; its row holds a value and is kept, on saving and by the cleanup.
+     */
+    public function test_course_group_with_fixed_course_is_kept(): void {
+        global $DB, $USER;
+
+        $course = get_course($this->dlx->course->id);
+        $groupid = (int) $this->getDataGenerator()->create_group(['courseid' => $course->id])->id;
+        $fieldid = $this->add_mobile_field($this->dlx, 'coursegroup', 'Group', ['param1' => (string) $course->id]);
+        $entryid = $this->add_mobile_entry($this->dlx, $USER->id, []);
+        $DB->insert_record('datalynx_contents', (object) [
+            'fieldid' => $fieldid, 'entryid' => $entryid, 'content' => null, 'content1' => (string) $groupid,
+        ]);
+        $dlx = new datalynx($this->dlx->id());
+
+        $this->assertSame(0, datalynxfield_base::delete_stored_empty_contents($dlx->id()));
+        $this->assertFalse($dlx->get_field_from_id($fieldid)->drop_empty_content($entryid));
+        $this->assertSame(
+            (string) $groupid,
+            $DB->get_field('datalynx_contents', 'content1', ['fieldid' => $fieldid, 'entryid' => $entryid])
+        );
+    }
+
+    /**
      * The entries an "empty" or NOT empty criterion on a field selects.
      *
      * @param int $fieldid

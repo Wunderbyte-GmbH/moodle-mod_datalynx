@@ -182,6 +182,17 @@ class field extends datalynxfield_base {
     }
 
     /**
+     * Empty only without a course and without a group: with a fixed course the course column
+     * stays empty and the group is kept in content1.
+     *
+     * @param stdClass $row
+     * @return bool
+     */
+    public static function is_stored_row_empty(stdClass $row): bool {
+        return parent::is_stored_row_empty($row) && (int) ($row->content1 ?? 0) <= 0;
+    }
+
+    /**
      * Return names of content parts.
      *
      * @return array
