@@ -161,6 +161,16 @@ $functions = [
                 'ajax'        => true,
                 'services'    => [MOODLE_OFFICIAL_MOBILE_SERVICE],
         ],
+        'mod_datalynx_delete_entry' => [
+                'classname'   => 'mod_datalynx\external\delete_entry',
+                'methodname'  => 'execute',
+                'classpath'   => '',
+                'description' => 'Delete one entry through a view, with the rights and the delete action of the web.',
+                'type'        => 'write',
+                'capabilities' => 'mod/datalynx:viewentry',
+                'ajax'        => true,
+                'services'    => [MOODLE_OFFICIAL_MOBILE_SERVICE],
+        ],
         'mod_datalynx_submit_entry' => [
                 'classname'   => 'mod_datalynx\external\submit_entry',
                 'methodname'  => 'execute',

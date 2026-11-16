@@ -110,6 +110,18 @@
                     </ion-label>
                 </ion-item>
             </ion-list>
+            <ion-card-content *ngIf="entry.candelete" class="mod-datalynx-mobile-actions">
+                <ion-button fill="clear" color="danger" size="small" core-site-plugins-call-ws
+                        name="mod_datalynx_delete_entry"
+                        [params]="{d: CONTENT_OTHERDATA.state.datalynxid, viewid: CONTENT_OTHERDATA.state.viewid, entryid: entry.id}"
+                        [preSets]="{getFromCache: false, saveToCache: false}"
+                        [confirmMessage]="'plugin.mod_datalynx.entrydeleteconfirm' | translate"
+                        [successMessage]="'plugin.mod_datalynx.entrydeleted' | translate"
+                        refreshOnSuccess="true">
+                    <ion-icon name="fas-trash" slot="start" aria-hidden="true"></ion-icon>
+                    {{ 'core.delete' | translate }}
+                </ion-button>
+            </ion-card-content>
         </ion-card>
 
         <core-infinite-loading [enabled]="CONTENT_OTHERDATA.state.cangrow" (action)="updateContent({

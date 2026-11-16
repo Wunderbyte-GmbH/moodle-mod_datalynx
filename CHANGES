@@ -20,6 +20,15 @@ mod_datalynx changes
   and entries left to add, the same check as the web's "Add entry" link,
   which now lives in datalynx::user_can_add_new_entry()), and a plain text
   title per entry.
+- Moodle App (#269): entries can be deleted in the app, one at a time. The
+  new web service mod_datalynx_delete_entry (mobile service) deletes through
+  the same path as the delete action of a view: the user must be allowed to
+  manage the entry and the view must have ##delete##, both checked before
+  anything is deleted so a refusal is an error the app shows. Contents,
+  files, the entry_deleted event and completion are handled as on the web.
+  The app shows a delete button where candelete is set, asks for
+  confirmation and reloads the page with its view, filter and search.
+  Version 2026111802.
 - Moodle App (#268): fixes found by the new app acceptance test
   (tests/behat/app_browse.feature, tag @app, runs only where Behat is set up
   for the app):

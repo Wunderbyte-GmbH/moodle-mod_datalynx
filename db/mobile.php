@@ -46,6 +46,8 @@ $addons = [
         ],
         'lang' => [
             ['pluginname', 'datalynx'],
+            ['entrydeleteconfirm', 'datalynx'],
+            ['entrydeleted', 'datalynx'],
             ['mobilefilterdefault', 'datalynx'],
             ['mobilefilterselect', 'datalynx'],
             ['mobilenoview', 'datalynx'],
