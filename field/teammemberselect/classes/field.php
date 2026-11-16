@@ -811,6 +811,40 @@ class field extends datalynxfield_base {
     }
 
     /**
+     * Ids of the entries whose team holds a member whose full name contains the search term.
+     *
+     * Reads the members stored in the entries, so members no longer enrolled are found too, and
+     * the member list may hold ids as numbers or strings.
+     *
+     * @param string $search
+     * @return int[]
+     */
+    public function get_entryids_with_member_named(string $search): array {
+        global $DB;
+
+        $usermap = $this->get_all_userids_in_all_entries();
+        if (!$usermap || trim($search) === '') {
+            return [];
+        }
+        [$insql, $params] = $DB->get_in_or_equal(array_keys($usermap), SQL_PARAMS_NAMED, 'tmqsuser');
+        $params['tmqsname'] = '%' . $DB->sql_like_escape($search) . '%';
+        $fullname = $DB->sql_fullname('u.firstname', 'u.lastname');
+        $userids = $DB->get_fieldset_sql(
+            "SELECT u.id FROM {user} u WHERE u.id $insql AND u.deleted = 0 AND " .
+                $DB->sql_like($fullname, ':tmqsname', false, false),
+            $params
+        );
+
+        $entryids = [];
+        foreach ($userids as $userid) {
+            foreach ($usermap[$userid] as $entryid) {
+                $entryids[$entryid] = (int) $entryid;
+            }
+        }
+        return array_values($entryids);
+    }
+
+    /**
      * Are fields of this field type suitable for use in customfilters?
      *
      * @return bool

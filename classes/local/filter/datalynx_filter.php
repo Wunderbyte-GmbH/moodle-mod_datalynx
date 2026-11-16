@@ -25,10 +25,10 @@
 namespace mod_datalynx\local\filter;
 
 use datalynxfield_no_content_can_join;
-use datalynxfield_option_single;
-use datalynxfield_select;
-use datalynxfield_teammemberselect;
+use datalynxfield_select\field as datalynxfield_select;
+use datalynxfield_teammemberselect\field as datalynxfield_teammemberselect;
 use mod_datalynx\local\field\datalynxfield_option_multiple;
+use mod_datalynx\local\field\datalynxfield_option_single;
 use stdClass;
 
 /**
@@ -358,17 +358,16 @@ class datalynx_filter {
                         }
                     } else {
                         if ($field instanceof datalynxfield_teammemberselect) {
-                            foreach ($field->options_menu() as $id => $option) {
-                                if (stripos($option, $simplesearch) !== false) {
-                                    $paramlike = "fieldquicksearch$i";
-                                    $paramid = "fieldid$i";
-                                    $searchlike[$paramlike] = "(" .
-                                            $DB->sql_like("cs.content", ":$paramlike", false, false) .
-                                            " AND fsimple.id = :$paramid)";
-                                    $searchparams[$paramlike] = "%\"$id\"%";
-                                    $searchparams[$paramid] = $field->id();
-                                    $i++;
-                                }
+                            $entryids = $field->get_entryids_with_member_named($simplesearch);
+                            if ($entryids) {
+                                [$insql, $inparams] = $DB->get_in_or_equal(
+                                    $entryids,
+                                    SQL_PARAMS_NAMED,
+                                    "fieldquicksearch{$i}_"
+                                );
+                                $searchlike["fieldquicksearch$i"] = "e.id $insql";
+                                $searchparams += $inparams;
+                                $i++;
                             }
                         }
                     }

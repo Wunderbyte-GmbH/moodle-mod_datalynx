@@ -1,6 +1,26 @@
 mod_datalynx changes
 ====================
 
+2026-11-16
+----------
+
+- Fix (#304): views whose saved filter selects approved or not approved
+  entries load again in the browse web services. A saved criterion the strict
+  criteria check refuses (a deleted field, an unselected row of the old filter
+  form) is now left out of the view's request with a debugging message instead
+  of failing the whole view.
+- Fix (#305): filters on the institution or department of team members work
+  again. Since April 2026 the team member profile fields were missing from the
+  instance, so such a criterion was ignored and the filter returned all entries
+  (for example "station leaders see their department" showed every
+  department); since the strict criteria check the view failed instead. Sites
+  that limit what a role sees with these filters should check what was visible
+  in the meantime.
+- Fix: the quick search finds entries by the labels of their single choice
+  options and by the names of their team members again (broken since April
+  2026), also for members no longer enrolled and whatever form the member list
+  is stored in.
+
 2026-11-15
 ----------
 
