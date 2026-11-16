@@ -90,7 +90,7 @@ final class entry_submission_service_test extends advanced_testcase {
      * @param int|string $entryid
      * @return string
      */
-    private function name(string $field, int|string $entryid): string {
+    private function element_name(string $field, int|string $entryid): string {
         return "field_{$this->fieldids[$field]}_{$entryid}";
     }
 
@@ -102,19 +102,19 @@ final class entry_submission_service_test extends advanced_testcase {
         $service = new entry_submission_service($this->view('[[Title]] [[Notes]] [[Secret|Read only]]'));
 
         $data = (object) [
-            $this->name('Title', -1) => 'Kept',
-            $this->name('Notes', -1) => 'Kept too',
-            $this->name('Notes', -1) . '_extra' => 'Not an input of the field',
-            $this->name('Secret', -1) => 'Not editable',
-            $this->name('Elsewhere', -1) => 'Not in the view',
-            $this->name('Title', 99) => 'Another entry',
+            $this->element_name('Title', -1) => 'Kept',
+            $this->element_name('Notes', -1) => 'Kept too',
+            $this->element_name('Notes', -1) . '_extra' => 'Not an input of the field',
+            $this->element_name('Secret', -1) => 'Not editable',
+            $this->element_name('Elsewhere', -1) => 'Not in the view',
+            $this->element_name('Title', 99) => 'Another entry',
             'field_garbage' => 'x',
             'submitbutton' => 'Save',
         ];
 
         $this->assertEquals((object) [
-            $this->name('Title', -1) => 'Kept',
-            $this->name('Notes', -1) => 'Kept too',
+            $this->element_name('Title', -1) => 'Kept',
+            $this->element_name('Notes', -1) => 'Kept too',
             'submitbutton' => 'Save',
         ], $service->filter_data([-1], $data));
     }
@@ -129,12 +129,12 @@ final class entry_submission_service_test extends advanced_testcase {
         $service = new entry_submission_service($this->view('[[Title]] [[Choice]] [[Tags]] [[Body]]'));
 
         $filtered = (array) $service->filter_data([-1], (object) [
-            $this->name('Title', -1) => '<script>alert(1)</script>Text',
+            $this->element_name('Title', -1) => '<script>alert(1)</script>Text',
             "field_{$choiceid}_-1" => '2 OR 1=1',
             "field_{$tagsid}_-1" => ['1', 'evil', '-999'],
             "field_{$editorid}_-1_editor" => ['text' => '<p>Hi</p>', 'format' => '1', 'itemid' => '5x', 'other' => 'dropped'],
         ]);
-        $this->assertSame('alert(1)Text', $filtered[$this->name('Title', -1)]);
+        $this->assertSame('alert(1)Text', $filtered[$this->element_name('Title', -1)]);
         $this->assertSame(2, $filtered["field_{$choiceid}_-1"]);
         // Only options the field has: no injected text, no placeholder of an empty selection.
         $this->assertSame([0 => 1], $filtered["field_{$tagsid}_-1"]);
@@ -156,7 +156,10 @@ final class entry_submission_service_test extends advanced_testcase {
         $this->assertSame([5, 7], entry_submission_service::expand_entry_ids(['5', '7']));
 
         $service = new entry_submission_service($this->view('[[Title]]'));
-        $filtered = $service->filter_data([-2], (object) [$this->name('Title', -1) => 'a', $this->name('Title', -2) => 'b']);
+        $filtered = $service->filter_data([-2], (object) [
+            $this->element_name('Title', -1) => 'a',
+            $this->element_name('Title', -2) => 'b',
+        ]);
         $this->assertCount(2, (array) $filtered);
     }
 
@@ -167,9 +170,12 @@ final class entry_submission_service_test extends advanced_testcase {
         $service = new entry_submission_service($this->view('[[Title|Required]] [[Notes]]'));
         $required = get_string('fieldrequired', 'datalynx');
 
-        $this->assertSame([$this->name('Title', -1) => $required], $service->validate([-1], []));
-        $this->assertSame([$this->name('Title', -1) => $required], $service->validate([-1], [$this->name('Title', -1) => '']));
-        $this->assertSame([], $service->validate([-1], [$this->name('Title', -1) => 'Given']));
+        $this->assertSame([$this->element_name('Title', -1) => $required], $service->validate([-1], []));
+        $this->assertSame(
+            [$this->element_name('Title', -1) => $required],
+            $service->validate([-1], [$this->element_name('Title', -1) => ''])
+        );
+        $this->assertSame([], $service->validate([-1], [$this->element_name('Title', -1) => 'Given']));
     }
 
     /**
@@ -194,7 +200,7 @@ final class entry_submission_service_test extends advanced_testcase {
      */
     public function test_form_validation_matches_the_service(): void {
         $view = $this->view('[[Title|Required]] [[Notes]]');
-        $data = ['new' => 1, $this->name('Notes', -1) => 'x'];
+        $data = ['new' => 1, $this->element_name('Notes', -1) => 'x'];
 
         $reflection = new ReflectionClass($view);
         $editentries = $reflection->getProperty('editentries');
@@ -207,7 +213,7 @@ final class entry_submission_service_test extends advanced_testcase {
 
         $service = new entry_submission_service($view);
         $this->assertSame($service->validate([-1], $data), $form->validation($data, []));
-        $this->assertArrayHasKey($this->name('Title', -1), $form->validation($data, []));
+        $this->assertArrayHasKey($this->element_name('Title', -1), $form->validation($data, []));
     }
 
     /**
@@ -217,14 +223,14 @@ final class entry_submission_service_test extends advanced_testcase {
         global $DB;
         $service = new entry_submission_service($this->view('[[Title|Required]] [[Secret|Read only]]'));
 
-        $result = $service->save([-1], (object) [$this->name('Secret', -1) => 'Injected']);
+        $result = $service->save([-1], (object) [$this->element_name('Secret', -1) => 'Injected']);
         $this->assertSame([], $result['entryids']);
-        $this->assertArrayHasKey($this->name('Title', -1), $result['errors']);
+        $this->assertArrayHasKey($this->element_name('Title', -1), $result['errors']);
 
         $result = $service->save([-1], (object) [
-            $this->name('Title', -1) => 'Saved',
-            $this->name('Secret', -1) => 'Injected',
-            $this->name('Elsewhere', -1) => 'Injected',
+            $this->element_name('Title', -1) => 'Saved',
+            $this->element_name('Secret', -1) => 'Injected',
+            $this->element_name('Elsewhere', -1) => 'Injected',
         ]);
         $this->assertSame([], $result['errors']);
         $this->assertCount(1, $result['entryids']);
@@ -391,7 +397,7 @@ final class entry_submission_service_test extends advanced_testcase {
         $this->assertNotEmpty($result['errors']);
         $this->assertFalse($phone());
 
-        $result = $service->save([-1], (object) ['field_myphone_-1' => '0316 1234', $this->name('Title', -1) => 'Saved']);
+        $result = $service->save([-1], (object) ['field_myphone_-1' => '0316 1234', $this->element_name('Title', -1) => 'Saved']);
         $this->assertSame([], $result['errors']);
         $this->assertSame('0316 1234', $phone());
     }
