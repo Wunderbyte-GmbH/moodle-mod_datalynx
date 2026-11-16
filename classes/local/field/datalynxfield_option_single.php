@@ -42,6 +42,15 @@ class datalynxfield_option_single extends datalynxfield_option {
     }
 
     /**
+     * No option chosen: options are numbered from 1; "Choose..." is posted as '' and was stored as 0.
+     *
+     * @return string[]
+     */
+    public static function get_empty_contents(): array {
+        return ['', '0'];
+    }
+
+    /**
      * Empty when no option is chosen: options are numbered from 1, the "choose" entry posts 0.
      *
      * @param string $name

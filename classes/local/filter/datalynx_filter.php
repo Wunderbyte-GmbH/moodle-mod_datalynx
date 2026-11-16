@@ -107,8 +107,8 @@ class datalynx_filter {
         $this->groupby = empty($filterdata->groupby) ? '' : $filterdata->groupby;
         $this->customsort = empty($filterdata->customsort) ? '' : $filterdata->customsort;
         $this->customsearch = empty($filterdata->customsearch) ? '' : $filterdata->customsearch;
-        if (empty($filterdata->search)) {
-            if (empty($filterdata->usersearch)) {
+        if ((string) ($filterdata->search ?? '') === '') {
+            if ((string) ($filterdata->usersearch ?? '') === '') {
                 $this->search = '';
             } else {
                 $this->search = $filterdata->usersearch;
@@ -317,7 +317,7 @@ class datalynx_filter {
                 $searchwhere[] = '(' . implode(' OR ', $whereor) . ')';
             }
         }
-        if ($simplesearch) {
+        if ((string) $simplesearch !== '') {
             $searchtables .= " JOIN {datalynx_contents} cs ON cs.entryid = e.id ";
             $searchtables .= " JOIN {datalynx_fields} fsimple ON cs.fieldid = fsimple.id ";
             $searchlike = ['search1' => $DB->sql_like('cs.content', ':search1', false, false),

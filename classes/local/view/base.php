@@ -576,8 +576,8 @@ abstract class base {
         $csort = !empty($urloptions['customsort']) ? $urloptions['customsort'] : null;
         $csearch = !empty($urloptions['customsearch']) ? $urloptions['customsearch'] : null;
 
-        $search = !empty($urloptions['search']) ? $urloptions['search'] : '';
-        $usersearch = !empty($urloptions['usersearch']) ? $urloptions['usersearch'] : '';
+        $search = (string) ($urloptions['search'] ?? '');
+        $usersearch = (string) ($urloptions['usersearch'] ?? '');
 
         // Permitted-filters whitelist (strict). When a whitelist is configured and "allow all
         // filters" (param5) is off, only the default and whitelisted filters may be selected as the
@@ -611,7 +611,7 @@ abstract class base {
 
         $this->filter->groupby = $groupby ? $groupby : $this->filter->groupby;
 
-        $this->filter->search = $search ? $search : ($usersearch ? $usersearch : $this->filter->search);
+        $this->filter->search = $search !== '' ? $search : ($usersearch !== '' ? $usersearch : $this->filter->search);
 
         // Add page.
         $this->filter->page = $page ? $page : 0;
@@ -2440,9 +2440,9 @@ abstract class base {
                 if ($this->filter->groupby) {
                     // Assuming here that the groupbyed field returns only one pattern.
                     $groupbyvalue = $this->get_groupby_value($entry);
-                    if ($groupbyvalue != $groupname) {
+                    if ((string) $groupbyvalue !== (string) $groupname) {
                         // Compile current group definitions.
-                        if ($groupname) {
+                        if ((string) $groupname !== '') {
                             // Add the group entries definitions.
                             $this->displaydefinition[$groupname] = $groupdefinition;
                             $groupdefinition = [];

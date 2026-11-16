@@ -682,7 +682,7 @@ abstract class datalynxfield_renderer {
         $fieldname = "field_{$fieldid}_{$entry->id}";
 
         $content = '';
-        if ($entry->id > 0 && !empty($entry->{"c{$fieldid}_content"})) {
+        if ($entry->id > 0 && (string) ($entry->{"c{$fieldid}_content"} ?? '') !== '') {
             $content = $entry->{"c{$fieldid}_content"};
         }
 

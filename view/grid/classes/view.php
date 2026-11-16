@@ -168,8 +168,8 @@ class view extends base {
         }
 
         // Add group heading.
-        $name = ($name == 'newentry') ? get_string('entrynew', 'datalynx') : $name;
-        if ($name) {
+        $name = ((string) $name === 'newentry') ? get_string('entrynew', 'datalynx') : (string) $name;
+        if ($name !== '') {
             array_unshift($elements, ['html', $OUTPUT->heading($name, 3, 'main')]);
         }
 

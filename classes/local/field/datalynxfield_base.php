@@ -659,7 +659,8 @@ abstract class datalynxfield_base {
 
         if (!empty($values)) {
             $resetted = reset($values);
-            $newcontent = !empty($resetted) ? $resetted : "";
+            // A "0" is a value; only nothing is stored as ''.
+            $newcontent = ($resetted === null || $resetted === false || $resetted === []) ? '' : $resetted;
             if (!empty($newcontent) && is_array($newcontent)) {
                 // When no value ist selected, then a default value is saved by Quickform. Value is removed here:.
                 if (($key = array_search('_qf__force_multiselect_submission', $newcontent)) !== false) {

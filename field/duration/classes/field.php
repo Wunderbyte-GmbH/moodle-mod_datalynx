@@ -57,7 +57,8 @@ class field extends datalynxfield_base {
     public function is_submitted_value_empty(string $name, stdClass $data): bool {
         $value = $data->$name ?? null;
         $number = is_array($value) ? ($value['number'] ?? '') : $value;
-        return trim((string) $number) === '';
+        // An untouched duration posts 0, which is stored as no duration (see get_empty_contents()).
+        return (float) trim((string) $number) === 0.0;
     }
 
     /**

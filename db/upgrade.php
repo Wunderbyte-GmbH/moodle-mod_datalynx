@@ -1415,6 +1415,14 @@ function xmldb_datalynx_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2026111602, 'datalynx');
     }
 
+    if ($oldversion < 2026111700) {
+        // Single choice fields store "Choose..." as 0, which is no value as well (#315); run the
+        // cleanup of empty content rows again (idempotent, see 2026111601).
+        \mod_datalynx\local\field\datalynxfield_base::delete_stored_empty_contents();
+
+        upgrade_mod_savepoint(true, 2026111700, 'datalynx');
+    }
+
     return true;
 }
 

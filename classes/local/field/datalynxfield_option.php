@@ -102,10 +102,7 @@ abstract class datalynxfield_option extends datalynxfield_base {
         $oldvalues = $newvalues = $this->options;
         $renames = !empty($forminput->renameoption) ? $forminput->renameoption : [];
         $deletes = !empty($forminput->deleteoption) ? $forminput->deleteoption : [];
-        $adds = preg_split(
-            "/[\|\r\n]+/",
-            !empty($forminput->addoptions) ? $forminput->addoptions : ''
-        );
+        $adds = preg_split("/[\|\r\n]+/", (string) ($forminput->addoptions ?? ''));
 
         // Make sure there are no renames when options are deleted. That will not work.
         $delvalues = array_values($deletes);
@@ -115,7 +112,8 @@ abstract class datalynxfield_option extends datalynxfield_base {
 
         $delkeys = array_keys($deletes);
         foreach ($delkeys as $id) {
-            $addedid = array_search($oldvalues[$id], $adds);
+            // Labels are text: compared numerically, "05" would be "5".
+            $addedid = array_search((string) $oldvalues[$id], $adds, true);
             if ($addedid !== false) {
                 unset($adds[$addedid]);
                 unset($deletes[$id]);
@@ -127,7 +125,7 @@ abstract class datalynxfield_option extends datalynxfield_base {
         $map = [0 => 0];
         $oldcount = count($oldvalues);
         for ($i = 1; $i <= $oldcount; $i++) {
-            $j = array_search($oldvalues[$i], $newvalues);
+            $j = array_search((string) $oldvalues[$i], array_map('strval', $newvalues), true);
             if ($j !== false) {
                 $map[$i] = $j;
             } else {
@@ -136,14 +134,14 @@ abstract class datalynxfield_option extends datalynxfield_base {
         }
 
         foreach ($renames as $id => $newname) {
-            if (!!(trim($newname))) {
+            if (trim((string) $newname) !== '') {
                 $newvalues[$id] = $newname;
             }
         }
 
         foreach ($adds as $add) {
-            $add = trim($add);
-            if (!empty($add)) {
+            $add = trim((string) $add);
+            if ($add !== '') {
                 $newvalues[] = $add;
             }
         }

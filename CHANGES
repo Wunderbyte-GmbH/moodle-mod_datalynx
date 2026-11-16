@@ -13,6 +13,15 @@ mod_datalynx changes
 - Fix: the cleanup of empty content rows (#308) kept only the content column
   in view; a course group field with a fixed course keeps the group in
   content1, so its rows were dropped on saving and by the upgrade.
+- Fix (#315): a value "0" is no longer lost or mistaken for empty: text and
+  text areas store and show "0"; a single choice left on "Choose..." stores no
+  value (it was stored as 0, which "is empty" filters missed; upgrade
+  2026111700 removes those rows); a required duration of 0 is refused; options
+  labelled "0" can be added, and saving the options keeps choices of labels
+  that are numerically equal ("5" and "05"); the quick search and the custom
+  filter search for "0"; grouping keeps a group "0" and tells "01" from "1";
+  rating aggregates of 0 are shown; the datalynx view field keeps numeric
+  values of its options.
 
 2026-11-16
 ----------

@@ -166,16 +166,16 @@ class renderer extends datalynxfield_renderer {
                         $str = !empty($entry->rating->count) ? $entry->rating->count : '-';
                         break;
                     case 'avg':
-                        $str = !empty($aggravg) ? $aggravg : '-';
+                        $str = !empty($entry->rating->count) ? $aggravg : '-';
                         break;
                     case 'max':
-                        $str = !empty($aggrmax) ? $aggrmax : '-';
+                        $str = !empty($entry->rating->count) ? $aggrmax : '-';
                         break;
                     case 'min':
-                        $str = !empty($aggrmin) ? $aggrmin : '-';
+                        $str = !empty($entry->rating->count) ? $aggrmin : '-';
                         break;
                     case 'sum':
-                        $str = !empty($aggrsum) ? $aggrsum : '-';
+                        $str = !empty($entry->rating->count) ? $aggrsum : '-';
                         break;
                     case 'view':
                     case 'viewurl':

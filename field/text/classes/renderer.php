@@ -48,7 +48,7 @@ class renderer extends datalynxfield_renderer {
         $autocomplete = $field->get('param9');
 
         $content = '';
-        if ($entryid > 0 && !empty($entry->{"c{$fieldid}_content"})) {
+        if ($entryid > 0 && (string) ($entry->{"c{$fieldid}_content"} ?? '') !== '') {
             $content = $entry->{"c{$fieldid}_content"};
         }
 
@@ -189,7 +189,7 @@ class renderer extends datalynxfield_renderer {
         $nolinkend = "";
         $nolinkstart = "";
         $formatoptions = [];
-        if (isset($entry->{"c{$fieldid}_content"}) && !empty($entry->{"c{$fieldid}_content"})) {
+        if ((string) ($entry->{"c{$fieldid}_content"} ?? '') !== '') {
             $content = $entry->{"c{$fieldid}_content"};
 
             $format = FORMAT_PLAIN;

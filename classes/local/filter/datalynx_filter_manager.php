@@ -544,7 +544,7 @@ class datalynx_filter_manager {
                                     $searchfields[$fieldname]['AND'][] = ['', '', $parsed];
                                 }
                             } else if ($type == "text") {
-                                if ($value) {
+                                if ((string) $value !== '') {
                                     $searchfields[$fieldname]['AND'][] = ['', 'LIKE', $value];
                                 }
                             } else if ($type == "multiselect" || $type == "checkbox") {

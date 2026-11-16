@@ -322,11 +322,13 @@ class renderer extends datalynxfield_renderer {
             $classname = "datalynxview_{$fieldid}_{$entryid}";
             $required = !empty($options['required']);
 
-            $selected = !empty($entry->{"c{$fieldid}_content"}) ? $entry->{"c{$fieldid}_content"} : [];
+            $stored = (string) ($entry->{"c{$fieldid}_content"} ?? '');
+            $selected = $stored !== '' ? explode(',', $stored) : [];
             // A hidden field is added to autocomplete fields by parent Quickform element.
             // The value of the hidden field must be added as option in order to process an empty autocomplete field.
             $menu = ["_qf__force_multiselect_submission" => "..."];
-            $menu = array_merge($menu, $field->refdatalynx->get_distinct_textfieldvalues_by_id($field->field->param7));
+            // The + operator keeps the values as keys; array_merge() would renumber numeric values.
+            $menu += $field->refdatalynx->get_distinct_textfieldvalues_by_id($field->field->param7);
 
             $mform->addElement('autocomplete', $fieldname, null, $menu, [
                     "class" => "datalynxfield_datalynxview $classname",
