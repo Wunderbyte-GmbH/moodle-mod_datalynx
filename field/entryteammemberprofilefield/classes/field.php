@@ -25,6 +25,7 @@
 namespace datalynxfield_entryteammemberprofilefield;
 
 use datalynxfield_no_content_can_join;
+use datalynxfield_teammemberselect\field as datalynxfield_teammemberselect;
 use mod_datalynx\local\field\datalynxfield_base;
 use stdClass;
 
