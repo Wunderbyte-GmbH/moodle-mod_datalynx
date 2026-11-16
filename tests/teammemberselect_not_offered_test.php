@@ -101,4 +101,40 @@ final class teammemberselect_not_offered_test extends advanced_testcase {
         $this->assertStringContainsString('Gerd Gone', $messages[0]);
         $this->assertStringContainsString('Lehrende', $messages[0]);
     }
+
+    /**
+     * A team member field in a fieldgroup line saves without reading the other lines' rows.
+     */
+    public function test_team_in_fieldgroup_lines(): void {
+        global $COURSE, $DB;
+
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        [$course, $dlx] = $this->create_mobile_instance();
+        $COURSE = $course;
+        $member = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($member->id, $course->id, 'student');
+        $teamid = $this->add_mobile_field($dlx, 'teammemberselect', 'Team', [
+            'param1' => '5', 'param2' => json_encode([datalynx::PERMISSION_STUDENT]),
+        ]);
+        $group = $this->add_mobile_field($dlx, 'fieldgroup', 'Group', [
+            'param1' => json_encode([(string) $teamid]), 'param2' => '3', 'param3' => '2',
+        ]);
+        $viewid = $this->add_mobile_view($dlx, 'grid', 'Edit', '[[Group]] ##edit##', [
+            'section' => '##addnewentry## ##entries##',
+        ]);
+        $dlx = new datalynx($dlx->id());
+        $name = fn(int $entryid, int $line): string => "field_{$teamid}_{$entryid}_fieldgroup_{$group}_{$line}";
+
+        $service = new entry_submission_service($dlx->get_view('grid', $viewid, false));
+        $result = $service->save([-1], (object) [$name(-1, 0) => [(int) $member->id], $name(-1, 1) => [(int) $member->id]]);
+        $entryid = (int) reset($result['entryids']);
+        $service = new entry_submission_service($dlx->get_view('grid', $viewid, false));
+        $this->assertSame([], $service->save([$entryid], (object) [
+            $name($entryid, 0) => [(int) $member->id],
+            $name($entryid, 1) => [(int) $member->id],
+        ])['errors']);
+
+        $this->assertSame(2, $DB->count_records('datalynx_contents', ['fieldid' => $teamid, 'entryid' => $entryid]));
+    }
 }

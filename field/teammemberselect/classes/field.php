@@ -300,7 +300,9 @@ class field extends datalynxfield_base {
 
         $newcontentid = parent::update_content($entry, $values);
 
-        $kept = array_map('intval', (array) (json_decode((string) $this->get_stored_members($entry), true) ?: []));
+        // Not submitted at all, the team stays as it is; otherwise it holds what was submitted.
+        $submitted = $values ? reset($values) : null;
+        $kept = $submitted === null ? array_keys($notoffered) : array_map('intval', (array) $submitted);
         $removed = array_diff_key($notoffered, array_flip($kept));
         $interactive = !(defined('WS_SERVER') && WS_SERVER) && !(defined('AJAX_SCRIPT') && AJAX_SCRIPT);
         if ($removed && $interactive) {
@@ -370,21 +372,6 @@ class field extends datalynxfield_base {
             $names[$userid] = isset($users[$userid]) ? fullname($users[$userid]) : "#{$userid}";
         }
         return $names;
-    }
-
-    /**
-     * The stored member list of an entry, as saved.
-     *
-     * @param stdClass $entry
-     * @return string|null
-     */
-    private function get_stored_members(stdClass $entry): ?string {
-        global $DB;
-        if (empty($entry->id)) {
-            return null;
-        }
-        $content = $DB->get_field('datalynx_contents', 'content', ['fieldid' => $this->field->id, 'entryid' => $entry->id]);
-        return $content === false ? null : $content;
     }
 
     /**
