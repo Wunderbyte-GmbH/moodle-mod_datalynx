@@ -179,6 +179,10 @@ abstract class base {
         if (strpos($eventname, 'comment') !== false) {
             return (int) ($event->get_data()['other']['itemid'] ?? 0);
         }
+        // An event about the instance (cron_triggered) carries the instance id, not an entry id.
+        if (($event->get_data()['objecttable'] ?? '') === 'datalynx') {
+            return 0;
+        }
         return (int) ($event->get_data()['objectid'] ?? 0);
     }
 

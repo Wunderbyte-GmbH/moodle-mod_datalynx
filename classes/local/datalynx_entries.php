@@ -930,16 +930,13 @@ class datalynx_entries {
                                     // changed_field_ids alongside ordinary content fields. The ['info'] array is keyed
                                     // by the field's internalname ('status', 'approved'); map back to the field id used
                                     // by rules (datalynxfield_status::_STATUS = 'status', _APPROVED = 'approve').
-                                    if (
-                                            isset($contents[$eid]['info']['status']) && $oldstatus !== null
-                                            && (int) $contents[$eid]['info']['status'] !== $oldstatus
-                                    ) {
+                                    // Compared with what update_entry() saved, not with what was posted:
+                                    // only managers' approval values are taken, and an update can reset
+                                    // the approval (APPROVAL_ON_UPDATE) without any posted value.
+                                    if ($oldstatus !== null && (int) ($entry->status ?? 0) !== $oldstatus) {
                                         $changedfields[datalynxfield_status::_STATUS] = true;
                                     }
-                                    if (
-                                            isset($contents[$eid]['info']['approved']) && $oldapproved !== null
-                                            && (int) $contents[$eid]['info']['approved'] !== $oldapproved
-                                    ) {
+                                    if ($oldapproved !== null && (int) ($entry->approved ?? 0) !== $oldapproved) {
                                         $changedfields[datalynxfield_approve::_APPROVED] = true;
                                     }
 
@@ -947,8 +944,9 @@ class datalynx_entries {
                                     // Iterate through all the fields part of an entry and a fieldgroup. Field by field.
                                     foreach ($contents[$eid]['fields'] as $fieldid => $content) {
                                         // If we see a fieldgroup we split and reset the content.
-                                        $fieldgroup = array_search(true, $content);
-                                        if (strpos($fieldgroup, "fieldgroup") === 0) {
+                                        // The marker 'fieldgroup_{id}' => true; strict, any other value is no marker.
+                                        $fieldgroup = array_search(true, $content, true);
+                                        if (is_string($fieldgroup) && strpos($fieldgroup, "fieldgroup") === 0) {
                                             // TODO: MDL-66151 Rewrite this for fieldgroup_id instead of fieldgroup.
                                             // Use $fieldgroup.
                                             // How many lines were visible to the user, store only those.

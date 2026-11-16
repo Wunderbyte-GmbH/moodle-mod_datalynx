@@ -2689,12 +2689,9 @@ class datalynx {
         }
         foreach ($fieldids as $fieldid) {
             // Extract all userids of teammemberselect field.
-            $userids = isset($entry->{"c{$fieldid}_content"}) ? json_decode(
-                $entry->{"c{$fieldid}_content"},
-                true
-            ) : [];
+            $userids = json_decode((string) ($entry->{"c{$fieldid}_content"} ?? ''), true);
             // Check if $USER is part of the teammembers who are allowed to edit.
-            if (in_array($USER->id, $userids)) {
+            if (is_array($userids) && in_array((int) $USER->id, array_map('intval', $userids), true)) {
                 return true;
             }
         }

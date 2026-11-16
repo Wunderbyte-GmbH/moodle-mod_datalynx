@@ -94,7 +94,8 @@ class renderer extends datalynxfield_renderer {
             true
         ) : [];
         $selected = $selected ? $selected : []; // TODO MDL-000000: Seems obsolete.
-        $teamfull = $field->teamsize < count($selected);
+        // Full when it holds as many members as the team size allows (team_subscription refuses more).
+        $teamfull = (int) $field->teamsize > 0 && count($selected) >= (int) $field->teamsize;
         $hasadmissiblerole = array_intersect(
             $field->dlx()->get_user_datalynx_permissions($USER->id),
             $field->admissibleroles

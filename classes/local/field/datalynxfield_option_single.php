@@ -291,11 +291,12 @@ class datalynxfield_option_single extends datalynxfield_option {
             $fieldid = $this->field->id;
             $fieldname = $this->name();
             $csvname = $importsettings[$fieldname]['name'];
-            $label = !empty($csvrecord[$csvname]) ? $csvrecord[$csvname] : null;
+            $label = trim((string) ($csvrecord[$csvname] ?? ''));
 
-            if ($label) {
-                $options = $this->options_menu();
-                if ($optionkey = array_search($label, $options)) {
+            if ($label !== '') {
+                // Labels are text: compared numerically, "05" would be "5".
+                $options = array_map('strval', $this->options_menu());
+                if ($optionkey = array_search($label, $options, true)) {
                     $data->{"field_{$fieldid}_{$entryid}"} = $optionkey;
                 }
             }

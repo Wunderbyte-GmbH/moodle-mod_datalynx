@@ -449,7 +449,8 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
         $result = [];
         foreach ((array) $ids as $id) {
             if (is_numeric($id) && (int) $id > 0) {
-                $result[] = $this->get_mappingid('datalynx_field', (int) $id);
+                // Ids as numbers, as the rule forms store them; 0 for a field the backup does not hold.
+                $result[] = (int) $this->get_mappingid('datalynx_field', (int) $id);
             } else {
                 $result[] = $id;
             }
@@ -475,7 +476,7 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
         foreach ((array) $config['criteria'] as $key => $criterion) {
             $criterion = (array) $criterion;
             if (!empty($criterion['fieldid']) && is_numeric($criterion['fieldid'])) {
-                $criterion['fieldid'] = $this->get_mappingid('datalynx_field', (int) $criterion['fieldid']);
+                $criterion['fieldid'] = (int) $this->get_mappingid('datalynx_field', (int) $criterion['fieldid']);
             }
             $config['criteria'][$key] = $criterion;
         }
@@ -511,7 +512,7 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
             $decoded = self::decode_rule_param($data->param3);
             if (!empty($decoded['teams'])) {
                 foreach ($decoded['teams'] as $key => $teamid) {
-                    $decoded['teams'][$key] = $this->get_mappingid('datalynx_field', $teamid);
+                    $decoded['teams'][$key] = (int) $this->get_mappingid('datalynx_field', $teamid);
                 }
             }
             $data->param3 = json_encode($decoded);
@@ -945,11 +946,11 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
                 $newusers = [];
                 foreach ($users as $user) {
                     if ($user) {
-                        $newuser = $this->get_mappingid('user', $user);
+                        $newuser = (int) $this->get_mappingid('user', $user);
                         if ($newuser) {
                             $newusers[] = $newuser;
                         } else {
-                            $newusers[] = $user; // WARNING: hack for restoring into same instance.
+                            $newusers[] = (int) $user; // WARNING: hack for restoring into same instance.
                             // W/o course data.
                         }
                     }

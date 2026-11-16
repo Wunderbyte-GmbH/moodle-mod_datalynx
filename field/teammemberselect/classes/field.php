@@ -153,11 +153,11 @@ class field extends datalynxfield_base {
         $this->teamsize = $this->field->param1;
         $this->minteamsize = $this->field->param3;
         $this->listformat = $this->field->param4;
-        $this->teamfield = $this->field->param5 != 0;
+        $this->teamfield = !empty($this->field->param5);
         $this->referencefieldid = $this->field->param5;
-        $this->notifyteammembers = $this->field->param6 != 0;
-        $this->usercanaddself = $this->field->param7 != 0;
-        $this->allowunsubscription = $this->field->param8 != 0;
+        $this->notifyteammembers = !empty($this->field->param6);
+        $this->usercanaddself = !empty($this->field->param7);
+        $this->allowunsubscription = !empty($this->field->param8);
         $this->separators = [
             self::TEAMMEMBERSELECT_FORMAT_NEWLINE => get_string('listformatnewline', 'datalynx'),
             self::TEAMMEMBERSELECT_FORMAT_SPACE => get_string('listformatspace', 'datalynx'),
@@ -334,8 +334,9 @@ class field extends datalynxfield_base {
             }
         }
 
+        // Not submitted (e.g. shown disabled): the team is kept, nobody joined or left.
         // Inside a fieldgroup the field is a list of people, not the entry's team: no notifications.
-        if (!$this->is_fieldgroup_subfield()) {
+        if ($values && !$this->is_fieldgroup_subfield()) {
             $field = $DB->get_record('datalynx_fields', ['id' => $this->field->id]);
             $this->notify_team_members($entry, $field, $oldcontent, $newcontent);
         }

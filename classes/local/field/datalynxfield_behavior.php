@@ -289,11 +289,8 @@ class datalynxfield_behavior {
                     if (!$teamfield || ($teamfield->type === 'teammemberselect' && $teamfield->is_fieldgroup_subfield())) {
                         continue;
                     }
-                    $userids = isset($entry->{"c{$fieldid}_content"}) ? json_decode(
-                        $entry->{"c{$fieldid}_content"},
-                        true
-                    ) : [];
-                    if (in_array($USER->id, $userids)) {
+                    $userids = json_decode((string) ($entry->{"c{$fieldid}_content"} ?? ''), true);
+                    if (is_array($userids) && in_array((int) $USER->id, array_map('intval', $userids), true)) {
                         return true;
                     }
                 }

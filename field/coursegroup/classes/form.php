@@ -56,7 +56,8 @@ class form extends datalynxfield_form {
             $options = $options + $DB->get_records_menu('groups', ['courseid' => $course], 'name', 'id,name');
         } else {
             // An arbitrary limit of 100 registered options.
-            $options = $options + range(1, 100);
+            // Keys and labels are the same group numbers (range() alone is keyed from 0).
+            $options = $options + array_combine(range(1, 100), range(1, 100));
         }
         $mform->addElement('select', "param2", get_string('group'), $options);
         $mform->disabledIf("param2", "param1", 'eq', '');

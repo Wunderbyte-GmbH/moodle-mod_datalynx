@@ -40,6 +40,14 @@ mod_datalynx changes
   values of number, time, team member and tag criteria (they arrived as JSON
   text and were read character by character); saving it again no longer loses
   them.
+- Fix (#319): an edit that resets the approval (approval on update) now counts
+  as a change of the approval for rules, and an approval value a user may not
+  set does not; a team member select that was not submitted no longer reports
+  all members as removed; a full team no longer offers "subscribe"; rules
+  triggered by the cron no longer act on the entry whose id equals the
+  instance id; CSV import matches single choice labels as text; the course
+  group menu without a course is no longer off by one; restore stores mapped
+  field and user ids as numbers.
 
 2026-11-16
 ----------
