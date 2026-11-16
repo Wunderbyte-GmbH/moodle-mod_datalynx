@@ -84,6 +84,14 @@ class form extends datalynxfield_form {
         $mform->setType('param4', PARAM_INT);
         $mform->setDefault('param4', field::TEAMMEMBERSELECT_FORMAT_UL);
 
+        // Inside a fieldgroup the team options below have no effect; say so where they are set.
+        if ($this->field->id() && $this->field->is_fieldgroup_subfield()) {
+            $mform->addElement('html', \html_writer::div(
+                get_string('teamoptionsfieldgroup', 'datalynxfield_teammemberselect'),
+                'alert alert-warning'
+            ));
+        }
+
         $mform->addElement('checkbox', 'param7', get_string('usercanaddself', 'datalynx'), null, 1);
         $mform->addHelpButton('param7', 'usercanaddself', 'datalynx');
         $mform->setType('param7', PARAM_BOOL);

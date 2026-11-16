@@ -2679,7 +2679,8 @@ class datalynx {
         $teammemberfields = $this->get_fields_by_type('teammemberselect');
         $fieldids = [];
         foreach ($teammemberfields as $fieldid => $field) {
-            if ($field->field->param9 == "1") {
+            // Inside a fieldgroup the field is a list of people, not the entry's team.
+            if ($field->field->param9 == "1" && !$field->is_fieldgroup_subfield()) {
                 $fieldids[] = $fieldid;
             }
         }

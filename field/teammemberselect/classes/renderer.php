@@ -87,6 +87,8 @@ class renderer extends datalynxfield_renderer {
         } else {
             $subscribeenabled = isset($options['subscribe']);
         }
+        // Inside a fieldgroup the field is a list of people: nobody subscribes to a line.
+        $subscribeenabled = $subscribeenabled && !$field->is_fieldgroup_subfield();
         $selected = isset($entry->{"c{$fieldid}_content"}) ? json_decode(
             $entry->{"c{$fieldid}_content"},
             true

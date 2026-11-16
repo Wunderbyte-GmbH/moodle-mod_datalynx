@@ -1379,7 +1379,7 @@ class datalynx_entries {
         $fields = $dlx->get_fields();
         $teamfield = false;
         foreach ($fields as $field) {
-            if ($field->type == 'teammemberselect' && $field->referencefieldid) {
+            if ($field->type == 'teammemberselect' && $field->referencefieldid && !$field->is_fieldgroup_subfield()) {
                 $teamfield = $field;
                 break;
             }

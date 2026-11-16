@@ -42,3 +42,4 @@ $string['rowadded'] = '{$a} added';
 $string['rowcleared'] = '{$a} cleared';
 $string['rowdeleted'] = '{$a} deleted';
 $string['rowlabel'] = '{$a->group}, row {$a->line}';
+$string['teamoptionsignored'] = 'These team member fields of the field group have team options set that have no effect inside a field group (edit rights and visibility for members, self subscription, team field, notifications): {$a}. Inside a field group a team member field is a plain list of people.';

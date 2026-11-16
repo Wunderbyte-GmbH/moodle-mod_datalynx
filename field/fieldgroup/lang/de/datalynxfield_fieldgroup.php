@@ -42,3 +42,4 @@ $string['rowadded'] = '{$a} hinzugefügt';
 $string['rowcleared'] = '{$a} geleert';
 $string['rowdeleted'] = '{$a} gelöscht';
 $string['rowlabel'] = '{$a->group}, Zeile {$a->line}';
+$string['teamoptionsignored'] = 'Für diese Teammitglieder-Felder der Feldgruppe sind Team-Optionen gesetzt, die innerhalb einer Feldgruppe keine Wirkung haben (Bearbeitungsrechte und Sichtbarkeit für Mitglieder, Selbst-Eintragen, Teamfeld, Benachrichtigungen): {$a}. In einer Feldgruppe ist ein Teammitglieder-Feld eine einfache Personenliste.';

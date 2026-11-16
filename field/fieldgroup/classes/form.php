@@ -100,6 +100,25 @@ class form extends datalynxfield_form {
             ]]
         );
 
+        // Team member select subfields keep their team options, but these have no effect here.
+        $teamfields = [];
+        foreach ($this->field->id() ? $this->field->get_subfield_ids() : [] as $subfieldid) {
+            $subfield = $this->dlx->get_field_from_id($subfieldid);
+            if ($subfield && $subfield->type === 'teammemberselect') {
+                $options = array_filter([$subfield->field->param5, $subfield->field->param6, $subfield->field->param7,
+                    $subfield->field->param8, $subfield->field->param9]);
+                if ($options) {
+                    $teamfields[] = format_string($subfield->name());
+                }
+            }
+        }
+        if ($teamfields) {
+            $mform->addElement('html', html_writer::div(
+                get_string('teamoptionsignored', 'datalynxfield_fieldgroup', implode(', ', $teamfields)),
+                'alert alert-warning'
+            ));
+        }
+
         // Number of times the field group can be filled out.
         $mform->addElement('text', 'param2', get_string('nummax', 'datalynx'));
         $mform->setDefault('param2', 3);

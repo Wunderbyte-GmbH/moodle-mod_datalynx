@@ -97,6 +97,9 @@ class field extends datalynxfield_base {
     /** @var bool User can add self */
     public $usercanaddself;
 
+    /** @var bool|null Whether a fieldgroup lists this field, see is_fieldgroup_subfield() */
+    private ?bool $infieldgroup = null;
+
     /** @var bool Allow unsubscription */
     public $allowunsubscription;
 
@@ -331,10 +334,45 @@ class field extends datalynxfield_base {
             }
         }
 
-        $field = $DB->get_record('datalynx_fields', ['id' => $this->field->id]);
-        $this->notify_team_members($entry, $field, $oldcontent, $newcontent);
+        // Inside a fieldgroup the field is a list of people, not the entry's team: no notifications.
+        if (!$this->is_fieldgroup_subfield()) {
+            $field = $DB->get_record('datalynx_fields', ['id' => $this->field->id]);
+            $this->notify_team_members($entry, $field, $oldcontent, $newcontent);
+        }
 
         return $newcontentid;
+    }
+
+    /**
+     * Whether a fieldgroup of the instance lists this field as a subfield.
+     *
+     * Inside a fieldgroup the field is a plain list of people, one per line: the team features
+     * that act on the entry as a whole (edit rights and visibility for members, self
+     * subscription, the team field, member notifications) do not apply.
+     *
+     * @return bool
+     */
+    public function is_fieldgroup_subfield(): bool {
+        global $DB;
+
+        if ($this->infieldgroup === null) {
+            $this->infieldgroup = false;
+            $fieldgroups = $DB->get_fieldset_select(
+                'datalynx_fields',
+                'param1',
+                'dataid = ? AND type = ?',
+                [$this->dlx->id(), 'fieldgroup']
+            );
+            foreach ($fieldgroups as $param1) {
+                $entries = json_decode((string) $param1, true);
+                foreach (\datalynxfield_fieldgroup\field::normalise_subfields(is_array($entries) ? $entries : []) as $entry) {
+                    if ((int) explode(':', $entry, 2)[0] === (int) $this->id()) {
+                        return $this->infieldgroup = true;
+                    }
+                }
+            }
+        }
+        return $this->infieldgroup;
     }
 
     /**

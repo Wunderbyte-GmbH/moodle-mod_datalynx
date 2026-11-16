@@ -70,6 +70,14 @@ mod_datalynx changes
   search and sort user preferences, which nothing reads, are removed.
 - A team member select field whose institution or department a filter searches
   cannot be deleted, like any other field a filter uses.
+- Team member select in fieldgroups (#312): inside a fieldgroup the field is a
+  plain list of people, one per line. The team features that act on the entry
+  as a whole no longer apply there: edit rights and visibility for team members
+  (before: only the members of the first line got them), self subscription
+  (before: always wrote to the first line; the link is gone and the web service
+  refuses), the team field and member notifications. Members of the first line
+  who had edit rights through such a field lose them. The settings forms of the
+  team member field and of the fieldgroup say so.
 
 2026-11-15
 ----------

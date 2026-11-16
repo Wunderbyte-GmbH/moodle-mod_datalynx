@@ -284,6 +284,11 @@ class datalynxfield_behavior {
             $allowedfieldids = $this->visibleto['teammember'];
             if (!empty($allowedfieldids)) {
                 foreach ($allowedfieldids as $fieldid) {
+                    // Inside a fieldgroup the field is a list of people, not the entry's team.
+                    $teamfield = $this->dlx->get_field_from_id($fieldid);
+                    if (!$teamfield || ($teamfield->type === 'teammemberselect' && $teamfield->is_fieldgroup_subfield())) {
+                        continue;
+                    }
                     $userids = isset($entry->{"c{$fieldid}_content"}) ? json_decode(
                         $entry->{"c{$fieldid}_content"},
                         true

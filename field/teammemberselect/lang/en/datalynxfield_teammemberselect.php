@@ -25,3 +25,5 @@ $string['pluginname'] = 'Team member select';
 $string['privacy:metadata'] = 'The team member select field stores no data of its own. The user IDs of the selected team members are part of the entry content, which mod_datalynx discovers, exports and removes.';
 $string['teammembersnotoffered'] = 'These users are no longer available for selection here, e.g. because they are no longer enrolled: {$a}. Saving the entry removes them from the team, and with it the access the team gives them.';
 $string['teammembersremoved'] = 'Removed from the team in "{$a->field}" because they are no longer available for selection: {$a->users}.';
+$string['teamoptionsfieldgroup'] = 'This field is a subfield of a field group. There it is a plain list of people: the options "user can add self", "notify team members", "allow unsubscription", the team field and "team members can edit the entry" have no effect, nor does making a field visible to its team members.';
+$string['teamsubscriptionfieldgroup'] = 'You cannot add or remove yourself here: in a field group this field is a plain list of people, not a team.';

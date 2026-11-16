@@ -83,6 +83,13 @@ class team_subscription extends external_api {
         if (empty($field) || $field->type !== 'teammemberselect') {
             throw new moodle_exception('invalidrecord', 'error', '', 'datalynx_fields');
         }
+        // Inside a fieldgroup the field is a list of people: nobody subscribes to a line.
+        if ($field->is_fieldgroup_subfield()) {
+            return [
+                    'success' => false,
+                    'error' => get_string('teamsubscriptionfieldgroup', 'datalynxfield_teammemberselect'),
+            ];
+        }
 
         // Fetch the existing content row and current members as integers.
         $row = $DB->get_record('datalynx_contents', [
