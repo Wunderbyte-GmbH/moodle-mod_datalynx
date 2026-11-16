@@ -256,73 +256,7 @@ class field extends datalynxfield_base {
      * @see datalynxfield_base::get_search_sql()
      */
     public function get_search_sql(array $search): array {
-        global $DB;
-
-        [$not, $operator, $value] = $search;
-
-        static $i = 0;
-        $i++;
-        $fieldid = $this->field->id;
-        $name = "df_{$fieldid}_{$i}";
-
-        // For all NOT criteria except NOT Empty, exclude entries which don't meet the positive.
-        // Criterion.
-        $excludeentries = (($not && $operator !== '') || (!$not && $operator === ''));
-
-        if ($excludeentries) {
-            $varcharcontent = $DB->sql_compare_text('content');
-        } else {
-            $varcharcontent = $this->get_sql_compare_text();
-        }
-
-        // The fragment below always states the criterion positively. A NOT criterion is realised
-        // by the $excludeentries branch further down, which looks up the entries meeting the
-        // positive criterion and excludes them - negating here as well would cancel that out and
-        // return exactly the entries the criterion was meant to exclude.
-        $params = [];
-        switch ($operator) {
-            case '':
-                // Stated positively, "holds a value"; the exclusion turns it into "holds none".
-                [$sql, $params] = $this->get_has_value_sql(!$excludeentries, "df_{$fieldid}_");
-                break;
-            case '=':
-            case '>':
-            case '>=':
-            case '<':
-            case '<=':
-                $paramname = "{$name}_$i";
-                $params[$paramname] = trim($value[0]);
-                $sql = " $varcharcontent $operator :$paramname ";
-                break;
-            case 'BETWEEN':
-                $paramname = "{$name}_$i";
-                $params["{$paramname}_l"] = floatval(trim($value[0]));
-                $params["{$paramname}_u"] = floatval(trim($value[1]));
-                $sql = " ($varcharcontent > :{$paramname}_l AND $varcharcontent < :{$paramname}_u) ";
-                break;
-            default:
-                $sql = " 1 = 1 ";
-                break;
-        }
-
-        if ($excludeentries) {
-            // Get entry ids for entries that meet the criterion.
-            if ($eids = $this->get_entry_ids_for_content($sql, $params)) {
-                // Get NOT IN sql.
-                [$notinids, $params] = $DB->get_in_or_equal(
-                    $eids,
-                    SQL_PARAMS_NAMED,
-                    "df_{$fieldid}_",
-                    false
-                );
-                $sql = " e.id $notinids ";
-                return [$sql, $params, false];
-            } else {
-                return ['', [], false];
-            }
-        } else {
-            return [$sql, $params, true];
-        }
+        return $this->get_numeric_search_sql($search);
     }
 
     /**

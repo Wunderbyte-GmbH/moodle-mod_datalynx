@@ -783,6 +783,17 @@ abstract class datalynxfield_base {
     }
 
     /**
+     * An expression to sort by instead of the stored text, or null to sort by the text.
+     *
+     * It is selected as c{fieldid}_sort, so it may use the joined content c{fieldid}.content.
+     *
+     * @return string|null
+     */
+    public function get_sort_select_sql(): ?string {
+        return null;
+    }
+
+    /**
      * Returns the SQL JOIN fragment used when searching by this field.
      *
      * @return string
@@ -1037,6 +1048,104 @@ abstract class datalynxfield_base {
         }
         return $deleted;
     }
+
+    /**
+     * Search criteria of a field whose stored text is a number, compared as numbers.
+     *
+     * The stored text would compare "10" < "9"; a cast in SQL fails on content that is no number.
+     * So the entries are matched on the stored values: '' (empty) by SQL, '=', '>', '>=', '<',
+     * '<=' and BETWEEN (exclusive bounds) by number. NOT selects the other entries, entries
+     * without a value included.
+     *
+     * @param array $search [not, operator, value]; value is a list of bounds
+     * @return array SQL fragment, params, and join flag
+     */
+    protected function get_numeric_search_sql(array $search): array {
+        global $DB;
+
+        [$not, $operator, $value] = $search;
+
+        static $i = 0;
+        $i++;
+        $fieldid = $this->field->id;
+        $name = "df_{$fieldid}_{$i}";
+
+        // For all NOT criteria except NOT Empty, exclude entries which don't meet the positive criterion.
+        $excludeentries = (($not && $operator !== '') || (!$not && $operator === ''));
+
+        if ($operator === '') {
+            // Stated positively, "holds a value"; the exclusion turns it into "holds none".
+            [$sql, $params] = $this->get_has_value_sql(!$excludeentries, "df_{$fieldid}_");
+            if (!$excludeentries) {
+                return [$sql, $params, true];
+            }
+            $eids = $this->get_entry_ids_for_content($sql, $params);
+            if (!$eids) {
+                return ['', [], false];
+            }
+            [$notin, $params] = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED, "df_{$fieldid}_", false);
+            return [" e.id $notin ", $params, false];
+        }
+
+        // Numbers are compared as numbers: the stored text would compare "10" < "9".
+        $bounds = array_map(fn($bound) => self::to_number((string) $bound), array_values((array) $value));
+        if ($bounds === [] || in_array(null, $bounds, true)) {
+            return ['', [], false];
+        }
+        $matches = match ($operator) {
+            '=' => fn(float $number): bool => $number == $bounds[0],
+            '>' => fn(float $number): bool => $number > $bounds[0],
+            '>=' => fn(float $number): bool => $number >= $bounds[0],
+            '<' => fn(float $number): bool => $number < $bounds[0],
+            '<=' => fn(float $number): bool => $number <= $bounds[0],
+            'BETWEEN' => count($bounds) === 2
+                ? fn(float $number): bool => $number > $bounds[0] && $number < $bounds[1]
+                : null,
+            default => null,
+        };
+        if ($matches === null) {
+            return ['', [], false];
+        }
+
+        $eids = $this->get_entry_ids_with_number($matches);
+        if (!$eids) {
+            return [$not ? '' : ' 1 = 0 ', [], false];
+        }
+        [$insql, $params] = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED, "{$name}_", !$not);
+        return [" e.id $insql ", $params, false];
+    }
+
+    /**
+     * A stored or searched value as a number: also with a decimal comma; null when it is none.
+     *
+     * @param string|null $content
+     * @return float|null
+     */
+    public static function to_number(?string $content): ?float {
+        $content = str_replace(',', '.', trim((string) $content));
+        return is_numeric($content) ? (float) $content : null;
+    }
+
+    /**
+     * The entries whose value of this field is a number that matches.
+     *
+     * @param callable $matches float => bool
+     * @return int[]
+     */
+    protected function get_entry_ids_with_number(callable $matches): array {
+        global $DB;
+        $entryids = [];
+        $rows = $DB->get_recordset('datalynx_contents', ['fieldid' => $this->field->id], '', 'id, entryid, content');
+        foreach ($rows as $row) {
+            $number = self::to_number($row->content);
+            if ($number !== null && $matches($number)) {
+                $entryids[(int) $row->entryid] = (int) $row->entryid;
+            }
+        }
+        $rows->close();
+        return array_values($entryids);
+    }
+
 
     /**
      * Get the entry ids for the specific sql using the field id and the field value.

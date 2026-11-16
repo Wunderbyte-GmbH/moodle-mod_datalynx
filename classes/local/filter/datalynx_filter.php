@@ -40,6 +40,8 @@ use stdClass;
 class datalynx_filter {
     /** @var int Filter record id. */
     public $id;
+    /** @var string[] Select columns of sort expressions (SELECT DISTINCT orders only by selected columns). */
+    protected array $sortselects = [];
     /** @var int Datalynx instance id. */
     public $dataid;
     /** @var string Filter name. */
@@ -167,6 +169,9 @@ class datalynx_filter {
         [$datalynxcontent, $whatcontent, $contenttables, $contentparams] = $this->get_content_sql(
             $fields
         );
+        if ($this->sortselects) {
+            $whatcontent = rtrim($whatcontent) . ', ' . implode(', ', $this->sortselects) . ' ';
+        }
 
         return [" $searchtables $sorttables $contenttables ", $wheresearch, $sortorder,
                 $whatcontent, array_merge($searchparams, $sortparams, $contentparams), $datalynxcontent];
@@ -180,6 +185,7 @@ class datalynx_filter {
         $this->searchfields = [];
         $this->sortfields = [];
         $this->joins = [];
+        $this->sortselects = [];
 
         if ($this->customsearch) {
             $this->searchfields = is_array($this->customsearch) ? $this->customsearch : unserialize(
@@ -442,6 +448,11 @@ class datalynx_filter {
                 if (!$field::is_internal()) {
                     $sorties[$fieldid] = $sortname;
                     $sortname = "c{$fieldid}_content";
+                    // A field that sorts by another expression than its text, e.g. as numbers.
+                    if ($sortexpression = $field->get_sort_select_sql()) {
+                        $this->sortselects[] = "$sortexpression AS c{$fieldid}_sort";
+                        $sortname = "c{$fieldid}_sort";
+                    }
                 }
 
                 // Here we can check if fields are special.

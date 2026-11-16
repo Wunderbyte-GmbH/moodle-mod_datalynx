@@ -40,7 +40,8 @@ class field extends datalynxfield_base {
     public function get_input_contract(array $options = []): array {
         $formats = [
             'alphanumeric' => PARAM_ALPHANUM,
-            'numeric' => PARAM_INT,
+            // The format check accepts decimals ("3.5"); PARAM_INT would cut them off before it.
+            'numeric' => PARAM_RAW_TRIMMED,
             'email' => PARAM_EMAIL,
             'lettersonly' => PARAM_TEXT,
             'iban' => PARAM_TEXT,

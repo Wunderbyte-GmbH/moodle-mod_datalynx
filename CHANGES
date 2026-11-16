@@ -22,6 +22,11 @@ mod_datalynx changes
   filter search for "0"; grouping keeps a group "0" and tells "01" from "1";
   rating aggregates of 0 are shown; the datalynx view field keeps numeric
   values of its options.
+- Fix (#316): number and duration fields are searched as numbers (before, the
+  stored text compared "10" < "9", so "> 5" found neither 10 nor 3), also with
+  a decimal comma and for NOT; number fields sort as numbers. A numeric text
+  field keeps decimals, and the unique check of text fields compares whole
+  values ("a_c" is no duplicate of "abc").
 
 2026-11-16
 ----------

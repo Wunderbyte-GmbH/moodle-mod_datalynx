@@ -269,12 +269,12 @@ class renderer extends datalynxfield_renderer {
                    FROM {datalynx_contents} c
                   WHERE c.fieldid = :fieldid
                     AND c.entryid <> :entryid
-                    AND c.content LIKE :content",
+                    AND " . $DB->sql_compare_text('c.content') . " = " . $DB->sql_compare_text(':content'),
                 [
                     'fieldid' => $fieldid,
                     // A fieldgroup line is "{entryid}_fieldgroup_{id}_{line}": its entry is the leading id.
                     'entryid' => (int) $entryid,
-                    'content' => $formdata->$formfieldname,
+                    'content' => (string) $formdata->$formfieldname,
                 ]
             );
             if ($exists) {

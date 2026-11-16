@@ -101,68 +101,25 @@ class field extends TextField {
      * @see datalynxfield_base::get_search_sql()
      */
     public function get_search_sql(array $search): array {
+        return $this->get_numeric_search_sql($search);
+    }
+
+    /**
+     * Sorted as numbers where the stored text is a number (also with a decimal comma); other
+     * contents sort as empty.
+     *
+     * @return string|null
+     */
+    public function get_sort_select_sql(): ?string {
         global $DB;
-
-        [$not, $operator, $value] = $search;
-
-        static $i = 0;
-        $i++;
-        $fieldid = $this->field->id;
-        $name = "df_{$fieldid}_{$i}";
-
-        // For all NOT criteria except NOT Empty, exclude entries which don't meet the positive criterion.
-        $excludeentries = (($not && $operator !== '') || (!$not && $operator === ''));
-
-        if ($excludeentries) {
-            $varcharcontent = $DB->sql_compare_text('content');
-        } else {
-            $varcharcontent = $this->get_sql_compare_text();
+        if (!$DB->sql_regex_supported()) {
+            return null;
         }
-
-        $params = [];
-        switch ($operator) {
-            case '':
-                // Stated positively, "holds a value"; the exclusion turns it into "holds none".
-                [$sql, $params] = $this->get_has_value_sql(!$excludeentries, "df_{$fieldid}_");
-                break;
-            case '=':
-            case '>':
-            case '>=':
-            case '<':
-            case '<=':
-                $paramname = "{$name}_$i";
-                $params[$paramname] = trim($value[0]);
-                $sql = " $varcharcontent $operator :$paramname ";
-                break;
-            case 'BETWEEN':
-                $paramname = "{$name}_$i";
-                $params["{$paramname}_l"] = floatval(trim($value[0]));
-                $params["{$paramname}_u"] = floatval(trim($value[1]));
-                $sql = " ($varcharcontent > :{$paramname}_l AND $varcharcontent < :{$paramname}_u) ";
-                break;
-            default:
-                $sql = " 1 = 1 ";
-                break;
-        }
-
-        if ($excludeentries) {
-            // Get entry ids for entries that meet the criterion.
-            if ($eids = $this->get_entry_ids_for_content($sql, $params)) {
-                // Get NOT IN sql.
-                [$notinids, $params] = $DB->get_in_or_equal(
-                    $eids,
-                    SQL_PARAMS_NAMED,
-                    "df_{$fieldid}_",
-                    false
-                );
-                $sql = " e.id $notinids ";
-                return [$sql, $params, false];
-            } else {
-                return ['', [], false];
-            }
-        } else {
-            return [$sql, $params, true];
-        }
+        $column = "c{$this->field->id}.content";
+        // No "?" in the pattern: Moodle would read it as a query parameter.
+        // A decimal comma counts as a decimal point, as in the search (see to_number()).
+        return "CASE WHEN $column " . $DB->sql_regex() . " '^-{0,1}[0-9]+([.,][0-9]+){0,1}$' THEN " .
+            $DB->sql_cast_char2real("REPLACE($column, ',', '.')", true) . " END";
     }
 
     /**
