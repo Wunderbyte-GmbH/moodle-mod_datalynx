@@ -23,3 +23,5 @@
  */
 $string['pluginname'] = 'Team member select';
 $string['privacy:metadata'] = 'The team member select field stores no data of its own. The user IDs of the selected team members are part of the entry content, which mod_datalynx discovers, exports and removes.';
+$string['teammembersnotoffered'] = 'These users are no longer available for selection here, e.g. because they are no longer enrolled: {$a}. Saving the entry removes them from the team, and with it the access the team gives them.';
+$string['teammembersremoved'] = 'Removed from the team in "{$a->field}" because they are no longer available for selection: {$a->users}.';

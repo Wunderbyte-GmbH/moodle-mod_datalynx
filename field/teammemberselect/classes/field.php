@@ -292,7 +292,23 @@ class field extends datalynxfield_base {
      * @return int|string|bool New content ID.
      */
     public function update_content(stdClass $entry, ?array $values = null): int|string|bool {
+        // Members the form no longer offers cannot be kept by the form: they are removed, which
+        // the edit form warns about. Saving confirms who was removed.
+        $storedcontent = $entry->{"c{$this->field->id}_content"} ?? null;
+        $stored = $storedcontent ? (json_decode($storedcontent, true) ?: []) : [];
+        $notoffered = $this->get_members_not_offered($entry, (array) $stored);
+
         $newcontentid = parent::update_content($entry, $values);
+
+        $kept = array_map('intval', (array) (json_decode((string) $this->get_stored_members($entry), true) ?: []));
+        $removed = array_diff_key($notoffered, array_flip($kept));
+        $interactive = !(defined('WS_SERVER') && WS_SERVER) && !(defined('AJAX_SCRIPT') && AJAX_SCRIPT);
+        if ($removed && $interactive) {
+            \core\notification::warning(get_string('teammembersremoved', 'datalynxfield_teammemberselect', (object) [
+                'field' => format_string($this->name()),
+                'users' => implode(', ', $removed),
+            ]));
+        }
 
         // TODO: MDL-0000 All this is only to notify team members. Check if we really need this here.
         global $DB;
@@ -317,6 +333,58 @@ class field extends datalynxfield_base {
         $this->notify_team_members($entry, $field, $oldcontent, $newcontent);
 
         return $newcontentid;
+    }
+
+    /**
+     * The users the edit form offers for an entry's team.
+     *
+     * @param stdClass $entry
+     * @return int[]
+     */
+    public function get_offered_userids(stdClass $entry): array {
+        global $USER;
+        $authorid = $entry->userid ?? $USER->id;
+        $menu = $this->options_menu(false, false, $this->usercanaddself ? 0 : $authorid);
+        return array_values(array_filter(array_map('intval', array_keys($menu)), fn(int $id): bool => $id > 0));
+    }
+
+    /**
+     * The members of a team whom the edit form does not offer, e.g. because they are no longer
+     * enrolled. The form cannot keep them, so saving the entry removes them from the team.
+     *
+     * @param stdClass $entry
+     * @param array $memberids the stored team
+     * @return string[] user id => full name
+     */
+    public function get_members_not_offered(stdClass $entry, array $memberids): array {
+        global $DB;
+
+        $memberids = array_filter(array_map('intval', $memberids), fn(int $id): bool => $id > 0);
+        $missing = array_values(array_diff($memberids, $this->get_offered_userids($entry)));
+        if (!$missing) {
+            return [];
+        }
+        $users = $DB->get_records_list('user', 'id', $missing, '', 'id, ' . implode(', ', \core_user\fields::get_name_fields()));
+        $names = [];
+        foreach ($missing as $userid) {
+            $names[$userid] = isset($users[$userid]) ? fullname($users[$userid]) : "#{$userid}";
+        }
+        return $names;
+    }
+
+    /**
+     * The stored member list of an entry, as saved.
+     *
+     * @param stdClass $entry
+     * @return string|null
+     */
+    private function get_stored_members(stdClass $entry): ?string {
+        global $DB;
+        if (empty($entry->id)) {
+            return null;
+        }
+        $content = $DB->get_field('datalynx_contents', 'content', ['fieldid' => $this->field->id, 'entryid' => $entry->id]);
+        return $content === false ? null : $content;
     }
 
     /**

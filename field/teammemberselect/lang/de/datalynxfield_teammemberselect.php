@@ -24,3 +24,5 @@
 
 $string['pluginname'] = 'Teammitglieder-Auswahl';
 $string['privacy:metadata'] = 'Das Feld Teammitglieder-Auswahl speichert selbst keine Daten. Die Nutzer-IDs der ausgewählten Teammitglieder sind Teil des Eintragsinhalts, den mod_datalynx auffindet, exportiert und entfernt.';
+$string['teammembersnotoffered'] = 'Diese Personen stehen hier nicht mehr zur Auswahl, z. B. weil sie nicht mehr eingeschrieben sind: {$a}. Beim Speichern des Eintrags werden sie aus dem Team entfernt und verlieren damit den Zugriff, den das Team ihnen gibt.';
+$string['teammembersremoved'] = 'Aus dem Team in „{$a->field}“ entfernt, weil sie nicht mehr zur Auswahl stehen: {$a->users}.';

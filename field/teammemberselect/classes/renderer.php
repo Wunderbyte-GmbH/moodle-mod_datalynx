@@ -234,6 +234,15 @@ class renderer extends datalynxfield_renderer {
         $authorid = isset($entry->userid) ? $entry->userid : $USER->id;
         $menu = $field->options_menu(true, false, $field->usercanaddself ? 0 : $authorid);
 
+        // Members the field no longer offers cannot stay selected: saving removes them. Say so.
+        if ($notoffered = $field->get_members_not_offered($entry, (array) $selected)) {
+            $mform->addElement('html', html_writer::div(
+                get_string('teammembersnotoffered', 'datalynxfield_teammemberselect', implode(', ', $notoffered)),
+                'alert alert-warning',
+                ['id' => "{$classname}_notoffered", 'role' => 'alert']
+            ));
+        }
+
         $mform->addElement(
             'autocomplete',
             $fieldname,
