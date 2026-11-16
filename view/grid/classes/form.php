@@ -47,16 +47,7 @@ class form extends datalynxview_base_form {
         // Grid Appearance Settings.
         $mform->addElement('header', 'gridsettingshdr', get_string('gridsettings', 'datalynxview_grid'));
 
-        $options = [
-            'col' => get_string('wrapperbootstraprowcols', 'datalynxview_grid'),
-            'col-12' => get_string('wrapperbootstrapcol12', 'datalynxview_grid'),
-            'col-12 col-md-6' => get_string('wrapperbootstrapcol6', 'datalynxview_grid'),
-            'col-12 col-md-6 col-lg-4' => get_string('wrapperbootstrapcol4', 'datalynxview_grid'),
-            'col-12 col-md-6 col-lg-3' => get_string('wrapperbootstrapcol3', 'datalynxview_grid'),
-            'entry' => get_string('wrapperlegacy', 'datalynxview_grid'),
-            'custom' => get_string('wrappercustom', 'datalynxview_grid'),
-            'none' => get_string('wrappernone', 'datalynxview_grid'),
-        ];
+        $options = array_map(fn(string $string): string => get_string($string, 'datalynxview_grid'), view::ENTRY_WRAPPERS);
         $mform->addElement('select', 'param3', get_string('entrywrapper', 'datalynxview_grid'), $options);
         $mform->addHelpButton('param3', 'entrywrapper', 'datalynxview_grid');
 

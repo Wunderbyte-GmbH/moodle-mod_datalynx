@@ -30,62 +30,56 @@ namespace mod_datalynx\task;
  */
 class migrate_tags_task extends \core\task\adhoc_task {
     /**
-     * Execute the task.
+     * Execute the task: migrate the views of one instance, or of all instances of a course
+     * (tasks queued by older versions).
      */
     public function execute() {
         global $DB;
         $data = $this->get_custom_data();
-        $courseid = $data->courseid;
-        $datalynxid = $data->datalynxid ?? null;
-
-        // Fetch views only for the restored course/instance.
-        $params = [$courseid];
-        $sql = "SELECT v.* FROM {datalynx_views} v
-                  JOIN {datalynx} d ON v.datalynxid = d.id
-                 WHERE d.course = ?";
-        if ($datalynxid) {
-            $sql .= " AND d.id = ?";
-            $params[] = $datalynxid;
+        $dataids = !empty($data->datalynxid)
+            ? [(int) $data->datalynxid]
+            : $DB->get_fieldset_select('datalynx', 'id', 'course = ?', [(int) $data->courseid]);
+        foreach ($dataids as $dataid) {
+            self::migrate_view_link_tags((int) $dataid);
         }
+    }
 
-        $views = $DB->get_records_sql($sql, $params);
+    /**
+     * Rewrite the view link tags of an instance's views from #{{viewlink:...}}# to ##viewlink:...##
+     * (and viewsesslink). Templates without old tags stay as they are, so running it again, or on
+     * current views, changes nothing.
+     *
+     * @param int $dataid
+     * @return int number of views changed
+     */
+    public static function migrate_view_link_tags(int $dataid): int {
+        global $DB;
 
         $textcolumns = [
             'section', 'param1', 'param2', 'param3', 'param4', 'param5',
             'param6', 'param7', 'param8', 'param9', 'param10',
         ];
-
-        foreach ($views as $view) {
+        $changedviews = 0;
+        foreach ($DB->get_records('datalynx_views', ['dataid' => $dataid]) as $view) {
             $changed = false;
             foreach ($textcolumns as $col) {
                 if (empty($view->$col)) {
                     continue;
                 }
-
                 $newval = preg_replace('/#\{\{(viewlink:[^}]+)\}\}#/', '##$1##', $view->$col);
                 $newval = preg_replace('/#\{\{(viewsesslink:[^}]+)\}\}#/', '##$1##', $newval);
-
                 if ($newval !== $view->$col) {
                     $view->$col = $newval;
                     $changed = true;
                 }
             }
             if ($changed) {
+                // The cached pattern list is built again from the changed templates.
+                $view->patterns = null;
                 $DB->update_record('datalynx_views', $view);
+                $changedviews++;
             }
         }
-
-        // Clear patterns cache for these views.
-        if ($datalynxid) {
-            $DB->set_field('datalynx_views', 'patterns', null, ['datalynxid' => $datalynxid]);
-        } else {
-            $DB->set_field_select(
-                'datalynx_views',
-                'patterns',
-                null,
-                'datalynxid IN (SELECT id FROM {datalynx} WHERE course = ?)',
-                [$courseid]
-            );
-        }
+        return $changedviews;
     }
 }

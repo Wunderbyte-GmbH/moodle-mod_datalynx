@@ -76,6 +76,10 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
         $data = (object) $data;
         $data->course = $this->get_courseid();
 
+        // The datalynx version that made the backup; backups made before it was written carry none.
+        $this->task->set_datalynx_backup_version(!empty($data->pluginversion) ? (int) $data->pluginversion : null);
+        unset($data->pluginversion);
+
         $data->timemodified = $this->apply_date_offset($data->timemodified);
         $data->timeavailable = $this->apply_date_offset($data->timeavailable);
         $data->timedue = $this->apply_date_offset($data->timedue);
@@ -376,12 +380,14 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
             $data->patterns = null;
         }
 
-        // Overwrite param3/param4 to defaults if restoring a grid view backup from before today.
-        $info = $this->task->get_info();
-        $backupversion = $info->metadata->plugin_mod_datalynx_version ?? 0;
-        if ($data->type === 'grid' && ($backupversion === 0 || $backupversion < 2026052500)) {
-            $data->param3 = 'entry';
-            $data->param4 = '';
+        // Grid views got a configurable entry wrapper (param3, custom class in param4) in 2026052500.
+        // A backup that predates it, or does not say its version, keeps a wrapper it already names;
+        // anything else is the former fixed wrapper, "entry".
+        if ($data->type === 'grid' && $this->task->datalynx_backup_predates(2026052500)) {
+            if (!array_key_exists((string) ($data->param3 ?? ''), \datalynxview_grid\view::ENTRY_WRAPPERS)) {
+                $data->param3 = 'entry';
+                $data->param4 = '';
+            }
         }
 
         // Replace double colons for ratings fields.

@@ -52,7 +52,7 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
                         'entriestoview', 'maxentries', 'timelimit', 'approval', 'grouped', 'rating',
                         'comments', 'locks', 'singleedit', 'singleview', 'rssarticles', 'rss', 'css',
                         'cssincludes', 'js', 'jsincludes', 'defaultview', 'defaultfilter',
-                        'completionentries',
+                        'completionentries', 'pluginversion',
             ]
         );
 
@@ -210,7 +210,12 @@ class backup_datalynx_activity_structure_step extends backup_activity_structure_
         $fieldformats->add_child($fieldformat);
 
         // Define sources.
-        $dlx->set_source_table('datalynx', ['id' => backup::VAR_ACTIVITYID]);
+        // The plugin version travels with the instance, so restore knows which migrations it needs.
+        $pluginversion = (int) get_config('mod_datalynx', 'version');
+        $dlx->set_source_sql(
+            "SELECT d.*, $pluginversion AS pluginversion FROM {datalynx} d WHERE d.id = ?",
+            [backup::VAR_ACTIVITYID]
+        );
         $module->set_source_table('course_modules', ['id' => backup::VAR_MODID]);
 
         // Tags.

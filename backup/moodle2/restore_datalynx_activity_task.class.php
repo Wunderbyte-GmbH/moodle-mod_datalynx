@@ -30,6 +30,32 @@ require_once("$CFG->dirroot/mod/datalynx/backup/moodle2/restore_datalynx_stepsli
  * complete restore of the activity
  */
 class restore_datalynx_activity_task extends restore_activity_task {
+    /** @var int|null datalynx version that made the backup, null if the backup does not say */
+    protected ?int $datalynxbackupversion = null;
+
+    /**
+     * Record the datalynx version that made the backup (restore step, from the activity element).
+     *
+     * @param int|null $version null for backups made before the version was written
+     */
+    public function set_datalynx_backup_version(?int $version): void {
+        $this->datalynxbackupversion = $version;
+    }
+
+    /**
+     * Whether the backup may come from a datalynx version before the given one.
+     *
+     * True when the backup is older, and when it does not say its version (backups made before the
+     * version was written): then the migration must find out from the data what it has to do, and
+     * leave current data unchanged.
+     *
+     * @param int $version
+     * @return bool
+     */
+    public function datalynx_backup_predates(int $version): bool {
+        return $this->datalynxbackupversion === null || $this->datalynxbackupversion < $version;
+    }
+
     /** @var int User id of designated owner of content. */
     protected $ownerid = 0;
 
@@ -387,12 +413,9 @@ class restore_datalynx_activity_task extends restore_activity_task {
      * Post-execution custom actions.
      */
     public function after_restore(): void {
-        // 1. Get the version of datalynx used when the backup was created.
-        $info = $this->get_info();
-        $backupversion = $info->metadata->plugin_mod_datalynx_version ?? 0;
-
-        // Auto-create formats from templates if the backup is from an older version that didn't have field formats.
-        if ($backupversion > 0 && $backupversion < 2026060600) {
+        // Field formats came in 2026060600: create the formats the view templates use and the
+        // backup does not hold (only missing ones are created).
+        if ($this->datalynx_backup_predates(2026060600)) {
             \mod_datalynx\local\field_format\manager::auto_create_formats_from_templates($this->get_activityid());
         }
 
@@ -400,16 +423,10 @@ class restore_datalynx_activity_task extends restore_activity_task {
         // formats for this restored instance (mirrors the Field Format upgrade migration).
         \mod_datalynx\local\field_format\manager::migrate_userinfo_fields($this->get_activityid());
 
-        // 2. Check if the backup version is older than our breaking change.
-        if ($backupversion > 0 && $backupversion < 2026041000) {
-            // 3. Queue an ad-hoc task to process this specific course.
-            // We do this via ad-hoc task to avoid slowing down the user's restore UI.
-            $task = new \mod_datalynx\task\migrate_tags_task();
-            $task->set_custom_data([
-                'courseid' => $this->get_courseid(),
-                'datalynxid' => $this->get_activityid(),
-            ]);
-            \core\task\manager::queue_adhoc_task($task);
+        // View link tags changed from #{{viewlink:...}}# to ##viewlink:...## in 2026041000. Only
+        // old tags are rewritten, so current templates stay as they are.
+        if ($this->datalynx_backup_predates(2026041000)) {
+            \mod_datalynx\task\migrate_tags_task::migrate_view_link_tags($this->get_activityid());
         }
 
         // Normalise restored teammemberselect content to the canonical integer-JSON form, so

@@ -78,6 +78,13 @@ mod_datalynx changes
   refuses), the team field and member notifications. Members of the first line
   who had edit rights through such a field lose them. The settings forms of the
   team member field and of the fieldgroup say so.
+- Fix (#313): restore never knew the datalynx version of a backup. Every
+  restore, import and duplication reset the entry wrapper of grid views to
+  "entry", and the migrations for old backups (field formats, view link tags)
+  never ran. Backups now carry the plugin version. Backups without it (made
+  before this fix) keep a grid wrapper they name and get the migrations, which
+  change only what is old. The tag migration of restored instances failed on a
+  wrong column; it now runs during the restore instead of as an ad-hoc task.
 
 2026-11-15
 ----------

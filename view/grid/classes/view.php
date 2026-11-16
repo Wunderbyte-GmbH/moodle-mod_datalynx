@@ -40,6 +40,18 @@ use stdClass;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class view extends base {
+    /** @var string[] The entry wrappers (param3) and the language string naming each in the settings. */
+    const ENTRY_WRAPPERS = [
+        'col' => 'wrapperbootstraprowcols',
+        'col-12' => 'wrapperbootstrapcol12',
+        'col-12 col-md-6' => 'wrapperbootstrapcol6',
+        'col-12 col-md-6 col-lg-4' => 'wrapperbootstrapcol4',
+        'col-12 col-md-6 col-lg-3' => 'wrapperbootstrapcol3',
+        'entry' => 'wrapperlegacy',
+        'custom' => 'wrappercustom',
+        'none' => 'wrappernone',
+    ];
+
     /** @var string The view type. */
     protected string $type = 'grid';
 
