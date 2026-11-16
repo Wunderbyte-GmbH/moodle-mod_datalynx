@@ -312,7 +312,7 @@ class datalynxview_patterns {
                     }
                     $viewurl = new moodle_url($baseurl->out_omit_querystring(), $linkparams);
                     if ($sesslink === 0) {
-                        if (!((strpos($urlquery, 'new=1') === false || $this->user_can_add_new_entry()))) {
+                        if (!((strpos($urlquery, 'new=1') === false || $dlx->user_can_add_new_entry()))) {
                             return '';
                         }
                     }
@@ -334,35 +334,6 @@ class datalynxview_patterns {
         }
 
         return '';
-    }
-
-    /**
-     * Find out if user can add a new entry
-     *
-     * @param number $userid
-     * @return bool true if user is allowed to add a new entry
-     */
-    private function user_can_add_new_entry($userid = 0): bool {
-        global $USER, $DB;
-        $userid = $userid ? $userid : $USER->id;
-        $dlx = $this->view->get_dlx();
-        $maxentries = $dlx->data->maxentries;
-        $writeentry = has_capability('mod/datalynx:writeentry', $dlx->context);
-        if ($writeentry) {
-            if ($maxentries == -1) {
-                return true;
-            }
-            $params = ['userid' => $userid, 'dataid' => $dlx->id()];
-            $sql = "SELECT COUNT(1)
-                      FROM {datalynx_entries} de
-                     WHERE de.userid = :userid
-                       AND de.dataid = :dataid";
-            $count = $DB->get_field_sql($sql, $params);
-
-            return $count < $maxentries;
-        } else {
-            return false;
-        }
     }
 
     /**
@@ -528,7 +499,7 @@ class datalynxview_patterns {
         switch ($tag) {
             case '##addnewentry##':
             case '##addnewentries##':
-                if (!empty($options['hidenewentry']) || !($this->user_can_add_new_entry())) {
+                if (!empty($options['hidenewentry']) || !($dlx->user_can_add_new_entry())) {
                     break;
                 }
 

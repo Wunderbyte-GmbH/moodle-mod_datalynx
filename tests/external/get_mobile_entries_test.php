@@ -125,6 +125,7 @@ final class get_mobile_entries_test extends externallib_advanced_testcase {
             $entry['fields']
         ));
         $this->assertSame('Banana', $entry['fields'][0]['valuetext']);
+        $this->assertSame('Banana', $entry['title']);
         $this->assertSame(fullname(get_admin()), $entry['author']);
     }
 
@@ -167,13 +168,72 @@ final class get_mobile_entries_test extends externallib_advanced_testcase {
      * A view type the app cannot show comes back unsupported, with the way to the web.
      */
     public function test_unsupported_view_type(): void {
-        $csv = $this->add_mobile_view($this->dlx, 'csv', 'Export');
+        foreach (['csv', 'pdf', 'report'] as $type) {
+            $viewid = $this->add_mobile_view($this->dlx, $type, ucfirst($type), '##edit## ##delete##', [
+                'section' => '##addnewentry## ##entries##',
+            ]);
 
-        $result = $this->call(['viewid' => $csv]);
+            $result = $this->call(['viewid' => $viewid]);
 
-        $this->assertFalse($result['supported']);
-        $this->assertSame([], $result['entries']);
-        $this->assertStringContainsString('view=' . $csv, $result['browserurl']);
+            $this->assertFalse($result['supported'], $type);
+            $this->assertSame($type, $result['viewtype']);
+            $this->assertSame([], $result['entries'], $type);
+            $this->assertFalse($result['canadd'], $type);
+            $this->assertStringContainsString('view=' . $viewid, $result['browserurl'], $type);
+        }
+    }
+
+    /**
+     * Edit and delete are offered on the entries the user may manage, through a view that has the
+     * action: the student on their own entry, the teacher on every entry.
+     */
+    public function test_canedit_candelete_student_and_teacher(): void {
+        $student = $this->create_mobile_student($this->course);
+        $other = $this->create_mobile_student($this->course);
+        $teacher = $this->getDataGenerator()->create_and_enrol($this->course, 'editingteacher');
+        $own = $this->add_mobile_entry($this->dlx, $student->id, [$this->titleid => 'Own']);
+        $foreign = $this->add_mobile_entry($this->dlx, $other->id, [$this->titleid => 'Foreign']);
+        $both = $this->add_mobile_view($this->dlx, 'grid', 'Manage', '[[Title]] ##edit## ##delete##');
+        $table = '<table><tr><td>[[Title]] ##edit##</td></tr></table>';
+        $editonly = $this->add_mobile_view($this->dlx, 'tabular', 'Edit only', $table);
+        $rights = function (int $viewid): array {
+            $rights = [];
+            foreach ($this->call(['viewid' => $viewid])['entries'] as $entry) {
+                $rights[$entry['id']] = [$entry['canedit'], $entry['candelete']];
+            }
+            return $rights;
+        };
+
+        $this->setUser($student);
+        $result = $rights($both);
+        $this->assertSame([true, true], $result[$own]);
+        $this->assertSame([false, false], $result[$foreign]);
+        $this->assertSame([true, false], $rights($editonly)[$own]);
+
+        $this->setUser($teacher);
+        $result = $rights($both);
+        $this->assertSame([true, true], $result[$own]);
+        $this->assertSame([true, true], $result[$foreign]);
+        $this->assertSame([true, false], $rights($editonly)[$foreign]);
+    }
+
+    /**
+     * Adding is offered where the view has ##addnewentry## and the user has entries left.
+     */
+    public function test_canadd(): void {
+        global $DB;
+
+        $student = $this->create_mobile_student($this->course);
+        $addable = $this->add_mobile_view($this->dlx, 'grid', 'Add', '[[Title]]', ['section' => '##addnewentry## ##entries##']);
+        $plain = $this->add_mobile_view($this->dlx, 'grid', 'Browse', '[[Title]]');
+        $this->setUser($student);
+
+        $this->assertTrue($this->call(['viewid' => $addable])['canadd']);
+        $this->assertFalse($this->call(['viewid' => $plain])['canadd']);
+
+        $DB->set_field('datalynx', 'maxentries', 1, ['id' => $this->dlx->id()]);
+        $this->add_mobile_entry($this->dlx, $student->id, [$this->titleid => 'Mine']);
+        $this->assertFalse($this->call(['viewid' => $addable])['canadd']);
     }
 
     /**

@@ -2453,6 +2453,26 @@ class datalynx {
     }
 
     /**
+     * Whether the current user may add a new entry: the ##addnewentry## link of a view and the
+     * "add" button of the Moodle App both ask this.
+     *
+     * @return bool
+     */
+    public function user_can_add_new_entry(): bool {
+        global $USER, $DB;
+
+        if (!has_capability('mod/datalynx:writeentry', $this->context)) {
+            return false;
+        }
+        $maxentries = (int) $this->data->maxentries;
+        if ($maxentries === -1) {
+            return true;
+        }
+
+        return $DB->count_records('datalynx_entries', ['userid' => $USER->id, 'dataid' => $this->id()]) < $maxentries;
+    }
+
+    /**
      * Has a user reached the max number of entries?
      * If interval is set then required entries, max entries etc. are relative to the current interval
      *

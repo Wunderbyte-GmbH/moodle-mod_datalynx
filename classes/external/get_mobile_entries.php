@@ -123,9 +123,11 @@ class get_mobile_entries extends external_api {
             'entriescount' => new external_value(PARAM_INT, 'Entries on this page'),
             'entriesfiltercount' => new external_value(PARAM_INT, 'Entries matching the filter'),
             'hasmore' => new external_value(PARAM_BOOL, 'Whether more entries match than this page holds'),
+            'canadd' => new external_value(PARAM_BOOL, 'Whether the user may add an entry through this view'),
             'entries' => new external_multiple_structure(new external_single_structure([
                 'id' => new external_value(PARAM_INT, 'Entry ID'),
                 'html' => new external_value(PARAM_RAW, 'The entry rendered with the view entry template, empty if none'),
+                'title' => new external_value(PARAM_RAW, 'Plain text of the first field with a value, empty if none'),
                 'fields' => new external_multiple_structure(new external_single_structure([
                     'fieldid' => new external_value(PARAM_INT, 'Field ID'),
                     'name' => new external_value(PARAM_TEXT, 'Field name'),
@@ -138,6 +140,8 @@ class get_mobile_entries extends external_api {
                 'status' => new external_value(PARAM_INT, 'Entry status'),
                 'timecreated' => new external_value(PARAM_INT, 'Time created'),
                 'timemodified' => new external_value(PARAM_INT, 'Time modified'),
+                'canedit' => new external_value(PARAM_BOOL, 'Whether the user may edit the entry through this view'),
+                'candelete' => new external_value(PARAM_BOOL, 'Whether the user may delete the entry through this view'),
             ])),
             'views' => new external_multiple_structure(new external_single_structure([
                 'id' => new external_value(PARAM_INT, 'View ID'),

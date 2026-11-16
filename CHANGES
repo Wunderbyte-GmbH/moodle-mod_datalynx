@@ -13,6 +13,13 @@ mod_datalynx changes
   rewrites the existing rows of the standard log to ids only.
   Sites must clean other log stores themselves (external database log stores,
   exported or archived logs): they still hold the old records.
+- Moodle App (#267): the entries the app browses say what the user may do
+  with them: canedit and candelete per entry (the user's rights on the
+  entry and the ##edit## / ##delete## action of the view, as the save and
+  delete services check them), canadd per view (##addnewentry## in the view
+  and entries left to add, the same check as the web's "Add entry" link,
+  which now lives in datalynx::user_can_add_new_entry()), and a plain text
+  title per entry.
 
 2026-11-17
 ----------

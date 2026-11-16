@@ -46,6 +46,10 @@ use stdClass;
  *   the app lists rather than draws as a table), for accessible labels, and as the fallback when
  *   a grid view has no entry template.
  *
+ * What the user may do with the entries (canadd, canedit, candelete) is decided by the checks the
+ * services that do it apply: the user's rights on the entry and the action tags of the view, as
+ * on the web, where a view without ##edit## offers no editing.
+ *
  * The filter state arrives with every request and is never stored, unlike the desktop's user
  * preferences: two devices of one user would otherwise overwrite each other's filter.
  *
@@ -110,6 +114,7 @@ final class entries_payload_builder {
             'entriescount' => 0,
             'entriesfiltercount' => 0,
             'hasmore' => false,
+            'canadd' => false,
             'entries' => [],
             'views' => $this->build_views($records, $record),
             'filters' => [],
@@ -158,6 +163,10 @@ final class entries_payload_builder {
         $payload['entriesfiltercount'] = $entries->get_count(true);
         $payload['hasmore'] = $filter->perpage > 0
             && ($payload['page'] + 1) * $payload['perpage'] < $payload['entriesfiltercount'];
+        $payload['canadd'] = $this->dlx->user_can_add_new_entry() && (
+            $view->confirm_view_action('addnewentry', (int) $record->id)
+            || $view->confirm_view_action('addnewentries', (int) $record->id)
+        );
         $payload['entries'] = $this->build_entries($manager, $view, $entries->entries() ?? []);
         $payload['filters'] = $this->build_filters($filtermenu, $payload['filterid']);
 
@@ -279,9 +288,16 @@ final class entries_payload_builder {
     private function build_entries(view_manager $manager, base $view, array $records): array {
         $usetemplate = $manager->uses_entry_template($view);
         $shown = $this->get_shown_fields($view, $manager->get_content_fields($view));
+        $viewid = (int) $view->id();
+        $viewallows = [
+            'edit' => $view->confirm_view_action('edit', $viewid),
+            'delete' => $view->confirm_view_action('delete', $viewid),
+        ];
         $entries = [];
 
         foreach ($records as $record) {
+            $manageable = $this->dlx->user_can_manage_entry($record);
+            $fields = $this->build_field_values($manager, $shown, $record);
             $record->baseurl = $view->get_navigationurl();
             $html = $usetemplate
                 ? html_sanitiser::for_app($view->render_entry_html($record, ['edit' => false, 'manage' => false]))
@@ -290,13 +306,16 @@ final class entries_payload_builder {
             $entries[] = [
                 'id' => (int) $record->id,
                 'html' => $html,
-                'fields' => $this->build_field_values($manager, $shown, $record),
+                'title' => $fields ? $fields[0]['valuetext'] : '',
+                'fields' => $fields,
                 'userid' => (int) $record->userid,
                 'author' => fullname($record),
                 'approved' => !empty($record->approved),
                 'status' => (int) ($record->status ?? 0),
                 'timecreated' => (int) $record->timecreated,
                 'timemodified' => (int) $record->timemodified,
+                'canedit' => $manageable && $viewallows['edit'],
+                'candelete' => $manageable && $viewallows['delete'],
             ];
         }
 
