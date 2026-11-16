@@ -308,7 +308,7 @@ final class entry_submission_service {
 
         // The required lines, and every other line that holds a value. The form posts all lines,
         // the hidden empty ones too, and saving drops the lines in which no subfield has a value
-        // by the same test (the subfield's is_fieldvalue_empty()).
+        // by the same test (the fieldgroup's line_has_value()).
         $lines = $requiredlines ? range(0, min($requiredlines, $maxlines) - 1) : [];
         foreach ((array) $data as $name => $value) {
             if (
@@ -317,12 +317,14 @@ final class entry_submission_service {
                 && preg_match(self::LINE_REGEX, $matches[3] ?? '', $line)
                 && (int) $line[1] === $groupid
                 && (int) $line[2] < $maxlines
-                && isset($state['subfields'][(int) $matches[1]])
-                && !$state['subfields'][(int) $matches[1]]['field']->is_fieldvalue_empty($value)
             ) {
-                $lines[] = (int) $line[2];
+                $lines[(int) $line[2]] = (int) $line[2];
             }
         }
+        $lines = array_filter(
+            $lines,
+            fn(int $line): bool => $line < $requiredlines || $fieldgroup->line_has_value($entryid, $line, $data)
+        );
 
         $errors = [];
         foreach (array_unique($lines) as $line) {

@@ -95,6 +95,33 @@ final class fieldgroup_empty_lines_test extends advanced_testcase {
     }
 
     /**
+     * Empty lines are recognised for every subfield type as the form posts them: a file subfield
+     * posts the id of an empty draft area, a masked date its parts, all 0 (mod_datalynx#307).
+     */
+    public function test_empty_file_and_masked_date_lines_are_not_stored(): void {
+        $picture = $this->create_field('picture', 'Picture', ['param2' => '-1', 'param3' => 'image']);
+        $masked = $this->create_field('time', 'Masked', ['param5' => '1']);
+        $note = $this->create_field('text', 'Note');
+        $group = $this->create_field('fieldgroup', 'Uploads', [
+            'param1' => json_encode(["$picture", "$masked", "$note"]), 'param2' => '10', 'param3' => '1',
+        ]);
+        $entryid = $this->create_entry();
+
+        $fg = "fieldgroup_{$group}";
+        $data = [$fg => $group];
+        for ($i = 0; $i < 4; $i++) {
+            $data["field_{$picture}_{$entryid}_{$fg}_{$i}_filemanager"] = file_get_unused_draft_itemid();
+            $data["field_{$masked}_{$entryid}_{$fg}_{$i}"] = ['day' => 0, 'month' => 0, 'year' => 0, 'hour' => 0, 'minute' => 0];
+            $data["field_{$note}_{$entryid}_{$fg}_{$i}"] = $i ? '' : 'Kept';
+        }
+        $this->save($entryid, $data);
+
+        $this->assertSame(['Kept'], $this->lines($note, $entryid));
+        $this->assertLessThanOrEqual(1, count($this->lines($picture, $entryid)));
+        $this->assertLessThanOrEqual(1, count($this->lines($masked, $entryid)));
+    }
+
+    /**
      * Form data as the browser posts it: line 0 filled, the other lines empty with the date disabled
      * (disabled inputs are not posted). The guest group has its value in line 1.
      *

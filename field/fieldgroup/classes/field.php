@@ -129,6 +129,29 @@ class field extends datalynxfield_base {
         return array_values(array_unique($ids));
     }
 
+    /**
+     * Whether a line of the fieldgroup holds a value in a submission: whether any subfield's
+     * input of that line is not empty, as the subfield judges it. The form posts every line,
+     * the hidden empty ones too, and their inputs are not blank: a file posts its draft area,
+     * a masked date its parts.
+     *
+     * @param int|string $entryid the entry id in the element names (negative for new entries)
+     * @param int $line
+     * @param stdClass $data the submission
+     * @return bool
+     */
+    public function line_has_value(int|string $entryid, int $line, stdClass $data): bool {
+        $groupid = $this->id();
+        foreach ($this->get_subfield_ids() as $subfieldid) {
+            $subfield = $this->dlx->get_field_from_id($subfieldid);
+            $name = "field_{$subfieldid}_{$entryid}_fieldgroup_{$groupid}_{$line}";
+            if ($subfield && !$subfield->is_submitted_value_empty($name, $data)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /** @var string The field type identifier. */
     public $type = 'fieldgroup';
 

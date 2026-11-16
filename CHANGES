@@ -32,6 +32,9 @@ mod_datalynx changes
   before, its id was lost. Deleting a field used in a fieldgroup with a
   behavior or layout is blocked like any other subfield, and such subfields are
   expanded correctly in views.
+- Fix (#307): saving an entry no longer stores the empty lines of a fieldgroup
+  with a file, picture or masked date subfield. Whether a line holds a value is
+  decided by its subfields' own empty check, for saving and for validation.
 
 2026-11-15
 ----------

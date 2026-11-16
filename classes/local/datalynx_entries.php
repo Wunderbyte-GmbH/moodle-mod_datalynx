@@ -1027,8 +1027,10 @@ class datalynx_entries {
 
                                                 // Remember the line's content ids and whether it has a value, so
                                                 // lines without any value can be removed below.
-                                                if (!$fields[$fieldid]->is_fieldvalue_empty($value)) {
-                                                    $fglines[$fieldgroup][$i]['hasvalue'] = true;
+                                                if (!isset($fglines[$fieldgroup][$i]['hasvalue'])) {
+                                                    $group = $fields[(int) substr($fieldgroup, strlen('fieldgroup_'))];
+                                                    $fglines[$fieldgroup][$i]['hasvalue'] =
+                                                        $group->line_has_value($eid, (int) $i, $data);
                                                 }
                                                 if (isset($entry->{"c{$fieldid}_id_fieldgroup"}[$i])) {
                                                     $fglines[$fieldgroup][$i]['contentids'][] =
