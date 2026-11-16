@@ -240,6 +240,15 @@ class field extends datalynxfield_base {
     }
 
     /**
+     * No duration: earlier versions stored 0 for a duration left empty.
+     *
+     * @return string[]
+     */
+    public static function get_empty_contents(): array {
+        return ['', '0'];
+    }
+
+    /**
      * {@inheritDoc}
      * @param array $search Search parameters array [not, operator, value].
      * @return array SQL fragment, params, and join flag.
@@ -271,6 +280,10 @@ class field extends datalynxfield_base {
         // return exactly the entries the criterion was meant to exclude.
         $params = [];
         switch ($operator) {
+            case '':
+                // Stated positively, "holds a value"; the exclusion turns it into "holds none".
+                [$sql, $params] = $this->get_has_value_sql(!$excludeentries, "df_{$fieldid}_");
+                break;
             case '=':
             case '>':
             case '>=':

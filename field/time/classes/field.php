@@ -64,6 +64,15 @@ class field extends datalynxfield_base {
         return (int) $value === 0;
     }
 
+    /**
+     * No date: earlier versions stored 0 for a date left empty.
+     *
+     * @return string[]
+     */
+    public static function get_empty_contents(): array {
+        return ['', '0'];
+    }
+
     /** @var string Field type */
     public $type = 'time';
 
@@ -280,8 +289,7 @@ class field extends datalynxfield_base {
             case '':
                 // Empty: state it positively as "holds a value" and let the exclusion above
                 // turn it into "holds none", which also covers entries with no content record.
-                [$sql, $params] = $DB->get_in_or_equal('', SQL_PARAMS_NAMED, "df_{$fieldid}_", false);
-                $sql = " $varcharcontent $sql ";
+                [$sql, $params] = $this->get_has_value_sql(!$excludeentries, "df_{$fieldid}_");
                 break;
             case '=':
                 if ($this->dateonly) {

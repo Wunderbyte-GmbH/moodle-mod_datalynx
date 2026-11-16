@@ -39,6 +39,18 @@ mod_datalynx changes
   every message without a field name above the form. Messages are shown at
   their fields; only one that no field shows appears on the page, named by its
   field.
+- Fix (#308): a field left empty stores no content row; a missing row means no
+  value. Before, saving stored the element's empty export ('0' for a date or a
+  duration, '' or '[]'), so "is empty" filters missed those entries and "NOT
+  empty" found some of them. The "is empty" search now also treats these
+  stored placeholders as empty, and the upgrade and restore remove them, except
+  in fieldgroup lines, whose rows keep the lines in place. File and picture
+  fields keep their rows. Required lines of fieldgroups are checked as before.
+- Fix: updating an entry that the view had not loaded (web services, imports)
+  added a second content row for every field instead of changing the stored
+  one.
+- Fix: the "NOT empty" search on a team member or single choice field with no
+  stored values failed on PostgreSQL.
 
 2026-11-15
 ----------

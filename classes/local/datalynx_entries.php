@@ -1044,8 +1044,18 @@ class datalynx_entries {
                                             }
                                         } else {
                                             // Keep behaviour if no fieldgroup is detected.
-                                            $updateresult = $fields[$fieldid]->update_content($entry, $content);
-                                            if ($updateresult !== true) {
+                                            $field = $fields[$fieldid];
+                                            $hadvalue = !empty($entry->{"c{$fieldid}_id"})
+                                                && !$field->is_stored_content_empty($entry->{"c{$fieldid}_content"} ?? null);
+                                            $updateresult = $field->update_content($entry, $content);
+                                            // A missing row means no value: a row that holds only the
+                                            // field's empty content goes, and is a change only if
+                                            // there was a value before.
+                                            if (!$field::is_internal() && $field->drop_empty_content((int) $entry->id)) {
+                                                if ($hadvalue) {
+                                                    $changedfields[$fieldid] = true;
+                                                }
+                                            } else if ($updateresult !== true) {
                                                 $changedfields[$fieldid] = true;
                                             }
                                         }

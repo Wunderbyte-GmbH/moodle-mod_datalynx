@@ -793,13 +793,8 @@ abstract class datalynxfield_base {
         }
 
         if ($operator === '') {
-            [$sql, $params] = $DB->get_in_or_equal(
-                '',
-                SQL_PARAMS_NAMED,
-                "df_{$fieldid}_",
-                false
-            );
-            $sql = " $varcharcontent $sql ";
+            // Stated positively, "holds a value"; the exclusion turns it into "holds none".
+            [$sql, $params] = $this->get_has_value_sql(!$excludeentries, "df_{$fieldid}_");
         } else {
             if ($operator === '=') {
                 $searchvalue = trim($value);
@@ -858,6 +853,141 @@ abstract class datalynxfield_base {
         } else {
             return [$sql, $params, true];
         }
+    }
+
+    /**
+     * The stored contents that mean "no value" for this field type.
+     *
+     * A missing content row means no value, but saving used to store the empty export of an
+     * element instead ('0' for a date, '[]' for a member list). The search for "empty" and the
+     * cleanup on saving treat these as no value.
+     *
+     * @return string[]
+     */
+    public static function get_empty_contents(): array {
+        return [''];
+    }
+
+    /**
+     * Whether a stored content means "no value" ({@see self::get_empty_contents()}).
+     *
+     * @param string|null $content
+     * @return bool
+     */
+    public function is_stored_content_empty(?string $content): bool {
+        return $content === null || in_array($content, static::get_empty_contents(), true);
+    }
+
+    /**
+     * SQL stating that the content holds a value: it is neither NULL nor an empty content.
+     *
+     * The stored text is compared, not a cast of it: the empty contents need not be numbers.
+     *
+     * @param bool $joined true for the content joined to the entries query (c<fieldid>.content),
+     *                     false for a query on datalynx_contents itself (content)
+     * @param string $prefix prefix of the named parameters
+     * @return array [sql, params]
+     */
+    protected function get_has_value_sql(bool $joined, string $prefix): array {
+        global $DB;
+        $raw = $joined ? "c{$this->field->id}.content" : 'content';
+        $column = $DB->sql_compare_text($raw);
+        [$insql, $params] = $DB->get_in_or_equal(static::get_empty_contents(), SQL_PARAMS_NAMED, $prefix, false);
+        return [" ($raw IS NOT NULL AND $column $insql) ", $params];
+    }
+
+    /**
+     * Remove the content row of an entry if it holds no value.
+     *
+     * Only a single row is removed: several rows are the lines of a fieldgroup, which are matched
+     * up by their order and must keep their places.
+     *
+     * @param int $entryid
+     * @return bool whether a row was removed
+     */
+    public function drop_empty_content(int $entryid): bool {
+        global $DB;
+
+        $rows = $DB->get_records('datalynx_contents', ['fieldid' => $this->id(), 'entryid' => $entryid], '', 'id, content');
+        if (count($rows) !== 1) {
+            return false;
+        }
+        $row = reset($rows);
+        if (!$this->is_stored_content_empty($row->content)) {
+            return false;
+        }
+        get_file_storage()->delete_area_files($this->dlx->context->id, 'mod_datalynx', 'content', $row->id);
+        $DB->delete_records('datalynx_contents', ['id' => $row->id]);
+        return true;
+    }
+
+    /**
+     * Delete the stored content rows that hold only their field's empty content.
+     *
+     * Used by the upgrade migration and by restore (after_restore). Kept are: the rows of file
+     * fields, which carry the files; the rows of fieldgroup subfields, whose lines are matched up by
+     * their order; and every row of an entry that has several rows for the field. Idempotent.
+     *
+     * @param int|null $dataid Restrict to one datalynx instance, or null for all instances.
+     * @return int Number of rows deleted.
+     */
+    public static function delete_stored_empty_contents(?int $dataid = null): int {
+        global $DB;
+
+        $conditions = $dataid !== null ? ['dataid' => $dataid] : [];
+        $fields = $DB->get_records('datalynx_fields', $conditions, 'id', 'id, dataid, type, param1');
+        $subfields = [];
+        foreach ($fields as $field) {
+            if ($field->type === 'fieldgroup') {
+                $entries = json_decode((string) $field->param1, true);
+                foreach (\datalynxfield_fieldgroup\field::normalise_subfields(is_array($entries) ? $entries : []) as $entry) {
+                    $subfields[(int) explode(':', $entry, 2)[0]] = true;
+                }
+            }
+        }
+
+        $deleted = 0;
+        $content = $DB->sql_compare_text('c.content');
+        foreach ($fields as $field) {
+            $class = "datalynxfield_{$field->type}\\field";
+            if (
+                isset($subfields[(int) $field->id]) || !class_exists($class) || $class::is_internal()
+                || is_a($class, \datalynxfield_file\field::class, true)
+                || is_a($class, \datalynxfield_fieldgroup\field::class, true)
+            ) {
+                continue;
+            }
+            [$insql, $params] = $DB->get_in_or_equal($class::get_empty_contents(), SQL_PARAMS_NAMED, 'empty');
+            $params['fieldid'] = $field->id;
+            $ids = $DB->get_fieldset_sql(
+                "SELECT c.id
+                   FROM {datalynx_contents} c
+                  WHERE c.fieldid = :fieldid
+                    AND (c.content IS NULL OR $content $insql)
+                    AND (SELECT COUNT(1) FROM {datalynx_contents} c2
+                          WHERE c2.fieldid = c.fieldid AND c2.entryid = c.entryid) = 1",
+                $params
+            );
+            if (!$ids) {
+                continue;
+            }
+            $cm = get_coursemodule_from_instance('datalynx', $field->dataid);
+            foreach (array_chunk($ids, 500) as $chunk) {
+                if ($cm) {
+                    [$filesql, $fileparams] = $DB->get_in_or_equal($chunk, SQL_PARAMS_NAMED);
+                    get_file_storage()->delete_area_files_select(
+                        \context_module::instance($cm->id)->id,
+                        'mod_datalynx',
+                        'content',
+                        $filesql,
+                        $fileparams
+                    );
+                }
+                $DB->delete_records_list('datalynx_contents', 'id', $chunk);
+                $deleted += count($chunk);
+            }
+        }
+        return $deleted;
     }
 
     /**

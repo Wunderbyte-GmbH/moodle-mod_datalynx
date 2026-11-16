@@ -121,6 +121,10 @@ class field extends TextField {
 
         $params = [];
         switch ($operator) {
+            case '':
+                // Stated positively, "holds a value"; the exclusion turns it into "holds none".
+                [$sql, $params] = $this->get_has_value_sql(!$excludeentries, "df_{$fieldid}_");
+                break;
             case '=':
             case '>':
             case '>=':

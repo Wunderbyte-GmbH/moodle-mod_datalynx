@@ -29,6 +29,7 @@ use mod_datalynx\local\view\datalynxview_entries_form;
 use moodle_exception;
 use moodle_url;
 use ReflectionClass;
+use stdClass;
 
 /**
  * The entry submission service decides for the web form and the web services what is saved (#266).
@@ -243,6 +244,92 @@ final class entry_submission_service_test extends advanced_testcase {
         $this->assertSame(["field_{$timer}_-1_fieldgroup_{$group}_0"], array_keys($errors));
         $this->assertSame([], $form->get_page_errors($errors));
         $this->assertSame(['Timer: Not shown'], $form->get_page_errors(["field_{$timer}_-1_elsewhere" => 'Not shown']));
+    }
+
+    /**
+     * Required lines of a fieldgroup are still enforced, and saving keeps every line's rows in
+     * place, the empty contents of subfields included: the lines are matched up by row order, so
+     * the cleanup of empty rows must not touch them.
+     */
+    public function test_fieldgroup_required_lines_and_line_rows(): void {
+        global $DB;
+
+        $timer = $this->add_mobile_field($this->dlx, 'time', 'Timer');
+        $title = $this->fieldids['Title'];
+        $group = $this->add_mobile_field($this->dlx, 'fieldgroup', 'Group', [
+            'param1' => json_encode([(string) $title, (string) $timer]), 'param2' => '4', 'param3' => '2', 'param4' => '2',
+        ]);
+        $view = $this->view('[[Group]]');
+        $service = new entry_submission_service($view);
+        $name = fn(int $fieldid, int $entryid, int $line): string => "field_{$fieldid}_{$entryid}_fieldgroup_{$group}_{$line}";
+        $date = make_timestamp(2026, 11, 16);
+
+        // Two lines are required: an empty second line is refused, subfield by subfield.
+        $errors = $service->validate([-1], [$name($title, -1, 0) => 'First', $name($timer, -1, 0) => $date]);
+        $this->assertEqualsCanonicalizing([$name($title, -1, 1), $name($timer, -1, 1)], array_keys($errors));
+
+        // Both lines filled: saved, two rows per subfield.
+        $posted = fn(int $entryid): stdClass => (object) [
+            $name($title, $entryid, 0) => 'First', $name($timer, $entryid, 0) => $date,
+            $name($title, $entryid, 1) => 'Second', $name($timer, $entryid, 1) => $date,
+            $name($title, $entryid, 2) => '', $name($timer, $entryid, 2) => 0,
+        ];
+        $result = $service->save([-1], $posted(-1));
+        $this->assertSame([], $result['errors']);
+        $entryid = (int) reset($result['entryids']);
+        $rows = fn(int $fieldid): array => array_values($DB->get_fieldset_select(
+            'datalynx_contents',
+            'content',
+            'fieldid = ? AND entryid = ? ORDER BY id',
+            [$fieldid, $entryid]
+        ));
+        $this->assertSame(['First', 'Second'], $rows($title));
+        $this->assertSame([(string) $date, (string) $date], $rows($timer));
+
+        // Saved again unchanged, through a fresh view as the next request: still valid, same rows.
+        $service = new entry_submission_service($this->dlx->get_view('grid', $view->id(), false));
+        $this->assertSame([], $service->save([$entryid], $posted($entryid))['errors']);
+        $this->assertSame(['First', 'Second'], $rows($title));
+        $this->assertSame([(string) $date, (string) $date], $rows($timer));
+
+        // Line 2 cleared: refused, the required lines stay as they are.
+        $cleared = $posted($entryid);
+        $cleared->{$name($title, $entryid, 1)} = '';
+        $cleared->{$name($timer, $entryid, 1)} = 0;
+        $this->assertNotEmpty($service->save([$entryid], $cleared)['errors']);
+        $this->assertSame(['First', 'Second'], $rows($title));
+    }
+
+    /**
+     * In a line that holds a value, a subfield left empty keeps its row, so the lines after it
+     * stay matched up.
+     */
+    public function test_fieldgroup_empty_subfield_keeps_its_line(): void {
+        global $DB;
+
+        $timer = $this->add_mobile_field($this->dlx, 'time', 'Timer');
+        $title = $this->fieldids['Title'];
+        $group = $this->add_mobile_field($this->dlx, 'fieldgroup', 'Group', [
+            'param1' => json_encode([(string) $title, (string) $timer]), 'param2' => '3', 'param3' => '2', 'param4' => '0',
+        ]);
+        $service = new entry_submission_service($this->view('[[Group]]'));
+        $date = make_timestamp(2026, 11, 16);
+        $result = $service->save([-1], (object) [
+            "field_{$title}_-1_fieldgroup_{$group}_0" => 'No date', "field_{$timer}_-1_fieldgroup_{$group}_0" => 0,
+            "field_{$title}_-1_fieldgroup_{$group}_1" => 'Dated', "field_{$timer}_-1_fieldgroup_{$group}_1" => $date,
+        ]);
+        $entryid = (int) reset($result['entryids']);
+
+        $rows = fn(int $fieldid): array => array_values($DB->get_fieldset_select(
+            'datalynx_contents',
+            'content',
+            'fieldid = ? AND entryid = ? ORDER BY id',
+            [$fieldid, $entryid]
+        ));
+        $this->assertSame(['No date', 'Dated'], $rows($title));
+        $timerrows = $rows($timer);
+        $this->assertCount(2, $timerrows);
+        $this->assertSame((string) $date, $timerrows[1]);
     }
 
     /**

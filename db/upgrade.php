@@ -1391,6 +1391,14 @@ function xmldb_datalynx_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2026111600, 'datalynx');
     }
 
+    if ($oldversion < 2026111601) {
+        // A missing content row means no value: remove the rows earlier versions stored for fields
+        // left empty ('0' for a date or duration, '' or '[]'), so "is empty" filters find them (#308).
+        \mod_datalynx\local\field\datalynxfield_base::delete_stored_empty_contents();
+
+        upgrade_mod_savepoint(true, 2026111601, 'datalynx');
+    }
+
     return true;
 }
 

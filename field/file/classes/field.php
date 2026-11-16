@@ -64,6 +64,16 @@ class field extends datalynxfield_base {
         return get_file_storage()->is_area_empty(context_user::instance($USER->id)->id, 'user', 'draft', $itemid);
     }
 
+    /**
+     * Never: the row of a file field carries its files, and its search reads 1 as "has a file".
+     *
+     * @param string|null $content
+     * @return bool
+     */
+    public function is_stored_content_empty(?string $content): bool {
+        return false;
+    }
+
     /** @var string Plugin type. */
     public $type = 'file';
 

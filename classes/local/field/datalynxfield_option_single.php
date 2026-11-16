@@ -218,8 +218,7 @@ class datalynxfield_option_single extends datalynxfield_option {
         } else {
             if ($operator === '') {
                 $usecontent = false;
-                $sqlnot = $DB->sql_like("content", ":{$name}_hascontent");
-                $params["{$name}_hascontent"] = "%";
+                [$sqlnot, $params] = $this->get_has_value_sql(false, "df_{$fieldid}_e_");
 
                 if ($eids = $this->get_entry_ids_for_content($sqlnot, $params)) { // There are non-empty.
                     // Contents.
@@ -233,7 +232,7 @@ class datalynxfield_option_single extends datalynxfield_option {
                     $sql = " (e.id $contentids) ";
                 } else { // There are no non-empty contents.
                     if ($not) {
-                        $sql = " 0 ";
+                        $sql = " 1 = 0 ";
                     } else {
                         $sql = " 1 = 1 ";
                     }

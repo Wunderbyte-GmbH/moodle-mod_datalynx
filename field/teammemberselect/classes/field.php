@@ -400,6 +400,15 @@ class field extends datalynxfield_base {
     }
 
     /**
+     * No members: the member list of an empty selection is stored as [].
+     *
+     * @return string[]
+     */
+    public static function get_empty_contents(): array {
+        return ['', '[]'];
+    }
+
+    /**
      * {@inheritDoc}
      * @see datalynxfield_base::get_search_sql()
      * @param array $search Search criteria array.
@@ -481,7 +490,7 @@ class field extends datalynxfield_base {
                 $sql = " (e.id $contentids) ";
             } else { // There are no non-empty contents.
                 if ($not) {
-                    $sql = " 0 ";
+                    $sql = " 1 = 0 ";
                 } else {
                     $sql = " 1 = 1 ";
                 }

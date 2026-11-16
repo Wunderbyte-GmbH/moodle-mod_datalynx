@@ -288,8 +288,7 @@ class datalynxfield_option_multiple extends datalynxfield_option {
                 } else {
                     if ($operator === '') { // EMPTY.
                         $usecontent = false;
-                        $sqlnot = $DB->sql_like("content", ":{$name}_hascontent");
-                        $params["{$name}_hascontent"] = "%";
+                        [$sqlnot, $params] = $this->get_has_value_sql(false, "df_{$fieldid}_e_");
 
                         if ($eids = $this->get_entry_ids_for_content($sqlnot, $params)) { // There are non-empty.
                             // Contents.

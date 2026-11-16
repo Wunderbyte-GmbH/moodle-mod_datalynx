@@ -420,6 +420,9 @@ class restore_datalynx_activity_task extends restore_activity_task {
         // Fieldgroups list their subfields in the current form (mirrors the upgrade migration).
         \datalynxfield_fieldgroup\field::normalize_stored_subfields($this->get_activityid());
 
+        // A missing content row means no value; older backups carry rows of fields left empty.
+        \mod_datalynx\local\field\datalynxfield_base::delete_stored_empty_contents($this->get_activityid());
+
         // Migrate restored rule conditions to JSON if needed.
         global $DB;
         $sql = "SELECT r.id, r.param5, r.param10
