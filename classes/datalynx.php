@@ -1563,7 +1563,7 @@ class datalynx {
                             $event->trigger();
 
                             // Update the views.
-                            if ($oldfieldname != $field->field->name) {
+                            if ((string) $oldfieldname !== (string) $field->field->name) {
                                 $this->replace_field_in_views($oldfieldname, $field->field->name);
                             }
                         }

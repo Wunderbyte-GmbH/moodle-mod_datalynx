@@ -1039,7 +1039,8 @@ abstract class base {
         // Process entries data.
         $processed = $this->process_entries_data();
         if (is_array($processed)) {
-            if ($processed[0] === -1) {
+            // Opening the form for new entries returns [-n]: nothing was processed yet.
+            if (count($processed) === 1 && (int) reset($processed) < 0) {
                 return;
             }
             [$strnotify, $successfullyprocessedeids] = $processed;
@@ -2748,10 +2749,16 @@ abstract class base {
         $confirmed = optional_param('confirmed', 0, PARAM_BOOL);
 
         if ($update) {
-            $action = ($update != self::ADD_NEW_ENTRY) ? "edit" : "addnewentry";
-            if (confirm_sesskey() && $this->confirm_view_action($action)) {
+            // New entries are one negative number: -1 for one, -3 for three (##addnewentries##).
+            $updateids = explode(',', (string) $update);
+            $isnew = count($updateids) === 1 && (int) $updateids[0] < 0;
+            $allowed = $isnew
+                ? $this->confirm_view_action('addnewentry') || $this->confirm_view_action('addnewentries')
+                : $this->confirm_view_action('edit');
+            $action = $isnew ? 'addnewentry' : 'edit';
+            if (confirm_sesskey() && $allowed) {
                 // Get entries only if updating existing entries.
-                if ($update != self::ADD_NEW_ENTRY) {
+                if (!$isnew) {
                     // Fetch entries.
                     $this->entries->set_content();
                 }

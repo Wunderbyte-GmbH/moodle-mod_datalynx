@@ -1116,10 +1116,14 @@ class datalynx_filter_manager {
                 continue;
             }
             [$fieldid, $dir] = $parts;
-            if (!preg_match('/^-?\d+$/', $fieldid)) {
+            // A field id is a number, or the name of an internal field (timecreated, status, ...);
+            // the filter skips ids the instance does not have.
+            if (preg_match('/^-?\d+$/', $fieldid)) {
+                $fieldid = (int) $fieldid;
+            } else if (!preg_match('/^[a-z][a-z0-9_]*$/', $fieldid)) {
                 continue;
             }
-            $sortoptions[(int) $fieldid] = ((int) $dir === 1) ? 1 : 0;
+            $sortoptions[$fieldid] = ((int) $dir === 1) ? 1 : 0;
         }
         return $sortoptions;
     }

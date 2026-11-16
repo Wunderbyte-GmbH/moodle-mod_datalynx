@@ -79,7 +79,8 @@ final class sort_query_parsing_test extends advanced_testcase {
     public static function malformed_query_provider(): array {
         return [
             'empty' => ['', []],
-            'non-numeric field id' => ['abc 1', []],
+            'internal field id' => ['timecreated 1', ['timecreated' => 1]],
+            'field id with other characters' => ['a-b 1', []],
             'sql fragment as field id' => ['1);DROP TABLE 1', []],
             'missing direction' => ['7', []],
             'direction normalised to 0' => ['7 9', [7 => 0]],

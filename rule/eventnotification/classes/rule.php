@@ -120,11 +120,13 @@ class rule extends base {
      * @return bool
      */
     private function checkteam(\core\event\base $event): bool {
-        $teamid = $event->get_data()['other']['fieldid'];
+        $teamid = (int) ($event->get_data()['other']['fieldid'] ?? 0);
         $param1 = $this->rule->param1 ?? null;
         $triggers = empty($param1) ? [] : (json_decode($param1, true) ?? []);
         foreach ($triggers as $trigger) {
-            if (strpos($trigger, "$teamid") !== false) {
+            // A team trigger is "team_updated:{fieldid}"; field 2 must not match "team_updated:12".
+            [$eventname, $fieldid] = array_pad(explode(':', (string) $trigger, 2), 2, '');
+            if ($eventname === 'team_updated' && $teamid > 0 && (int) $fieldid === $teamid) {
                 return true;
             }
         }

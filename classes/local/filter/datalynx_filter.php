@@ -345,7 +345,8 @@ class datalynx_filter {
                             $searchlike[$paramlike] = "(" .
                                     $DB->sql_like("cs.content", ":$paramlike", false, false) .
                                     " AND fsimple.id = :$paramid)";
-                            $searchparams[$paramlike] = "%#{$id}%#";
+                            // Stored as #1#,#21#: "#2#" must match whole ids, not the start of 21.
+                            $searchparams[$paramlike] = "%#{$id}#%";
                             $searchparams[$paramid] = $field->id();
                             $i++;
                         }

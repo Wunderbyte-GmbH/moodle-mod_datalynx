@@ -337,7 +337,7 @@ class datalynxfield_layout {
         global $DB;
         $formdata->dataid = $formdata->d;
         // When name is altered we have to replace patterns.
-        if ($DB->get_field('datalynx_renderers', 'name', ['id' => $formdata->id]) != $formdata->name) {
+        if ((string) $DB->get_field('datalynx_renderers', 'name', ['id' => $formdata->id]) !== (string) $formdata->name) {
             self::update_render_pattern($formdata->id, $formdata->name);
         }
         $DB->update_record('datalynx_renderers', $formdata);

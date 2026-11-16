@@ -1541,16 +1541,14 @@ function mod_datalynx_get_tagged_entries($tag, $exclusivemode = false, $fromctx 
         // Solution is to use datalynx instance to check accessibility.
         // But not a problem if no information is displayed. Only link to datalynx entry is shown.
         $builder->walk(
-            function ($taggeditem) use ($courseid, $modinfo, $builder) {
+            function ($taggeditem) use ($courseid, $modinfo, $builder, $USER) {
                 if ($taggeditem->courseid == $courseid) {
                     $accessible = false;
                     if (($cm = $modinfo->get_cm($taggeditem->cmid)) && $cm->uservisible) {
-                        $dlx = (object) ['id' => $taggeditem->datalynxid,
-                                'course' => $cm->course,
-                        ];
-                        $dlx = new mod_datalynx\datalynx($taggeditem->datalynxid);
+                        // The query selects the instance as dataid.
+                        $dlx = new mod_datalynx\datalynx($taggeditem->dataid);
                         if (!$dlx->user_can_view_all_entries()) {
-                            if ($taggeditem->userid === $USER->id) {
+                            if ((int) $taggeditem->userid === (int) $USER->id) {
                                 $accessible = true;
                             }
                             if (

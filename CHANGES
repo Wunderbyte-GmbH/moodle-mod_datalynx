@@ -27,6 +27,15 @@ mod_datalynx changes
   a decimal comma and for NOT; number fields sort as numbers. A numeric text
   field keeps decimals, and the unique check of text fields compares whole
   values ("a_c" is no duplicate of "abc").
+- Fix (#317): ids are compared as whole numbers. A notification rule for team
+  field 12 no longer runs when team field 2 (or 1) changes; the quick search for
+  an option label of a multiple choice field no longer finds entries with
+  option 21 when it means option 2; adding several entries at once
+  (##addnewentries##) is checked as adding, not editing, and opening that form
+  no longer shows an error; renaming a field or layout from "10" to "010"
+  updates the views; a sorted filter keeps its sort by internal fields (time
+  created, ...) when read back from its URL; the tag index lets authors see
+  their own tagged entries.
 
 2026-11-16
 ----------
