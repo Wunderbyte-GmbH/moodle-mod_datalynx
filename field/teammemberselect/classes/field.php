@@ -682,56 +682,42 @@ class field extends datalynxfield_base {
     }
 
     /**
-     * Trigger events to notify the team members when new members were
-     * added to the field "teammemeberselect" in a specific entry
+     * Trigger one team_updated event when a save added or removed team members.
+     *
+     * The event carries the ids of the added and removed members only: the event data is
+     * written to the logs (and exported with the acting user's data), so no user records go
+     * into it (mod_datalynx#321).
      *
      * @param stdClass $entry
      * @param stdClass $field
-     * @param array $oldmembers
+     * @param array|null $oldmembers
      * @param array $newmembers
      */
     public function notify_team_members($entry, $field, $oldmembers, $newmembers): void {
-        global $DB;
+        $ids = fn($members) => array_values(array_unique(array_filter(
+            array_map('intval', is_array($members) ? $members : []),
+            fn(int $id) => $id > 0
+        )));
+        $oldmembers = $ids($oldmembers);
+        $newmembers = $ids($newmembers);
 
-        $oldmembers = !empty($oldmembers) ? array_filter($oldmembers) : [];
-        $newmembers = array_filter($newmembers);
-
-        $addedmemberids = array_diff($newmembers, $oldmembers);
-        $removedmemberids = array_diff($oldmembers, $newmembers);
-
-        if (!empty($addedmemberids)) {
-            [$insql, $params] = $DB->get_in_or_equal($addedmemberids);
-            $addedmembers = $DB->get_records_sql("SELECT * FROM {user} WHERE id $insql", $params);
-        } else {
-            $addedmembers = [];
+        $added = array_values(array_diff($newmembers, $oldmembers));
+        $removed = array_values(array_diff($oldmembers, $newmembers));
+        if (!$added && !$removed) {
+            return;
         }
 
-        if (!empty($removedmemberids)) {
-            [$insql, $params] = $DB->get_in_or_equal($removedmemberids);
-            $removedmembers = $DB->get_records_sql("SELECT * FROM {user} WHERE id $insql", $params);
-        } else {
-            $removedmembers = [];
-        }
-
-        $other = ['dataid' => $field->dataid, 'fieldid' => $field->id, 'name' => $field->name,
-            'addedmembers' => json_encode($addedmembers),
-            'removedmembers' => json_encode($removedmembers)];
-
-        if (!empty($addedmembers)) {
-            $event = \mod_datalynx\event\team_updated::create(
-                ['context' => $this->dlx->context, 'objectid' => $entry->id,
-                'other' => $other]
-            );
-            $event->trigger();
-        }
-
-        if (!empty($removedmembers)) {
-            $event = \mod_datalynx\event\team_updated::create(
-                ['context' => $this->dlx->context, 'objectid' => $entry->id,
-                'other' => $other]
-            );
-            $event->trigger();
-        }
+        \mod_datalynx\event\team_updated::create([
+            'context' => $this->dlx->context,
+            'objectid' => $entry->id,
+            'other' => [
+                'dataid' => (int) $field->dataid,
+                'fieldid' => (int) $field->id,
+                'name' => $field->name,
+                'addedmembers' => $added,
+                'removedmembers' => $removed,
+            ],
+        ])->trigger();
     }
 
     /**

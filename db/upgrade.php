@@ -1423,7 +1423,67 @@ function xmldb_datalynx_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2026111700, 'datalynx');
     }
 
+    if ($oldversion < 2026111800) {
+        // Logged team_updated events held complete user records of the team members (password
+        // hash, email, login data); keep their ids only (#321).
+        mod_datalynx_upgrade_clean_team_updated_logs();
+
+        upgrade_mod_savepoint(true, 2026111800, 'datalynx');
+    }
+
     return true;
+}
+
+/**
+ * Reduce the member lists of logged team_updated events to user ids (2026111800, #321).
+ *
+ * Works through the standard log in chunks of ids; keeps the storage format of each row
+ * (serialized PHP or JSON) and leaves rows that hold ids only untouched. Other log stores
+ * (external databases, exports) are not reached.
+ *
+ * @param int $chunksize rows read per query
+ * @return int number of rows rewritten
+ */
+function mod_datalynx_upgrade_clean_team_updated_logs(int $chunksize = 500): int {
+    global $DB;
+
+    if (!$DB->get_manager()->table_exists('logstore_standard_log')) {
+        return 0;
+    }
+
+    $eventname = '\\mod_datalynx\\event\\team_updated';
+    $rewritten = 0;
+    $lastid = 0;
+    do {
+        $rows = $DB->get_records_select(
+            'logstore_standard_log',
+            'eventname = :eventname AND id > :lastid',
+            ['eventname' => $eventname, 'lastid' => $lastid],
+            'id ASC',
+            'id, other',
+            0,
+            $chunksize
+        );
+        foreach ($rows as $row) {
+            $lastid = (int) $row->id;
+            $serialized = $row->other === 'N;' || preg_match('~^.:~', $row->other ?? '');
+            $other = $serialized
+                ? @unserialize($row->other, ['allowed_classes' => false])
+                : json_decode($row->other ?? '', true);
+            if (!is_array($other)) {
+                continue;
+            }
+            $clean = \mod_datalynx\event\team_updated::member_ids_only($other);
+            if ($clean === $other) {
+                continue;
+            }
+            $encoded = $serialized ? serialize($clean) : json_encode($clean);
+            $DB->set_field('logstore_standard_log', 'other', $encoded, ['id' => $row->id]);
+            $rewritten++;
+        }
+    } while (count($rows) === $chunksize);
+
+    return $rewritten;
 }
 
 /**

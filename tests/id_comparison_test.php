@@ -54,7 +54,7 @@ final class id_comparison_test extends advanced_testcase {
         $event = fn(int $fieldid) => \mod_datalynx\event\team_updated::create([
             'context' => $dlx->context, 'objectid' => 1,
             'other' => ['dataid' => $dlx->id(), 'fieldid' => $fieldid, 'name' => 'Team',
-                'addedmembers' => '[]', 'removedmembers' => '[]'],
+                'addedmembers' => [], 'removedmembers' => []],
         ]);
 
         $this->assertTrue($checkteam->invoke($rule, $event(12)));

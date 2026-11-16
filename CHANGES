@@ -1,6 +1,19 @@
 mod_datalynx changes
 ====================
 
+2026-11-18
+----------
+
+- Security / privacy (#321): the "Team updated" event logged the complete
+  user records of the added and removed team members (password hash, email,
+  username, IP and login data). Anyone who could read the logs, and the data
+  export of the user who changed the team, received them. The event now holds
+  the user ids only, and one save that adds and removes members triggers one
+  event (rules on "Team updated" ran twice before). Upgrade 2026111800
+  rewrites the existing rows of the standard log to ids only.
+  Sites must clean other log stores themselves (external database log stores,
+  exported or archived logs): they still hold the old records.
+
 2026-11-17
 ----------
 

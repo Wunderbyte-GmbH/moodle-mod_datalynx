@@ -27,10 +27,17 @@ namespace mod_datalynx\event;
 /**
  * The mod_datalynx team updated event class.
  *
+ * Ids only: the event data is written to the logs and exported with the data of the acting
+ * user, so it must not hold user records (mod_datalynx#321).
+ *
  * @property-read array $other {
  *                Extra information about event.
  *
  *                - int dataid: the id of the datalynx activity.
+ *                - int fieldid: the id of the team member select field.
+ *                - string name: the name of the field.
+ *                - int[] addedmembers: ids of the users who joined the team.
+ *                - int[] removedmembers: ids of the users who left the team.
  *                }
  *
  * @package mod_datalynx
@@ -94,5 +101,58 @@ class team_updated extends \core\event\base {
         if (!isset($this->other['dataid'])) {
             throw new \coding_exception('The \'dataid\' value must be set in other.');
         }
+        foreach (['addedmembers', 'removedmembers'] as $key) {
+            $members = $this->other[$key] ?? [];
+            if (!is_array($members) || array_filter($members, fn($id) => !is_int($id))) {
+                throw new \coding_exception("The '$key' value in other must be a list of user ids.");
+            }
+        }
+    }
+
+    /**
+     * Mapping of the ids in other for restoring logs.
+     *
+     * The member lists are lists of user ids; the log restore maps single ids only, so they
+     * are not mapped.
+     *
+     * @return array
+     */
+    public static function get_other_mapping() {
+        return [
+            'dataid' => ['db' => 'datalynx', 'restore' => 'datalynx'],
+            'fieldid' => ['db' => 'datalynx_fields', 'restore' => 'datalynx_field'],
+            'addedmembers' => \core\event\base::NOT_MAPPED,
+            'removedmembers' => \core\event\base::NOT_MAPPED,
+        ];
+    }
+
+    /**
+     * The other data of a logged event with the member lists reduced to user ids.
+     *
+     * Before mod_datalynx#321 the lists were JSON strings of complete user records (with
+     * password hash, email and login data). Lists that hold ids only come back unchanged.
+     *
+     * @param array $other
+     * @return array
+     */
+    public static function member_ids_only(array $other): array {
+        foreach (['addedmembers', 'removedmembers'] as $key) {
+            if (!array_key_exists($key, $other)) {
+                continue;
+            }
+            $members = $other[$key];
+            if (is_string($members)) {
+                $members = json_decode($members, true);
+            }
+            $ids = [];
+            foreach (is_array($members) ? $members : [] as $member) {
+                $id = is_array($member) ? ($member['id'] ?? 0) : $member;
+                if (is_numeric($id) && (int) $id > 0) {
+                    $ids[] = (int) $id;
+                }
+            }
+            $other[$key] = array_values(array_unique($ids));
+        }
+        return $other;
     }
 }
