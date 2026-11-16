@@ -20,6 +20,11 @@ mod_datalynx changes
   options and by the names of their team members again (broken since April
   2026), also for members no longer enrolled and whatever form the member list
   is stored in.
+- Fix (#306): a PDF view whose stored settings cannot be read no longer fails
+  the whole activity page. Settings whose string lengths a charset conversion
+  broke are repaired; unreadable ones fall back to the defaults with a
+  debugging message. Stored settings no longer instantiate classes other than
+  stdClass.
 
 2026-11-15
 ----------

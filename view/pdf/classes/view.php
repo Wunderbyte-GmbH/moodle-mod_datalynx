@@ -31,6 +31,7 @@ use html_table_row;
 use html_writer;
 use mod_datalynx\local\datalynx_tcpdf;
 use mod_datalynx\local\view\base;
+use moodle_url;
 use stdClass;
 
 /**
@@ -102,6 +103,52 @@ class view extends base {
     }
 
     /**
+     * The stored PDF settings (param1), base64 encoded or, from older versions, plain serialized.
+     *
+     * Settings whose string lengths no longer match their content (a charset conversion of the
+     * plain serialized form) are repaired. Settings that cannot be read fall back to the defaults
+     * with a debugging message; saving the view settings form stores them anew.
+     *
+     * @param string $param1
+     * @return stdClass
+     */
+    protected function decode_settings(string $param1): stdClass {
+        $serialized = base64_decode($param1, true);
+        if ($serialized === false) {
+            $serialized = $param1;
+        }
+        $settings = @unserialize($serialized, ['allowed_classes' => [stdClass::class]]);
+        if (!is_object($settings)) {
+            $settings = @unserialize(self::repair_string_lengths($serialized), ['allowed_classes' => [stdClass::class]]);
+        }
+        if (!is_object($settings)) {
+            $url = new moodle_url('/mod/datalynx/view/view_edit.php', ['d' => $this->dlx->id(), 'vedit' => $this->id()]);
+            debugging("The settings of the PDF view '{$this->name()}' cannot be read; the defaults apply. " .
+                "Save the view settings again: $url", DEBUG_DEVELOPER);
+            return new stdClass();
+        }
+        return $settings;
+    }
+
+    /**
+     * Recount the declared lengths of the strings in a serialized value.
+     *
+     * A string ends where its closing quote is followed by the next serialized token, so content
+     * that itself holds such a sequence cannot be repaired this way.
+     *
+     * @param string $serialized
+     * @return string
+     */
+    protected static function repair_string_lengths(string $serialized): string {
+        $nexttoken = '(?=s:\d+:"|i:-?\d+;|b:[01];|d:[-0-9.E+INFAN]+;|N;|O:\d+:"|a:\d+:\{|\})';
+        return preg_replace_callback(
+            '/s:\d+:"(.*?)";' . $nexttoken . '/s',
+            fn(array $match): string => 's:' . strlen($match[1]) . ':"' . $match[1] . '";',
+            $serialized
+        ) ?? $serialized;
+    }
+
+    /**
      * Constructor
      *
      * @param int $dlx Datalynx instance id
@@ -111,15 +158,7 @@ class view extends base {
     public function __construct($dlx = 0, $view = 0, $filteroptions = true) {
         parent::__construct($dlx, $view, $filteroptions);
 
-        if (!empty($this->view->param1)) {
-            if (base64_decode($this->view->param1, true)) {
-                $settings = unserialize(base64_decode($this->view->param1));
-            } else {
-                $settings = unserialize($this->view->param1);
-            }
-        } else {
-            $settings = new stdClass();
-        }
+        $settings = !empty($this->view->param1) ? $this->decode_settings($this->view->param1) : new stdClass();
 
         $this->settings = (object) [
                 'docname' => !empty($settings->docname) ? $settings->docname : '',
