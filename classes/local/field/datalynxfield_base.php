@@ -440,6 +440,9 @@ abstract class datalynxfield_base {
         // Update if new is different from old.
         if (!is_null($contentid)) {
             foreach ($contents as $key => $content) {
+                // Submitted values are typed by the input contract (e.g. int), stored ones are strings:
+                // compare them as they would be stored, so an unchanged value is no change.
+                $content = is_int($content) ? (string) $content : $content;
                 if (!isset($oldcontents[$key]) || $content !== $oldcontents[$key]) {
                     $rec->id = $contentid; // MUST_EXIST.
                     $DB->update_record('datalynx_contents', $rec);
