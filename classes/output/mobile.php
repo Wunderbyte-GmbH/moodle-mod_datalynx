@@ -44,7 +44,7 @@ class mobile {
      * Browse the entries of the activity.
      *
      * The app opens this with cmid and courseid. View switching, searching and growing the list
-     * call it again with the rest of the state, which is otherwise kept in otherdata.
+     * call it again with the rest of the state, which is otherwise kept in otherdata.state.
      *
      * @param array $args arguments of tool_mobile_get_content, all strings
      * @return array templates, javascript and otherdata
@@ -143,14 +143,17 @@ class mobile {
     /**
      * Encode otherdata for the app.
      *
-     * The app parses every otherdata value as JSON. Encoding each value here, strings included,
-     * makes that parse return exactly the value sent: a search term or the criteria JSON stays a
-     * string instead of turning into a number or an object on the way.
+     * tool_mobile_get_content hands every otherdata value over as a string, and the app parses a
+     * value as JSON only when it starts with "{" or "[" (Moodle App 4.x/5.x). Sent one by one, a
+     * number would arrive as a string (the view menu could not match "5" to view 5), "false" would
+     * be true, and a search starting with "[" would be parsed. The whole state therefore travels
+     * as one JSON object under "state", which the app parses with every type intact; the template
+     * reads CONTENT_OTHERDATA.state.
      *
      * @param array $data
-     * @return array name => JSON
+     * @return array ['state' => JSON object]
      */
     private static function otherdata(array $data): array {
-        return array_map(fn($value) => json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), $data);
+        return ['state' => json_encode((object) $data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)];
     }
 }

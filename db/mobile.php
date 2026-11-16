@@ -50,6 +50,7 @@ $addons = [
             ['mobilefilterselect', 'datalynx'],
             ['mobilenoview', 'datalynx'],
             ['mobileopeninbrowser', 'datalynx'],
+            ['mobilesearchentries', 'datalynx'],
             ['mobileshowingxofy', 'datalynx'],
             ['mobileviewnotsupported', 'datalynx'],
             ['mobileviewselect', 'datalynx'],

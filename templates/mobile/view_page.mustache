@@ -21,7 +21,7 @@
 
     Rendered on the server, compiled by Angular in the app. The delimiters are switched to <% %>
     so that the double curly braces stay Angular's. Everything the page shows comes from
-    CONTENT_OTHERDATA through property bindings; only the two ids below are written into the source.
+    CONTENT_OTHERDATA.state (see \mod_datalynx\output\mobile::otherdata()) through property bindings; only the two ids below are written into the source.
 
     Example context (json):
     {
@@ -31,66 +31,72 @@
 }}
 {{=<% %>=}}
 <div class="mod-datalynx-mobile">
-    <core-course-module-description *ngIf="CONTENT_OTHERDATA.intro" [description]="CONTENT_OTHERDATA.intro"
+    <core-course-module-description *ngIf="CONTENT_OTHERDATA.state.intro" [description]="CONTENT_OTHERDATA.state.intro"
             component="mod_datalynx" componentId="<% cmid %>"></core-course-module-description>
 
-    <core-empty-box *ngIf="!CONTENT_OTHERDATA.hasview" icon="fas-database"
+    <core-empty-box *ngIf="!CONTENT_OTHERDATA.state.hasview" icon="fas-database"
             [message]="'plugin.mod_datalynx.mobilenoview' | translate"></core-empty-box>
 
-    <ion-list *ngIf="CONTENT_OTHERDATA.hasview" class="mod-datalynx-mobile-controls">
-        <ion-item *ngIf="CONTENT_OTHERDATA.views.length > 1">
+    <ion-list *ngIf="CONTENT_OTHERDATA.state.hasview" class="mod-datalynx-mobile-controls">
+        <ion-item *ngIf="CONTENT_OTHERDATA.state.views.length > 1">
             <ion-select [label]="'plugin.mod_datalynx.mobileviewselect' | translate" labelPlacement="stacked"
-                    interface="action-sheet" [value]="CONTENT_OTHERDATA.viewid"
-                    (ionChange)="$event.detail.value !== CONTENT_OTHERDATA.viewid && updateContent({
+                    interface="action-sheet" [value]="CONTENT_OTHERDATA.state.viewid"
+                    (ionChange)="$event.detail.value !== CONTENT_OTHERDATA.state.viewid && updateContent({
                         cmid: <% cmid %>, courseid: <% courseid %>, viewid: $event.detail.value
                     })">
-                <ion-select-option *ngFor="let view of CONTENT_OTHERDATA.views" [value]="view.id">{{ view.name }}</ion-select-option>
+                <ion-select-option *ngFor="let view of CONTENT_OTHERDATA.state.views" [value]="view.id">{{ view.name }}</ion-select-option>
             </ion-select>
         </ion-item>
-        <ion-item *ngIf="CONTENT_OTHERDATA.canfilter && CONTENT_OTHERDATA.filters.length">
+        <ion-item *ngIf="CONTENT_OTHERDATA.state.canfilter && CONTENT_OTHERDATA.state.filters.length">
             <ion-select [label]="'plugin.mod_datalynx.mobilefilterselect' | translate" labelPlacement="stacked"
-                    interface="action-sheet" [value]="CONTENT_OTHERDATA.filterid"
-                    (ionChange)="$event.detail.value !== CONTENT_OTHERDATA.filterid && updateContent({
-                        cmid: <% cmid %>, courseid: <% courseid %>, viewid: CONTENT_OTHERDATA.viewid,
-                        filterid: $event.detail.value, search: CONTENT_OTHERDATA.search,
-                        criteria: CONTENT_OTHERDATA.criteria, sort: CONTENT_OTHERDATA.sort
+                    interface="action-sheet" [value]="CONTENT_OTHERDATA.state.filterid"
+                    (ionChange)="$event.detail.value !== CONTENT_OTHERDATA.state.filterid && updateContent({
+                        cmid: <% cmid %>, courseid: <% courseid %>, viewid: CONTENT_OTHERDATA.state.viewid,
+                        filterid: $event.detail.value, search: CONTENT_OTHERDATA.state.search,
+                        criteria: CONTENT_OTHERDATA.state.criteria, sort: CONTENT_OTHERDATA.state.sort
                     })">
                 <ion-select-option [value]="0">{{ 'plugin.mod_datalynx.mobilefilterdefault' | translate }}</ion-select-option>
-                <ion-select-option *ngFor="let filter of CONTENT_OTHERDATA.filters" [value]="filter.id">{{ filter.name }}</ion-select-option>
+                <ion-select-option *ngFor="let filter of CONTENT_OTHERDATA.state.filters" [value]="filter.id">{{ filter.name }}</ion-select-option>
             </ion-select>
         </ion-item>
     </ion-list>
 
-    <ion-searchbar *ngIf="CONTENT_OTHERDATA.hasview && CONTENT_OTHERDATA.supported && CONTENT_OTHERDATA.canfilter"
-            [value]="CONTENT_OTHERDATA.search" [placeholder]="'core.search' | translate"
-            (ionChange)="($event.detail.value || '') !== CONTENT_OTHERDATA.search && updateContent({
-                cmid: <% cmid %>, courseid: <% courseid %>, viewid: CONTENT_OTHERDATA.viewid,
-                filterid: CONTENT_OTHERDATA.filterid, search: $event.detail.value || '',
-                criteria: CONTENT_OTHERDATA.criteria, sort: CONTENT_OTHERDATA.sort
-            })"></ion-searchbar>
+    <core-search-box *ngIf="CONTENT_OTHERDATA.state.hasview && CONTENT_OTHERDATA.state.supported && CONTENT_OTHERDATA.state.canfilter"
+            [searchText]="CONTENT_OTHERDATA.state.search" [lengthCheck]="1" [showClear]="true"
+            [placeholder]="'plugin.mod_datalynx.mobilesearchentries' | translate" [searchLabel]="'core.search' | translate"
+            (onSubmit)="$event !== CONTENT_OTHERDATA.state.search && updateContent({
+                cmid: <% cmid %>, courseid: <% courseid %>, viewid: CONTENT_OTHERDATA.state.viewid,
+                filterid: CONTENT_OTHERDATA.state.filterid, search: $event,
+                criteria: CONTENT_OTHERDATA.state.criteria, sort: CONTENT_OTHERDATA.state.sort
+            })"
+            (onClear)="CONTENT_OTHERDATA.state.search !== '' && updateContent({
+                cmid: <% cmid %>, courseid: <% courseid %>, viewid: CONTENT_OTHERDATA.state.viewid,
+                filterid: CONTENT_OTHERDATA.state.filterid, search: '',
+                criteria: CONTENT_OTHERDATA.state.criteria, sort: CONTENT_OTHERDATA.state.sort
+            })"></core-search-box>
 
-    <ion-card *ngIf="CONTENT_OTHERDATA.hasview && !CONTENT_OTHERDATA.supported">
+    <ion-card *ngIf="CONTENT_OTHERDATA.state.hasview && !CONTENT_OTHERDATA.state.supported">
         <ion-card-content>
             <p>{{ 'plugin.mod_datalynx.mobileviewnotsupported' | translate }}</p>
-            <ion-button expand="block" fill="outline" [href]="CONTENT_OTHERDATA.browserurl" core-link autoLogin="yes">
+            <ion-button expand="block" fill="outline" [href]="CONTENT_OTHERDATA.state.browserurl" core-link autoLogin="yes">
                 {{ 'plugin.mod_datalynx.mobileopeninbrowser' | translate }}
             </ion-button>
         </ion-card-content>
     </ion-card>
 
-    <ng-container *ngIf="CONTENT_OTHERDATA.hasview && CONTENT_OTHERDATA.supported">
-        <ng-container *ngIf="CONTENT_OTHERDATA.entriesfiltercount">
+    <ng-container *ngIf="CONTENT_OTHERDATA.state.hasview && CONTENT_OTHERDATA.state.supported">
+        <ng-container *ngIf="CONTENT_OTHERDATA.state.entriesfiltercount">
             <p class="ion-padding-horizontal mod-datalynx-mobile-count">
                 {{ 'plugin.mod_datalynx.mobileshowingxofy' | translate: { $a: {
-                    count: CONTENT_OTHERDATA.entries.length, total: CONTENT_OTHERDATA.entriesfiltercount
+                    count: CONTENT_OTHERDATA.state.entries.length, total: CONTENT_OTHERDATA.state.entriesfiltercount
                 } } }}
             </p>
         </ng-container>
 
-        <core-empty-box *ngIf="!CONTENT_OTHERDATA.entries.length" icon="fas-database"
-                [message]="CONTENT_OTHERDATA.emptycontent"></core-empty-box>
+        <core-empty-box *ngIf="!CONTENT_OTHERDATA.state.entries.length" icon="fas-database"
+                [message]="CONTENT_OTHERDATA.state.emptycontent"></core-empty-box>
 
-        <ion-card *ngFor="let entry of CONTENT_OTHERDATA.entries" class="mod-datalynx-mobile-entry">
+        <ion-card *ngFor="let entry of CONTENT_OTHERDATA.state.entries" class="mod-datalynx-mobile-entry">
             <ion-card-content *ngIf="entry.html">
                 <core-format-text [text]="entry.html" component="mod_datalynx" [componentId]="<% cmid %>"
                         contextLevel="module" [contextInstanceId]="<% cmid %>" [courseId]="<% courseid %>"></core-format-text>
@@ -106,18 +112,16 @@
             </ion-list>
         </ion-card>
 
-        <ion-infinite-scroll *ngIf="CONTENT_OTHERDATA.cangrow" (ionInfinite)="updateContent({
-                    cmid: <% cmid %>, courseid: <% courseid %>, viewid: CONTENT_OTHERDATA.viewid,
-                    filterid: CONTENT_OTHERDATA.filterid, search: CONTENT_OTHERDATA.search,
-                    criteria: CONTENT_OTHERDATA.criteria, sort: CONTENT_OTHERDATA.sort,
-                    perpage: CONTENT_OTHERDATA.nextperpage
-                }); $event.target.complete()">
-            <ion-infinite-scroll-content></ion-infinite-scroll-content>
-        </ion-infinite-scroll>
+        <core-infinite-loading [enabled]="CONTENT_OTHERDATA.state.cangrow" (action)="updateContent({
+                    cmid: <% cmid %>, courseid: <% courseid %>, viewid: CONTENT_OTHERDATA.state.viewid,
+                    filterid: CONTENT_OTHERDATA.state.filterid, search: CONTENT_OTHERDATA.state.search,
+                    criteria: CONTENT_OTHERDATA.state.criteria, sort: CONTENT_OTHERDATA.state.sort,
+                    perpage: CONTENT_OTHERDATA.state.nextperpage
+                }); $event()"></core-infinite-loading>
 
-        <ion-card *ngIf="!CONTENT_OTHERDATA.cangrow && CONTENT_OTHERDATA.entries.length < CONTENT_OTHERDATA.entriesfiltercount">
+        <ion-card *ngIf="!CONTENT_OTHERDATA.state.cangrow && CONTENT_OTHERDATA.state.entries.length < CONTENT_OTHERDATA.state.entriesfiltercount">
             <ion-card-content>
-                <ion-button expand="block" fill="outline" [href]="CONTENT_OTHERDATA.browserurl" core-link autoLogin="yes">
+                <ion-button expand="block" fill="outline" [href]="CONTENT_OTHERDATA.state.browserurl" core-link autoLogin="yes">
                     {{ 'plugin.mod_datalynx.mobileopeninbrowser' | translate }}
                 </ion-button>
             </ion-card-content>

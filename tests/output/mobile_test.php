@@ -40,13 +40,31 @@ final class mobile_test extends advanced_testcase {
      * Call the content method the way tool_mobile_get_content does: every argument a string.
      *
      * @param array $args
-     * @return array the result, with otherdata decoded the way the app decodes it
+     * @return array the result, with otherdata decoded the way the app decodes it, as the template
+     *               sees CONTENT_OTHERDATA.state
      */
     private function get_content(array $args): array {
         $result = mobile::mobile_course_view(array_map('strval', $args));
-        $result['otherdata'] = array_map(fn($value) => json_decode($value, true), $result['otherdata']);
+        $result['otherdata'] = self::app_decode($result['otherdata'])['state'];
 
         return $result;
+    }
+
+    /**
+     * Decode otherdata as the Moodle App does (CoreSitePluginsProvider::getContent()): every value
+     * is a string, and only a value starting with "{" or "[" is parsed as JSON.
+     *
+     * @param array $otherdata name => value as tool_mobile_get_content returns it
+     * @return array
+     */
+    private static function app_decode(array $otherdata): array {
+        $decoded = [];
+        foreach ($otherdata as $name => $value) {
+            $value = (string) $value;
+            $decoded[$name] = $value !== '' && ($value[0] === '{' || $value[0] === '[') ? json_decode($value, true) : $value;
+        }
+
+        return $decoded;
     }
 
     /**
@@ -67,7 +85,7 @@ final class mobile_test extends advanced_testcase {
         $this->assertSame('main', $result['templates'][0]['id']);
         $html = $result['templates'][0]['html'];
         $this->assertStringContainsString('core-format-text', $html);
-        $this->assertStringContainsString('CONTENT_OTHERDATA.entries', $html);
+        $this->assertStringContainsString('CONTENT_OTHERDATA.state.entries', $html);
         $this->assertStringNotContainsString('<%', $html, 'Mustache delimiters left in the template.');
         $this->assertStringNotContainsString('Mock', $html);
         // Entry content travels as data, never in the template source.
@@ -87,32 +105,39 @@ final class mobile_test extends advanced_testcase {
     }
 
     /**
-     * Every otherdata value survives the app's JSON parse with its type: strings stay strings.
+     * The state reaches the template with its types, after the app's decoding: numbers stay
+     * numbers (the view menu matches its options), booleans stay booleans, and a search or
+     * criteria text stays text, also when it starts with a bracket.
      */
-    public function test_otherdata_keeps_string_values(): void {
+    public function test_otherdata_survives_the_app_decoding(): void {
         global $USER;
 
         $this->resetAfterTest();
         $this->setAdminUser();
         [$course, $dlx] = $this->create_mobile_instance();
         $fieldid = $this->add_mobile_field($dlx, 'text', 'Title');
-        $this->add_mobile_view($dlx, 'grid', 'Rides');
-        $this->add_mobile_entry($dlx, $USER->id, [$fieldid => '42']);
-        $criteria = json_encode([$fieldid => ['AND' => [['', '=', '42']]]]);
+        $viewid = $this->add_mobile_view($dlx, 'grid', 'Rides');
+        $this->add_mobile_view($dlx, 'csv', 'Export');
+        $this->add_mobile_entry($dlx, $USER->id, [$fieldid => '[draft] 42']);
+        $criteria = json_encode([$fieldid => ['AND' => [['', 'LIKE', '42']]]]);
 
         $result = mobile::mobile_course_view([
             'cmid' => (string) $dlx->cm->id,
             'courseid' => (string) $course->id,
-            'search' => '42',
+            'search' => '[draft]',
             'criteria' => $criteria,
         ]);
 
-        foreach ($result['otherdata'] as $name => $value) {
-            $this->assertIsString($value, "otherdata $name is not a string");
-        }
-        $data = array_map(fn($value) => json_decode($value, true), $result['otherdata']);
-        $this->assertSame('42', $data['search']);
+        $this->assertSame(['state'], array_keys($result['otherdata']));
+        $this->assertIsString($result['otherdata']['state']);
+        $data = self::app_decode($result['otherdata'])['state'];
+        $this->assertSame('[draft]', $data['search']);
         $this->assertSame($criteria, $data['criteria']);
+        $this->assertSame($viewid, $data['viewid']);
+        $this->assertSame($viewid, $data['views'][0]['id']);
+        $this->assertTrue($data['supported']);
+        $this->assertFalse($data['views'][1]['supported']);
+        $this->assertFalse($data['cangrow']);
         $this->assertCount(1, $data['entries']);
     }
 

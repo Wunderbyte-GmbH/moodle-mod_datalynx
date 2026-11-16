@@ -634,6 +634,7 @@ $string['mobilefilterdefault'] = 'Filter of the view';
 $string['mobilefilterselect'] = 'Filter';
 $string['mobilenoview'] = 'This activity has no view you can open.';
 $string['mobileopeninbrowser'] = 'Open in browser';
+$string['mobilesearchentries'] = 'Search entries';
 $string['mobileshowingxofy'] = 'Showing {$a->count} of {$a->total} entries';
 $string['mobileviewnotsupported'] = 'This view cannot be shown in the app.';
 $string['mobileviewselect'] = 'View';

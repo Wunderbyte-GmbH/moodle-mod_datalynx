@@ -632,6 +632,7 @@ $string['mobilefilterdefault'] = 'Filter der Ansicht';
 $string['mobilefilterselect'] = 'Filter';
 $string['mobilenoview'] = 'Diese Aktivität hat keine Ansicht, die Sie öffnen können.';
 $string['mobileopeninbrowser'] = 'Im Browser öffnen';
+$string['mobilesearchentries'] = 'Einträge durchsuchen';
 $string['mobileshowingxofy'] = '{$a->count} von {$a->total} Einträgen';
 $string['mobileviewnotsupported'] = 'Diese Ansicht kann in der App nicht angezeigt werden.';
 $string['mobileviewselect'] = 'Ansicht';

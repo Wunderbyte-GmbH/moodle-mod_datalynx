@@ -20,6 +20,21 @@ mod_datalynx changes
   and entries left to add, the same check as the web's "Add entry" link,
   which now lives in datalynx::user_can_add_new_entry()), and a plain text
   title per entry.
+- Moodle App (#268): fixes found by the new app acceptance test
+  (tests/behat/app_browse.feature, tag @app, runs only where Behat is set up
+  for the app):
+  - The browse page reads its state from one JSON object (otherdata.state).
+    The app parses an otherdata value only when it starts with "{" or "[", so
+    values sent one by one arrived as raw strings: the description and the
+    search showed quotes, the view menu showed no view (view "5" did not match
+    view 5), and "false" would have been true.
+  - Search uses the app's search box with a labelled search button. The bare
+    Ionic search bar only searched on Enter or leaving the field. The search
+    box submits its text again when it is created, so the page reloads only
+    when the text changed; otherwise every search reloaded the page without
+    end.
+  - Loading more entries at the end of the list uses the app's own loader.
+  - New string mobilesearchentries; version 2026111801 (db/mobile.php changed).
 - Fix: the "Add entry" link and saving new entries counted the limit of
   entries differently. The link counted all of the user's entries, also for
   managers; saving exempted managers and counted per interval (several
