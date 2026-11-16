@@ -80,6 +80,22 @@ Feature: Browse datalynx entries in the Moodle App
     Then I should find "Fruit: Damson" in the app
     And I should find "Showing 4 of 4 entries" in the app
 
+  Scenario: Without a connection the app shows its network error and recovers
+    Given I entered the course "Course 1" as "student1" in the app
+    And I press "Fruits" in the app
+    And I should find "Fruit: Apple" in the app
+    When I switch network connection to offline
+    And I press "View" in the app
+    And I press "Table" in the app
+    Then I should find "There was a problem connecting to the site" in the app
+    # The app empties the page after a failed load; pulling to refresh once online loads it again.
+    When I press "OK" in the app
+    And I switch network connection to wifi
+    And I pull to refresh in the app
+    Then I should find "Cherry" in the app
+    But I should not find "Fruit: Cherry" in the app
+    And I should find "Showing 3 of 3 entries" in the app
+
   Scenario: Scrolling down loads more entries
     Given the "Fruits" datalynx has the following entries:
       | user     | Title    |
