@@ -648,15 +648,7 @@ class datalynx_entries {
 
                 // TODO: MDL-66151 Prepare counters for adding new entries.
                 $addcount = 0;
-                $addmax = $dlx->data->maxentries;
-                $perinterval = ($dlx->data->intervalcount > 1);
-                if ($addmax != -1 && has_capability('mod/datalynx:manageentries', $dlx->context)) {
-                    $addmax = -1;
-                } else {
-                    if ($addmax != -1) {
-                        $addmax = max(0, $addmax - $dlx->user_num_entries($perinterval));
-                    }
-                }
+                $addmax = $dlx->new_entries_left();
 
                 // Prepare the entries to process.
                 foreach ($eids as $eid) {

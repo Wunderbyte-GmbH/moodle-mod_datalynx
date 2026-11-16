@@ -20,6 +20,13 @@ mod_datalynx changes
   and entries left to add, the same check as the web's "Add entry" link,
   which now lives in datalynx::user_can_add_new_entry()), and a plain text
   title per entry.
+- Fix: the "Add entry" link and saving new entries counted the limit of
+  entries differently. The link counted all of the user's entries, also for
+  managers; saving exempted managers and counted per interval (several
+  intervals) and per group (grouped activities). Both now go by
+  datalynx::new_entries_left(), so managers see the link again when a limit
+  is set, and the link no longer disappears while the current interval or
+  group still has entries left.
 
 2026-11-17
 ----------

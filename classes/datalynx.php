@@ -2453,23 +2453,32 @@ class datalynx {
     }
 
     /**
+     * How many more entries the current user may add, -1 for no limit.
+     *
+     * The one rule for the limit of entries: saving new entries (process_entries), the
+     * ##addnewentry## link and the "add" button of the Moodle App all go by it. Managers have no
+     * limit; others count their entries (or their group's, in a grouped activity), within the
+     * current interval when the activity has several.
+     *
+     * @return int
+     */
+    public function new_entries_left(): int {
+        $max = (int) $this->data->maxentries;
+        if ($max === -1 || has_capability('mod/datalynx:manageentries', $this->context)) {
+            return -1;
+        }
+
+        return max(0, $max - $this->user_num_entries($this->data->intervalcount > 1));
+    }
+
+    /**
      * Whether the current user may add a new entry: the ##addnewentry## link of a view and the
      * "add" button of the Moodle App both ask this.
      *
      * @return bool
      */
     public function user_can_add_new_entry(): bool {
-        global $USER, $DB;
-
-        if (!has_capability('mod/datalynx:writeentry', $this->context)) {
-            return false;
-        }
-        $maxentries = (int) $this->data->maxentries;
-        if ($maxentries === -1) {
-            return true;
-        }
-
-        return $DB->count_records('datalynx_entries', ['userid' => $USER->id, 'dataid' => $this->id()]) < $maxentries;
+        return has_capability('mod/datalynx:writeentry', $this->context) && $this->new_entries_left() !== 0;
     }
 
     /**

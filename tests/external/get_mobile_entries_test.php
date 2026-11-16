@@ -234,6 +234,28 @@ final class get_mobile_entries_test extends externallib_advanced_testcase {
         $DB->set_field('datalynx', 'maxentries', 1, ['id' => $this->dlx->id()]);
         $this->add_mobile_entry($this->dlx, $student->id, [$this->titleid => 'Mine']);
         $this->assertFalse($this->call(['viewid' => $addable])['canadd']);
+        $this->assertSame([], $this->submit_new($addable), 'Saving refuses what canadd refuses.');
+
+        // Managers have no limit: canadd and saving agree for them as well.
+        $teacher = $this->getDataGenerator()->create_and_enrol($this->course, 'editingteacher');
+        $this->setUser($teacher);
+        $this->add_mobile_entry($this->dlx, $teacher->id, [$this->titleid => 'Teacher']);
+        $this->assertTrue($this->call(['viewid' => $addable])['canadd']);
+        $this->assertCount(1, $this->submit_new($addable));
+    }
+
+    /**
+     * Add an entry through submit_entry as the current user.
+     *
+     * @param int $viewid
+     * @return int[] the ids of the saved entries
+     */
+    private function submit_new(int $viewid): array {
+        $result = submit_entry::execute($this->dlx->id(), $viewid, 0, [
+            ['fieldid' => (string) $this->titleid, 'value' => 'New'],
+        ]);
+
+        return $result['entryid'] ? [$result['entryid']] : [];
     }
 
     /**
