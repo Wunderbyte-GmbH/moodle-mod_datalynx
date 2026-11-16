@@ -219,6 +219,42 @@ final class entry_submission_service_test extends advanced_testcase {
     }
 
     /**
+     * The entry form and the service also agree on fieldgroups: a required line left empty, a
+     * filled optional line with an invalid value, and an empty optional line.
+     */
+    public function test_form_validation_matches_the_service_for_fieldgroups(): void {
+        $number = $this->add_mobile_field($this->dlx, 'number', 'Amount');
+        $title = $this->fieldids['Title'];
+        $group = $this->add_mobile_field($this->dlx, 'fieldgroup', 'Group', [
+            'param1' => json_encode([(string) $title, (string) $number]), 'param2' => '4', 'param3' => '3', 'param4' => '1',
+        ]);
+        $view = $this->view('[[Group]]');
+        $reflection = new ReflectionClass($view);
+        $editentries = $reflection->getProperty('editentries');
+        $editentries->setAccessible(true);
+        $editentries->setValue($view, [-1]);
+        $definition = $reflection->getMethod('set_display_definition');
+        $definition->setAccessible(true);
+        $definition->invoke($view);
+        $form = new datalynxview_entries_form(new moodle_url('/mod/datalynx/view.php'), ['view' => $view, 'update' => '-1']);
+        $name = fn(int $fieldid, int $line): string => "field_{$fieldid}_-1_fieldgroup_{$group}_{$line}";
+        $data = [
+            'new' => 1,
+            $name($title, 0) => '', $name($number, 0) => '',
+            $name($title, 1) => 'Second', $name($number, 1) => 'not a number',
+            $name($title, 2) => '', $name($number, 2) => '',
+        ];
+
+        $service = new entry_submission_service($view);
+        $expected = $service->validate([-1], $service->filter_data([-1], (object) $data));
+        $this->assertSame($expected, $form->validation($data, []));
+        $this->assertEqualsCanonicalizing(
+            [$name($title, 0), $name($number, 0), $name($number, 1)],
+            array_keys($expected)
+        );
+    }
+
+    /**
      * An empty required date in a required fieldgroup line yields one error, at the date's element
      * in the entry form, so the page repeats nothing; an error without an element is named by its
      * field on the page (mod_datalynx#310).
