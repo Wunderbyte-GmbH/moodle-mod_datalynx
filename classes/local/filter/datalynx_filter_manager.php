@@ -15,7 +15,6 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 namespace mod_datalynx\local\filter;
-use datalynxfield_file\field as file_field;
 use html_table;
 use html_writer;
 use mod_datalynx\form\datalynx_customfilter_frontend_form;
@@ -472,130 +471,41 @@ class datalynx_filter_manager {
     }
 
     /**
-     * Get filter form data from customfilter form
+     * Build the filter a submitted custom filter form asks for.
      *
-     * @param datalynx_filter $filter The filter object to populate.
-     * @param object $formdata Submitted form data.
-     * @param object $customfilter The customfilter definition object.
-     * @return datalynx_filter The populated filter object.
+     * The form's inputs are read by {@see customfilter_controls::values()} and searched by
+     * {@see customfilter_search::criteria()}, as the Moodle App's are.
+     *
+     * @param datalynx_filter $filter
+     * @param stdClass $formdata the submitted custom filter form
+     * @param stdClass $customfilter the datalynx_customfilters record
+     * @param \mod_datalynx\local\view\base|null $view the view the form was shown in; null: all fields
+     * @return datalynx_filter
      */
-    public function get_filter_from_customfilterform($filter, $formdata, $customfilter): datalynx_filter {
+    public function get_filter_from_customfilterform(
+        $filter,
+        $formdata,
+        $customfilter,
+        ?\mod_datalynx\local\view\base $view = null
+    ): datalynx_filter {
+        $search = new customfilter_search($this->dlx, $customfilter);
+        $formdata = (object) $formdata;
+        // The same inputs and the same reading as the Moodle App (customfilter_controls).
+        $values = customfilter_controls::values($search, $view, customfilter_controls::inputs_from($formdata), $formdata);
 
-        $customfilterfields = json_decode($customfilter->fieldlist);
-        $customfilterfieldids = [];
-        foreach (array_keys((array) $customfilterfields) as $fid) {
-            $customfilterfieldids[] = $fid;
+        $criteria = $search->criteria($view, $values);
+        if ($criteria['search'] !== '') {
+            $filter->search = $criteria['search'];
         }
-
-        $fields = $this->dlx->get_fields();
-        $searchfields = [];
-        // Fields whose search value has already been reassembled, keyed fieldid_index.
-        $composites = [];
-        foreach ($formdata as $key => $value) {
-            $formfieldarray = explode("_", $key);
-            if (count($formfieldarray) >= 3) {
-                $fieldname = $formfieldarray[2];
-                switch ($fieldname) {
-                    case ("approve"):
-                        // Value -1 (or empty) means "no selection" => no filter; 0 and 1 are real states.
-                        if ((int) $value === 0 || (int) $value === 1) {
-                            $searchfields['approve']['AND'][] = ['', '=', (int) $value];
-                        }
-                        break;
-                    case ("timecreated"):
-                    case ("timemodified"):
-                        if (count($formfieldarray) == 4 && $formfieldarray[3] == 'from') {
-                            if ($formdata->{$key} > 0) {
-                                $valuearr = [];
-                                // The "from" timestamp is the first BETWEEN bound (not the field name).
-                                $valuearr[] = $formdata->{$key};
-                                $tokeyactive = str_replace('_from', '_to', $key);
-                                if (isset($formdata->{$tokeyactive}) && $formdata->{$tokeyactive} > $formdata->{$key}) {
-                                    $valuearr[] = $formdata->{$tokeyactive};
-                                    $searchfields[$fieldname]['AND'][] = ['', 'BETWEEN',
-                                            $valuearr];
-                                } else {
-                                    $searchfields[$fieldname]['AND'][] = ['', '>', [$formdata->{$key}]];
-                                }
-                            }
-                        }
-                        break;
-                    case ("status"):
-                        // Empty value means "no selection" => no filter; a real status (incl. -1 => not created,
-                        // which get_search_sql clamps to 0) is applied.
-                        if ($value !== '' && $value !== null) {
-                            $searchfields['status']['AND'][] = ['', '=', (int) $value];
-                        }
-                        break;
-                    default:
-                        if (in_array($fieldname, $customfilterfieldids)) {
-                            $type = $fields[$fieldname]->type;
-                            if ($fields[$fieldname]->has_composite_search()) {
-                                // One criterion spread over several elements (e.g. the itinerary
-                                // corridor: two addresses, four hidden coordinates and a radius).
-                                // Reading them one by one would produce nonsense, so the field
-                                // reassembles its own value from the whole form, once per index.
-                                $i = (int) $formfieldarray[1];
-                                if (isset($composites["{$fieldname}_{$i}"])) {
-                                    break;
-                                }
-                                $composites["{$fieldname}_{$i}"] = true;
-                                if ($parsed = $fields[$fieldname]->parse_search($formdata, $i)) {
-                                    $searchfields[$fieldname]['AND'][] = ['', '', $parsed];
-                                }
-                            } else if ($type == "text") {
-                                if ((string) $value !== '') {
-                                    $searchfields[$fieldname]['AND'][] = ['', 'LIKE', $value];
-                                }
-                            } else if ($type == "multiselect" || $type == "checkbox") {
-                                // The any/all toggle travels with the selected options; it is not
-                                // an option itself. -2 means ALL_OF.
-                                $value = (array) $value;
-                                $operator = ($value['andor'] ?? 0) == -2 ? 'ALL_OF' : 'ANY_OF';
-                                unset($value['andor']);
-                                $value = array_values(array_filter($value, fn($option) => (int) $option > 0));
-                                if ($value) {
-                                    $searchfields[$fieldname]['AND'][] = ['', $operator, $value];
-                                }
-                            } else if ($fields[$fieldname] instanceof file_field) {
-                                // File and picture fields: the choice "exists" (0) or "missing" (1)
-                                // is the criterion "not empty" or "empty", as a view filter writes it.
-                                if ((string) $value === '0') {
-                                    $searchfields[$fieldname]['AND'][] = ['NOT', '', ''];
-                                } else if ((string) $value === '1') {
-                                    $searchfields[$fieldname]['AND'][] = ['', '', ''];
-                                }
-                            } else {
-                                // Analog to advanced filter form:
-                                // searchfieldid - searchandor - not - operator - value.
-                                // Only add to query when something is chosen, ignore empty values.
-                                if ($value) {
-                                    $searchfields[$fieldname]['AND'][] = ['', 'ANY_OF', $value];
-                                }
-                            }
-                        }
-                }
-            } else {
-                if ($key == "search" && $value) {
-                    $filter->search = $value;
-                }
-
-                if ($key == "authorsearch" && $value) {
-                    $searchfields['userid']['AND'][] = ['', '=', $value];
-                    $filter->authorsearch = $value;
-                }
-            }
+        if (!empty($values['userid'])) {
+            $filter->authorsearch = $values['userid'];
         }
-        $searchfields = stored_criteria::normalise_search($searchfields, stored_criteria::field_types((int) $this->dlx->id()));
-        if ($searchfields) {
-            $filter->customsearch = serialize($searchfields);
+        if ($criteria['customsearch']) {
+            $filter->customsearch = serialize($criteria['customsearch']);
         }
-
-        // Persist the chosen sort field/direction. The customfilter is not stored in user preferences,
-        // so without this the sort would be lost as soon as the request finishes.
-        if (!empty($formdata->customfiltersortfield)) {
-            $sortdirection = empty($formdata->customfiltersortdirection) ? 0 : 1;
-            $filter->customsort = serialize([$formdata->customfiltersortfield => $sortdirection]);
+        // The custom filter is not stored, so the sort chosen in it travels with the filter.
+        if ($criteria['customsort']) {
+            $filter->customsort = serialize($criteria['customsort']);
         }
 
         return $filter;
@@ -1046,7 +956,7 @@ class datalynx_filter_manager {
             if ($filterform->no_submit_button_pressed()) {
                 return $filter;
             } else if ($formdata = $filterform->get_data()) { // Process validated.
-                $filter = $this->get_filter_from_customfilterform($filter, $formdata, $customfilter);
+                $filter = $this->get_filter_from_customfilterform($filter, $formdata, $customfilter, $view);
             }
         }
 

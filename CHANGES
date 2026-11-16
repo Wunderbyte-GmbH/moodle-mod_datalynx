@@ -20,6 +20,36 @@ mod_datalynx changes
   and entries left to add, the same check as the web's "Add entry" link,
   which now lives in datalynx::user_can_add_new_entry()), and a plain text
   title per entry.
+- Custom filters, one contract for the web and the Moodle App (#270): the
+  controls of a custom filter are described once
+  (local\filter\customfilter_controls), their inputs are named cf_{field}
+  and read by one parser, and each field type decides once what its value
+  searches (get_customfilter_criteria()); customfilter_search::criteria()
+  makes the search. The custom filter form of the web and the new custom
+  filter of the app are both built from it, so they cannot search
+  differently. Internal fields (approval, status, time created/modified)
+  are recognised by id, no longer by their translated name.
+  The desktop form changes slightly: dates are days (no time), number
+  ranges take an empty bound, the sort selects are named cf_sort and
+  cf_sortdir. Fields whose search no control expresses (schedule,
+  itinerary) keep their own elements on the web.
+- Fixed on the way (custom filter, web):
+  - number fields searched ANY_OF [a, b], which they do not take: nothing
+    was filtered;
+  - time fields always set "to" (default now) and hid entries without a
+    time or after now, even when the filter was left alone;
+  - the empty option (-1) reached option criteria;
+  - approval, status and times were not shown when the filter listed no
+    field.
+- Fixed: the tag search failed with an SQL error (a missing space before
+  AND), and built "IN ()" when no entry carries the tag; time and time
+  created/modified searched with one bound ('>' / '<') raised an
+  undefined array key warning.
+- Moodle App (#270): the custom filters of a view are offered as chips;
+  the chosen one opens its form on the browse page, Apply filters in place,
+  and the values travel with search, loading more, refresh and delete.
+  get_mobile_entries takes customfilterid and customvalues. New strings;
+  version 2026111803.
 - Moodle App (#269): entries can be deleted in the app, one at a time. The
   new web service mod_datalynx_delete_entry (mobile service) deletes through
   the same path as the delete action of a view: the user must be allowed to

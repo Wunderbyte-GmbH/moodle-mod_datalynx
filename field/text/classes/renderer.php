@@ -385,4 +385,13 @@ class renderer extends datalynxfield_renderer {
         }
         return $remainder === 1;
     }
+
+    /**
+     * Text is searched with a text input.
+     *
+     * @return string
+     */
+    public function get_customfilter_control(): string {
+        return 'text';
+    }
 }

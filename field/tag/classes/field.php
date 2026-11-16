@@ -213,10 +213,10 @@ class field extends datalynxfield_option_multiple {
                 $params[$xname] = $searchstring;
             }
             if ($operator === 'ANY_OF') {
-                $sql .= "AND (" . implode(" OR ", $conditions) . ") ";
+                $sql .= " AND (" . implode(" OR ", $conditions) . ") ";
             } else {
                 if ($operator === 'ALL_OF') {
-                    $sql .= "AND (" . implode(" AND ", $conditions) . ") ";
+                    $sql .= " AND (" . implode(" AND ", $conditions) . ") ";
                 }
             }
         } else {
@@ -232,9 +232,13 @@ class field extends datalynxfield_option_multiple {
         }
 
         $entryids = $DB->get_fieldset_sql($sql, $params);
-        $entryidsstr = implode(',', $entryids);
+        if (!$entryids) {
+            // No entry has such a tag: nothing matches, and NOT matches everything ("IN ()" is no SQL).
+            return [$not ? ' 1 = 1 ' : ' 1 = 0 ', [], false];
+        }
+        [$insql, $inparams] = $DB->get_in_or_equal(array_map('intval', $entryids), SQL_PARAMS_NAMED, 'tagentry', !$not);
 
-        return [" e.id $not IN ($entryidsstr)", [], false];
+        return [" e.id $insql", $inparams, false];
     }
 
     /**
@@ -269,5 +273,21 @@ class field extends datalynxfield_option_multiple {
             $data->{"field_{$fieldid}_{$entryid}"} = $labels;
         }
         return true;
+    }
+
+    /**
+     * A custom filter value is a list of tag names: entries with any of them.
+     *
+     * @param mixed $value
+     * @return array
+     */
+    public function get_customfilter_criteria($value): array {
+        $names = is_array($value) ? $value : ($value === null || $value === '' ? [] : [$value]);
+        $names = array_values(array_unique(array_filter(
+            array_map(fn($name) => is_scalar($name) ? trim((string) $name) : '', $names),
+            fn(string $name) => $name !== ''
+        )));
+
+        return $names ? [['', 'ANY_OF', $names]] : [];
     }
 }

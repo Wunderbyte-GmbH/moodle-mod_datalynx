@@ -284,4 +284,13 @@ class renderer extends TextRenderer {
 
         return $errors;
     }
+
+    /**
+     * A number is searched in a range.
+     *
+     * @return string
+     */
+    public function get_customfilter_control(): string {
+        return 'range';
+    }
 }

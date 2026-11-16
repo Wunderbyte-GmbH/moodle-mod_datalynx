@@ -239,4 +239,26 @@ class renderer extends datalynxfield_renderer {
 
         return $patterns;
     }
+
+    /**
+     * The status is searched by one status.
+     *
+     * @return string
+     */
+    public function get_customfilter_control(): string {
+        return 'status';
+    }
+
+    /**
+     * The statuses, as the search form offers them.
+     *
+     * @return array
+     */
+    public function get_customfilter_options(): array {
+        return [
+            -1 => get_string('statusnotcreated', 'datalynx'),
+            field::STATUS_DRAFT => get_string('statusdraft', 'datalynx'),
+            field::STATUS_FINAL_SUBMISSION => get_string('statusfinalsubmission', 'datalynx'),
+        ];
+    }
 }

@@ -22,6 +22,7 @@ use core_external\external_multiple_structure;
 use core_external\external_single_structure;
 use core_external\external_value;
 use core_external\external_warnings;
+use mod_datalynx\local\mobile\customfilter_form;
 use mod_datalynx\local\mobile\entries_payload_builder;
 
 /**
@@ -52,6 +53,13 @@ class get_mobile_entries extends external_api {
             'criteria' => new external_value(PARAM_RAW, 'JSON search criteria by field id', VALUE_DEFAULT, ''),
             'sort' => new external_value(PARAM_RAW, 'JSON sort directions by field id', VALUE_DEFAULT, ''),
             'eids' => new external_value(PARAM_SEQUENCE, 'Restrict to these entry ids', VALUE_DEFAULT, ''),
+            'customfilterid' => new external_value(PARAM_INT, 'Custom filter of the view to apply, 0 for none', VALUE_DEFAULT, 0),
+            'customvalues' => new external_value(
+                PARAM_RAW,
+                'JSON object of the custom filter inputs, named as the app form names them',
+                VALUE_DEFAULT,
+                ''
+            ),
         ]);
     }
 
@@ -67,6 +75,8 @@ class get_mobile_entries extends external_api {
      * @param string $criteria
      * @param string $sort
      * @param string $eids
+     * @param int $customfilterid
+     * @param string $customvalues
      * @return array
      */
     public static function execute(
@@ -78,7 +88,9 @@ class get_mobile_entries extends external_api {
         string $search = '',
         string $criteria = '',
         string $sort = '',
-        string $eids = ''
+        string $eids = '',
+        int $customfilterid = 0,
+        string $customvalues = ''
     ): array {
         $params = self::validate_parameters(self::execute_parameters(), [
             'd' => $d,
@@ -90,7 +102,10 @@ class get_mobile_entries extends external_api {
             'criteria' => $criteria,
             'sort' => $sort,
             'eids' => $eids,
+            'customfilterid' => $customfilterid,
+            'customvalues' => $customvalues,
         ]);
+        $params['customfilterinputs'] = customfilter_form::inputs([], $params['customvalues']);
 
         $builder = new entries_payload_builder(browse_request::require_access($params['d']));
         $payload = $builder->build($params);
@@ -155,6 +170,12 @@ class get_mobile_entries extends external_api {
                 'name' => new external_value(PARAM_TEXT, 'Filter name'),
                 'active' => new external_value(PARAM_BOOL, 'Whether this filter is applied'),
             ])),
+            'customfilters' => new external_multiple_structure(new external_single_structure([
+                'id' => new external_value(PARAM_INT, 'Custom filter ID'),
+                'name' => new external_value(PARAM_TEXT, 'Custom filter name'),
+                'active' => new external_value(PARAM_BOOL, 'Whether this custom filter is applied'),
+            ])),
+            'customfilterid' => new external_value(PARAM_INT, 'The custom filter applied, 0 for none'),
             'emptycontent' => new external_value(PARAM_TEXT, 'Text to show when there are no entries'),
             'warnings' => new external_warnings(),
         ]);

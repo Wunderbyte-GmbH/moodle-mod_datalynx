@@ -1178,6 +1178,31 @@ abstract class datalynxfield_base {
     }
 
     /**
+     * The search criteria a custom filter value of this field stands for (mod_datalynx#270).
+     *
+     * The one rule per field type: the custom filter form of the web and the Moodle App both
+     * hand their values to {@see \mod_datalynx\local\filter\customfilter_search::criteria()},
+     * which asks the field. The value is in the shape
+     * {@see \mod_datalynx\local\filter\customfilter_controls::values()} reads it for the
+     * field's control. By default that is a list of ids (single choice, team members): any of
+     * them, ignoring the empty choice (-1).
+     *
+     * @param mixed $value
+     * @return array list of [not, operator, value]; empty when the value sets no condition
+     */
+    public function get_customfilter_criteria($value): array {
+        if ($this->has_composite_search()) {
+            return is_array($value) && $value ? [['', '', $value]] : [];
+        }
+        $ids = array_values(array_unique(array_filter(
+            array_map('intval', is_array($value) ? $value : ($value === null || $value === '' ? [] : [$value])),
+            fn(int $id) => $id > 0
+        )));
+
+        return $ids ? [['', 'ANY_OF', $ids]] : [];
+    }
+
+    /**
      * Whether one search criterion of this field is spread over several form elements.
      *
      * Most fields put their whole search value in a single element named

@@ -350,4 +350,22 @@ class renderer extends datalynxfield_renderer {
         }
         return $errors;
     }
+
+    /**
+     * Team members are searched by any of the users the field offers.
+     *
+     * @return string
+     */
+    public function get_customfilter_control(): string {
+        return 'select';
+    }
+
+    /**
+     * The users the field offers.
+     *
+     * @return array user id => name
+     */
+    public function get_customfilter_options(): array {
+        return array_filter($this->field->options_menu(), fn($name, $id) => $id > 0 && $name !== null, ARRAY_FILTER_USE_BOTH);
+    }
 }

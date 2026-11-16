@@ -89,4 +89,16 @@ class field extends datalynxfield_base {
     public static function is_customfilterfield(): bool {
         return true;
     }
+
+    /**
+     * A custom filter value is text the field contains.
+     *
+     * @param mixed $value
+     * @return array
+     */
+    public function get_customfilter_criteria($value): array {
+        $value = is_scalar($value) ? trim((string) $value) : '';
+
+        return $value === '' ? [] : [['', 'LIKE', $value]];
+    }
 }

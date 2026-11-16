@@ -221,4 +221,22 @@ class renderer extends datalynxfield_renderer {
         }
         return $errors;
     }
+
+    /**
+     * A single choice is searched by any of its options.
+     *
+     * @return string
+     */
+    public function get_customfilter_control(): string {
+        return 'select';
+    }
+
+    /**
+     * The options of the field.
+     *
+     * @return array
+     */
+    public function get_customfilter_options(): array {
+        return $this->format_option_labels($this->field->options_menu());
+    }
 }

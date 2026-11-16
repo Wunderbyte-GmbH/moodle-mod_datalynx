@@ -19,6 +19,8 @@ namespace mod_datalynx\local\mobile;
 use invalid_parameter_exception;
 use mod_datalynx\datalynx;
 use mod_datalynx\external\browse_request;
+use mod_datalynx\local\filter\customfilter_controls;
+use mod_datalynx\local\filter\customfilter_search;
 use mod_datalynx\local\filter\search_criteria;
 use mod_datalynx\local\view\base;
 use mod_datalynx\local\view\manager\grid_view_manager;
@@ -83,13 +85,14 @@ final class entries_payload_builder {
      * Build the payload for one browse request.
      *
      * @param array $request any of viewid, filterid, page, perpage, search, criteria (JSON),
-     *                       sort (JSON), eids (comma separated ids)
+     *                       sort (JSON), eids (comma separated ids), customfilterid and
+     *                       customfilterinputs (the app's custom filter form, see customfilter_form)
      * @return array
      * @throws invalid_parameter_exception for a view, filter or criteria the user may not use
      */
     public function build(array $request): array {
         $request += ['viewid' => 0, 'filterid' => 0, 'page' => 0, 'perpage' => 0, 'search' => '',
-            'criteria' => '', 'sort' => '', 'eids' => ''];
+            'criteria' => '', 'sort' => '', 'eids' => '', 'customfilterid' => 0, 'customfilterinputs' => []];
 
         $records = $this->dlx->get_view_records();
         // Creation order, whatever order the database returns them in, so the view menu is stable.
@@ -118,12 +121,18 @@ final class entries_payload_builder {
             'entries' => [],
             'views' => $this->build_views($records, $record),
             'filters' => [],
+            'customfilters' => [],
+            'customfilterid' => 0,
+            'customfilter' => null,
+            'customfilterinputs' => [],
             'emptycontent' => get_string('noentries', 'datalynx'),
         ];
 
         if (!$payload['supported']) {
             return $payload;
         }
+
+        $request = $this->apply_customfilter($record, $request, $payload);
 
         $request['perpage'] = (int) $request['perpage'];
         $options = browse_request::filter_options([
@@ -171,6 +180,56 @@ final class entries_payload_builder {
         $payload['filters'] = $this->build_filters($filtermenu, $payload['filterid']);
 
         return $payload;
+    }
+
+    /**
+     * Turn the custom filter the app applied into the search, criteria and sort of the request.
+     *
+     * The search is made by customfilter_search, the same as for the custom filter form of the
+     * web; the criteria then take the strict path all criteria take (search_criteria). A view that
+     * forces its filter offers no custom filter, as it offers no search.
+     *
+     * @param stdClass $record the view record
+     * @param array $request
+     * @param array $payload filled with the custom filters offered and the one applied
+     * @return array the request with the custom filter's search applied
+     * @throws invalid_parameter_exception for a custom filter the view does not offer
+     */
+    private function apply_customfilter(stdClass $record, array $request, array &$payload): array {
+        $view = $this->dlx->get_view($record->type, $record, false);
+        $offered = $view->is_forcing_filter() ? [] : customfilter_form::offered($this->dlx, $record);
+        $activeid = (int) $request['customfilterid'];
+        if ($activeid && !isset($offered[$activeid])) {
+            throw new invalid_parameter_exception('Custom filter not available in this view.');
+        }
+
+        foreach ($offered as $id => $customfilter) {
+            $payload['customfilters'][] = [
+                'id' => (int) $id,
+                'name' => format_string($customfilter->name, true, ['context' => $this->dlx->context]),
+                'active' => $id === $activeid,
+            ];
+        }
+        if (!$activeid) {
+            return $request;
+        }
+
+        $search = new customfilter_search($this->dlx, $offered[$activeid]);
+        $inputs = array_map('strval', array_filter((array) $request['customfilterinputs'], 'is_scalar'));
+        $criteria = $search->criteria($view, customfilter_controls::values($search, $view, $inputs));
+        $request['criteria'] = search_criteria::encode($criteria['customsearch']);
+        if ($criteria['customsort']) {
+            $request['sort'] = search_criteria::encode($criteria['customsort']);
+        }
+        if ($criteria['search'] !== '') {
+            $request['search'] = $criteria['search'];
+        }
+
+        $payload['customfilterid'] = $activeid;
+        $payload['customfilterinputs'] = $inputs;
+        $payload['customfilter'] = ['id' => $activeid] + customfilter_controls::describe($search, $view, $inputs);
+
+        return $request;
     }
 
     /**

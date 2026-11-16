@@ -214,4 +214,23 @@ class field extends TextField {
                 '<' => get_string('lessthan', 'datalynx'), '<=' => get_string('lessequal', 'datalynx'),
                 'BETWEEN' => get_string('between', 'datalynx')];
     }
+
+    /**
+     * A custom filter value is a range ['from' => number, 'to' => number]; either bound may be
+     * empty, both are inclusive. A number field is searched as a number, not as text.
+     *
+     * @param mixed $value
+     * @return array
+     */
+    public function get_customfilter_criteria($value): array {
+        $criteria = [];
+        foreach (['from' => '>=', 'to' => '<='] as $bound => $operator) {
+            $raw = is_array($value) && isset($value[$bound]) && is_scalar($value[$bound]) ? trim((string) $value[$bound]) : '';
+            if (self::to_number($raw) !== null) {
+                $criteria[] = ['', $operator, str_replace(',', '.', $raw)];
+            }
+        }
+
+        return $criteria;
+    }
 }

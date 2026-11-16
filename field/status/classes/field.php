@@ -164,4 +164,17 @@ class field extends datalynxfield_no_content {
     public static function is_customfilterfield(): bool {
         return true;
     }
+
+    /**
+     * A custom filter value is a status (-1 not created, draft, final submission); empty sets no
+     * condition.
+     *
+     * @param mixed $value
+     * @return array
+     */
+    public function get_customfilter_criteria($value): array {
+        $value = is_scalar($value) ? trim((string) $value) : '';
+
+        return is_numeric($value) ? [['', '=', (int) $value]] : [];
+    }
 }

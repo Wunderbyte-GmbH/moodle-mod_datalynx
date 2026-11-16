@@ -208,5 +208,26 @@ class renderer extends datalynxfield_renderer {
 
         return $patterns;
     }
+
+    /**
+     * Approval is searched as approved or not.
+     *
+     * @return string
+     */
+    public function get_customfilter_control(): string {
+        return 'approve';
+    }
+
+    /**
+     * Approved or not.
+     *
+     * @return array
+     */
+    public function get_customfilter_options(): array {
+        return [
+            1 => ucfirst(get_string('approved', 'datalynx')),
+            0 => ucfirst(get_string('approvednot', 'datalynx')),
+        ];
+    }
 }
 // phpcs:enable moodle.PHP.ForbiddenGlobalUse.BadGlobal

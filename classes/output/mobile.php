@@ -18,6 +18,7 @@ namespace mod_datalynx\output;
 
 use context_module;
 use mod_datalynx\datalynx;
+use mod_datalynx\local\mobile\customfilter_form;
 use mod_datalynx\local\mobile\entries_payload_builder;
 use stdClass;
 
@@ -52,6 +53,7 @@ class mobile {
     public static function mobile_course_view(array $args): array {
         global $OUTPUT;
 
+        $rawargs = $args;
         $args = self::args($args, [
             'cmid' => PARAM_INT,
             'courseid' => PARAM_INT,
@@ -62,6 +64,8 @@ class mobile {
             'criteria' => PARAM_RAW,
             'sort' => PARAM_RAW,
             'eids' => PARAM_SEQUENCE,
+            'customfilterid' => PARAM_INT,
+            'customvalues' => PARAM_RAW,
         ]);
         [$cm, $context] = self::context($args->cmid);
 
@@ -75,6 +79,9 @@ class mobile {
             'criteria' => $args->criteria,
             'sort' => $args->sort,
             'eids' => $args->eids,
+            'customfilterid' => $args->customfilterid,
+            // The form's inputs when the filter was just applied, else those the page carries.
+            'customfilterinputs' => customfilter_form::inputs($rawargs, $args->customvalues),
         ]);
 
         // The list grows by asking for a larger first page rather than appending the next one,
@@ -87,6 +94,8 @@ class mobile {
             'hasview' => $payload['viewid'] > 0,
             'cangrow' => $payload['hasmore'] && $nextperpage > $payload['perpage'],
             'nextperpage' => $nextperpage,
+            // Carried on by every later request of the page, so the custom filter stays applied.
+            'customvalues' => $payload['customfilterid'] ? json_encode((object) $payload['customfilterinputs']) : '',
         ];
 
         $html = $OUTPUT->render_from_template('mod_datalynx/mobile/view_page', [

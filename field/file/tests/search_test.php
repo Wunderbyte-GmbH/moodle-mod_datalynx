@@ -102,7 +102,7 @@ final class search_test extends advanced_testcase {
      *
      * @dataProvider customfilter_provider
      * @param string $type file or picture
-     * @param string $choice the selector value: 0 exists, 1 missing
+     * @param string $choice the selector value: exists or missing
      * @param array $criterion the criterion the custom filter writes
      * @param string[] $expected keys of the entries found
      */
@@ -113,7 +113,7 @@ final class search_test extends advanced_testcase {
             'dataid' => $this->dlx->id(),
             'fieldlist' => json_encode([$fieldid => ['name' => ucfirst($type), 'sortable' => 0]]),
         ];
-        $formdata = (object) ["f_0_{$fieldid}" => $choice];
+        $formdata = (object) ["cf_{$fieldid}" => $choice];
 
         $filter = new datalynx_filter((object) ['id' => 0, 'dataid' => $this->dlx->id()]);
         $filter = $this->dlx->get_filter_manager()->get_filter_from_customfilterform($filter, $formdata, $customfilter);
@@ -135,10 +135,10 @@ final class search_test extends advanced_testcase {
      */
     public static function customfilter_provider(): array {
         return [
-            'file exists' => ['file', '0', ['NOT', '', ''], ['both']],
-            'file missing' => ['file', '1', ['', '', ''], ['none', 'removed']],
-            'picture exists' => ['picture', '0', ['NOT', '', ''], ['both']],
-            'picture missing' => ['picture', '1', ['', '', ''], ['none', 'removed']],
+            'file exists' => ['file', 'exists', ['NOT', '', ''], ['both']],
+            'file missing' => ['file', 'missing', ['', '', ''], ['none', 'removed']],
+            'picture exists' => ['picture', 'exists', ['NOT', '', ''], ['both']],
+            'picture missing' => ['picture', 'missing', ['', '', ''], ['none', 'removed']],
         ];
     }
 
@@ -152,24 +152,24 @@ final class search_test extends advanced_testcase {
 
         $filter = new datalynx_filter((object) ['id' => 0, 'dataid' => $this->dlx->id()]);
         $filter = $this->dlx->get_filter_manager()
-            ->get_filter_from_customfilterform($filter, (object) ["f_0_{$fieldid}" => '-1'], $customfilter);
+            ->get_filter_from_customfilterform($filter, (object) ["cf_{$fieldid}" => ''], $customfilter);
 
         $this->assertEmpty($filter->customsearch);
     }
 
     /**
-     * A view filter row offers no value to enter, a custom filter the exists/missing choice.
+     * A view filter row offers no value to enter; a custom filter asks whether there is a file
+     * (the presence control, see customfilter_controls).
      */
     public function test_search_elements(): void {
-        $renderer = $this->dlx->get_field_from_id($this->fieldids['file'])->renderer();
+        foreach (['file', 'picture'] as $type) {
+            $renderer = $this->dlx->get_field_from_id($this->fieldids[$type])->renderer();
 
-        $mform = new MoodleQuickForm('mod_datalynx_form_datalynx_filter_form', 'post', '');
-        [$elements] = $renderer->render_search_mode($mform, 0, '');
-        $this->assertSame('static', $elements[0]->getType());
-
-        $mform = new MoodleQuickForm('mod_datalynx_form_datalynx_customfilter_frontend_form', 'post', '');
-        [$elements] = $renderer->render_search_mode($mform, 0, '');
-        $this->assertSame('select', $elements[0]->getType());
+            $mform = new MoodleQuickForm('mod_datalynx_form_datalynx_filter_form', 'post', '');
+            [$elements] = $renderer->render_search_mode($mform, 0, '');
+            $this->assertSame('static', $elements[0]->getType());
+            $this->assertSame('presence', $renderer->get_customfilter_control());
+        }
     }
 
     /**

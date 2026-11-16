@@ -130,49 +130,33 @@ class renderer extends datalynxfield_renderer {
 
         $elements = [];
 
-        // With normal filter display whole form and disable cases.
-        if ($mform->_formName != 'mod_datalynx_form_datalynx_customfilter_frontend_form') {
-            $elements[] = &$mform->createElement(
-                'date_time_selector',
-                "{$fieldname}_from",
-                get_string('fromdate', 'moodle')
-            );
-            $elements[] = &$mform->createElement(
-                'date_time_selector',
-                "{$fieldname}_to",
-                get_string('todate', 'moodle')
-            );
-            if (isset($value[0])) {
-                $mform->setDefault("{$fieldname}_from", $value[0]);
-            }
-            if (isset($value[1])) {
-                $mform->setDefault("{$fieldname}_to", $value[1]);
-            }
-            foreach (['year', 'month', 'day', 'hour', 'minute'] as $fieldidentifier) {
-                $mform->disabledIf("{$fieldname}_to[$fieldidentifier]", "searchoperator$i", 'neq', 'BETWEEN');
-            }
-            foreach (['year', 'month', 'day', 'hour', 'minute'] as $fieldidentifier) {
-                $mform->disabledIf("{$fieldname}_from[$fieldidentifier]", "searchoperator$i", 'eq', '');
-            }
-            if ($field->dateonly) {
-                // Deactivate form elements for min and seconds when field is date only and operator is "=".
-                foreach (['hour', 'minute'] as $fieldidentifier) {
-                    $mform->disabledIf("{$fieldname}_from[$fieldidentifier]", "searchoperator$i", 'eq', '=');
-                }
-            }
+        $elements[] = &$mform->createElement(
+            'date_time_selector',
+            "{$fieldname}_from",
+            get_string('fromdate', 'moodle')
+        );
+        $elements[] = &$mform->createElement(
+            'date_time_selector',
+            "{$fieldname}_to",
+            get_string('todate', 'moodle')
+        );
+        if (isset($value[0])) {
+            $mform->setDefault("{$fieldname}_from", $value[0]);
         }
-
-        // With customfilter we have to simplify the form.
-        if ($mform->_formName == 'mod_datalynx_form_datalynx_customfilter_frontend_form') {
-            $attr = ['optional' => true]; // Allows date_time to be enabled, passes 0 if disabled.
-            $elements[] = $element = &$mform->createElement(
-                'date_time_selector',
-                "{$fieldname}[0]",
-                get_string('fromdate', 'moodle'),
-                $attr
-            );
-            $element->setAttributes(['size' => 1]);
-            $elements[] = &$mform->createElement('date_time_selector', "{$fieldname}[1]", get_string('todate', 'moodle'));
+        if (isset($value[1])) {
+            $mform->setDefault("{$fieldname}_to", $value[1]);
+        }
+        foreach (['year', 'month', 'day', 'hour', 'minute'] as $fieldidentifier) {
+            $mform->disabledIf("{$fieldname}_to[$fieldidentifier]", "searchoperator$i", 'neq', 'BETWEEN');
+        }
+        foreach (['year', 'month', 'day', 'hour', 'minute'] as $fieldidentifier) {
+            $mform->disabledIf("{$fieldname}_from[$fieldidentifier]", "searchoperator$i", 'eq', '');
+        }
+        if ($field->dateonly) {
+            // Deactivate form elements for min and seconds when field is date only and operator is "=".
+            foreach (['hour', 'minute'] as $fieldidentifier) {
+                $mform->disabledIf("{$fieldname}_from[$fieldidentifier]", "searchoperator$i", 'eq', '=');
+            }
         }
 
         $separators = ['<br>', '<br>'];
@@ -438,5 +422,14 @@ class renderer extends datalynxfield_renderer {
         // Whether a value is required is checked by the entry submission service; the selectors
         // only offer valid dates.
         return [];
+    }
+
+    /**
+     * A time is searched in a range of days.
+     *
+     * @return string
+     */
+    public function get_customfilter_control(): string {
+        return 'daterange';
     }
 }

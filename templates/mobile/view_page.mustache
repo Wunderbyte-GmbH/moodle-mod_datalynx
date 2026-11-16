@@ -61,18 +61,114 @@
         </ion-item>
     </ion-list>
 
+    <ng-container *ngIf="CONTENT_OTHERDATA.state.supported && CONTENT_OTHERDATA.state.customfilters.length">
+    <div class="ion-padding-horizontal mod-datalynx-mobile-customfilters">
+        <ion-chip *ngFor="let cf of CONTENT_OTHERDATA.state.customfilters" [outline]="!cf.active"
+                core-site-plugins-new-content [samePage]="true"
+                [args]="{cmid: <% cmid %>, courseid: <% courseid %>, viewid: CONTENT_OTHERDATA.state.viewid, customfilterid: cf.active ? 0 : cf.id}">
+            <ion-icon name="fas-filter" aria-hidden="true"></ion-icon>
+            <ion-label>{{ cf.name }}</ion-label>
+        </ion-chip>
+    </div>
+    </ng-container>
+
+    <ng-container *ngIf="CONTENT_OTHERDATA.state.customfilter">
+    <form name="dlxcustomfilter" class="mod-datalynx-mobile-customfilter">
+        <ion-list>
+            <ng-container *ngFor="let c of CONTENT_OTHERDATA.state.customfilter.controls">
+                <ion-item *ngIf="c.control === 'text'">
+                    <ion-input [label]="c.name" labelPlacement="stacked" [name]="'cf_' + c.key" [value]="c.value"></ion-input>
+                </ion-item>
+                <ng-container *ngIf="c.control === 'range' || c.control === 'daterange'">
+                    <ion-item>
+                        <ion-input [label]="c.name + ': ' + ('plugin.mod_datalynx.customfilterfrom' | translate)" labelPlacement="stacked"
+                                [type]="c.control === 'daterange' ? 'date' : 'text'" [attr.inputmode]="c.control === 'range' ? 'decimal' : null"
+                                [name]="'cf_' + c.key + '_from'" [value]="c.from"></ion-input>
+                    </ion-item>
+                    <ion-item>
+                        <ion-input [label]="c.name + ': ' + ('plugin.mod_datalynx.customfilterto' | translate)" labelPlacement="stacked"
+                                [type]="c.control === 'daterange' ? 'date' : 'text'" [attr.inputmode]="c.control === 'range' ? 'decimal' : null"
+                                [name]="'cf_' + c.key + '_to'" [value]="c.to"></ion-input>
+                    </ion-item>
+                </ng-container>
+                <ion-item *ngIf="c.control === 'select' || c.control === 'multiselect'">
+                    <ion-select [label]="c.name" labelPlacement="stacked" [multiple]="true" [name]="'cf_' + c.key" [value]="c.selected"
+                            interface="alert">
+                        <ion-select-option *ngFor="let o of c.options" [value]="o.value">{{ o.label }}</ion-select-option>
+                    </ion-select>
+                </ion-item>
+                <ion-item *ngIf="c.control === 'multiselect'">
+                    <ion-select [label]="c.name" labelPlacement="stacked" [name]="'cf_' + c.key + '_mode'" [value]="c.mode"
+                            interface="popover">
+                        <ion-select-option value="any">{{ 'plugin.mod_datalynx.customfilterany' | translate }}</ion-select-option>
+                        <ion-select-option value="all">{{ 'plugin.mod_datalynx.customfilterall' | translate }}</ion-select-option>
+                    </ion-select>
+                </ion-item>
+                <ion-item *ngIf="c.control === 'approve' || c.control === 'status'">
+                    <ion-select [label]="c.name" labelPlacement="stacked" [name]="'cf_' + c.key" [value]="c.value" interface="popover">
+                        <ion-select-option value="">{{ 'core.choosedots' | translate }}</ion-select-option>
+                        <ion-select-option *ngFor="let o of c.options" [value]="o.value">{{ o.label }}</ion-select-option>
+                    </ion-select>
+                </ion-item>
+                <ion-item *ngIf="c.control === 'presence'">
+                    <ion-select [label]="c.name" labelPlacement="stacked" [name]="'cf_' + c.key" [value]="c.value" interface="popover">
+                        <ion-select-option value="">{{ 'core.choosedots' | translate }}</ion-select-option>
+                        <ion-select-option value="exists">{{ 'plugin.mod_datalynx.fileexist' | translate }}</ion-select-option>
+                        <ion-select-option value="missing">{{ 'plugin.mod_datalynx.filemissing' | translate }}</ion-select-option>
+                    </ion-select>
+                </ion-item>
+            </ng-container>
+            <ng-container *ngIf="CONTENT_OTHERDATA.state.customfilter.sortfields.length">
+                <ion-item>
+                    <ion-select [label]="'plugin.mod_datalynx.mobilesortby' | translate" labelPlacement="stacked" name="cf_sort"
+                            [value]="CONTENT_OTHERDATA.state.customfilter.sort" interface="popover">
+                        <ion-select-option value="">{{ 'core.choosedots' | translate }}</ion-select-option>
+                        <ion-select-option *ngFor="let o of CONTENT_OTHERDATA.state.customfilter.sortfields" [value]="o.value">{{ o.label }}</ion-select-option>
+                    </ion-select>
+                </ion-item>
+                <ion-item>
+                    <ion-select [label]="'plugin.mod_datalynx.mobilesortdirection' | translate" labelPlacement="stacked" name="cf_sortdir"
+                            [value]="CONTENT_OTHERDATA.state.customfilter.sortdir" interface="popover">
+                        <ion-select-option value="0">{{ 'plugin.mod_datalynx.mobilesortascending' | translate }}</ion-select-option>
+                        <ion-select-option value="1">{{ 'plugin.mod_datalynx.mobilesortdescending' | translate }}</ion-select-option>
+                    </ion-select>
+                </ion-item>
+            </ng-container>
+        </ion-list>
+        <ng-container *ngIf="CONTENT_OTHERDATA.state.customfilter.unsupported.length">
+            <p class="ion-padding-horizontal">
+                {{ 'plugin.mod_datalynx.mobilefilterunsupported' | translate: {$a: CONTENT_OTHERDATA.state.customfilter.unsupported.join(', ')} }}
+            </p>
+        </ng-container>
+        <div class="ion-padding-horizontal">
+            <ion-button expand="block" type="button" form="dlxcustomfilter" core-site-plugins-new-content [samePage]="true"
+                    [args]="{cmid: <% cmid %>, courseid: <% courseid %>, viewid: CONTENT_OTHERDATA.state.viewid,
+                        customfilterid: CONTENT_OTHERDATA.state.customfilter.id, cfapply: 1}">
+                {{ 'plugin.mod_datalynx.mobileapplyfilter' | translate }}
+            </ion-button>
+            <ion-button expand="block" fill="outline" type="button" core-site-plugins-new-content [samePage]="true"
+                    [args]="{cmid: <% cmid %>, courseid: <% courseid %>, viewid: CONTENT_OTHERDATA.state.viewid,
+                        customfilterid: CONTENT_OTHERDATA.state.customfilter.id, cfapply: 1}">
+                {{ 'plugin.mod_datalynx.mobileclearfilters' | translate }}
+            </ion-button>
+        </div>
+    </form>
+    </ng-container>
+
     <core-search-box *ngIf="CONTENT_OTHERDATA.state.hasview && CONTENT_OTHERDATA.state.supported && CONTENT_OTHERDATA.state.canfilter"
             [searchText]="CONTENT_OTHERDATA.state.search" [lengthCheck]="1" [showClear]="true"
             [placeholder]="'plugin.mod_datalynx.mobilesearchentries' | translate" [searchLabel]="'core.search' | translate"
             (onSubmit)="$event !== CONTENT_OTHERDATA.state.search && updateContent({
                 cmid: <% cmid %>, courseid: <% courseid %>, viewid: CONTENT_OTHERDATA.state.viewid,
                 filterid: CONTENT_OTHERDATA.state.filterid, search: $event,
-                criteria: CONTENT_OTHERDATA.state.criteria, sort: CONTENT_OTHERDATA.state.sort
+                criteria: CONTENT_OTHERDATA.state.criteria, sort: CONTENT_OTHERDATA.state.sort,
+                customfilterid: CONTENT_OTHERDATA.state.customfilterid, customvalues: CONTENT_OTHERDATA.state.customvalues
             })"
             (onClear)="CONTENT_OTHERDATA.state.search !== '' && updateContent({
                 cmid: <% cmid %>, courseid: <% courseid %>, viewid: CONTENT_OTHERDATA.state.viewid,
                 filterid: CONTENT_OTHERDATA.state.filterid, search: '',
-                criteria: CONTENT_OTHERDATA.state.criteria, sort: CONTENT_OTHERDATA.state.sort
+                criteria: CONTENT_OTHERDATA.state.criteria, sort: CONTENT_OTHERDATA.state.sort,
+                customfilterid: CONTENT_OTHERDATA.state.customfilterid, customvalues: CONTENT_OTHERDATA.state.customvalues
             })"></core-search-box>
 
     <ion-card *ngIf="CONTENT_OTHERDATA.state.hasview && !CONTENT_OTHERDATA.state.supported">
@@ -128,7 +224,8 @@
                     cmid: <% cmid %>, courseid: <% courseid %>, viewid: CONTENT_OTHERDATA.state.viewid,
                     filterid: CONTENT_OTHERDATA.state.filterid, search: CONTENT_OTHERDATA.state.search,
                     criteria: CONTENT_OTHERDATA.state.criteria, sort: CONTENT_OTHERDATA.state.sort,
-                    perpage: CONTENT_OTHERDATA.state.nextperpage
+                    perpage: CONTENT_OTHERDATA.state.nextperpage,
+                    customfilterid: CONTENT_OTHERDATA.state.customfilterid, customvalues: CONTENT_OTHERDATA.state.customvalues
                 }); $event()"></core-infinite-loading>
 
         <ion-card *ngIf="!CONTENT_OTHERDATA.state.cangrow && CONTENT_OTHERDATA.state.entries.length < CONTENT_OTHERDATA.state.entriesfiltercount">

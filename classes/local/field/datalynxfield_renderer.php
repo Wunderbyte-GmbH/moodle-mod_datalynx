@@ -734,6 +734,29 @@ abstract class datalynxfield_renderer {
     }
 
     /**
+     * The control the Moodle App shows for this field in a custom filter (mod_datalynx#270).
+     *
+     * One of text, range, daterange, select, multiselect, presence, approve, status: the web and
+     * the app build the field's custom filter input from it (customfilter_controls). Unsupported
+     * when no control expresses the field's search: the web then shows the field's own search
+     * elements (render_search_mode()), the app sends the user to the web.
+     *
+     * @return string
+     */
+    public function get_customfilter_control(): string {
+        return 'unsupported';
+    }
+
+    /**
+     * The choices of a select, multiselect or status control: value => label.
+     *
+     * @return array
+     */
+    public function get_customfilter_options(): array {
+        return [];
+    }
+
+    /**
      * Returns the menu for the field.
      *
      * @param bool $showall Whether to show all patterns.

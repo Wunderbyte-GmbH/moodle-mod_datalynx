@@ -111,41 +111,22 @@ class renderer extends datalynxfield_renderer {
             $to = 0;
         }
 
-        if ($mform->_formName != 'mod_datalynx_form_datalynx_customfilter_frontend_form') {
-            $elements = [];
-            $elements[] = &$mform->createElement(
-                'date_time_selector',
-                "f_{$i}_{$fieldid}_from",
-                get_string('fromdate', 'moodle')
-            );
-            $elements[] = &$mform->createElement(
-                'date_time_selector',
-                "f_{$i}_{$fieldid}_to",
-                get_string('todate', 'moodle')
-            );
+        $elements = [];
+        $elements[] = &$mform->createElement(
+            'date_time_selector',
+            "f_{$i}_{$fieldid}_from",
+            get_string('fromdate', 'moodle')
+        );
+        $elements[] = &$mform->createElement(
+            'date_time_selector',
+            "f_{$i}_{$fieldid}_to",
+            get_string('todate', 'moodle')
+        );
 
-            $mform->setDefault("f_{$i}_{$fieldid}_from", (int) $from);
-            $mform->setDefault("f_{$i}_{$fieldid}_to", (int) $to);
-            foreach (['year', 'month', 'day', 'hour', 'minute'] as $fieldidentifier) {
-                $mform->disabledIf("f_{$i}_{$fieldid}_to[$fieldidentifier]", "searchoperator$i", 'neq', 'BETWEEN');
-            }
-        }
-
-        if ($mform->_formName == 'mod_datalynx_form_datalynx_customfilter_frontend_form') {
-            $attr = ['optional' => true]; // Allows date_time to be enabled, passes 0 if disabled.
-            $elements[] = $element = &$mform->createElement(
-                'date_time_selector',
-                "f_{$i}_{$fieldid}_from",
-                get_string('fromdate', 'moodle'),
-                $attr
-            );
-            $element->setAttributes(['size' => 1]);
-            $elements[] = &$mform->createElement(
-                'date_time_selector',
-                "f_{$i}_{$fieldid}_to",
-                get_string('todate', 'moodle'),
-                $attr
-            );
+        $mform->setDefault("f_{$i}_{$fieldid}_from", (int) $from);
+        $mform->setDefault("f_{$i}_{$fieldid}_to", (int) $to);
+        foreach (['year', 'month', 'day', 'hour', 'minute'] as $fieldidentifier) {
+            $mform->disabledIf("f_{$i}_{$fieldid}_to[$fieldidentifier]", "searchoperator$i", 'neq', 'BETWEEN');
         }
 
         $separators = ['<div class="w-100"><br></div>', '<div class="w-100"><br></div>'];
@@ -177,5 +158,14 @@ class renderer extends datalynxfield_renderer {
         }
 
         return $patterns;
+    }
+
+    /**
+     * Time created and modified are searched in a range of days.
+     *
+     * @return string
+     */
+    public function get_customfilter_control(): string {
+        return 'daterange';
     }
 }

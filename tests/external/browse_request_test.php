@@ -195,11 +195,10 @@ final class browse_request_test extends externallib_advanced_testcase {
             'dataid' => $this->dlx->id(),
             'fieldlist' => json_encode([$tagsid => ['name' => 'Tags', 'sortable' => 0]]),
         ];
-        // As the frontend form submits it: the autocomplete's options with the toggle among them.
+        // As the frontend form submits it: the options and the any/all toggle (customfilter_controls).
         $formdata = (object) [
-            "f_0_{$tagsid}" => ['1', '2', 'andor' => (string) $andor],
-            'f_0_approve' => '1',
-            'f_0_status' => '0',
+            "cf_{$tagsid}" => ['1', '2'],
+            "cf_{$tagsid}_mode" => $andor === -2 ? 'all' : 'any',
         ];
 
         $filter = new \mod_datalynx\local\filter\datalynx_filter((object) ['id' => 0, 'dataid' => $this->dlx->id()]);

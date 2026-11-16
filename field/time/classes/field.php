@@ -261,8 +261,9 @@ class field extends datalynxfield_base {
         [$not, $operator, $value] = $search;
 
         if (is_array($value)) {
-            $from = $value[0];
-            $to = $value[1];
+            // One bound for the operators > and <, two for BETWEEN.
+            $from = $value[0] ?? 0;
+            $to = $value[1] ?? 0;
         } else {
             $from = 0;
             $to = 0;
@@ -475,5 +476,27 @@ class field extends datalynxfield_base {
      */
     public static function is_customfilterfield(): bool {
         return true;
+    }
+
+    /**
+     * A custom filter value is a range of timestamps ['from' => int, 'to' => int]; either may be
+     * empty (0), both are inclusive. Nothing set, no condition.
+     *
+     * @param mixed $value
+     * @return array
+     */
+    public function get_customfilter_criteria($value): array {
+        $from = is_array($value) ? (int) ($value['from'] ?? 0) : 0;
+        $to = is_array($value) ? (int) ($value['to'] ?? 0) : 0;
+        if ($from > 0 && $to > 0) {
+            // The search takes the range as from <= time < to.
+            return [['', 'BETWEEN', [$from, $to + 1]]];
+        } else if ($from > 0) {
+            return [['', '>', [$from - 1]]];
+        } else if ($to > 0) {
+            return [['', '<', [$to + 1]]];
+        }
+
+        return [];
     }
 }

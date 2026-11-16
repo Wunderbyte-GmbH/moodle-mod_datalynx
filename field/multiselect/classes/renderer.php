@@ -226,19 +226,6 @@ class renderer extends datalynxfield_renderer {
             $mform->disabledIf($fieldname, "searchoperator{$i}", 'eq', '');
         }
 
-        // Add a checkbox to select if any of or all elements are needed, only show this in customfilter forms..
-        if ($mform->_formName == 'mod_datalynx_form_datalynx_customfilter_frontend_form') {
-            // NOTE: Do not set to 0|1 as 1 will be cleared as form input by modform.
-            $elements[] = $mform->createElement(
-                'advcheckbox',
-                $fieldname . "[andor]",
-                get_string('customfilterandor', 'datalynx'),
-                '',
-                [],
-                [0, -2]
-            );
-        }
-
         return [$elements, null];
     }
 
@@ -272,5 +259,23 @@ class renderer extends datalynxfield_renderer {
         $patterns = parent::patterns();
 
         return $this->add_legacy_suffix_patterns($patterns, ['addnew']);
+    }
+
+    /**
+     * A multiple choice is searched by any or all of its options.
+     *
+     * @return string
+     */
+    public function get_customfilter_control(): string {
+        return 'multiselect';
+    }
+
+    /**
+     * The options of the field.
+     *
+     * @return array
+     */
+    public function get_customfilter_options(): array {
+        return $this->format_option_labels($this->field->options_menu());
     }
 }

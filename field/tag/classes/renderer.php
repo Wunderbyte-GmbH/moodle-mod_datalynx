@@ -163,4 +163,34 @@ class renderer extends datalynxfield_renderer {
         // Whether a value is required is checked by the entry submission service.
         return [];
     }
+
+    /**
+     * Tags are searched by any of the tags the entries carry.
+     *
+     * @return string
+     */
+    public function get_customfilter_control(): string {
+        return 'select';
+    }
+
+    /**
+     * The tags entries of this field carry: tag name => tag name.
+     *
+     * @return array
+     */
+    public function get_customfilter_options(): array {
+        global $DB;
+
+        $names = $DB->get_fieldset_sql(
+            "SELECT DISTINCT t.rawname
+               FROM {tag} t
+               JOIN {tag_instance} ti ON ti.tagid = t.id
+               JOIN {datalynx_contents} dc ON dc.id = ti.itemid
+              WHERE ti.component = :component AND ti.itemtype = :itemtype AND dc.fieldid = :fieldid",
+            ['component' => 'mod_datalynx', 'itemtype' => 'datalynx_contents', 'fieldid' => $this->field->id()]
+        );
+        \core_collator::asort($names);
+
+        return array_combine($names, $names) ?: [];
+    }
 }

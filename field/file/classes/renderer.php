@@ -174,20 +174,9 @@ class renderer extends datalynxfield_renderer {
     public function render_search_mode(MoodleQuickForm &$mform, int $i = 0, string $value = ''): array {
         $fieldname = "f_{$i}_{$this->field->id()}";
 
-        if ($mform->_formName !== 'mod_datalynx_form_datalynx_customfilter_frontend_form') {
-            return [[$mform->createElement('static', $fieldname, '', get_string('empty', 'datalynx'))], null];
-        }
-
-        $options = [
-            -1 => get_string('choose'),
-            0 => get_string('fileexist', 'datalynx'),
-            1 => get_string('filemissing', 'datalynx'),
-        ];
-        $element = $mform->createElement('select', $fieldname, '', $options);
-        $mform->setType($fieldname, PARAM_INT);
-        $mform->setDefault($fieldname, $value === '' ? -1 : $value);
-
-        return [[$element], null];
+        // Files are searched for being there or not by the custom filter (customfilter_controls);
+        // other search forms take the operator alone.
+        return [[$mform->createElement('static', $fieldname, '', get_string('empty', 'datalynx'))], null];
     }
 
     /**
@@ -366,5 +355,14 @@ class renderer extends datalynxfield_renderer {
         }
 
         return implode(",", $matches);
+    }
+
+    /**
+     * Files are searched for being there or not.
+     *
+     * @return string
+     */
+    public function get_customfilter_control(): string {
+        return 'presence';
     }
 }

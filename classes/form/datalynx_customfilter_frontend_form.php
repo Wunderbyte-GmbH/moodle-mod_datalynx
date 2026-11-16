@@ -24,6 +24,8 @@
 
 namespace mod_datalynx\form;
 
+use mod_datalynx\local\filter\customfilter_controls;
+use mod_datalynx\local\filter\customfilter_search;
 use moodle_exception;
 use moodle_url;
 
@@ -48,103 +50,105 @@ class datalynx_customfilter_frontend_form extends datalynx_filter_base_form {
             throw new moodle_exception('nocustomfilter', 'datalynx');
         }
 
-        $customfilterfieldlistfields = [];
-        if ($customfilter->fieldlist) {
-            $customfilterfieldlistfields = json_decode($customfilter->fieldlist);
-        }
-        $fields = $view->get_view_fields();
-        $fieldoptions = [];
-        $sortfields = [];
-        foreach ($fields as $fieldid => $field) {
-            $select = false;
-            foreach ($customfilterfieldlistfields as $fid => $listfield) {
-                if ($field->field->id == $fid) {
-                    $select = true;
-                    if ($listfield->sortable) {
-                        $sortfields[$fid] = $listfield->name;
-                    }
-                    break;
-                }
-            }
-            if ($select == false) {
-                switch ($field->field->name) {
-                    case (get_string("approved", "datalynx")):
-                        if ($customfilter->approve) {
-                            $select = true;
-                        }
-                        break;
-                    case (get_string("timecreated", "datalynx")):
-                        if ($customfilter->timecreated) {
-                            $select = true;
-                        }
-                        if ($customfilter->timecreatedsortable) {
-                            $sortfields[$fieldid] = $field->field->name;
-                        }
-                        break;
-                    case (get_string("timemodified", "datalynx")):
-                        if ($customfilter->timemodified) {
-                            $select = true;
-                        }
-                        if ($customfilter->timemodifiedsortable) {
-                            $sortfields[$fieldid] = $field->field->name;
-                        }
-                        break;
-                    case (get_string("status", "datalynx")):
-                        if ($customfilter->status) {
-                            $select = true;
-                        }
-                        break;
-                }
-            }
-            if ($select) {
-                $fieldoptions[$fieldid] = $field->field->name;
-            }
-        }
+        // The controls of the filter, the same ones the Moodle App shows (mod_datalynx#270): the
+        // inputs are named and read alike, see customfilter_controls.
+        $search = new customfilter_search($this->dlx, $customfilter);
+        $described = customfilter_controls::describe($search, $view, []);
+        $fields = $search->get_fields($view);
+        $prefix = customfilter_controls::PREFIX;
 
         $mform = &$this->_form;
         $mform->addElement('header', 'collapseCustomfilter', get_string('search'));
         $mform->setExpanded('collapseCustomfilter', false);
 
-        if ($customfilter->fulltextsearch) {
-            $mform->addElement('text', 'search', get_string('search'));
-            $mform->setType('search', PARAM_TEXT);
-        }
-
-        // Search for author.
-        if (isset($customfilter->authorsearch) && $customfilter->authorsearch) {
-            // Add users that have written an entry in the current datalynx instance to list.
-            global $DB;
-            $entryauthors = $DB->get_records_sql(
-                'SELECT DISTINCT e.userid, u.firstname, u.lastname
-                   FROM {datalynx_entries} e
-                   JOIN {user} u ON u.id = e.userid
-                  WHERE e.dataid = :dataid',
-                ['dataid' => $this->dlx->id()]
-            );
-
-            $menu = [];
-            foreach ($entryauthors as $userid => $author) {
-                $menu[$userid] = $author->firstname . " " . $author->lastname;
+        $count = 1;
+        foreach ($described['controls'] as $control) {
+            $key = $control['key'];
+            $name = $prefix . $key;
+            $options = array_column($control['options'], 'label', 'value');
+            if ($key === 'search') {
+                $mform->addElement('text', $name, get_string('search'));
+                $mform->setType($name, PARAM_TEXT);
+                continue;
             }
-            $options = ['multiple' => true];
-            $mform->addElement('autocomplete', 'authorsearch', get_string('authorsearch', 'datalynx'), $menu, $options);
-            $mform->setType('authorsearch', PARAM_INT);
+            if ($key === 'userid') {
+                $mform->addElement('autocomplete', $name, $control['name'], $options, ['multiple' => true]);
+                $mform->setType($name, PARAM_INT);
+                continue;
+            }
+
+            $elements = [];
+            switch ($control['control']) {
+                case 'text':
+                    $elements[] = $mform->createElement('text', $name, null, ['size' => 32]);
+                    $mform->setType($name, PARAM_TEXT);
+                    break;
+                case 'range':
+                    foreach (['from', 'to'] as $bound) {
+                        $label = get_string("customfilter{$bound}", 'datalynx');
+                        $elements[] = $mform->createElement(
+                            'text',
+                            "{$name}_{$bound}",
+                            null,
+                            ['size' => 6, 'placeholder' => $label, 'aria-label' => $label]
+                        );
+                        $mform->setType("{$name}_{$bound}", PARAM_RAW_TRIMMED);
+                    }
+                    break;
+                case 'daterange':
+                    foreach (['from', 'to'] as $bound) {
+                        $elements[] = $mform->createElement(
+                            'date_selector',
+                            "{$name}_{$bound}",
+                            get_string("customfilter{$bound}", 'datalynx'),
+                            ['optional' => true]
+                        );
+                    }
+                    break;
+                case 'select':
+                case 'multiselect':
+                    $elements[] = $mform->createElement('autocomplete', $name, null, $options, ['multiple' => true]);
+                    $mform->setType($name, PARAM_TEXT);
+                    if ($control['control'] === 'multiselect') {
+                        $elements[] = $mform->createElement(
+                            'advcheckbox',
+                            "{$name}_mode",
+                            get_string('customfilterandor', 'datalynx'),
+                            '',
+                            [],
+                            ['any', 'all']
+                        );
+                    }
+                    break;
+                case 'approve':
+                case 'status':
+                case 'presence':
+                    if ($control['control'] === 'presence') {
+                        $options = [
+                            'exists' => get_string('fileexist', 'datalynx'),
+                            'missing' => get_string('filemissing', 'datalynx'),
+                        ];
+                    }
+                    $elements[] = $mform->createElement('select', $name, null, ['' => get_string('choosedots')] + $options);
+                    break;
+                default:
+                    // A search no control can express keeps the field's own elements (f_{i}_{fieldid}).
+                    $field = $fields[$key] ?? $fields[(int) $key] ?? null;
+                    if ($field) {
+                        [$elements] = $field->renderer()->render_search_mode($mform, $count, '');
+                    }
+            }
+            if ($elements) {
+                $mform->addGroup($elements, "customsearcharr{$count}", $control['name'], ' ', false);
+                $count++;
+            }
         }
 
-        // Custom search.
-        if ($customfilter->fieldlist) {
-            $this->customfilter_search_definition($fields, $fieldoptions);
-        }
-
-        if (!empty($sortfields)) {
-            // Important, keep fieldids intact.
-            $sortfields = [0 => get_string('choosedots')] + $sortfields;
-
+        if ($described['sortfields']) {
             $grp = [];
-            $grp[] = $mform->createElement('select', 'customfiltersortfield', '', $sortfields);
-            $directions = ["0" => get_string('asc'), "1" => get_string('desc')];
-
-            $grp[] = $mform->createElement('select', 'customfiltersortdirection', '', $directions);
+            $sortfields = ['' => get_string('choosedots')] + array_column($described['sortfields'], 'label', 'value');
+            $grp[] = $mform->createElement('select', "{$prefix}sort", '', $sortfields);
+            $grp[] = $mform->createElement('select', "{$prefix}sortdir", '', ['0' => get_string('asc'), '1' => get_string('desc')]);
             $mform->addGroup($grp, "customfiltersort_grp", get_string('sortby'), ' ', false);
         }
 
@@ -234,12 +238,12 @@ class datalynx_customfilter_frontend_form extends datalynx_filter_base_form {
 
             if ($type === 'hidden') {
                 $hiddenfields .= $element->toHtml();
-            } else if ($name === 'search') {
+            } else if ($name === customfilter_controls::PREFIX . 'search') {
                 $fulltextsearch = [
                     'label' => $element->getLabel() ?: get_string('search', 'datalynx'),
                     'html' => $renderfield($element),
                 ];
-            } else if ($name === 'authorsearch') {
+            } else if ($name === customfilter_controls::PREFIX . 'userid') {
                 $authorsearch = [
                     'label' => $element->getLabel(),
                     'html' => $renderfield($element),

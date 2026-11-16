@@ -363,4 +363,22 @@ class datalynxfield_option_multiple extends datalynxfield_option {
             return 1;
         }
     }
+
+    /**
+     * A custom filter value is ['ids' => option ids, 'mode' => 'any'|'all']: entries with any (or
+     * all) of the options. A plain list of ids means any of them.
+     *
+     * @param mixed $value
+     * @return array
+     */
+    public function get_customfilter_criteria($value): array {
+        $value = is_array($value) ? $value : [];
+        $mode = $value['mode'] ?? 'any';
+        $criteria = parent::get_customfilter_criteria(array_key_exists('ids', $value) ? $value['ids'] : $value);
+        if ($criteria && $mode === 'all') {
+            $criteria[0][1] = 'ALL_OF';
+        }
+
+        return $criteria;
+    }
 }

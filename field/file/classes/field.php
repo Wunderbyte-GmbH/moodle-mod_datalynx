@@ -446,4 +446,18 @@ class field extends datalynxfield_base {
         }
         return false;
     }
+
+    /**
+     * A custom filter value is 'exists' (the entry has a file) or 'missing'.
+     *
+     * @param mixed $value
+     * @return array
+     */
+    public function get_customfilter_criteria($value): array {
+        return match ($value) {
+            'exists' => [['NOT', '', '']],
+            'missing' => [['', '', '']],
+            default => [],
+        };
+    }
 }

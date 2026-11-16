@@ -166,4 +166,16 @@ class field extends datalynxfield_no_content {
     public static function is_customfilterfield(): bool {
         return true;
     }
+
+    /**
+     * A custom filter value is 1 (approved) or 0 (not approved); anything else sets no condition.
+     *
+     * @param mixed $value
+     * @return array
+     */
+    public function get_customfilter_criteria($value): array {
+        $value = is_scalar($value) ? trim((string) $value) : '';
+
+        return $value === '0' || $value === '1' ? [['', '=', (int) $value]] : [];
+    }
 }
