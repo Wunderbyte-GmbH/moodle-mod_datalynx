@@ -131,6 +131,15 @@ class field extends datalynxfield_base {
         $fs = get_file_storage();
         $files = $fs->get_area_files($usercontext->id, 'user', 'draft', $filemanager);
 
+        // The same files and link text as stored: nothing to write, and no change to report.
+        if (!empty($contentid) && $filemanager != 111111) {
+            $stored = $fs->get_area_files($this->dlx->context->id, 'mod_datalynx', 'content', $contentid);
+            $samefiles = self::file_hashes($files) === self::file_hashes($stored);
+            if ($samefiles && (string) ($alttext ?? '') === (string) ($entry->{"c{$fieldid}_content1"} ?? '')) {
+                return true;
+            }
+        }
+
         // Even if we don't store any file info we need to have a contentid to show empty lines.
         $rec = new stdClass();
         $rec->fieldid = $fieldid;
@@ -170,6 +179,23 @@ class field extends datalynxfield_base {
             $this->update_content_files($contentid);
         }
         return $contentid;
+    }
+
+    /**
+     * The files of an area by path and name, with their content hashes, sorted.
+     *
+     * @param \stored_file[] $files
+     * @return string[] path and name => content hash
+     */
+    private static function file_hashes(array $files): array {
+        $hashes = [];
+        foreach ($files as $file) {
+            if (!$file->is_directory()) {
+                $hashes[$file->get_filepath() . $file->get_filename()] = $file->get_contenthash();
+            }
+        }
+        ksort($hashes);
+        return $hashes;
     }
 
     /**

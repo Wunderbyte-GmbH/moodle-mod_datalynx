@@ -438,19 +438,48 @@ abstract class datalynxfield_base {
         }
 
         // Update if new is different from old.
-        if (!is_null($contentid)) {
-            foreach ($contents as $key => $content) {
-                // Submitted values are typed by the input contract (e.g. int), stored ones are strings:
-                // compare them as they would be stored, so an unchanged value is no change.
-                $content = is_int($content) ? (string) $content : $content;
-                if (!isset($oldcontents[$key]) || $content !== $oldcontents[$key]) {
-                    $rec->id = $contentid; // MUST_EXIST.
-                    $DB->update_record('datalynx_contents', $rec);
-                    return $rec->id;
-                }
+        if (!is_null($contentid) && !self::same_contents($contents, $oldcontents)) {
+            $rec->id = $contentid; // MUST_EXIST.
+            $DB->update_record('datalynx_contents', $rec);
+            return $rec->id;
+        }
+        return true;
+    }
+
+    /**
+     * Whether new contents equal the stored ones, column by column, as they are stored.
+     *
+     * Submitted values are typed (an int from the input contract, a float, NULL), stored ones are
+     * strings or NULL; a value counts as unchanged when both read the same as stored text, NULL and
+     * '' alike. Every update_content() decides "unchanged" with this, so that saving an entry again
+     * reports no change and rules that wait for a change do not run.
+     *
+     * @param array $contents new contents by column index (0 = content, 1 = content1, ...)
+     * @param array|null $oldcontents stored contents by column index
+     * @return bool
+     */
+    public static function same_contents(array $contents, ?array $oldcontents): bool {
+        foreach ($contents as $key => $content) {
+            if ((string) ($content ?? '') !== (string) ($oldcontents[$key] ?? '')) {
+                return false;
             }
         }
         return true;
+    }
+
+    /**
+     * The stored contents of the field in an entry, by column index, as loaded with the entry.
+     *
+     * @param stdClass $entry
+     * @return array
+     */
+    protected function get_stored_contents(stdClass $entry): array {
+        $fieldid = $this->field->id;
+        $stored = [];
+        foreach ($this->get_content_parts() as $index => $column) {
+            $stored[$index] = $entry->{"c{$fieldid}_{$column}"} ?? null;
+        }
+        return $stored;
     }
 
     /**

@@ -108,7 +108,7 @@ class field extends datalynxfield_base {
      * @param ?array $values
      * @return int|string
      */
-    public function update_content(stdClass $entry, ?array $values = null): int|string {
+    public function update_content(stdClass $entry, ?array $values = null): int|string|bool {
         global $DB;
 
         $entryid = $entry->id;
@@ -116,23 +116,32 @@ class field extends datalynxfield_base {
 
         $contentid = isset($entry->{"c{$fieldid}_id"}) ? $entry->{"c{$fieldid}_id"} : null;
 
-        $rec = new stdClass();
-        $rec->fieldid = $fieldid;
-        $rec->entryid = $entryid;
-
-        if (!$rec->id = $contentid) {
-            $rec->id = $DB->insert_record('datalynx_contents', $rec);
+        // Not submitted at all (e.g. shown disabled): keep what is stored.
+        if (is_array($values) && empty($values) && !is_null($contentid)) {
+            return true;
         }
 
-        $value = reset($values);
+        $value = $values ? reset($values) : '';
         if (is_array($value)) {
             // Import: One value as array of text,format,trust, so take the text.
             $value = reset($value);
         }
 
-        $value = str_replace("<br />", "\n", $value); // Reset carriage returns, bug#887.
-        $rec->content = clean_param($value, PARAM_NOTAGS); // Replaced PARAM_RAW.
+        $value = str_replace("<br />", "\n", (string) $value); // Reset carriage returns, bug#887.
+        $content = clean_param($value, PARAM_NOTAGS); // Replaced PARAM_RAW.
 
+        // Unchanged: nothing to write, and no change to report.
+        if (!is_null($contentid) && self::same_contents([$content], $this->get_stored_contents($entry))) {
+            return true;
+        }
+
+        $rec = new stdClass();
+        $rec->fieldid = $fieldid;
+        $rec->entryid = $entryid;
+        if (!$rec->id = $contentid) {
+            $rec->id = $DB->insert_record('datalynx_contents', $rec);
+        }
+        $rec->content = $content;
         $DB->update_record('datalynx_contents', $rec);
 
         // We need the contentid as return value.

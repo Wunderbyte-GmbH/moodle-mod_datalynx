@@ -133,7 +133,7 @@ class field extends datalynxfield_base {
      * @return int|string The content record id.
      * @see datalynxfield_base::update_content()
      */
-    public function update_content(stdClass $entry, ?array $values = null): int|string {
+    public function update_content(stdClass $entry, ?array $values = null): int|string|bool {
         global $DB;
         $entryid = $entry->id;
         $fieldid = $this->field->id;
@@ -165,6 +165,11 @@ class field extends datalynxfield_base {
         );
         $rec->content = $data->content;
         $rec->content1 = $data->contentformat;
+
+        // Unchanged text and format: nothing to write, and no change to report.
+        if ($contentid && self::same_contents([$rec->content, $rec->content1], $this->get_stored_contents($entry))) {
+            return true;
+        }
 
         $DB->update_record('datalynx_contents', $rec);
 

@@ -85,18 +85,35 @@ class field extends datalynxfield_base {
      * @return array
      */
     protected function format_content($entry, ?array $values = null): array {
-        $contents = [];
-
-        if (!empty($values)) {
-            if (count($values) === 1) {
-                $values = reset($values);
-            }
+        $oldcontents = [$entry->{"c{$this->field->id}_content"} ?? null];
+        $value = $values ? reset($values) : '';
+        if (is_array($value)) {
+            $value = reset($value);
         }
-        // Remove youtube prefix and only store the key.
-        // Source: https://stackoverflow.com/questions/3392993/php-regex-to-get-youtube-video-id.
-        parse_str(parse_url($values, PHP_URL_QUERY), $vars);
-        $contents[] = $vars['v'];
+        $videoid = self::get_video_id(trim((string) $value));
 
-        return [$contents];
+        return [$videoid === '' ? [] : [$videoid], $oldcontents];
+    }
+
+    /**
+     * The video id of a YouTube address: the v parameter of a watch link, the path of a youtu.be,
+     * embed or shorts link, or the value itself when it already is an id.
+     *
+     * @param string $url
+     * @return string '' when there is none
+     */
+    public static function get_video_id(string $url): string {
+        if ($url === '') {
+            return '';
+        }
+        parse_str((string) parse_url($url, PHP_URL_QUERY), $vars);
+        if (!empty($vars['v']) && is_string($vars['v'])) {
+            return clean_param($vars['v'], PARAM_ALPHANUMEXT);
+        }
+        $path = trim((string) parse_url($url, PHP_URL_PATH), '/');
+        if (preg_match('~(?:^|/)(?:embed/|shorts/|v/)?([A-Za-z0-9_-]{6,})$~', $path, $matches)) {
+            return $matches[1];
+        }
+        return '';
     }
 }

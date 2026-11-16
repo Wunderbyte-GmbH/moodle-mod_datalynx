@@ -1,6 +1,19 @@
 mod_datalynx changes
 ====================
 
+2026-11-17
+----------
+
+- Fix (#314): saving an entry again without changing a field no longer reports
+  that field as changed for text areas, editors, files, tags, URLs and YouTube
+  links, so rules that run only when a field changes do not run again. One
+  comparison decides "unchanged" for every field type, comparing values as
+  they are stored. Saving a YouTube link no longer raises a PHP warning, and
+  youtu.be, embed and shorts links are understood.
+- Fix: the cleanup of empty content rows (#308) kept only the content column
+  in view; a course group field with a fixed course keeps the group in
+  content1, so its rows were dropped on saving and by the upgrade.
+
 2026-11-16
 ----------
 

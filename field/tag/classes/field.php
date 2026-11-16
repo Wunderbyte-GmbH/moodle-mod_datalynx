@@ -65,7 +65,7 @@ class field extends datalynxfield_option_multiple {
      * @return int|string The content record ID.
      * @see datalynxfield_base::update_content()
      */
-    public function update_content(stdClass $entry, ?array $values = null): int|string {
+    public function update_content(stdClass $entry, ?array $values = null): int|string|bool {
         global $DB;
         $entryid = $entry->id;
         $fieldid = $this->field->id;
@@ -77,6 +77,13 @@ class field extends datalynxfield_option_multiple {
         if (!empty($values)) {
             $tags = reset($values);
         }
+
+        // Unchanged tags: nothing to write, and no change to report.
+        $content = $tags ? implode(',', (array) $tags) : '';
+        if ($contentid && self::same_contents([$content], $this->get_stored_contents($entry))) {
+            return true;
+        }
+        $content = '';
 
         $rec = new stdClass();
         $rec->fieldid = $fieldid;
