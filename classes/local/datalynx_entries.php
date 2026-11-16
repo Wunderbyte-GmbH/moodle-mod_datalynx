@@ -707,6 +707,8 @@ class datalynx_entries {
                 // The filter takes the ids as a comma separated string (see get_entries()).
                 $filterdata = ['dataid' => $dlx->id(), 'eids' => implode(',', $importentryids)];
                 $filter = new datalynx_filter((object) $filterdata);
+                // With their stored contents, so saving updates the rows instead of adding new ones.
+                $filter->contentfields = array_keys(array_filter($dlx->get_fields(), fn($field) => !$field::is_internal()));
                 $entries += $this->get_entries(['filter' => $filter])->entries;
             }
 

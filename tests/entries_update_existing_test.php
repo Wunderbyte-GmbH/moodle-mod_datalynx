@@ -61,5 +61,18 @@ final class entries_update_existing_test extends advanced_testcase {
             'Updated title',
             $DB->get_field('datalynx_contents', 'content', ['entryid' => $entryid, 'fieldid' => $fieldid])
         );
+
+        // A second update changes the stored row; it does not add another.
+        $entries = new local\datalynx_entries(new datalynx($instance->id));
+        $entries->process_entries('update', (string) $entryid, (object) ["field_{$fieldid}_{$entryid}" => 'Again'], true);
+        $this->assertSame(
+            ['Again'],
+            array_values($DB->get_fieldset_select(
+                'datalynx_contents',
+                'content',
+                'entryid = ? AND fieldid = ?',
+                [$entryid, $fieldid]
+            ))
+        );
     }
 }
