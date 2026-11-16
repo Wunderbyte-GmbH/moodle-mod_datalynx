@@ -36,6 +36,7 @@ use mod_datalynx\datalynx;
 use mod_datalynx\local\datalynx_entries;
 use mod_datalynx\local\filter\datalynx_filter;
 use mod_datalynx\local\filter\datalynx_filter_manager;
+use mod_datalynx\local\filter\search_criteria;
 use moodle_exception;
 use moodle_url;
 use moodleform;
@@ -1256,13 +1257,17 @@ abstract class base {
             $customsort = is_array($this->filter->customsort)
                 ? $this->filter->customsort
                 : (unserialize($this->filter->customsort, ['allowed_classes' => false]) ?: []);
-            $args['customsort'] = json_encode($customsort);
+            if ($customsort = search_criteria::accepted_sort($customsort, $this->dlx)) {
+                $args['customsort'] = search_criteria::encode($customsort);
+            }
         }
         if (!empty($this->filter->customsearch)) {
             $customsearch = is_array($this->filter->customsearch)
                 ? $this->filter->customsearch
                 : (unserialize($this->filter->customsearch, ['allowed_classes' => false]) ?: []);
-            $args['customsearch'] = json_encode($customsearch);
+            if ($customsearch = search_criteria::accepted_search($customsearch, $this->dlx)) {
+                $args['customsearch'] = search_criteria::encode($customsearch);
+            }
         }
         if (!empty($this->filter->search)) {
             $args['search'] = (string) $this->filter->search;

@@ -125,6 +125,15 @@ class field extends datalynxfield_no_content {
     }
 
     /**
+     * Also '', which saved filters write for approved/not approved and get_search_sql() treats as '='.
+     *
+     * @return string[]
+     */
+    public function get_accepted_search_operators(): array {
+        return array_merge(parent::get_accepted_search_operators(), ['']);
+    }
+
+    /**
      * Parses submitted search form data for this field.
      *
      * @param object $formdata The submitted form data.

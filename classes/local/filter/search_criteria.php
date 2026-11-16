@@ -139,6 +139,53 @@ final class search_criteria {
     }
 
     /**
+     * The search criteria of a saved filter that the decode methods accept, field by field.
+     *
+     * Saved filters may hold criteria the gate refuses: a field deleted since, an operator a field
+     * no longer offers, a row the old filter form left unselected. Such a criterion is skipped with
+     * a debugging message instead of failing the whole view.
+     *
+     * @param array $criteria stored search criteria, keyed by field id
+     * @param datalynx $dlx
+     * @return array the accepted criteria, in the shape decode_search() returns
+     */
+    public static function accepted_search(array $criteria, datalynx $dlx): array {
+        return self::accepted($criteria, $dlx, 'decode_search');
+    }
+
+    /**
+     * The sort criteria of a saved filter that the decode methods accept, field by field.
+     *
+     * @param array $criteria stored sort criteria, keyed by field id
+     * @param datalynx $dlx
+     * @return array the accepted criteria, in the shape decode_sort() returns
+     * @see self::accepted_search()
+     */
+    public static function accepted_sort(array $criteria, datalynx $dlx): array {
+        return self::accepted($criteria, $dlx, 'decode_sort');
+    }
+
+    /**
+     * Run each field's criteria through a decode method on its own and keep those it accepts.
+     *
+     * @param array $criteria
+     * @param datalynx $dlx
+     * @param string $decode decode_search or decode_sort
+     * @return array
+     */
+    private static function accepted(array $criteria, datalynx $dlx, string $decode): array {
+        $accepted = [];
+        foreach (array_slice($criteria, 0, self::MAX_FIELDS, true) as $fieldid => $fieldcriteria) {
+            try {
+                $accepted += self::$decode(self::encode([$fieldid => $fieldcriteria]), $dlx);
+            } catch (invalid_parameter_exception $e) {
+                debugging("Saved filter criteria of field '$fieldid' skipped: {$e->debuginfo}", DEBUG_DEVELOPER);
+            }
+        }
+        return $accepted;
+    }
+
+    /**
      * Encode criteria for transport, the inverse of the decode methods.
      *
      * Empty criteria encode to '', which the decode methods read back as no criteria.

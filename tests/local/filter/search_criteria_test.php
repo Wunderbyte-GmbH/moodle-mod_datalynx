@@ -243,4 +243,48 @@ final class search_criteria_test extends advanced_testcase {
 
         $this->assertSame([$graz], array_map('intval', array_keys($result->entries)));
     }
+
+    /**
+     * Saved approval filters write the operator '' ([['', '', '1']] approved, [['', '', '0']] not
+     * approved); the gate accepts them and the engine selects by the approval flag.
+     */
+    public function test_saved_approval_criteria_select_by_approval(): void {
+        global $DB, $USER;
+
+        $approved = $this->add_mobile_entry($this->dlx, $USER->id, [$this->titleid => 'Approved']);
+        $pending = $this->add_mobile_entry($this->dlx, $USER->id, [$this->titleid => 'Pending']);
+        $DB->set_field('datalynx_entries', 'approved', 1, ['id' => $approved]);
+        $DB->set_field('datalynx_entries', 'approved', 0, ['id' => $pending]);
+        $viewid = $this->add_mobile_view($this->dlx, 'grid', 'Approval');
+
+        foreach (['1' => $approved, '0' => $pending] as $value => $expected) {
+            $criteria = search_criteria::decode_search('{"approve":{"AND":[["","","' . $value . '"]]}}', $this->dlx);
+            $this->assertSame([['', '', (string) $value]], $criteria['approve']['AND']);
+
+            $view = $this->dlx->get_view('grid', $viewid, false);
+            $view->set_filter(['customsearch' => $criteria], true);
+            $entries = new datalynx_entries($this->dlx, $view->get_filter());
+            $this->assertSame([$expected], array_map('intval', array_keys($entries->get_entries()->entries)));
+        }
+    }
+
+    /**
+     * A saved filter keeps the criteria the gate accepts; the others are skipped with a debugging
+     * message instead of failing the view: here an unselected row of the old filter form (field
+     * '0') and a field deleted since.
+     */
+    public function test_accepted_search_skips_stale_saved_criteria(): void {
+        $stored = [
+            $this->titleid => ['AND' => [['', 'LIKE', 'Graz']]],
+            0 => ['AND' => [['', '', false]]],
+            999999 => ['AND' => [['', '=', 'x']]],
+        ];
+
+        $accepted = search_criteria::accepted_search($stored, $this->dlx);
+
+        $this->assertSame([$this->titleid => ['AND' => [['', 'LIKE', 'Graz']]]], $accepted);
+        $this->assertDebuggingCalledCount(2);
+        $this->assertSame([$this->seatsid => 1], search_criteria::accepted_sort([$this->seatsid => '1', 999999 => 0], $this->dlx));
+        $this->assertDebuggingCalled();
+    }
 }
