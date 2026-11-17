@@ -24,9 +24,9 @@ Feature: Add and edit datalynx entries in the Moodle App
     And I log in as "admin"
     And I am on "Course 1" course homepage
     And I add to the "Fruits" datalynx the following fields:
-      | type        | name  | description | param1    |
-      | text        | Title |             |           |
-      | multiselect | Tags  |             | Red,Green |
+      | type        | name  | description | param1    | param2 | param3 |
+      | text        | Title |             |           |        |        |
+      | multiselect | Tags  |             | Red,Green |        |        |
     And I add to "Fruits" datalynx the view of "Grid" type with:
       | name        | Cards |
       | description | Cards |
