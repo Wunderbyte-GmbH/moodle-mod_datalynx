@@ -60,12 +60,7 @@ class renderer extends SelectRenderer {
         $menuoptions = $field->options_menu();
         $fieldname = "field_{$fieldid}_$entryid";
         $required = !empty($options['required']);
-        $selected = !empty($entry->{"c{$fieldid}_content"}) ? (int) $entry->{"c{$fieldid}_content"} : 0;
-
-        // Check for default value.
-        if (!$selected && $defaultval = $field->get('param2')) {
-            $selected = (int) array_search($defaultval, $menuoptions);
-        }
+        $selected = $this->get_selected_option($entry);
 
         $separator = $field->separators[0]['chr'];
         $param3 = (int) $field->get('param3');
@@ -198,5 +193,20 @@ class renderer extends SelectRenderer {
         }
 
         return parent::render_display_mode($entry, $options);
+    }
+
+    /**
+     * A single choice shown as radio buttons is edited with radio buttons.
+     *
+     * @param stdClass $entry
+     * @param array $options
+     * @return array|null
+     */
+    public function get_edit_control(stdClass $entry, array $options): ?array {
+        $selected = $this->get_selected_option($entry);
+
+        return $this->edit_control('radio', ['' => $selected ?: ''], $options, [
+            'choices' => self::edit_choices($this->format_option_labels($this->field->options_menu())),
+        ]);
     }
 }

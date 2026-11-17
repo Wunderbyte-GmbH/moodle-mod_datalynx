@@ -20,6 +20,19 @@ mod_datalynx changes
   and entries left to add, the same check as the web's "Add entry" link,
   which now lives in datalynx::user_can_add_new_entry()), and a plain text
   title per entry.
+- Entry editing outside the web form (#271): each field type describes the
+  control that edits it (datalynxfield_renderer::get_edit_control()): the
+  control, its inputs named after the field's input contract with their
+  current values, and its choices. The values go back through the
+  submission service (submit_entry) unchanged. Phase 1: text, number,
+  textarea, url, select, radio, multiple choice, checkbox, time, duration,
+  identifier (the flag that has a new entry's identifier generated),
+  status (draft / final) and grade item (shown). No control yet: text
+  autocomplete, multiple choice that adds options, masked time, editor,
+  file, picture, fieldgroup. The logic the web form and the control share
+  (the chosen option and its default, options used up, alphabetical order,
+  the chosen options of multiple choice and checkboxes, the link text of
+  urls, date-only time) lives in one renderer method each.
 - Custom filters, one contract for the web and the Moodle App (#270): the
   controls of a custom filter are described once
   (local\filter\customfilter_controls), their inputs are named cf_{field}

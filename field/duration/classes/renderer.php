@@ -188,4 +188,17 @@ class renderer extends datalynxfield_renderer {
 
         return $errors;
     }
+
+    /**
+     * A duration in seconds.
+     *
+     * @param stdClass $entry
+     * @param array $options
+     * @return array|null
+     */
+    public function get_edit_control(stdClass $entry, array $options): ?array {
+        $content = $entry->{"c{$this->field->id()}_content"} ?? '';
+
+        return $this->edit_control('duration', ['' => $content ?: ''], $options);
+    }
 }

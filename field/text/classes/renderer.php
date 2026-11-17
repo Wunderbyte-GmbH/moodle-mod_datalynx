@@ -394,4 +394,23 @@ class renderer extends datalynxfield_renderer {
     public function get_customfilter_control(): string {
         return 'text';
     }
+
+    /**
+     * One line of text; not while the field offers an autocomplete (param9), which the app
+     * cannot show yet.
+     *
+     * @param stdClass $entry
+     * @param array $options
+     * @return array|null
+     */
+    public function get_edit_control(stdClass $entry, array $options): ?array {
+        if ($this->field->get('param9')) {
+            return null;
+        }
+        $inputmodes = ['numeric' => 'decimal', 'email' => 'email', 'phone' => 'tel'];
+
+        return $this->edit_control('text', ['' => $entry->{"c{$this->field->id()}_content"} ?? ''], $options, [
+            'inputmode' => $inputmodes[(string) $this->field->get('param4')] ?? 'text',
+        ]);
+    }
 }

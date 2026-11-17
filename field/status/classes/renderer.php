@@ -261,4 +261,23 @@ class renderer extends datalynxfield_renderer {
             field::STATUS_FINAL_SUBMISSION => get_string('statusfinalsubmission', 'datalynx'),
         ];
     }
+
+    /**
+     * Draft or final submission, as the switch of the entry form.
+     *
+     * @param stdClass $entry
+     * @param array $options
+     * @return array|null
+     */
+    public function get_edit_control(stdClass $entry, array $options): ?array {
+        $final = (int) ($entry->status ?? field::STATUS_NOT_SET) === field::STATUS_FINAL_SUBMISSION;
+
+        return $this->edit_control('toggle', ['' => $final ? field::STATUS_FINAL_SUBMISSION : field::STATUS_DRAFT], $options, [
+            'choices' => self::edit_choices([
+                field::STATUS_DRAFT => get_string('statuslabeloff', 'datalynx'),
+                field::STATUS_FINAL_SUBMISSION => get_string('statuslabelon', 'datalynx'),
+            ]),
+            'description' => get_string('statustoggledesc', 'datalynx'),
+        ]);
+    }
 }

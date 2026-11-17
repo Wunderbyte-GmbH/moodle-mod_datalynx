@@ -52,8 +52,6 @@ class renderer extends MultiSelectRenderer {
             $required = false;
         }
 
-        $content = !empty($entry->{"c{$fieldid}_content"}) ? $entry->{"c{$fieldid}_content"} : null;
-
         $param3 = (int) $field->get('param3');
         $separator = isset($field->separators[$param3]) ? $field->separators[$param3]['chr'] : $field->separators[0]['chr'];
 
@@ -77,20 +75,7 @@ class renderer extends MultiSelectRenderer {
         }
         $group->setAttributes(['class' => $groupclasses]);
 
-        $selected = [];
-        if ($entryid > 0 && $content) {
-            $contentprepare = str_replace("#", "", $content);
-            $selectedraw = explode(',', $contentprepare);
-
-            foreach ($selectedraw as $item) {
-                $selected[$item] = $item;
-            }
-        }
-
-        // Check for default values.
-        if (!$selected && $field->get('param2')) {
-            $selected = $field->default_values();
-        }
+        $selected = $this->get_selected_options($entry);
 
         $mform->getElement($fieldname)->setValue($selected);
 
@@ -104,5 +89,15 @@ class renderer extends MultiSelectRenderer {
                 'client'
             );
         }
+    }
+
+
+    /**
+     * Checkboxes are edited as checkboxes.
+     *
+     * @return string
+     */
+    protected function get_edit_control_name(): string {
+        return 'checkbox';
     }
 }

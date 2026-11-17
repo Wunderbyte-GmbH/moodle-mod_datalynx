@@ -50,16 +50,10 @@ class renderer extends datalynxfield_renderer {
         $field = $this->field;
         $fieldid = $field->id();
         $entryid = $entry->id;
-        $menuoptions = $field->options_menu();
         $fieldname = "field_{$fieldid}_$entryid";
         $required = !empty($options['required']);
-        $selected = !empty($entry->{"c{$fieldid}_content"}) ? (int) $entry->{"c{$fieldid}_content"} : 0;
+        $selected = $this->get_selected_option($entry);
         $autocomplete = $field->get('param6');
-
-        // Check for default value.
-        if (!$selected && $defaultval = $field->get('param2')) {
-            $selected = (int) array_search($defaultval, $menuoptions);
-        }
 
         // Render as autocomplete field (param6 not empty) or select field.
         if ($autocomplete) {
@@ -68,35 +62,13 @@ class renderer extends datalynxfield_renderer {
             $select = &$mform->addElement('select', $fieldname, null);
         }
 
-        if (isset($this->field->field->param5) && is_numeric($this->field->field->param5) && $this->field->field->param5 > 0) {
-            $disabled = $this->field->get_disabled_values_for_user();
-        } else {
-            $disabled = [];
-        }
-
-        // Only the labels: the default value above is matched against the raw option text.
-        foreach ($this->format_option_labels($menuoptions) as $id => $name) {
-            $option = new stdClass();
-            $option->id = $id;
-            $option->name = $name;
-            $menuoptions[$id] = $option;
-        }
-        // Sort the options alphabetically.
-        $sortalphbetically = $field->field->param4;
-        if ($sortalphbetically) {
-            usort($menuoptions, function ($a, $b) {
-                return strcoll($a->name, $b->name);
-            });
-        }
-        $choosedots = new stdClass();
-        $choosedots->id = '';
-        $choosedots->name = get_string('choosedots');
-        $menuoptions = ['' => $choosedots] + $menuoptions;
-        foreach ($menuoptions as $option) {
-            if (array_search($option->id, $disabled) === false || $option->id == $selected) {
-                $select->addOption($option->name, $option->id);
+        $disabled = $this->get_disabled_options();
+        $menu = ['' => get_string('choosedots')] + $this->get_ordered_labels();
+        foreach ($menu as $id => $name) {
+            if (array_search($id, $disabled) === false || $id == $selected) {
+                $select->addOption($name, $id);
             } else {
-                $select->addOption($option->name, $option->id, ['disabled' => 'disabled']);
+                $select->addOption($name, $id, ['disabled' => 'disabled']);
             }
         }
 
@@ -238,5 +210,65 @@ class renderer extends datalynxfield_renderer {
      */
     public function get_customfilter_options(): array {
         return $this->format_option_labels($this->field->options_menu());
+    }
+
+    /**
+     * The option chosen in an entry; for an entry without one, the field's default option.
+     *
+     * @param stdClass $entry
+     * @return int 0 for none
+     */
+    protected function get_selected_option(stdClass $entry): int {
+        $field = $this->field;
+        $fieldid = $field->id();
+        $selected = !empty($entry->{"c{$fieldid}_content"}) ? (int) $entry->{"c{$fieldid}_content"} : 0;
+        // The default is matched against the raw option text.
+        if (!$selected && $defaultval = $field->get('param2')) {
+            $selected = (int) array_search($defaultval, $field->options_menu());
+        }
+
+        return $selected;
+    }
+
+    /**
+     * The options the user may no longer choose: an option may be chosen a limited number of
+     * times (param5).
+     *
+     * @return array option ids
+     */
+    protected function get_disabled_options(): array {
+        $limit = $this->field->field->param5 ?? null;
+        return is_numeric($limit) && $limit > 0 ? $this->field->get_disabled_values_for_user() : [];
+    }
+
+    /**
+     * The option labels in the order they are offered: as configured, or alphabetically (param4).
+     *
+     * @return array option id => label
+     */
+    protected function get_ordered_labels(): array {
+        $labels = $this->format_option_labels($this->field->options_menu());
+        if ($this->field->field->param4) {
+            uasort($labels, fn($a, $b) => strcoll((string) $a, (string) $b));
+        }
+
+        return $labels;
+    }
+
+    /**
+     * A single choice is edited with a select.
+     *
+     * @param stdClass $entry
+     * @param array $options
+     * @return array|null
+     */
+    public function get_edit_control(stdClass $entry, array $options): ?array {
+        $selected = $this->get_selected_option($entry);
+        // An option chosen before it was used up stays choosable.
+        $disabled = array_diff($this->get_disabled_options(), [$selected]);
+
+        return $this->edit_control('select', ['' => $selected ?: ''], $options, [
+            'choices' => self::edit_choices($this->get_ordered_labels(), $disabled),
+        ]);
     }
 }

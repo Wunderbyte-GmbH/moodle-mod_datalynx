@@ -61,7 +61,6 @@ class renderer extends datalynxfield_renderer {
 
         // Legacy entries may hold a bare "http://" prefill; show those as empty.
         $url = \datalynxfield_url\field::normalise_url((string) $url);
-        $displaylinktextfield = empty($field->field->param5) ? false : true;
         $options = [
             'title' => s($field->field->description),
             'size' => 60,
@@ -77,7 +76,7 @@ class renderer extends datalynxfield_renderer {
         $mform->setDefault("{$fieldname}_url", s($url));
 
         // Add alt name if not forcing name.
-        if (empty($field->field->param2) && $displaylinktextfield) {
+        if ($this->shows_link_text()) {
             $options = ['placeholder' => get_string('linktext', 'datalynxfield_url')];
             $group[] = $mform->createElement('text', "{$fieldname}_alt", null, $options);
             $mform->setType("{$fieldname}_alt", PARAM_TEXT);
@@ -212,5 +211,32 @@ class renderer extends datalynxfield_renderer {
         }
 
         return $errors;
+    }
+
+    /**
+     * Whether a link text is entered next to the address: it is asked for (param5) and not
+     * forced by the field (param2).
+     *
+     * @return bool
+     */
+    protected function shows_link_text(): bool {
+        return empty($this->field->field->param2) && !empty($this->field->field->param5);
+    }
+
+    /**
+     * An address, and its link text where the field asks for one.
+     *
+     * @param stdClass $entry
+     * @param array $options
+     * @return array|null
+     */
+    public function get_edit_control(stdClass $entry, array $options): ?array {
+        $fieldid = $this->field->id();
+        $values = ['url' => \datalynxfield_url\field::normalise_url((string) ($entry->{"c{$fieldid}_content"} ?? ''))];
+        if ($this->shows_link_text()) {
+            $values['alt'] = $entry->{"c{$fieldid}_content1"} ?? '';
+        }
+
+        return $this->edit_control('url', $values, $options, ['inputmode' => 'url']);
     }
 }

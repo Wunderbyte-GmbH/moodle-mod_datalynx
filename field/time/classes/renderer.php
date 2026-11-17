@@ -60,7 +60,7 @@ class renderer extends datalynxfield_renderer {
             $content = $entry->{"c{$fieldid}_content"};
         }
 
-        $includetime = empty($options['date']) && !isset($field->dateonly);
+        $includetime = $this->includes_time($options);
 
         if ($field->masked) {
             $this->render_masked_selector($mform, $entry, $content, $includetime, $options);
@@ -431,5 +431,34 @@ class renderer extends datalynxfield_renderer {
      */
     public function get_customfilter_control(): string {
         return 'daterange';
+    }
+
+    /**
+     * Whether a time of day is entered with the date: not for a date-only field or tag.
+     *
+     * @param array $options
+     * @return bool
+     */
+    protected function includes_time(array $options): bool {
+        return empty($options['date']) && !isset($this->field->dateonly);
+    }
+
+    /**
+     * A date, with the time of day unless the field or tag is date only; not for the masked
+     * selectors, which the app cannot show yet.
+     *
+     * @param stdClass $entry
+     * @param array $options
+     * @return array|null
+     */
+    public function get_edit_control(stdClass $entry, array $options): ?array {
+        if ($this->field->masked) {
+            return null;
+        }
+        $content = $entry->{"c{$this->field->id()}_content"} ?? '';
+
+        return $this->edit_control('datetime', ['' => $content ?: ''], $options, [
+            'includetime' => $this->includes_time($options),
+        ]);
     }
 }

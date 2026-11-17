@@ -99,4 +99,18 @@ class renderer extends datalynxfield_renderer {
 
         return [$arr, null];
     }
+
+    /**
+     * Nothing to enter: an entry without an identifier sends the flag that asks for one to be
+     * generated, as the entry form does, so that a new entry gets its identifier.
+     *
+     * @param stdClass $entry
+     * @param array $options
+     * @return array|null
+     */
+    public function get_edit_control(stdClass $entry, array $options): ?array {
+        $content = $entry->id > 0 ? ($entry->{"c{$this->field->id()}_content"} ?? '') : '';
+
+        return $this->edit_control('hidden', $content === '' || $content === null ? ['' => '1'] : [], $options);
+    }
 }

@@ -734,6 +734,94 @@ abstract class datalynxfield_renderer {
     }
 
     /**
+     * The control that edits this field outside the web's entry form, e.g. in the Moodle App
+     * (mod_datalynx#271).
+     *
+     * It only describes the control. What the user may see and change in an entry is decided by
+     * entry_submission_service::get_field_states(); the inputs are named and typed by the field's
+     * input contract, so their values go back through the submission service (submit_entry)
+     * unchanged.
+     *
+     * @param stdClass $entry the entry with its contents (c{fieldid}_content, ...); id < 0 for a new one
+     * @param array $options the resolved render options of the tag the field is edited under
+     * @return array|null see edit_control(); null when there is no control (the field is edited on the web)
+     */
+    public function get_edit_control(stdClass $entry, array $options): ?array {
+        return null;
+    }
+
+    /**
+     * A field shown, not edited: its display as in browse mode.
+     *
+     * @param stdClass $entry
+     * @param array $options
+     * @return array see edit_control()
+     */
+    public function get_static_control(stdClass $entry, array $options): array {
+        $html = $entry->id > 0 ? $this->render_display_mode($entry, ['edit' => false] + $options) : '';
+
+        return $this->edit_control('static', [], $options, ['html' => $html]);
+    }
+
+    /**
+     * Describe a control; each input must be one the field's input contract names.
+     *
+     * @param string $control text, number, textarea, url, select, radio, multiselect, checkbox,
+     *                        datetime, duration, toggle, hidden or static
+     * @param array $values content name, as the input contract names it ('' for the value itself) =>
+     *                      the current value: text, or a list of texts for a list input
+     * @param array $options the render options the input contract is read with
+     * @param array $extra further keys of the control: choices, multiple, inputmode, html, ...
+     * @return array ['fieldid', 'control', 'inputs' => [['name', 'list', 'value']], 'choices' =>
+     *               [['value', 'label', 'disabled']], 'multiple', ...]
+     * @throws \coding_exception for an input outside the contract
+     */
+    protected function edit_control(string $control, array $values, array $options, array $extra = []): array {
+        $contract = $this->field->get_input_contract($options);
+        $inputs = [];
+        foreach ($values as $name => $value) {
+            $name = (string) $name;
+            if (!array_key_exists($name, $contract)) {
+                throw new \coding_exception("'$name' is no input of field {$this->field->id()}.");
+            }
+            $list = is_array($contract[$name]) && array_key_exists('list', $contract[$name]);
+            $inputs[] = [
+                'name' => $name,
+                'list' => $list,
+                'value' => $list ? array_values(array_map('strval', (array) $value)) : (string) $value,
+            ];
+        }
+
+        return $extra + [
+            'fieldid' => $this->field->id(),
+            'control' => $control,
+            'inputs' => $inputs,
+            'choices' => [],
+            'multiple' => false,
+        ];
+    }
+
+    /**
+     * The choices of a control from a menu.
+     *
+     * @param array $menu value => label
+     * @param array $disabled values that cannot be chosen
+     * @return array [['value', 'label', 'disabled']]
+     */
+    protected static function edit_choices(array $menu, array $disabled = []): array {
+        $choices = [];
+        foreach ($menu as $value => $label) {
+            $choices[] = [
+                'value' => (string) $value,
+                'label' => (string) $label,
+                'disabled' => in_array((string) $value, array_map('strval', $disabled), true),
+            ];
+        }
+
+        return $choices;
+    }
+
+    /**
      * The control the Moodle App shows for this field in a custom filter (mod_datalynx#270).
      *
      * One of text, range, daterange, select, multiselect, presence, approve, status: the web and

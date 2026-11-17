@@ -293,4 +293,17 @@ class renderer extends TextRenderer {
     public function get_customfilter_control(): string {
         return 'range';
     }
+
+    /**
+     * A number.
+     *
+     * @param stdClass $entry
+     * @param array $options
+     * @return array|null
+     */
+    public function get_edit_control(stdClass $entry, array $options): ?array {
+        return $this->edit_control('number', ['' => $entry->{"c{$this->field->id()}_content"} ?? ''], $options, [
+            'inputmode' => 'decimal',
+        ]);
+    }
 }

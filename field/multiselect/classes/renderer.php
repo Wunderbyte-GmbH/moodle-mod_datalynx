@@ -56,17 +56,7 @@ class renderer extends datalynxfield_renderer {
         $required = !empty($options['required']);
         $autocomplete = $field->get('param6');
 
-        $content = !empty($entry->{"c{$fieldid}_content"}) ? $entry->{"c{$fieldid}_content"} : null;
-
-        $selected = [];
-        if ($entryid > 0 && $content) {
-            $contentprepare = str_replace("#", "", $content);
-            $selectedraw = explode(',', $contentprepare);
-
-            foreach ($selectedraw as $item) {
-                $selected[$item] = $item;
-            }
-        }
+        $selected = $this->get_selected_options($entry);
 
         // If we edit an existing entry that is not required we need a workaround.
         if ($entryid > 0 && !$required && $autocomplete) {
@@ -86,11 +76,6 @@ class renderer extends datalynxfield_renderer {
                 'html',
                 '<input type="hidden" name="' . $fieldname . '[-1]" value="-999">'
             );
-        }
-
-        // Check for default values.
-        if (!$selected && $field->get('param2')) {
-            $selected = $field->default_values();
         }
 
         // Option numbers, or their text where the tag allows adding options; the entry submission
@@ -277,5 +262,59 @@ class renderer extends datalynxfield_renderer {
      */
     public function get_customfilter_options(): array {
         return $this->format_option_labels($this->field->options_menu());
+    }
+
+
+    /**
+     * The options chosen in an entry; for an entry without any, the field's default options.
+     *
+     * @param stdClass $entry
+     * @return array option id => option id
+     */
+    protected function get_selected_options(stdClass $entry): array {
+        $field = $this->field;
+        $content = $entry->id > 0 ? ($entry->{"c{$field->id()}_content"} ?? null) : null;
+
+        $selected = [];
+        if ($content) {
+            foreach (explode(',', str_replace('#', '', $content)) as $item) {
+                $selected[$item] = $item;
+            }
+        }
+        if (!$selected && $field->get('param2')) {
+            $selected = $field->default_values();
+        }
+
+        return $selected;
+    }
+
+    /**
+     * A multiple choice is edited with a multiple select. Not where the tag lets users add
+     * options: the app has no control for that yet.
+     *
+     * @param stdClass $entry
+     * @param array $options
+     * @return array|null
+     */
+    public function get_edit_control(stdClass $entry, array $options): ?array {
+        if ($this->field->get_input_contract($options)['']['list'] !== PARAM_INT) {
+            return null;
+        }
+
+        $selected = array_values($this->get_selected_options($entry));
+
+        return $this->edit_control($this->get_edit_control_name(), ['' => $selected], $options, [
+            'choices' => self::edit_choices($this->format_option_labels($this->field->options_menu())),
+            'multiple' => true,
+        ]);
+    }
+
+    /**
+     * The name of the control: multiselect, or checkbox for checkboxes.
+     *
+     * @return string
+     */
+    protected function get_edit_control_name(): string {
+        return 'multiselect';
     }
 }

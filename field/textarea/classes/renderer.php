@@ -165,4 +165,15 @@ class renderer extends datalynxfield_renderer {
         }
         return null;
     }
+
+    /**
+     * Several lines of text.
+     *
+     * @param stdClass $entry
+     * @param array $options
+     * @return array|null
+     */
+    public function get_edit_control(stdClass $entry, array $options): ?array {
+        return $this->edit_control('textarea', ['' => $entry->{"c{$this->field->id()}_content"} ?? ''], $options);
+    }
 }

@@ -72,4 +72,15 @@ class renderer extends datalynxfield_renderer {
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options): void {
         // Not editable.
     }
+
+    /**
+     * The grade is shown, not entered.
+     *
+     * @param stdClass $entry
+     * @param array $options
+     * @return array|null
+     */
+    public function get_edit_control(stdClass $entry, array $options): ?array {
+        return $this->get_static_control($entry, $options);
+    }
 }
