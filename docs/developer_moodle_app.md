@@ -129,8 +129,8 @@ activity, and the app's `core-format-text` fetches them with the user's token.
 
 | Kind | Where |
 |---|---|
-| PHPUnit | `tests/output/mobile_test.php`, `tests/external/*` (one per service), `tests/local/mobile/*` (links: `app_links_test.php`), `tests/local/field/edit_control_test.php` |
-| App acceptance (Behat `@app`) | `tests/behat/app_browse.feature`, `app_customfilter.feature`, `app_edit.feature`, `app_delete.feature`, `app_approve.feature`, `app_navigation.feature` |
+| PHPUnit | `tests/output/mobile_test.php`, `tests/output/mobile_edit_template_test.php` (entry template around the inputs), `tests/external/*` (one per service), `tests/local/mobile/*` (links: `app_links_test.php`), `tests/local/field/edit_control_test.php` |
+| App acceptance (Behat `@app`) | `tests/behat/app_browse.feature`, `app_customfilter.feature`, `app_edit.feature`, `app_delete.feature`, `app_approve.feature`, `app_navigation.feature`, `app_edit_template.feature` |
 
 The `@app` features need the plugin `local_moodleappbehat` in the Moodle root (same version as the
 app) and an app container; see

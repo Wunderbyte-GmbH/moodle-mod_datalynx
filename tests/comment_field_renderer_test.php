@@ -70,6 +70,32 @@ final class comment_field_renderer_test extends advanced_testcase {
     }
 
     /**
+     * In the Moodle App (pagecontrols => false) the comment widget, which needs the web page's
+     * JavaScript, is replaced by the number of comments; the web keeps the widget.
+     *
+     * @covers \datalynxfield_comment\renderer::replacements
+     */
+    public function test_app_shows_comment_count_instead_of_widget(): void {
+        global $PAGE;
+
+        $course = $this->getDataGenerator()->create_course();
+        $instance = $this->getDataGenerator()->create_module('datalynx', ['course' => $course->id]);
+        $dlx = new datalynx($instance->id);
+        $fieldrecord = comment_field::get_field_objects($dlx->id())[comment_field::_COMMENT];
+        $renderer = (new comment_field($dlx, $fieldrecord))->renderer();
+        $PAGE = new moodle_page();
+        $entry = (object) ['id' => 42];
+
+        $app = $renderer->replacements(['##comments##', '##comments:add##'], $entry, ['pagecontrols' => false]);
+        foreach ($app as $replacement) {
+            $this->assertSame('<span class="datalynx-comments-count">Comments (0)</span>', $replacement[1]);
+        }
+
+        $web = $renderer->replacements(['##comments##'], $entry, []);
+        $this->assertStringNotContainsString('datalynx-comments-count', $web['##comments##'][1]);
+    }
+
+    /**
      * Every placeholder must occur exactly once in the comment template.
      *
      * M.core_comment.render() in comment/comment.js substitutes them with

@@ -68,6 +68,18 @@ final class html_sanitiser_test extends basic_testcase {
     }
 
     /**
+     * A fixed minimum width of the web layout is dropped from the inline style; other declarations stay.
+     */
+    public function test_drops_min_width_from_inline_styles(): void {
+        $this->assertSame('<div>Label</div>', html_sanitiser::for_app('<div style="min-width:230px;">Label</div>'));
+        $this->assertSame(
+            '<div class="x" style="color:red; width:5px">V</div>',
+            html_sanitiser::for_app('<div class="x" style="color:red; MIN-WIDTH: 10em; width:5px">V</div>')
+        );
+        $this->assertSame('<p style="max-width:620px;">T</p>', html_sanitiser::for_app('<p style="max-width:620px;">T</p>'));
+    }
+
+    /**
      * Non-ASCII text survives, and a fragment comes back as a fragment.
      */
     public function test_keeps_utf8_text_and_fragments(): void {

@@ -20,6 +20,7 @@ use core_date;
 use DateTime;
 use mod_datalynx\local\datalynx_entries;
 use mod_datalynx\local\filter\datalynx_filter;
+use mod_datalynx\local\mobile\app_links;
 use mod_datalynx\local\view\base;
 use moodle_url;
 use stdClass;
@@ -40,11 +41,17 @@ use stdClass;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class entry_edit_form {
+    /** @var string Marks the place of a control in the rendered entry template (index into the fields). */
+    const FIELDMARKER = '@@DLXAPPFIELD%d@@';
+
     /** @var string The prefix of a form input: ef_{fieldid}__{input name}. */
     const PREFIX = 'ef_';
 
     /** @var base */
     private base $view;
+
+    /** @var array field id => [prefix, suffix] of the field layout of its edit tag, see build() */
+    private array $layouts = [];
 
     /**
      * Constructor.
@@ -108,6 +115,7 @@ final class entry_edit_form {
             $renderer = $field->renderer();
             $name = format_string($field->name(), true, ['context' => $dlx->context]);
             if ($state['editable']) {
+                $this->layouts[(string) $fieldid] = $renderer->get_edit_layout((string) ($state['tags'][0] ?? ''));
                 $control = $renderer->get_edit_control($entry, $state['options']);
                 if ($control === null) {
                     $form['unsupportedfields'][] = $name;
@@ -220,6 +228,95 @@ final class entry_edit_form {
         $date = (new DateTime('@' . $value))->setTimezone(core_date::get_user_timezone_object());
 
         return $date->format($includetime ? 'Y-m-d\TH:i' : 'Y-m-d');
+    }
+
+    /**
+     * The entry template of the view as the Moodle App shows it around the inputs of the form.
+     *
+     * The template is rendered as the app lists an entry (action tags empty, links through
+     * app_links), with a marker in place of the tags of each field the form has a control for.
+     * Cut at the markers it gives the parts in order: HTML, links to other views and the place of
+     * each control. A field whose tag appears more than once gets its control at the first one; a
+     * control without a tag in the template (none so far) follows at the end. Without an entry
+     * template, or when it cannot be rendered, the parts are only the controls, as before.
+     *
+     * @param array $form see build()
+     * @return array parts, each with html (string), isfield (bool), field (index into
+     *               $form['fields'], -1 for none) and label (the question of the field's layout, or
+     *               ''), and a link part with link (see app_links::parts())
+     */
+    public function parts(array $form): array {
+        global $USER;
+
+        $controls = [];
+        foreach ($form['fields'] as $index => $control) {
+            $controls[(string) $control['fieldid']] = $index;
+        }
+        $labels = [];
+        $fieldpart = function (int $index) use (&$labels): array {
+            return ['html' => '', 'entries' => false, 'isfield' => true, 'field' => $index, 'label' => $labels[$index] ?? ''];
+        };
+        $onlycontrols = array_map($fieldpart, array_keys($form['fields']));
+        if (!$form['allowed'] || trim((string) ($this->view->view->param2 ?? '')) === '') {
+            return $onlycontrols;
+        }
+
+        // The field layout around an input: the text before it (the question) labels the app's
+        // input, the HTML after it follows the input. A layout without text before the input
+        // keeps its HTML and the field name stays the label.
+        $markers = [];
+        foreach ($controls as $fieldid => $index) {
+            [$prefix, $suffix] = $this->layouts[$fieldid] ?? ['', ''];
+            $label = trim(preg_replace('/\s+/u', ' ', html_entity_decode(strip_tags($prefix), ENT_QUOTES | ENT_HTML5, 'UTF-8')));
+            if ($label !== '') {
+                $labels[$index] = $label;
+                $prefix = '';
+            }
+            $markers[$fieldid] = $prefix . sprintf(self::FIELDMARKER, $index) . $suffix;
+        }
+        $entry = $this->load_entry($form['formentryid']);
+        if (!$entry) {
+            return $onlycontrols;
+        }
+        if ($entry->id < 0) {
+            $entry->userid = (int) $USER->id;
+            $entry->groupid = 0;
+            $entry->approved = 0;
+            $entry->timecreated = $entry->timemodified = time();
+        }
+        $links = new app_links($this->view->get_dlx());
+        try {
+            $html = $this->view->render_entry_html(
+                $entry,
+                ['edit' => false, 'manage' => false] + $links->render_options(),
+                $markers
+            );
+        } catch (\Throwable $e) {
+            debugging('Entry template not rendered for the app: ' . $e->getMessage(), DEBUG_DEVELOPER);
+            return $onlycontrols;
+        }
+
+        $marker = str_replace('%d', '(\d+)', preg_quote(self::FIELDMARKER, '/'));
+        $pieces = preg_split('/' . $marker . '/', $html, -1, PREG_SPLIT_DELIM_CAPTURE);
+        $parts = [];
+        $placed = [];
+        foreach ($pieces as $i => $piece) {
+            if ($i % 2 === 0) {
+                foreach ($links->parts($piece) as $part) {
+                    $parts[] = $part + ['isfield' => false, 'field' => -1, 'label' => ''];
+                }
+            } else if (!isset($placed[(int) $piece]) && isset($form['fields'][(int) $piece])) {
+                $placed[(int) $piece] = true;
+                $parts[] = $fieldpart((int) $piece);
+            }
+        }
+        foreach (array_keys($form['fields']) as $index) {
+            if (!isset($placed[$index])) {
+                $parts[] = $fieldpart($index);
+            }
+        }
+
+        return $parts;
     }
 
     /**

@@ -998,6 +998,37 @@ class behat_mod_datalynx extends behat_base {
     }
 
     /**
+     * Creates field layouts directly for the specified datalynx instance.
+     *
+     * Table columns: name, edittemplate (HTML with #input) and displaytemplate (HTML with #value,
+     * optional). The other templates keep the defaults of a new layout. A tag uses a layout as
+     * [[field||layoutname]].
+     *
+     * @Given /^the "(?P<activityname_string>(?:[^"]|\\")*)" datalynx has the following field layouts:$/
+     *
+     * @param string $activityname
+     * @param TableNode $table
+     */
+    public function the_datalynx_has_the_following_field_layouts($activityname, TableNode $table): void {
+        global $DB;
+
+        $dataid = $DB->get_field('datalynx', 'id', ['name' => $activityname], MUST_EXIST);
+        foreach ($table->getHash() as $row) {
+            $DB->insert_record('datalynx_renderers', (object) [
+                'dataid' => $dataid,
+                'name' => $row['name'],
+                'description' => '',
+                'notvisibletemplate' => \mod_datalynx\local\field\datalynxfield_layout::NOT_VISIBLE_SHOW_NOTHING,
+                'displaytemplate' => ($row['displaytemplate'] ?? '') !== ''
+                    ? $row['displaytemplate'] : \mod_datalynx\local\field\datalynxfield_layout::DISPLAY_MODE_TEMPLATE_NONE,
+                'novaluetemplate' => \mod_datalynx\local\field\datalynxfield_layout::NO_VALUE_SHOW_NOTHING,
+                'edittemplate' => $row['edittemplate'],
+                'noteditabletemplate' => \mod_datalynx\local\field\datalynxfield_layout::NOT_EDITABLE_SHOW_AS_DISPLAY_MODE,
+            ]);
+        }
+    }
+
+    /**
      * Sets the entry template (param2) of a named view directly.
      *
      * @Given /^the "(?P<viewname_string>(?:[^"]|\\")*)" view of "(?P<activityname_string>(?:[^"]|\\")*)" datalynx has the entry template "(?P<template_string>(?:[^"]|\\")*)"$/

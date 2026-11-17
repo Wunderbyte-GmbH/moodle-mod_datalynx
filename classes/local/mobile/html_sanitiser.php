@@ -100,7 +100,9 @@ final class html_sanitiser {
     }
 
     /**
-     * Drop event handler attributes and script URLs from one element.
+     * Drop event handler attributes and script URLs from one element, and fixed minimum widths
+     * from its inline style: a web layout's min-width (e.g. a label column of 230px) leaves the
+     * rest of a phone screen too narrow and cannot be overridden by the app's stylesheet.
      *
      * @param DOMElement $element
      */
@@ -108,7 +110,14 @@ final class html_sanitiser {
         $remove = [];
         foreach ($element->attributes as $attribute) {
             $name = strtolower($attribute->nodeName);
-            if (str_starts_with($name, 'on')) {
+            if ($name === 'style' && stripos($attribute->nodeValue, 'min-width') !== false) {
+                $style = trim(preg_replace('/(^|;)\s*min-width\s*:[^;]*;?/i', '$1', $attribute->nodeValue), " ;");
+                if ($style === '') {
+                    $remove[] = $attribute->nodeName;
+                } else {
+                    $element->setAttribute($attribute->nodeName, $style);
+                }
+            } else if (str_starts_with($name, 'on')) {
                 $remove[] = $attribute->nodeName;
             } else if (in_array($name, self::URLATTRIBUTES, true) && self::is_script_url($attribute->nodeValue)) {
                 $remove[] = $attribute->nodeName;

@@ -98,3 +98,99 @@
     margin-top: 0.25em;
     margin-bottom: 0.25em;
 }
+/* Bootstrap badges (e.g. the steps of a form) have no style of their own in the app, so their
+   text did not show; give them the look of a light pill, primary where the web has primary. */
+.mod-datalynx-mobile .badge {
+    display: inline-block;
+    margin: 0 0.25em 0.25em 0;
+    padding: 0.35em 0.65em;
+    border-radius: 1em;
+    background: var(--ion-color-light);
+    color: var(--ion-color-light-contrast);
+    font-size: 0.75em;
+    font-weight: bold;
+    line-height: 1.2;
+    white-space: normal;
+}
+.mod-datalynx-mobile .badge.badge-primary,
+.mod-datalynx-mobile .badge.bg-primary {
+    background: var(--ion-color-primary);
+    color: var(--ion-color-primary-contrast);
+}
+/* The entry template around the inputs of the entry form. */
+.mod-datalynx-mobile .mod-datalynx-mobile-template {
+    display: block;
+    padding-top: 0.5em;
+}
+/* Muted texts (labels of the value rows, hints) came out almost white: the app colours
+   .text-secondary with the Ionic secondary colour (light grey) and !important; the colour variables
+   it reads are set to a readable grey on those elements of the author's templates. */
+.mod-datalynx-mobile .mod-datalynx-mobile-entry .text-secondary,
+.mod-datalynx-mobile .mod-datalynx-mobile-section .text-secondary {
+    --ion-color-secondary: var(--ion-color-step-650, #595959);
+    --bs-secondary-rgb: 89, 89, 89;
+}
+.mod-datalynx-mobile .mod-datalynx-mobile-entry .text-muted,
+.mod-datalynx-mobile .mod-datalynx-mobile-section .text-muted {
+    color: var(--ion-color-step-650, #595959);
+}
+/* Label and value rows: the label takes its own width and the value moves below when needed (fixed
+   widths of the web, style="min-width:...", are removed for the app by html_sanitiser). */
+.mod-datalynx-mobile .mod-datalynx-mobile-entry .d-flex,
+.mod-datalynx-mobile .mod-datalynx-mobile-section .d-flex,
+.mod-datalynx-mobile .mod-datalynx-mobile-template .d-flex {
+    flex-wrap: wrap;
+    column-gap: 0.5em;
+}
+/* The stepper of a radio button field (display format stepper) as a compact list of steps. */
+.mod-datalynx-mobile .datalynx-stepper {
+    flex-direction: column;
+    margin: 0.5em 0;
+    padding: 0;
+    list-style: none;
+}
+.mod-datalynx-mobile .datalynx-stepper .step {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    margin: 0.25em 0;
+    text-align: left;
+}
+.mod-datalynx-mobile .datalynx-stepper .step-icon-wrap {
+    flex: 0 0 auto;
+}
+.mod-datalynx-mobile .datalynx-stepper .step-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75em;
+    height: 1.75em;
+    border: 2px solid var(--ion-color-step-300, #b3b3b3);
+    border-radius: 50%;
+    font-size: 0.8em;
+    font-weight: bold;
+}
+.mod-datalynx-mobile .datalynx-stepper .step.completed .step-icon {
+    border-color: var(--ion-color-primary);
+    background: var(--ion-color-primary);
+    color: var(--ion-color-primary-contrast);
+}
+.mod-datalynx-mobile .datalynx-stepper .step.completed .step-title {
+    color: var(--ion-color-primary);
+    font-weight: 600;
+}
+.mod-datalynx-mobile .datalynx-stepper .step.special .step-icon {
+    border-width: 3px;
+    border-color: var(--ion-color-warning);
+}
+.mod-datalynx-mobile .datalynx-stepper .step-status {
+    color: #8a5a00;
+    font-size: 0.85em;
+    font-weight: 600;
+}
+/* Labels of the entry form (often a whole question from the field layout) wrap instead of being cut off. */
+.mod-datalynx-mobile-edit .mod-datalynx-mobile-label {
+    margin-bottom: 0.35em;
+    line-height: 1.3;
+    white-space: normal;
+}

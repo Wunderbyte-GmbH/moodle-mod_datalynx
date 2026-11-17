@@ -176,6 +176,15 @@ class mobile {
             }
         }
 
+        // The entry template around the inputs, as on the web; an input whose
+        // field layout asks a question before it is labelled with that question.
+        $parts = $builder->parts($form);
+        foreach ($parts as $part) {
+            if ($part['isfield'] && $part['label'] !== '') {
+                $form['fields'][$part['field']]['name'] = $part['label'];
+            }
+        }
+
         $html = $OUTPUT->render_from_template('mod_datalynx/mobile/edit_entry', [
             'cmid' => (int) $cm->id,
             'courseid' => (int) $cm->course,
@@ -187,6 +196,7 @@ class mobile {
             ],
             'javascript' => '',
             'otherdata' => self::otherdata(self::edit_state($form) + [
+                'parts' => $parts,
                 'viewid' => (int) $args->viewid,
                 'saved' => $saved,
                 'message' => $message,

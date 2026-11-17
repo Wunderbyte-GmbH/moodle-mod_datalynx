@@ -55,8 +55,20 @@ class renderer extends datalynxfield_renderer {
         $dlxid = $this->field->dlx()->id();
 
         if ($entry->id > 0 && !empty($CFG->usecomments)) {
+            // A client without the web page (the Moodle App, render option pagecontrols => false)
+            // cannot run the comment widget; it shows the number of comments instead.
+            $webpage = $options['pagecontrols'] ?? true;
             foreach ($tags as $tag) {
                 $stripped = trim($tag, '@');
+
+                if (!$webpage && ($stripped === '##comments##' || strpos($stripped, '##comments:') === 0)) {
+                    $count = $this->display_browse($entry, ['count' => true]);
+                    $replacements[$tag] = ['html', \html_writer::span(
+                        get_string('commentscount', 'moodle', $count),
+                        'datalynx-comments-count'
+                    )];
+                    continue;
+                }
 
                 if ($stripped === '##comments##') {
                     $str = $this->display_browse($entry);

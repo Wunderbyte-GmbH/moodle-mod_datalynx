@@ -124,6 +124,11 @@ The settings of the view and its field behaviors apply, just as in the web form:
 - read-only fields are shown as text;
 - required fields are marked with `*` and must be filled in.
 
+The form looks like the view's **entry template**: its headings, step badges, hints and info boxes
+are shown, and each input stands where its field tag is. Where a field layout puts a question
+before `#input`, that question is the label of the input (otherwise the field name is). Controls
+of the web page, such as `##edit##` or `##reset##`, are left out; comments show their number.
+
 These field types can be edited in the app:
 
 | Field type | Control in the app |

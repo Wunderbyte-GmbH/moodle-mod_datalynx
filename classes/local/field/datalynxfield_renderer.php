@@ -265,6 +265,24 @@ abstract class datalynxfield_renderer {
     }
 
     /**
+     * The HTML a tag's field layout puts before and after the input in edit mode, e.g. the label of
+     * the question; empty strings where the layout has no edit template with #input.
+     *
+     * @param string $tag the field tag, e.g. [[name|behavior|layout]]
+     * @return string[] [prefix, suffix]
+     */
+    public function get_edit_layout(string $tag): array {
+        [, , $layout] = $this->process_tag($tag);
+        $template = $layout ? $layout->get_edit_template() : null;
+        if (!is_string($template) || strpos($template, '#input') === false) {
+            return ['', ''];
+        }
+        [$prefix, $suffix] = explode('#input', (string) $this->filter_layout_template($template), 2);
+
+        return [$prefix, $suffix];
+    }
+
+    /**
      * Run a custom field layout template through the content filters (multilang, ...).
      *
      * View templates are filtered before their tags are substituted, so a layout template that is

@@ -2363,10 +2363,17 @@ abstract class base {
      *
      * @param stdClass $entry Entry record.
      * @param array $options Rendering options.
+     * @param array $fieldhtml field id => HTML that takes the place of every tag of that field
+     *        (the Moodle App puts a marker there and shows its own input at the marker)
      * @return string
      */
-    public function render_entry_html(stdClass $entry, array $options = []): string {
+    public function render_entry_html(stdClass $entry, array $options = [], array $fieldhtml = []): string {
         $fielddefinitions = $this->get_entry_tag_replacements($entry, $options);
+        foreach ($fieldhtml as $fieldid => $html) {
+            foreach ($this->tags['field'][$fieldid] ?? [] as $tag) {
+                $fielddefinitions[$tag] = ['html', $html];
+            }
+        }
         $elements = $this->entry_definition($fielddefinitions);
         $html = '';
 
