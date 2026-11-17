@@ -82,8 +82,13 @@ final class edit_control_test extends advanced_testcase {
             $this->ids[$name] = $this->add_mobile_field($dlx, $type, $name, $params);
             $tags[] = "[[$name]]";
         }
-        $this->viewid = $this->add_mobile_view($dlx, 'grid', 'Edit', implode(' ', $tags) . ' ##status## ##edit##',
-            ['section' => '##addnewentry## ##entries##']);
+        $this->viewid = $this->add_mobile_view(
+            $dlx,
+            'grid',
+            'Edit',
+            implode(' ', $tags) . ' ##status## ##edit##',
+            ['section' => '##addnewentry## ##entries##']
+        );
 
         $this->entryid = $this->add_mobile_entry($dlx, $USER->id, [
             $this->ids['Title'] => 'Apple',
@@ -99,8 +104,12 @@ final class edit_control_test extends advanced_testcase {
             $this->ids['Length'] => '5400',
             $this->ids['Code'] => 'ABC123',
         ]);
-        $DB->set_field('datalynx_contents', 'content1', 'Apple site',
-            ['entryid' => $this->entryid, 'fieldid' => $this->ids['Link']]);
+        $DB->set_field(
+            'datalynx_contents',
+            'content1',
+            'Apple site',
+            ['entryid' => $this->entryid, 'fieldid' => $this->ids['Link']]
+        );
         $DB->set_field('datalynx_entries', 'status', 1, ['id' => $this->entryid]);
         $this->dlx = new datalynx($dlx->id());
     }
@@ -157,8 +166,10 @@ final class edit_control_test extends advanced_testcase {
         $this->assertSame('email', $c['Mail']['inputmode']);
         $this->assertSame(['number', '3.5'], [$c['Count']['control'], $value('Count')]);
         $this->assertSame(['textarea', "Line one\nLine two"], [$c['Notes']['control'], $value('Notes')]);
-        $this->assertSame(['url', 'https://example.com/apple', 'Apple site'],
-            [$c['Link']['control'], $value('Link', 'url'), $value('Link', 'alt')]);
+        $this->assertSame(
+            ['url', 'https://example.com/apple', 'Apple site'],
+            [$c['Link']['control'], $value('Link', 'url'), $value('Link', 'alt')]
+        );
 
         $this->assertSame(['select', '2'], [$c['Colour']['control'], $value('Colour')]);
         $this->assertSame(['Red', 'Green', 'Blue'], array_column($c['Colour']['choices'], 'label'));
@@ -217,8 +228,10 @@ final class edit_control_test extends advanced_testcase {
 
         $this->assertTrue($result['status'], json_encode($result));
         $this->assertSame([], $changed);
-        $this->assertEquals($before,
-            $DB->get_records('datalynx_contents', ['entryid' => $this->entryid], 'fieldid', 'fieldid, content, content1'));
+        $this->assertEquals(
+            $before,
+            $DB->get_records('datalynx_contents', ['entryid' => $this->entryid], 'fieldid', 'fieldid, content, content1')
+        );
         $this->assertEquals(1, $DB->get_field('datalynx_entries', 'status', ['id' => $this->entryid]));
     }
 
