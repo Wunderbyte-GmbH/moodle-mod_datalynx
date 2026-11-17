@@ -40,7 +40,7 @@ $addons = [
                 'method' => 'mobile_course_view',
                 'styles' => [
                     'url' => $CFG->wwwroot . '/mod/datalynx/mobileapp/styles.css',
-                    'version' => 4,
+                    'version' => 5,
                 ],
             ],
         ],
