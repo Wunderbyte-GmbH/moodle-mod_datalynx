@@ -67,12 +67,12 @@ final class entries_payload_builder_test extends advanced_testcase {
 
         $this->assertCount(1, $payload['entries']);
         $entry = $payload['entries'][0];
-        $this->assertStringContainsString('Hello', $entry['html']);
-        $this->assertStringContainsString('Notes text', $entry['html']);
+        $this->assertStringContainsString('Hello', implode('', array_column($entry['parts'], 'html')));
+        $this->assertStringContainsString('Notes text', implode('', array_column($entry['parts'], 'html')));
         $this->assertSame('Hello', $entry['title']);
         $this->assertTrue($entry['canedit']);
         $this->assertTrue($entry['candelete']);
-        $texts = array_merge([$entry['html']], array_column($entry['fields'], 'valuehtml'));
+        $texts = array_merge([implode('', array_column($entry['parts'], 'html'))], array_column($entry['fields'], 'valuehtml'));
         foreach ($texts as $html) {
             foreach (self::FORBIDDEN as $needle) {
                 $this->assertStringNotContainsStringIgnoringCase($needle, $html);

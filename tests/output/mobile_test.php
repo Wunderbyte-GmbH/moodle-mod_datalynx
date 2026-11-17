@@ -99,7 +99,7 @@ final class mobile_test extends advanced_testcase {
         $this->assertSame((int) $course->id, $data['courseid']);
         $this->assertStringContainsString('Find a ride', $data['intro']);
         $this->assertSame([$entryid], array_column($data['entries'], 'id'));
-        $this->assertStringContainsString('Wien → Graz', $data['entries'][0]['html']);
+        $this->assertStringContainsString('Wien → Graz', implode('', array_column($data['entries'][0]['parts'], 'html')));
         $this->assertSame(mobile::PERPAGE, $data['perpage']);
         $this->assertFalse($data['cangrow']);
     }

@@ -24,10 +24,11 @@ the same view offers it on the web.
 | **Search** | The view does not force its filter | The same quick search as on the web |
 | **Switch filter** | The view does not force its filter and saved filters exist | Respects **Permitted filters** of the view |
 | **Custom filter** | The view contains `##customfilter:NAME##` | Shown as chips above the entries; tap to open the form |
-| **Add an entry** | The view contains `##addnewentry##` or `##addnewentries##`, and the user may add entries | The entry limit of the activity applies |
+| **Add an entry** | The view contains `##addnewentry##` or `##addnewentries##`, and the user may add entries | The button appears where the tag is; the entry limit of the activity applies |
 | **Edit an entry** | The view contains `##edit##`, and the user may edit the entry | See *Editing in the app* below |
 | **Delete an entry** | The view contains `##delete##`, and the user may delete the entry | Asks for confirmation; one entry at a time |
 | **Approve an entry** | Approval is on, the user may approve, and the view contains `##approve##` | Buttons **Approve** and **Withdraw approval** |
+| **Follow a link to another view** | The view contains `##viewlink:…##` or `##viewsesslink:…##` | Opens in the app; see *Links between views* below |
 | **Open files and images** | The view shows file or picture fields | Files open in the app; images are shown in the entry |
 
 Rights are checked by the server, exactly as on the web. A student who cannot edit an entry on the
@@ -48,6 +49,18 @@ web cannot edit it in the app either.
 > learners can see it.
 
 ---
+
+## How a view looks in the app
+
+The app shows the view's **view template** with its text, headings and cards. The entries are
+listed where the template has `##entries##`. A view whose template has no `##entries##` lists no
+entries, just like on the web. Such a view works as a start page of buttons (see
+*Links between views*).
+
+The web page's own controls are not shown in the template, because the app has its own controls
+above the view. These are the view and filter menus, quick search, entries per page, the paging
+bar, custom filter forms and the bulk actions. The app offers search, filters and custom filters
+only on views that list entries.
 
 ## How entries look in the app
 
@@ -70,6 +83,35 @@ with the name of each field above its value.
 
 The app loads 20 entries at a time and loads more as the user scrolls, up to 200. If a search
 finds more entries than that, the app offers **Open in browser**.
+
+---
+
+## Links between views
+
+Activities built of several views, such as the Mitfahrbörse, link their views with
+`##viewlink:…##` and `##viewsesslink:…##`. In the app each of these links is a button that opens
+in the app. The rules are the same as on the web: the user must be able to see the target view,
+and a link with `new=1` is only offered to users who may add entries.
+
+| The link's URL query | Opens in the app |
+|---|---|
+| empty, `filter=…`, `eids=…` | The target view as a list. The filter is applied if the target view offers it. |
+| `new=1` | The form of the target view for a new entry |
+| `editentries=##entryid##` (one entry) | The form of the target view for that entry |
+| anything else, e.g. `delete=…` | The web page, in the browser |
+
+A link to a view type the app cannot show (for example CSV or PDF) opens in the browser.
+`##addnewentry##` becomes the **Add a new entry** button at its place in the template.
+
+How the button looks follows the link's CSS classes. `btn btn-primary` gives a filled button,
+`btn-outline-…` an outlined one, and `w-100` makes it full width. Links without button classes
+look like links.
+
+Use the **back** arrow of the app to return to the previous view.
+
+> **Pro-Tip**  
+> A start page with one card per task and a button in each card (as in the Mitfahrbörse) works well
+> on a phone. In the app each button appears directly below the text of its card.
 
 ---
 
@@ -132,6 +174,7 @@ location and itinerary can only be searched on the web; the app names them under
 |---|---|
 | Build at least one **Grid** view that learners can see | Other view types open in the browser |
 | Put the action tags (`##edit##`, `##delete##`, `##approve##`, `##addnewentry##`) in the view | The app offers exactly the actions the view offers |
+| Link views with `##viewlink##` and `##viewsesslink##` using `new=1`, `editentries=`, `eids=` or `filter=` | These links stay in the app |
 | Keep the entry template simple: headings, short paragraphs, a few fields | Phones are about 375 px wide |
 | Avoid fixed widths in inline styles (`style="width: 600px"`) | Fixed widths make the page scroll sideways |
 | Do not rely on JavaScript or forms inside the entry template | They are removed in the app |
@@ -149,7 +192,8 @@ location and itinerary can only be searched on the web; the app names them under
 | No **Approve** button | Approval is off, the view lacks `##approve##`, or the user may not approve | Check the activity's approval setting and the view template |
 | The form only offers **Open in browser** | A required field cannot be edited in the app | Make the field optional for this view, or edit on the web |
 | A new entry does not appear after saving | The list does not update by itself | Go back and pull down to refresh |
-| Search and filters are missing | The view forces its filter | See *Permitted filters* in [Views](user_guide_views.md) |
+| Search and filters are missing | The view forces its filter, or its template has no `##entries##` | See *Permitted filters* in [Views](user_guide_views.md) |
+| A link opens the browser | The link's URL query has a parameter the app does not handle, or the target view is not a Grid or Tabular view | See *Links between views* |
 | New buttons or texts are missing after a Datalynx update | The app keeps the plugin's app definition for a while | An administrator purges all caches; users pull down to refresh, or log out and in again |
 
 ---

@@ -139,9 +139,11 @@ class get_mobile_entries extends external_api {
             'entriesfiltercount' => new external_value(PARAM_INT, 'Entries matching the filter'),
             'hasmore' => new external_value(PARAM_BOOL, 'Whether more entries match than this page holds'),
             'canadd' => new external_value(PARAM_BOOL, 'Whether the user may add an entry through this view'),
+            'section' => self::parts_structure('The view template around the entries'),
+            'listsentries' => new external_value(PARAM_BOOL, 'Whether the view template lists the entries'),
             'entries' => new external_multiple_structure(new external_single_structure([
                 'id' => new external_value(PARAM_INT, 'Entry ID'),
-                'html' => new external_value(PARAM_RAW, 'The entry rendered with the view entry template, empty if none'),
+                'parts' => self::parts_structure('The entry rendered with the view entry template, empty if none'),
                 'title' => new external_value(PARAM_RAW, 'Plain text of the first field with a value, empty if none'),
                 'fields' => new external_multiple_structure(new external_single_structure([
                     'fieldid' => new external_value(PARAM_INT, 'Field ID'),
@@ -183,5 +185,30 @@ class get_mobile_entries extends external_api {
             'emptycontent' => new external_value(PARAM_TEXT, 'Text to show when there are no entries'),
             'warnings' => new external_warnings(),
         ]);
+    }
+
+    /**
+     * Rendered HTML cut at its links to other views (see \mod_datalynx\local\mobile\app_links).
+     *
+     * @param string $desc
+     * @return external_multiple_structure
+     */
+    private static function parts_structure(string $desc): external_multiple_structure {
+        return new external_multiple_structure(new external_single_structure([
+            'html' => new external_value(PARAM_RAW, 'HTML, empty for a link or the entries'),
+            'entries' => new external_value(PARAM_BOOL, 'Whether the entries are listed here'),
+            'link' => new external_single_structure([
+                'label' => new external_value(PARAM_TEXT, 'Link text'),
+                'title' => new external_value(PARAM_TEXT, 'Name of the target view'),
+                'method' => new external_value(PARAM_ALPHANUMEXT, 'App content method to open, empty to open url in the browser'),
+                'viewid' => new external_value(PARAM_INT, 'Target view ID'),
+                'entryid' => new external_value(PARAM_INT, 'Entry to edit, 0 for a new entry'),
+                'filterid' => new external_value(PARAM_INT, 'Saved filter to apply, 0 for the view filter'),
+                'eids' => new external_value(PARAM_SEQUENCE, 'Entries to list, empty for all'),
+                'url' => new external_value(PARAM_URL, 'The target on the web'),
+                'fill' => new external_value(PARAM_ALPHA, 'Button fill: solid, outline or clear'),
+                'expand' => new external_value(PARAM_BOOL, 'Whether the button takes the full width'),
+            ], 'A link to another view; missing for HTML and the entries', VALUE_OPTIONAL),
+        ]), $desc);
     }
 }

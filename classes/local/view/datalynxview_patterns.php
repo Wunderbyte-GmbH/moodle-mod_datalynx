@@ -29,6 +29,7 @@ use html_writer;
 use moodle_url;
 use paging_bar;
 use single_select;
+use stdClass;
 
 /**
  * Base class for view patterns
@@ -188,7 +189,9 @@ class datalynxview_patterns {
      *
      * @param array $tags array of tags with tagname as value and tagname or number as key
      * @param null $entry
-     * @param array $options options like pluginfileurl, entriescount, entriesfiltercount, hidenewentry, baseurl
+     * @param array $options options like pluginfileurl, entriescount, entriesfiltercount, hidenewentry, baseurl;
+     *        linkrenderer (callable) renders the links to views (see render_view_link()), and
+     *        pagecontrols => false leaves out the controls that only work on the web page
      * @return array of strings key: tagname, value:the string that replaces the tag
      */
     public function get_replacements($tags = null, $entry = null, array $options = []): array {
@@ -204,10 +207,22 @@ class datalynxview_patterns {
         $options['filter'] = $view->get_filter();
         $options['baseurl'] = new moodle_url($view->get_navigationurl(), ['sesskey' => sesskey()]);
 
+        // A client that shows the view outside its web page (the Moodle App) has its own controls
+        // for these; on that page they would be forms and links that only work on the web.
+        $pagecontrols = $options['pagecontrols'] ?? true;
+        $webonly = $pagecontrols ? [] : array_merge(
+            ['##viewsmenu##', '##filtersmenu##'],
+            $userpref,
+            array_diff($actions, ['##addnewentry##', '##addnewentries##']),
+            $paging
+        );
+
         $replacements = [];
         foreach ($tags as $tag) {
             if ($tag == '##entries##') {
                 $replacements[$tag] = '##entries##';
+            } else if (in_array($tag, $webonly) || (!$pagecontrols && strpos($tag, '##customfilter') === 0)) {
+                $replacements[$tag] = '';
             } else {
                 if (in_array($tag, $info)) {
                     $replacements[$tag] = $this->get_info_replacements($tag, $entry, $options);
@@ -249,80 +264,9 @@ class datalynxview_patterns {
      * @return string
      */
     protected function get_regexp_replacements($tag, $entry = null, ?array $options = null): string {
-        global $OUTPUT;
-
-        $dlx = $this->view->get_dlx();
-        $currentview = $dlx->get_current_view();
-
-        $views = $this->get_cached_named_views();
-        if ($views) {
-            foreach (array_keys($views) as $viewname) {
-                $viewname = (string) $viewname;
-                $viewlink = strpos($tag, "##viewlink:$viewname;");
-                $sesslink = strpos($tag, "##viewsesslink:$viewname;");
-                if ($viewlink === 0 || $sesslink === 0) {
-                    // Only the view the link points to is built.
-                    $view = $this->get_cached_named_view($viewname);
-                    // Already editing the entry in this view so do not show link for editing entry in the same view.
-                    if (
-                        $sesslink === 0 && $currentview && $currentview->user_is_editing() &&
-                        $viewname === $currentview->name() &&
-                        strpos($tag, 'editentries') !== false
-                    ) {
-                        return '';
-                    }
-                    // Strip leading and trailing ## delimiters.
-                    $tagdefinition = substr($tag, 2, -2);
-                    [, $linktext, $urlquery, $class, $flags] = array_pad(explode(';', $tagdefinition, 5), 5, '');
-                    // Opt-in: an edit link is only useful while the target view has something the user can still
-                    // change in this entry (e.g. no longer after final submission, unless fields stay editable).
-                    if (
-                        in_array(self::VIEW_LINK_FLAG_IFEDITABLE, array_map('trim', explode(',', $flags)), true)
-                        && !empty($entry->id) && $entry->id > 0
-                        && !$view->entry_has_editable_fields($entry)
-                    ) {
-                        return '';
-                    }
-                    // Pix icon for text.
-                    if (strpos($linktext, '_pixicon:') === 0) {
-                        [, $icon, $titletext] = explode(':', $linktext);
-                        $linktext = $OUTPUT->pix_icon($icon, $titletext);
-                    } else {
-                        // Apply content filters (e.g. multilang2) so filter tags such as
-                        // {mlang ...} can be used in the link text. The datalynx tag itself
-                        // was shielded from filtering while masked in set_view_tags(), so the
-                        // label reaches here unresolved and is localised at build time.
-                        $linktext = filter_manager::instance()->filter_text($linktext, $dlx->context);
-                    }
-                    // Replace pipes in urlquery with &.
-                    $urlquery = str_replace('|', '&', $urlquery);
-                    $urlquery = $this->resolve_nested_entry_tags($urlquery, $entry, $options ?? []);
-                    // Build a clean link to the target view. Only carry the identifying
-                    // parameters; the current page's filter/search/paging state must NOT
-                    // leak into the link. Any filter or extra parameters are supplied
-                    // explicitly through the tag's URL query when desired.
-                    $baseurl = $view->get_baseurl();
-                    $linkparams = ['d' => $baseurl->get_param('d'), 'view' => $baseurl->get_param('view')];
-                    if ($baseurl->get_param('currentgroup') !== null) {
-                        $linkparams['currentgroup'] = $baseurl->get_param('currentgroup');
-                    }
-                    // If it is a link with session (viewsesslink).
-                    if ($sesslink === 0) {
-                        $linkparams['sesskey'] = sesskey();
-                    }
-                    $viewurl = new moodle_url($baseurl->out_omit_querystring(), $linkparams);
-                    if ($sesslink === 0) {
-                        if (!((strpos($urlquery, 'new=1') === false || $dlx->user_can_add_new_entry()))) {
-                            return '';
-                        }
-                    }
-                    $linkurl = $viewurl->out(false);
-                    if ($urlquery !== '') {
-                        $linkurl .= "&$urlquery";
-                    }
-                    return html_writer::link($linkurl, $linktext, ['class' => $class]);
-                }
-            }
+        $link = $this->get_view_link($tag, $entry, $options ?? []);
+        if ($link !== null) {
+            return $link ? $this->render_view_link($link, $options ?? []) : '';
         }
 
         $fields = $this->get_cached_fields();
@@ -334,6 +278,119 @@ class datalynxview_patterns {
         }
 
         return '';
+    }
+
+    /**
+     * Resolve a ##viewlink:...## or ##viewsesslink:...## tag.
+     *
+     * Every rule of a view link lives here, so the web and the Moodle App offer the same links:
+     * which views the user can see, the ifeditable flag, adding only for users who may add, no
+     * edit link to the view the entry is already edited in, and the entry tags in the query.
+     *
+     * @param string $tag
+     * @param stdClass|null $entry the entry whose template holds the tag, if any
+     * @param array $options render options, see get_replacements()
+     * @return array|null null when the tag is no link to a view the user can see; an empty array
+     *                    when the link is not offered here; else the link: viewid (the target
+     *                    view), label (HTML), cssclass, query (parameters of the tag's URL query)
+     *                    and url
+     */
+    public function get_view_link(string $tag, $entry = null, array $options = []): ?array {
+        global $OUTPUT;
+
+        $dlx = $this->view->get_dlx();
+        foreach (array_keys($this->get_cached_named_views()) as $viewname) {
+            $viewname = (string) $viewname;
+            $viewlink = strpos($tag, "##viewlink:$viewname;");
+            $sesslink = strpos($tag, "##viewsesslink:$viewname;");
+            if ($viewlink !== 0 && $sesslink !== 0) {
+                continue;
+            }
+            // Only the view the link points to is built.
+            $view = $this->get_cached_named_view($viewname);
+            // Already editing the entry in this view so do not show link for editing entry in the same view.
+            $currentview = $dlx->get_current_view();
+            if (
+                $sesslink === 0 && $currentview && $currentview->user_is_editing() &&
+                $viewname === $currentview->name() &&
+                strpos($tag, 'editentries') !== false
+            ) {
+                return [];
+            }
+            // Strip leading and trailing ## delimiters.
+            $tagdefinition = substr($tag, 2, -2);
+            [, $linktext, $urlquery, $class, $flags] = array_pad(explode(';', $tagdefinition, 5), 5, '');
+            // Opt-in: an edit link is only useful while the target view has something the user can still
+            // change in this entry (e.g. no longer after final submission, unless fields stay editable).
+            if (
+                in_array(self::VIEW_LINK_FLAG_IFEDITABLE, array_map('trim', explode(',', $flags)), true)
+                && !empty($entry->id) && $entry->id > 0
+                && !$view->entry_has_editable_fields($entry)
+            ) {
+                return [];
+            }
+            // Pix icon for text.
+            if (strpos($linktext, '_pixicon:') === 0) {
+                [, $icon, $titletext] = explode(':', $linktext);
+                $linktext = $OUTPUT->pix_icon($icon, $titletext);
+            } else {
+                // Apply content filters (e.g. multilang2) so filter tags such as
+                // {mlang ...} can be used in the link text. The datalynx tag itself
+                // was shielded from filtering while masked in set_view_tags(), so the
+                // label reaches here unresolved and is localised at build time.
+                $linktext = filter_manager::instance()->filter_text($linktext, $dlx->context);
+            }
+            // Replace pipes in urlquery with &.
+            $urlquery = str_replace('|', '&', $urlquery);
+            $urlquery = $this->resolve_nested_entry_tags($urlquery, $entry, $options);
+            if ($sesslink === 0 && strpos($urlquery, 'new=1') !== false && !$dlx->user_can_add_new_entry()) {
+                return [];
+            }
+            // Build a clean link to the target view. Only carry the identifying
+            // parameters; the current page's filter/search/paging state must NOT
+            // leak into the link. Any filter or extra parameters are supplied
+            // explicitly through the tag's URL query when desired.
+            $baseurl = $view->get_baseurl();
+            $linkparams = ['d' => $baseurl->get_param('d'), 'view' => $baseurl->get_param('view')];
+            if ($baseurl->get_param('currentgroup') !== null) {
+                $linkparams['currentgroup'] = $baseurl->get_param('currentgroup');
+            }
+            // If it is a link with session (viewsesslink).
+            if ($sesslink === 0) {
+                $linkparams['sesskey'] = sesskey();
+            }
+            $linkurl = (new moodle_url($baseurl->out_omit_querystring(), $linkparams))->out(false);
+            if ($urlquery !== '') {
+                $linkurl .= "&$urlquery";
+            }
+            parse_str($urlquery, $query);
+
+            return [
+                'viewid' => (int) $view->id(),
+                'label' => $linktext,
+                'cssclass' => $class,
+                'query' => $query,
+                'url' => $linkurl,
+            ];
+        }
+
+        return null;
+    }
+
+    /**
+     * Render a resolved link to a view: an anchor, unless the render options name a link renderer
+     * of their own (option linkrenderer, a callable taking the link and returning its HTML).
+     *
+     * @param array $link see get_view_link()
+     * @param array $options render options
+     * @return string
+     */
+    protected function render_view_link(array $link, array $options): string {
+        if (isset($options['linkrenderer']) && is_callable($options['linkrenderer'])) {
+            return (string) $options['linkrenderer']($link);
+        }
+
+        return html_writer::link($link['url'], $link['label'], ['class' => $link['cssclass']]);
     }
 
     /**
@@ -506,17 +563,18 @@ class datalynxview_patterns {
                 // Remember the view the entry is added from so the cancel button can return here.
                 $baseurl->param('sourceview', $view->id());
 
-                if ($tag == '##addnewentry##') {
-                    if (!empty($dlx->data->singleedit)) {
-                        $baseurl->param('view', $dlx->data->singleedit);
-                    }
+                // A client with a link renderer of its own adds one entry at a time.
+                if ($tag == '##addnewentry##' || isset($options['linkrenderer'])) {
+                    $targetviewid = (int) ($dlx->data->singleedit ?: $view->id());
+                    $baseurl->param('view', $targetviewid);
                     $baseurl->param('new', 1);
-                    $label = html_writer::tag('span', get_string('entryaddnew', 'datalynx'));
-                    $replacement = html_writer::link(
-                        $baseurl,
-                        $label,
-                        ['class' => 'addnewentry']
-                    );
+                    $replacement = $this->render_view_link([
+                        'viewid' => $targetviewid,
+                        'label' => html_writer::tag('span', get_string('entryaddnew', 'datalynx')),
+                        'cssclass' => 'addnewentry',
+                        'query' => ['new' => 1, 'sourceview' => (int) $view->id()],
+                        'url' => $baseurl->out(false),
+                    ], $options ?? []);
                 } else {
                     $range = range(1, 20);
                     $options = array_combine($range, $range);

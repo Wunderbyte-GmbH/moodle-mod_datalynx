@@ -92,7 +92,7 @@ final class entry_files_and_approval_test extends externallib_advanced_testcase 
         $this->setUser($student);
         $payload = (new entries_payload_builder(new datalynx($dlx->id())))->build(['viewid' => $viewid]);
 
-        $html = $payload['entries'][0]['html'];
+        $html = implode('', array_column($payload['entries'][0]['parts'], 'html'));
         $base = $CFG->wwwroot . '/pluginfile.php/' . $dlx->context->id . '/mod_datalynx/content/';
         $this->assertMatchesRegularExpression('~href="' . preg_quote($base, '~') . '\d+/report\.pdf~', $html);
         $this->assertMatchesRegularExpression('~<img[^>]+src="' . preg_quote($base, '~') . '\d+/apple\.png~', $html);

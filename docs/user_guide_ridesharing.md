@@ -511,6 +511,11 @@ Stated plainly so you can plan around it:
 - **No stored pickup point.** By design: it is agreed between the two people.
 - **No combined map of all rides.** Each entry has its own map; a single map view of the whole
   board is planned.
+- **Only partly usable in the Moodle App.** In the app, the portal buttons, "Fahrt suchen" and
+  "Meine Fahrten" open as app pages (see
+  [Links between views](user_guide_moodle_app.md#links-between-views)). The route (itinerary
+  field) cannot be searched or edited in the app yet, so the entry steps that need it offer
+  **Open in browser**.
 
 ---
 

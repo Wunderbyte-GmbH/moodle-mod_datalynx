@@ -24,6 +24,8 @@ same code as the web, and app code only adds the projection the app needs.
 | Edit controls | `datalynxfield_renderer::get_edit_control()` per field type |
 | Edit form | `local\entry\entry_edit_form` |
 | Rights | `datalynx::user_can_manage_entry()`, `user_can_add_new_entry()`, `user_can_approve_entries()`, `view\base::confirm_view_action()` |
+| Links to other views | `datalynxview_patterns::get_view_link()` (every rule of `##viewlink##` / `##viewsesslink##`) |
+| View template | `view\base::get_section_html()` (the section as `display()` shows it, without changing the view) |
 
 App-only code:
 
@@ -33,8 +35,33 @@ App-only code:
 | `classes/local/mobile/entries_payload_builder.php` | Projects entries onto the app's shape (`html`, `fields`, `canedit`, …) |
 | `classes/local/mobile/html_sanitiser.php` | Removes scripts, forms and controls from entry HTML |
 | `classes/local/mobile/customfilter_form.php` | Custom filters offered by a view, and the app's filter inputs |
+| `classes/local/mobile/app_links.php` | Turns links to other views into app buttons and cuts HTML into parts |
 | `templates/mobile/view_page.mustache`, `edit_entry.mustache` | Ionic templates |
 | `mobileapp/styles.css` | Styles loaded by the app, scoped to `.mod-datalynx-mobile` |
+
+---
+
+## Links between views and the view template
+
+The app shows the view template (section) and the entry template as **parts**: HTML, a link button,
+HTML, and so on, plus one part in the section that marks where the entries are listed.
+
+1. `entries_payload_builder` renders both templates with two render options from
+   `app_links::render_options()`. These options pass through `datalynxview_patterns::get_replacements()`:
+   - `linkrenderer`: a callable that receives each resolved link (`get_view_link()`, also used for
+     `##addnewentry##`) and returns its HTML. `app_links` keeps the link and returns a placeholder.
+     Without the option the link is the web's anchor.
+   - `pagecontrols => false`: the controls of the web page render empty. These are the menus,
+     quick search, per page, paging bar, custom filter forms and bulk actions.
+2. `app_links::parts()` cuts the HTML at the placeholders and at `##entries##`. Each HTML part is
+   cleaned on its own (`html_sanitiser`); end tags a part does not open are dropped first.
+3. A link opens `mobile_course_view` (a list), `mobile_edit_entry` (`new=1`, or `editentries=` with
+   one entry) or, for anything else, the web page through `core-link`. A `filter=` is passed only
+   where the target view offers it (`entries_payload_builder::filter_menu()`).
+
+The template draws every link from one `ng-template` (`#dlxlink`), and the section and the
+entries share it. `core-site-plugins-new-content` opens a new page, so the app's back button
+returns, and `getFromCache: false` makes a view show entries saved in the meantime.
 
 ---
 
@@ -102,8 +129,8 @@ activity, and the app's `core-format-text` fetches them with the user's token.
 
 | Kind | Where |
 |---|---|
-| PHPUnit | `tests/output/mobile_test.php`, `tests/external/*` (one per service), `tests/local/mobile/*`, `tests/local/field/edit_control_test.php` |
-| App acceptance (Behat `@app`) | `tests/behat/app_browse.feature`, `app_customfilter.feature`, `app_edit.feature`, `app_delete.feature`, `app_approve.feature` |
+| PHPUnit | `tests/output/mobile_test.php`, `tests/external/*` (one per service), `tests/local/mobile/*` (links: `app_links_test.php`), `tests/local/field/edit_control_test.php` |
+| App acceptance (Behat `@app`) | `tests/behat/app_browse.feature`, `app_customfilter.feature`, `app_edit.feature`, `app_delete.feature`, `app_approve.feature`, `app_navigation.feature` |
 
 The `@app` features need the plugin `local_moodleappbehat` in the Moodle root (same version as the
 app) and an app container; see
@@ -115,9 +142,11 @@ Steps that work well:
 - `Given I entered the course "Course 1" as "student1" in the app` and then
   `I press "<activity name>" in the app`;
 - `I press "Edit" near "Fruit: Apple" in the app`;
-- `I pull to refresh in the app` after saving.
+- `I pull to refresh in the app` after saving;
+- `the header should be "<view name>" in the app` after following a view link, `I go back in the app` to return.
 
 Gotchas:
 
 - The datalynx Behat field step names fields "Datalynx field X"; templates must use `[[Datalynx field X]]`.
-- The editor step drops a leading `##`; start a view section with a space.
+- The editor step drops a leading `##`; start a view section with a space or an HTML tag.
+- The editor step does not take `\"` inside its text; use single quotes for HTML attributes.

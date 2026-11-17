@@ -115,10 +115,10 @@ final class get_mobile_entries_test extends externallib_advanced_testcase {
         $this->assertCount(1, $result['entries']);
         $entry = $result['entries'][0];
         $this->assertSame($this->entryids['Banana'], $entry['id']);
-        $this->assertStringContainsString('<div class="ride">', $entry['html']);
-        $this->assertStringContainsString('Banana', $entry['html']);
+        $this->assertStringContainsString('<div class="ride">', implode('', array_column($entry['parts'], 'html')));
+        $this->assertStringContainsString('Banana', implode('', array_column($entry['parts'], 'html')));
         foreach (['delete=', 'editentries=', 'duplicate=', 'sesskey=', '<script', '<input'] as $needle) {
-            $this->assertStringNotContainsString($needle, $entry['html']);
+            $this->assertStringNotContainsString($needle, implode('', array_column($entry['parts'], 'html')));
         }
         $this->assertSame([['fieldid' => $this->titleid, 'name' => 'Title']], array_map(
             fn($field) => ['fieldid' => $field['fieldid'], 'name' => $field['name']],
@@ -140,7 +140,7 @@ final class get_mobile_entries_test extends externallib_advanced_testcase {
         $this->assertTrue($result['supported']);
         $this->assertCount(3, $result['entries']);
         foreach ($result['entries'] as $entry) {
-            $this->assertSame('', $entry['html']);
+            $this->assertSame([], $entry['parts']);
             $this->assertCount(1, $entry['fields']);
         }
     }

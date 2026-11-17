@@ -42,9 +42,13 @@ use stdClass;
  * Their desktop payloads differ in shape (grouped entries vs. rows of cells) and carry Bootstrap
  * classes and action links, so they are not passed through. The builder projects both onto one
  * mobile shape instead:
- * - `html`: the entry rendered with the view's own entry template, so an entry looks in the app
+ * - `parts`: the entry rendered with the view's own entry template, so an entry looks in the app
  *   the way its author designed it. Action tags render empty (manage => false), and markup the
- *   app cannot use is removed by html_sanitiser.
+ *   app cannot use is removed by html_sanitiser. Links to other views become app buttons
+ *   between the HTML parts (app_links).
+ * - `section`: the view template around the entries, as parts in the same way; one part marks
+ *   where the entries are listed (`listsentries` is false for a view that lists none, such as a
+ *   start page of buttons).
  * - `fields`: name, HTML and plain text of every field the view shows, for tabular views (which
  *   the app lists rather than draws as a table), for accessible labels, and as the fallback when
  *   a grid view has no entry template.
@@ -120,6 +124,8 @@ final class entries_payload_builder {
             'entriesfiltercount' => 0,
             'hasmore' => false,
             'canadd' => false,
+            'section' => [],
+            'listsentries' => false,
             'entries' => [],
             'views' => $this->build_views($records, $record),
             'filters' => [],
@@ -178,7 +184,13 @@ final class entries_payload_builder {
             $view->confirm_view_action('addnewentry', (int) $record->id)
             || $view->confirm_view_action('addnewentries', (int) $record->id)
         );
-        $payload['entries'] = $this->build_entries($manager, $view, $entries->entries() ?? []);
+        $links = new app_links($this->dlx);
+        $payload['section'] = $this->build_section($view, $payload, $links);
+        $payload['listsentries'] = in_array(true, array_column($payload['section'], 'entries'), true);
+        // As on the web, a view whose template has no ##entries## shows none, such as a start page.
+        if ($payload['listsentries']) {
+            $payload['entries'] = $this->build_entries($manager, $view, $entries->entries() ?? [], $links);
+        }
         $payload['filters'] = $this->build_filters($filtermenu, $payload['filterid']);
 
         return $payload;
@@ -310,12 +322,49 @@ final class entries_payload_builder {
      * @return array filter id => name
      */
     private function get_filter_menu(base $view): array {
-        $menu = $this->dlx->get_filter_manager()->get_filters(null, true) ?: [];
+        return self::filter_menu($this->dlx, $view);
+    }
+
+    /**
+     * The saved filters a view lets the user switch to, as the desktop filter menu offers them:
+     * none in a view that forces its filter.
+     *
+     * @param datalynx $dlx
+     * @param base $view
+     * @return array filter id => name
+     */
+    public static function filter_menu(datalynx $dlx, base $view): array {
+        if ($view->is_forcing_filter()) {
+            return [];
+        }
+        $menu = $dlx->get_filter_manager()->get_filters(null, true) ?: [];
         if ($view->is_filter_whitelist_active()) {
             $menu = array_intersect_key($menu, array_flip($view->get_permitted_filter_ids()));
         }
 
         return $menu;
+    }
+
+    /**
+     * The view template (section) as parts: its HTML, its links, and where the entries are listed.
+     *
+     * A view without a section lists its entries only.
+     *
+     * @param base $view
+     * @param array $payload the payload so far, for the entry counts the section may show
+     * @param app_links $links
+     * @return array parts, see app_links::parts()
+     */
+    private function build_section(base $view, array $payload, app_links $links): array {
+        $html = $view->get_section_html([
+            'entriescount' => $payload['entriescount'],
+            'entriesfiltercount' => $payload['entriesfiltercount'],
+        ] + $links->render_options());
+        if (trim($html) === '') {
+            $html = '##entries##';
+        }
+
+        return $links->parts($html, true);
     }
 
     /**
@@ -344,9 +393,10 @@ final class entries_payload_builder {
      * @param view_manager $manager the manager that loaded the entries
      * @param base $view
      * @param stdClass[] $records
+     * @param app_links $links renders the links of the entry template
      * @return array
      */
-    private function build_entries(view_manager $manager, base $view, array $records): array {
+    private function build_entries(view_manager $manager, base $view, array $records, app_links $links): array {
         $usetemplate = $manager->uses_entry_template($view);
         $shown = $this->get_shown_fields($view, $manager->get_content_fields($view));
         $viewid = (int) $view->id();
@@ -362,13 +412,13 @@ final class entries_payload_builder {
             $manageable = $this->dlx->user_can_manage_entry($record);
             $fields = $this->build_field_values($manager, $shown, $record);
             $record->baseurl = $view->get_navigationurl();
-            $html = $usetemplate
-                ? html_sanitiser::for_app($view->render_entry_html($record, ['edit' => false, 'manage' => false]))
-                : '';
+            $parts = $usetemplate
+                ? $links->parts($view->render_entry_html($record, ['edit' => false, 'manage' => false] + $links->render_options()))
+                : [];
 
             $entries[] = [
                 'id' => (int) $record->id,
-                'html' => $html,
+                'parts' => $parts,
                 'title' => $fields ? $fields[0]['valuetext'] : '',
                 'fields' => $fields,
                 'userid' => (int) $record->userid,

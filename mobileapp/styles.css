@@ -1,9 +1,9 @@
 /*
  * Styles for mod_datalynx in the Moodle App.
  *
- * Entry bodies are the author's own templates, written for the web and its Bootstrap theme.
- * These rules only keep that markup from breaking a phone screen. They are scoped to the
- * plugin's root class and never restyle Ionic components.
+ * Entry bodies and the view template (section) are the author's own templates, written for the
+ * web and its Bootstrap theme. These rules only keep that markup from breaking a phone screen.
+ * They are scoped to the plugin's root class and never restyle Ionic components.
  */
 .mod-datalynx-mobile .mod-datalynx-mobile-count {
     font-size: 0.875em;
@@ -11,29 +11,37 @@
 }
 
 .mod-datalynx-mobile .mod-datalynx-mobile-entry img,
+.mod-datalynx-mobile .mod-datalynx-mobile-section img,
 .mod-datalynx-mobile .mod-datalynx-mobile-entry video,
-.mod-datalynx-mobile .mod-datalynx-mobile-entry iframe {
+.mod-datalynx-mobile .mod-datalynx-mobile-section video,
+.mod-datalynx-mobile .mod-datalynx-mobile-entry iframe,
+.mod-datalynx-mobile .mod-datalynx-mobile-section iframe {
     max-width: 100%;
     height: auto;
 }
 
-.mod-datalynx-mobile .mod-datalynx-mobile-entry table {
+.mod-datalynx-mobile .mod-datalynx-mobile-entry table,
+.mod-datalynx-mobile .mod-datalynx-mobile-section table {
     display: block;
     max-width: 100%;
     overflow-x: auto;
 }
 
 /* Bootstrap grid classes do nothing in the app; let the columns stack. */
-.mod-datalynx-mobile .mod-datalynx-mobile-entry .row {
+.mod-datalynx-mobile .mod-datalynx-mobile-entry .row,
+.mod-datalynx-mobile .mod-datalynx-mobile-section .row {
     display: block;
 }
 
-.mod-datalynx-mobile .mod-datalynx-mobile-entry [class*="col-"] {
+.mod-datalynx-mobile .mod-datalynx-mobile-entry [class*="col-"],
+.mod-datalynx-mobile .mod-datalynx-mobile-section [class*="col-"] {
     max-width: 100%;
 }
 
-/* Links styled as Bootstrap buttons on the web read as plain links in the app. */
-.mod-datalynx-mobile .mod-datalynx-mobile-entry .btn {
+/* Links styled as Bootstrap buttons on the web read as plain links in the app (links to other
+   views are app buttons of their own, see app_links). */
+.mod-datalynx-mobile .mod-datalynx-mobile-entry .btn,
+.mod-datalynx-mobile .mod-datalynx-mobile-section .btn {
     display: inline-block;
     padding: 0;
     border: 0;
@@ -41,20 +49,24 @@
     color: var(--ion-color-primary);
 }
 
-/* Nothing in an entry may be wider than the screen, whatever its inline width, and long words
+/* Nothing in an entry or the section may be wider than the screen, whatever its inline width, and long words
    such as URLs and e-mail addresses wrap instead of widening the page. */
-.mod-datalynx-mobile .mod-datalynx-mobile-entry * {
+.mod-datalynx-mobile .mod-datalynx-mobile-entry *,
+.mod-datalynx-mobile .mod-datalynx-mobile-section * {
     max-width: 100%;
     box-sizing: border-box;
 }
 
-.mod-datalynx-mobile .mod-datalynx-mobile-entry {
+.mod-datalynx-mobile .mod-datalynx-mobile-entry,
+.mod-datalynx-mobile .mod-datalynx-mobile-section {
     overflow-wrap: anywhere;
 }
 
 /* Table cells of entry templates have no spacing in the app; without it their texts run together. */
 .mod-datalynx-mobile .mod-datalynx-mobile-entry td,
-.mod-datalynx-mobile .mod-datalynx-mobile-entry th {
+.mod-datalynx-mobile .mod-datalynx-mobile-section td,
+.mod-datalynx-mobile .mod-datalynx-mobile-entry th,
+.mod-datalynx-mobile .mod-datalynx-mobile-section th {
     padding: 0.25em 0.5em 0.25em 0;
     vertical-align: top;
 }
@@ -74,4 +86,15 @@
     display: flex;
     flex-wrap: wrap;
     gap: 0.25em;
+}
+
+/* The view template around the entries, on the page itself rather than in a card. */
+.mod-datalynx-mobile .mod-datalynx-mobile-section {
+    display: block;
+    padding: 0 16px;
+}
+
+.mod-datalynx-mobile .mod-datalynx-mobile-link {
+    margin-top: 0.25em;
+    margin-bottom: 0.25em;
 }

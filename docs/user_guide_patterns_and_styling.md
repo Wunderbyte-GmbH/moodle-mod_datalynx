@@ -296,6 +296,13 @@ In the tag dialog, tick **Only show if the entry can still be edited there**.
 > **Note**  
 > Hiding the link only improves the user interface. The edit form itself still enforces which fields are editable.
 
+**View links in the Moodle App**
+
+In the Moodle App, view links become app buttons and open inside the app; see
+[Links between views](user_guide_moodle_app.md#links-between-views). Links whose URL query uses only
+`new=1`, `editentries=##entryid##`, `eids=…` and `filter=…` stay in the app. Other parameters
+(for example `delete=` or `pdfexportentry=`) open the web page in the browser.
+
 **Full examples**
 
 ```text

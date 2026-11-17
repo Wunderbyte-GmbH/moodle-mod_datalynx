@@ -23,6 +23,10 @@
     so that the double curly braces stay Angular's. Everything the page shows comes from
     CONTENT_OTHERDATA.state (see \mod_datalynx\output\mobile::otherdata()) through property bindings; only the two ids below are written into the source.
 
+    The view template (state.section) and each entry (entry.parts) arrive as parts: HTML, a link to
+    another view (shown as a button, see \mod_datalynx\local\mobile\app_links) or the place of
+    the entries list.
+
     Example context (json):
     {
         "cmid": 12,
@@ -31,6 +35,20 @@
 }}
 {{=<% %>=}}
 <div class="mod-datalynx-mobile">
+    <ng-template #dlxlink let-link="link">
+        <ion-button *ngIf="link.method" class="mod-datalynx-mobile-link" [fill]="link.fill" [expand]="link.expand ? 'block' : undefined"
+                core-site-plugins-new-content component="mod_datalynx" [method]="link.method" [title]="link.title || link.label"
+                [args]="{cmid: <% cmid %>, courseid: <% courseid %>, viewid: link.viewid, entryid: link.entryid,
+                    filterid: link.filterid, eids: link.eids}" [preSets]="{getFromCache: false}">
+            {{ link.label }}
+        </ion-button>
+        <ion-button *ngIf="!link.method" class="mod-datalynx-mobile-link" [fill]="link.fill" [expand]="link.expand ? 'block' : undefined"
+                [href]="link.url" core-link autoLogin="yes">
+            {{ link.label }}
+            <ion-icon name="fas-up-right-from-square" slot="end" aria-hidden="true"></ion-icon>
+        </ion-button>
+    </ng-template>
+
     <core-course-module-description *ngIf="CONTENT_OTHERDATA.state.intro" [description]="CONTENT_OTHERDATA.state.intro"
             component="mod_datalynx" componentId="<% cmid %>"></core-course-module-description>
 
@@ -47,7 +65,7 @@
                 <ion-select-option *ngFor="let view of CONTENT_OTHERDATA.state.views" [value]="view.id">{{ view.name }}</ion-select-option>
             </ion-select>
         </ion-item>
-        <ion-item *ngIf="CONTENT_OTHERDATA.state.canfilter && CONTENT_OTHERDATA.state.filters.length">
+        <ion-item *ngIf="CONTENT_OTHERDATA.state.listsentries && CONTENT_OTHERDATA.state.canfilter && CONTENT_OTHERDATA.state.filters.length">
             <ion-select [label]="'plugin.mod_datalynx.mobilefilterselect' | translate" labelPlacement="stacked"
                     interface="action-sheet" [value]="CONTENT_OTHERDATA.state.filterid"
                     (ionChange)="$event.detail.value !== CONTENT_OTHERDATA.state.filterid && updateContent({
@@ -61,7 +79,7 @@
         </ion-item>
     </ion-list>
 
-    <ng-container *ngIf="CONTENT_OTHERDATA.state.supported && CONTENT_OTHERDATA.state.customfilters.length">
+    <ng-container *ngIf="CONTENT_OTHERDATA.state.listsentries && CONTENT_OTHERDATA.state.customfilters.length">
     <div class="ion-padding-horizontal mod-datalynx-mobile-customfilters">
         <ion-chip *ngFor="let cf of CONTENT_OTHERDATA.state.customfilters" [outline]="!cf.active"
                 role="button" [attr.aria-pressed]="cf.active"
@@ -156,7 +174,7 @@
     </form>
     </ng-container>
 
-    <core-search-box *ngIf="CONTENT_OTHERDATA.state.hasview && CONTENT_OTHERDATA.state.supported && CONTENT_OTHERDATA.state.canfilter"
+    <core-search-box *ngIf="CONTENT_OTHERDATA.state.listsentries && CONTENT_OTHERDATA.state.canfilter"
             [searchText]="CONTENT_OTHERDATA.state.search" [lengthCheck]="1" [showClear]="true"
             [placeholder]="'plugin.mod_datalynx.mobilesearchentries' | translate" [searchLabel]="'core.search' | translate"
             (onSubmit)="$event !== CONTENT_OTHERDATA.state.search && updateContent({
@@ -182,87 +200,93 @@
     </ion-card>
 
     <ng-container *ngIf="CONTENT_OTHERDATA.state.hasview && CONTENT_OTHERDATA.state.supported">
-        <ng-container *ngIf="CONTENT_OTHERDATA.state.canadd">
-            <div class="ion-padding-horizontal">
-                <ion-button expand="block" core-site-plugins-new-content component="mod_datalynx" method="mobile_edit_entry"
-                        [title]="'plugin.mod_datalynx.entryaddnew' | translate"
-                        [args]="{cmid: <% cmid %>, courseid: <% courseid %>, viewid: CONTENT_OTHERDATA.state.viewid, entryid: 0}">
-                    <ion-icon name="fas-plus" slot="start" aria-hidden="true"></ion-icon>
-                    {{ 'plugin.mod_datalynx.entryaddnew' | translate }}
-                </ion-button>
-            </div>
+        <ng-container *ngFor="let part of CONTENT_OTHERDATA.state.section">
+            <core-format-text *ngIf="part.html" class="mod-datalynx-mobile-section" [text]="part.html" component="mod_datalynx"
+                    [componentId]="<% cmid %>" contextLevel="module" [contextInstanceId]="<% cmid %>" [courseId]="<% courseid %>"></core-format-text>
+            <ng-container *ngIf="part.link">
+                <div class="ion-padding-horizontal">
+                    <ng-container *ngTemplateOutlet="dlxlink; context: {link: part.link}"></ng-container>
+                </div>
+            </ng-container>
+            <ng-container *ngIf="part.entries">
+                <ng-container *ngIf="CONTENT_OTHERDATA.state.entriesfiltercount">
+                    <p class="ion-padding-horizontal mod-datalynx-mobile-count" aria-live="polite">
+                        {{ 'plugin.mod_datalynx.mobileshowingxofy' | translate: { $a: {
+                            count: CONTENT_OTHERDATA.state.entries.length, total: CONTENT_OTHERDATA.state.entriesfiltercount
+                        } } }}
+                    </p>
+                </ng-container>
+
+                <core-empty-box *ngIf="!CONTENT_OTHERDATA.state.entries.length" icon="fas-database"
+                        [message]="CONTENT_OTHERDATA.state.emptycontent"></core-empty-box>
+
+                <ion-card *ngFor="let entry of CONTENT_OTHERDATA.state.entries" class="mod-datalynx-mobile-entry">
+                    <ion-card-content *ngIf="entry.parts.length">
+                        <ng-container *ngFor="let part of entry.parts">
+                            <core-format-text *ngIf="part.html" [text]="part.html" component="mod_datalynx" [componentId]="<% cmid %>"
+                                    contextLevel="module" [contextInstanceId]="<% cmid %>" [courseId]="<% courseid %>"></core-format-text>
+                            <ng-container *ngIf="part.link">
+                                <ng-container *ngTemplateOutlet="dlxlink; context: {link: part.link}"></ng-container>
+                            </ng-container>
+                        </ng-container>
+                    </ion-card-content>
+                    <ion-list *ngIf="!entry.parts.length" lines="none">
+                        <ion-item *ngFor="let field of entry.fields" class="ion-text-wrap">
+                            <ion-label>
+                                <p class="item-heading">{{ field.name }}</p>
+                                <core-format-text [text]="field.valuehtml" component="mod_datalynx" [componentId]="<% cmid %>"
+                                        contextLevel="module" [contextInstanceId]="<% cmid %>" [courseId]="<% courseid %>"></core-format-text>
+                            </ion-label>
+                        </ion-item>
+                    </ion-list>
+                    <ion-card-content *ngIf="entry.canedit || entry.candelete || entry.canapprove" class="mod-datalynx-mobile-actions"
+                            role="group" [attr.aria-label]="entry.title || null">
+                        <ion-button *ngIf="entry.canapprove" fill="clear" size="small" [color]="entry.approved ? 'medium' : 'success'"
+                                core-site-plugins-call-ws name="mod_datalynx_toggle_entry_approval"
+                                [params]="{d: CONTENT_OTHERDATA.state.datalynxid, viewid: CONTENT_OTHERDATA.state.viewid, entryid: entry.id,
+                                    action: entry.approved ? 'disapprove' : 'approve'}"
+                                [preSets]="{getFromCache: false, saveToCache: false}"
+                                [successMessage]="(entry.approved ? 'plugin.mod_datalynx.datalynxentrydisapproved'
+                                    : 'plugin.mod_datalynx.datalynxentryapproved') | translate"
+                                refreshOnSuccess="true">
+                            <ion-icon [name]="entry.approved ? 'fas-xmark' : 'fas-check'" slot="start" aria-hidden="true"></ion-icon>
+                            {{ (entry.approved ? 'plugin.mod_datalynx.mobiledisapproveentry' : 'plugin.mod_datalynx.mobileapproveentry') | translate }}
+                        </ion-button>
+                        <ion-button *ngIf="entry.canedit" fill="clear" size="small" core-site-plugins-new-content
+                                component="mod_datalynx" method="mobile_edit_entry" [title]="'core.edit' | translate"
+                                [args]="{cmid: <% cmid %>, courseid: <% courseid %>, viewid: CONTENT_OTHERDATA.state.viewid, entryid: entry.id}">
+                            <ion-icon name="fas-pen" slot="start" aria-hidden="true"></ion-icon>
+                            {{ 'core.edit' | translate }}
+                        </ion-button>
+                        <ion-button *ngIf="entry.candelete" fill="clear" color="danger" size="small" core-site-plugins-call-ws
+                                name="mod_datalynx_delete_entry"
+                                [params]="{d: CONTENT_OTHERDATA.state.datalynxid, viewid: CONTENT_OTHERDATA.state.viewid, entryid: entry.id}"
+                                [preSets]="{getFromCache: false, saveToCache: false}"
+                                [confirmMessage]="'plugin.mod_datalynx.entrydeleteconfirm' | translate"
+                                [successMessage]="'plugin.mod_datalynx.entrydeleted' | translate"
+                                refreshOnSuccess="true">
+                            <ion-icon name="fas-trash" slot="start" aria-hidden="true"></ion-icon>
+                            {{ 'core.delete' | translate }}
+                        </ion-button>
+                    </ion-card-content>
+                </ion-card>
+
+                <core-infinite-loading [enabled]="CONTENT_OTHERDATA.state.cangrow" (action)="updateContent({
+                            cmid: <% cmid %>, courseid: <% courseid %>, viewid: CONTENT_OTHERDATA.state.viewid,
+                            filterid: CONTENT_OTHERDATA.state.filterid, search: CONTENT_OTHERDATA.state.search,
+                            criteria: CONTENT_OTHERDATA.state.criteria, sort: CONTENT_OTHERDATA.state.sort,
+                            perpage: CONTENT_OTHERDATA.state.nextperpage,
+                            customfilterid: CONTENT_OTHERDATA.state.customfilterid, customvalues: CONTENT_OTHERDATA.state.customvalues
+                        }); $event()"></core-infinite-loading>
+
+                <ion-card *ngIf="!CONTENT_OTHERDATA.state.cangrow && CONTENT_OTHERDATA.state.entries.length < CONTENT_OTHERDATA.state.entriesfiltercount">
+                    <ion-card-content>
+                        <ion-button expand="block" fill="outline" [href]="CONTENT_OTHERDATA.state.browserurl" core-link autoLogin="yes">
+                            {{ 'plugin.mod_datalynx.mobileopeninbrowser' | translate }}
+                        </ion-button>
+                    </ion-card-content>
+                </ion-card>
+            </ng-container>
         </ng-container>
-        <ng-container *ngIf="CONTENT_OTHERDATA.state.entriesfiltercount">
-            <p class="ion-padding-horizontal mod-datalynx-mobile-count" aria-live="polite">
-                {{ 'plugin.mod_datalynx.mobileshowingxofy' | translate: { $a: {
-                    count: CONTENT_OTHERDATA.state.entries.length, total: CONTENT_OTHERDATA.state.entriesfiltercount
-                } } }}
-            </p>
-        </ng-container>
-
-        <core-empty-box *ngIf="!CONTENT_OTHERDATA.state.entries.length" icon="fas-database"
-                [message]="CONTENT_OTHERDATA.state.emptycontent"></core-empty-box>
-
-        <ion-card *ngFor="let entry of CONTENT_OTHERDATA.state.entries" class="mod-datalynx-mobile-entry">
-            <ion-card-content *ngIf="entry.html">
-                <core-format-text [text]="entry.html" component="mod_datalynx" [componentId]="<% cmid %>"
-                        contextLevel="module" [contextInstanceId]="<% cmid %>" [courseId]="<% courseid %>"></core-format-text>
-            </ion-card-content>
-            <ion-list *ngIf="!entry.html" lines="none">
-                <ion-item *ngFor="let field of entry.fields" class="ion-text-wrap">
-                    <ion-label>
-                        <p class="item-heading">{{ field.name }}</p>
-                        <core-format-text [text]="field.valuehtml" component="mod_datalynx" [componentId]="<% cmid %>"
-                                contextLevel="module" [contextInstanceId]="<% cmid %>" [courseId]="<% courseid %>"></core-format-text>
-                    </ion-label>
-                </ion-item>
-            </ion-list>
-            <ion-card-content *ngIf="entry.canedit || entry.candelete || entry.canapprove" class="mod-datalynx-mobile-actions"
-                    role="group" [attr.aria-label]="entry.title || null">
-                <ion-button *ngIf="entry.canapprove" fill="clear" size="small" [color]="entry.approved ? 'medium' : 'success'"
-                        core-site-plugins-call-ws name="mod_datalynx_toggle_entry_approval"
-                        [params]="{d: CONTENT_OTHERDATA.state.datalynxid, viewid: CONTENT_OTHERDATA.state.viewid, entryid: entry.id,
-                            action: entry.approved ? 'disapprove' : 'approve'}"
-                        [preSets]="{getFromCache: false, saveToCache: false}"
-                        [successMessage]="(entry.approved ? 'plugin.mod_datalynx.datalynxentrydisapproved'
-                            : 'plugin.mod_datalynx.datalynxentryapproved') | translate"
-                        refreshOnSuccess="true">
-                    <ion-icon [name]="entry.approved ? 'fas-xmark' : 'fas-check'" slot="start" aria-hidden="true"></ion-icon>
-                    {{ (entry.approved ? 'plugin.mod_datalynx.mobiledisapproveentry' : 'plugin.mod_datalynx.mobileapproveentry') | translate }}
-                </ion-button>
-                <ion-button *ngIf="entry.canedit" fill="clear" size="small" core-site-plugins-new-content
-                        component="mod_datalynx" method="mobile_edit_entry" [title]="'core.edit' | translate"
-                        [args]="{cmid: <% cmid %>, courseid: <% courseid %>, viewid: CONTENT_OTHERDATA.state.viewid, entryid: entry.id}">
-                    <ion-icon name="fas-pen" slot="start" aria-hidden="true"></ion-icon>
-                    {{ 'core.edit' | translate }}
-                </ion-button>
-                <ion-button *ngIf="entry.candelete" fill="clear" color="danger" size="small" core-site-plugins-call-ws
-                        name="mod_datalynx_delete_entry"
-                        [params]="{d: CONTENT_OTHERDATA.state.datalynxid, viewid: CONTENT_OTHERDATA.state.viewid, entryid: entry.id}"
-                        [preSets]="{getFromCache: false, saveToCache: false}"
-                        [confirmMessage]="'plugin.mod_datalynx.entrydeleteconfirm' | translate"
-                        [successMessage]="'plugin.mod_datalynx.entrydeleted' | translate"
-                        refreshOnSuccess="true">
-                    <ion-icon name="fas-trash" slot="start" aria-hidden="true"></ion-icon>
-                    {{ 'core.delete' | translate }}
-                </ion-button>
-            </ion-card-content>
-        </ion-card>
-
-        <core-infinite-loading [enabled]="CONTENT_OTHERDATA.state.cangrow" (action)="updateContent({
-                    cmid: <% cmid %>, courseid: <% courseid %>, viewid: CONTENT_OTHERDATA.state.viewid,
-                    filterid: CONTENT_OTHERDATA.state.filterid, search: CONTENT_OTHERDATA.state.search,
-                    criteria: CONTENT_OTHERDATA.state.criteria, sort: CONTENT_OTHERDATA.state.sort,
-                    perpage: CONTENT_OTHERDATA.state.nextperpage,
-                    customfilterid: CONTENT_OTHERDATA.state.customfilterid, customvalues: CONTENT_OTHERDATA.state.customvalues
-                }); $event()"></core-infinite-loading>
-
-        <ion-card *ngIf="!CONTENT_OTHERDATA.state.cangrow && CONTENT_OTHERDATA.state.entries.length < CONTENT_OTHERDATA.state.entriesfiltercount">
-            <ion-card-content>
-                <ion-button expand="block" fill="outline" [href]="CONTENT_OTHERDATA.state.browserurl" core-link autoLogin="yes">
-                    {{ 'plugin.mod_datalynx.mobileopeninbrowser' | translate }}
-                </ion-button>
-            </ion-card-content>
-        </ion-card>
     </ng-container>
 </div>

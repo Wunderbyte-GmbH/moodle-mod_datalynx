@@ -1386,24 +1386,7 @@ abstract class base {
         $pluginfileurl = !empty($options['pluginfileurl']) ? $options['pluginfileurl'] : null;
         foreach ($this->editors as $editorname) {
             $editor = "e$editorname";
-
-            // Export with files should provide the file path.
-            if ($pluginfileurl) {
-                $this->view->$editor = str_replace(
-                    '@@PLUGINFILE@@/',
-                    $pluginfileurl,
-                    $this->view->$editor
-                );
-            } else {
-                $this->view->$editor = file_rewrite_pluginfile_urls(
-                    $this->view->$editor,
-                    'pluginfile.php',
-                    $this->dlx->context->id,
-                    'mod_datalynx',
-                    "view$editorname",
-                    $this->id()
-                );
-            }
+            $this->view->$editor = $this->rewrite_editor_urls($editorname, $this->view->$editor, $pluginfileurl);
         }
 
         $tags = $this->tags['view'];
@@ -1414,20 +1397,7 @@ abstract class base {
                 $this->view->{"e$editor"} = null;
                 continue;
             }
-
-            $text = $this->view->{"e$editor"};
-            $text = $this->mask_tags($text);
-            $text = format_text($text, FORMAT_HTML, ['trusted' => 1, 'filter' => true]);
-            $text = $this->unmask_tags($text);
-
-            $editortags = [];
-            $editorreplacements = [];
-            foreach ($tags as $tag) {
-                $editortags[] = $tag;
-                $editorreplacements[] = $replacements[$tag];
-            }
-
-            $this->view->{"e$editor"} = str_replace($editortags, $editorreplacements, $text);
+            $this->view->{"e$editor"} = $this->replace_view_tags($this->view->{"e$editor"}, $tags, $replacements);
         }
         // Remove customfilter tags after we have displayed them.
         foreach ($tags as $key => $value) {
@@ -1435,6 +1405,74 @@ abstract class base {
                 unset($this->tags['view'][$key]);
             }
         }
+    }
+
+    /**
+     * The view template (section) as display() shows it around the entries, with its view tags
+     * replaced and ##entries## left in place. Unlike set_view_tags() the view is not changed.
+     *
+     * @param array $options render options, see datalynxview_patterns::get_replacements()
+     * @return string HTML
+     */
+    public function get_section_html(array $options = []): string {
+        $section = $this->rewrite_editor_urls('section', (string) ($this->view->esection ?? ''), null);
+        if (trim($section) === '') {
+            return '';
+        }
+        $tags = $this->tags['view'] ?? [];
+        $replacements = $this->patternclass()->get_replacements($tags, null, $options);
+
+        return $this->process_calculations($this->replace_view_tags($section, $tags, $replacements));
+    }
+
+    /**
+     * Point the file links of one view editor at pluginfile.php, or at the export's file path.
+     *
+     * @param string $editorname e.g. section or param2
+     * @param string|null $text
+     * @param string|null $pluginfileurl the file path of an export, null for pluginfile.php
+     * @return string|null
+     */
+    protected function rewrite_editor_urls(string $editorname, ?string $text, ?string $pluginfileurl): ?string {
+        if ($text === null) {
+            return null;
+        }
+        if ($pluginfileurl) {
+            return str_replace('@@PLUGINFILE@@/', $pluginfileurl, $text);
+        }
+
+        return file_rewrite_pluginfile_urls(
+            $text,
+            'pluginfile.php',
+            $this->dlx->context->id,
+            'mod_datalynx',
+            "view$editorname",
+            $this->id()
+        );
+    }
+
+    /**
+     * Filter a view template and replace its view tags. The tags are masked while the text
+     * filters run, so a filter cannot change them (see mask_tags()).
+     *
+     * @param string $text
+     * @param array $tags
+     * @param array $replacements tag => HTML
+     * @return string
+     */
+    protected function replace_view_tags(string $text, array $tags, array $replacements): string {
+        $text = $this->mask_tags($text);
+        $text = format_text($text, FORMAT_HTML, ['trusted' => 1, 'filter' => true]);
+        $text = $this->unmask_tags($text);
+
+        $find = [];
+        $replace = [];
+        foreach ($tags as $tag) {
+            $find[] = $tag;
+            $replace[] = $replacements[$tag];
+        }
+
+        return str_replace($find, $replace, $text);
     }
 
     /**
