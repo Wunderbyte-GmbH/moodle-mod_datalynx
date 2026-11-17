@@ -1,0 +1,123 @@
+# Datalynx Developer Notes — Moodle App
+
+This page is for developers working on the Moodle App support of `mod_datalynx`. For what teachers
+and learners see, read [Using Datalynx in the Moodle App](user_guide_moodle_app.md).
+
+---
+
+## Architecture in one paragraph
+
+Datalynx uses the **site plugin** route of the Moodle App: `db/mobile.php` registers a course
+module handler, `\mod_datalynx\output\mobile` returns server-rendered Ionic templates
+(`templates/mobile/*.mustache`), and the app calls web services of the plugin that are part of
+`MOODLE_OFFICIAL_MOBILE_SERVICE`. There is no TypeScript in the app and no offline mode.
+
+The rule that shapes everything: **no parallel structures for the app.** The app goes through the
+same code as the web, and app code only adds the projection the app needs.
+
+| Concern | Shared code used by web and app |
+|---|---|
+| Browsing a view | `local\view\manager\view_manager` (open, filter, load) and `external\browse_request` |
+| Search criteria | `local\filter\search_criteria` (strict JSON contract) |
+| Custom filters | `local\filter\customfilter_controls` (one description, one parser) and `customfilter_search` |
+| Saving an entry | `local\entry\entry_submission_service` and the input contract of each field type |
+| Edit controls | `datalynxfield_renderer::get_edit_control()` per field type |
+| Edit form | `local\entry\entry_edit_form` |
+| Rights | `datalynx::user_can_manage_entry()`, `user_can_add_new_entry()`, `user_can_approve_entries()`, `view\base::confirm_view_action()` |
+
+App-only code:
+
+| File | Purpose |
+|---|---|
+| `classes/output/mobile.php` | `mobile_course_view()` (browse) and `mobile_edit_entry()` (add/edit) |
+| `classes/local/mobile/entries_payload_builder.php` | Projects entries onto the app's shape (`html`, `fields`, `canedit`, …) |
+| `classes/local/mobile/html_sanitiser.php` | Removes scripts, forms and controls from entry HTML |
+| `classes/local/mobile/customfilter_form.php` | Custom filters offered by a view, and the app's filter inputs |
+| `templates/mobile/view_page.mustache`, `edit_entry.mustache` | Ionic templates |
+| `mobileapp/styles.css` | Styles loaded by the app, scoped to `.mod-datalynx-mobile` |
+
+---
+
+## Web services in the mobile service
+
+| Function | Use |
+|---|---|
+| `mod_datalynx_get_mobile_entries` | Entries of a view, with search, filters and paging |
+| `mod_datalynx_get_entry_edit_form` | The form to add or edit an entry, with a control per field |
+| `mod_datalynx_submit_entry` | Save an entry through a view, with the rules of its entry form |
+| `mod_datalynx_delete_entry` | Delete one entry through a view |
+| `mod_datalynx_toggle_entry_approval` | Approve or disapprove an entry |
+
+Files and images need no extra service: entry HTML carries absolute `pluginfile.php` URLs of the
+activity, and the app's `core-format-text` fetches them with the user's token.
+
+---
+
+## Development workflow
+
+1. **After every change to `db/mobile.php`**, purge all caches. The app caches the plugin
+   definition (`tool_mobile` plugin info), including the list of language strings.
+2. **After every change to `db/services.php`**, bump `version.php` and run the upgrade. Otherwise
+   the function is not added to the mobile service.
+3. **A new string used in an app template** must be added to the `lang` list in `db/mobile.php`,
+   in English and German.
+4. In the app, open **Settings → About**, tap the app version several times to unlock the
+   developer options, then turn on:
+   - **Always show site plugin content errors**, so template errors are shown instead of an empty page;
+   - **Force reload site plugins**, or log out and in again after a change.
+5. The Moodle App in a desktop browser works well for development: run the app's Docker image and
+   open it in Chrome with the device toolbar set to 375 px.
+
+---
+
+## Template rules (Ionic Mustache)
+
+- The delimiters are switched to `<% %>` so that `{{ }}` stays Angular's. Only `cmid` and
+  `courseid` are written into the source; everything else is bound from `CONTENT_OTHERDATA.state`.
+- **otherdata values are strings.** The app JSON-parses a value only when it starts with `{` or
+  `[`. The whole page state therefore goes as one JSON object, `otherdata.state`.
+- Search uses `core-search-box` (it needs `searchLabel`). It submits its text again when it starts,
+  so guard `onSubmit` with `$event !== state.search`, or the page reloads forever.
+- Endless lists use `core-infinite-loading`.
+- Forms: `core-site-plugins-new-content` with `[samePage]="true"` and `form="<name>"` posts the
+  form's inputs as arguments. A multiple `ion-select` posts a comma-separated string.
+- Entry HTML is bound with `[text]` on `core-format-text`, never written into the template source.
+- `moodle-plugin-ci mustache` fails on warnings. The validator rejects `*ngIf` on native `p`, `div`
+  and `form`, and Angular bindings on native `input`; use `ng-container` or an Ionic element.
+
+---
+
+## Accessibility
+
+- Every input has a visible `label` (Ionic `label` with `labelPlacement="stacked"`).
+- Icons next to text are `aria-hidden="true"`.
+- The action buttons of an entry are grouped (`role="group"`) and named after the entry, so a
+  screen reader announces "Edit" together with the entry it belongs to.
+- Custom filter chips are toggle buttons (`role="button"`, `aria-pressed`).
+- The entry count is a polite live region, so a search result is announced.
+
+---
+
+## Tests
+
+| Kind | Where |
+|---|---|
+| PHPUnit | `tests/output/mobile_test.php`, `tests/external/*` (one per service), `tests/local/mobile/*`, `tests/local/field/edit_control_test.php` |
+| App acceptance (Behat `@app`) | `tests/behat/app_browse.feature`, `app_customfilter.feature`, `app_edit.feature`, `app_delete.feature`, `app_approve.feature` |
+
+The `@app` features need the plugin `local_moodleappbehat` in the Moodle root (same version as the
+app) and an app container; see
+[Acceptance testing for the Moodle App](https://moodledev.io/general/app/development/testing/acceptance-testing).
+Without them Moodle skips the `@app` features.
+
+Steps that work well:
+
+- `Given I entered the course "Course 1" as "student1" in the app` and then
+  `I press "<activity name>" in the app`;
+- `I press "Edit" near "Fruit: Apple" in the app`;
+- `I pull to refresh in the app` after saving.
+
+Gotchas:
+
+- The datalynx Behat field step names fields "Datalynx field X"; templates must use `[[Datalynx field X]]`.
+- The editor step drops a leading `##`; start a view section with a space.

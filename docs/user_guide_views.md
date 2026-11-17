@@ -40,6 +40,9 @@ In Moodle 4.5+, Datalynx views use **progressive AJAX-based browse loading** pow
 | **PDF** | Printable and formal output | Teachers, managers |
 | **Email** | Notification and message templates | Teachers, managers |
 
+> **Moodle App**  
+> **Grid** and **Tabular** views can be browsed in the Moodle App; the other types offer **Open in browser** there. The app offers the actions the view's tags offer. See [User Guide — Moodle App](user_guide_moodle_app.md).
+
 ---
 
 ## Practical layout model: Grid, List, and Single-style output

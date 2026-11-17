@@ -2482,6 +2482,17 @@ class datalynx {
     }
 
     /**
+     * Whether the current user may approve and disapprove entries: approval is on for this
+     * instance and the user has the capability. The ##approve## switch, the bulk approve button,
+     * the approval web service and the approve button of the Moodle App all ask this.
+     *
+     * @return bool
+     */
+    public function user_can_approve_entries(): bool {
+        return !empty($this->data->approval) && has_capability('mod/datalynx:approve', $this->context);
+    }
+
+    /**
      * Has a user reached the max number of entries?
      * If interval is set then required entries, max entries etc. are relative to the current interval
      *

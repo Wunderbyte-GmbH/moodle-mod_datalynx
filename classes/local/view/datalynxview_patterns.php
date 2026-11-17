@@ -621,7 +621,7 @@ class datalynxview_patterns {
 
             case '##multiapprove##':
             case '##multiapprove:icon##':
-                if ($dlx->data->approval && has_capability('mod/datalynx:approve', $dlx->context)) {
+                if ($dlx->user_can_approve_entries()) {
                     if ($tag == '##multiapprove##') {
                         $replacement = html_writer::empty_tag(
                             'input',

@@ -6,6 +6,7 @@ This guide explains daily entry operations for teachers and course managers:
 
 - Adding and editing records
 - Searching and filtering
+- Working in the Moodle App
 - Bulk actions
 - Import/export workflows
 
@@ -48,11 +49,23 @@ This guide explains daily entry operations for teachers and course managers:
 2. Select an existing filter.
 3. Review the filtered results.
 
-### Advanced filtering
+### Custom filters
 
-1. Open a view that provides advanced filtering controls.
-2. Define field-based conditions.
-3. Apply the filter and verify the result set.
+1. Open a view that includes `##customfilter:NAME##`.
+2. Fill in the fields of the search form (for example a text, a date range or several choices).
+3. Choose a sort field and direction if the form offers them.
+4. Apply the filter and verify the result set.
+
+Custom filters are set up under **Manage → Custom Filters**. The same filter works in the Moodle App.
+
+---
+
+## Entries in the Moodle App
+
+Learners and teachers can browse, search, add, edit, delete and approve entries in the Moodle App.
+The app follows the tags of the view: it offers **Edit** where the view has `##edit##`,
+**Approve** where it has `##approve##`, and so on. See
+[User Guide — Moodle App](user_guide_moodle_app.md).
 
 ---
 
@@ -150,6 +163,7 @@ Common export targets:
 | Add button is missing | View does not include add action or role lacks permission | Check view template and role permissions |
 | Cannot edit a record | Entry action not visible or edit permission restricted | Verify view actions and **Editable by** settings |
 | Filter returns no results | Filter conditions too strict | Remove one condition and re-test |
+| Add button is missing although the view has the tag | The user has reached the maximum number of entries | Check **Maximum entries** in the activity settings; managers are not limited |
 | Export option unavailable | Role permission or view configuration limitation | Ask manager/admin to review export capabilities |
 
 ---
@@ -157,4 +171,5 @@ Common export targets:
 ## Next
 
 - [User Guide — Permissions](user_guide_permissions.md)
+- [User Guide — Moodle App](user_guide_moodle_app.md)
 - [User Guide — Patterns, Styling, and Tools](user_guide_patterns_and_styling.md)

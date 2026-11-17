@@ -16,16 +16,21 @@
 
 namespace mod_datalynx\external;
 
-use context_module;
 use core_external\external_api;
 use core_external\external_function_parameters;
 use core_external\external_single_structure;
 use core_external\external_value;
-use mod_datalynx\datalynx;
+use invalid_parameter_exception;
 use mod_datalynx\local\datalynx_entries;
+use moodle_exception;
 
 /**
- * Web service to toggle the approval state of a datalynx entry.
+ * Web service to toggle the approval state of a datalynx entry: the ##approve## switch on the web
+ * and the approve button of the Moodle App.
+ *
+ * Who may approve is decided by datalynx::user_can_approve_entries(), the check the switch and
+ * the bulk approve button are shown by. The view, when given, must be one the user can see; it is
+ * passed on to the approval events.
  *
  * @package    mod_datalynx
  * @copyright  2026 Wunderbyte GmbH
@@ -54,8 +59,12 @@ class toggle_entry_approval extends external_api {
      * @param int $entryid Entry ID.
      * @param string $action Approval action.
      * @return array
+     * @throws invalid_parameter_exception for a view the user cannot see or an entry not in this instance
+     * @throws moodle_exception when approval is off or the user may not approve
      */
     public static function execute(int $d, int $viewid, int $entryid, string $action): array {
+        global $DB;
+
         $params = self::validate_parameters(self::execute_parameters(), [
             'd' => $d,
             'viewid' => $viewid,
@@ -63,14 +72,17 @@ class toggle_entry_approval extends external_api {
             'action' => $action,
         ]);
 
-        $cm = get_coursemodule_from_instance('datalynx', $params['d'], 0, false, MUST_EXIST);
-        $context = context_module::instance($cm->id);
+        $dlx = browse_request::require_access($params['d']);
+        if (!$dlx->user_can_approve_entries()) {
+            throw new moodle_exception('entryapprovenotallowed', 'datalynx');
+        }
+        if ($params['viewid'] && !array_key_exists($params['viewid'], $dlx->get_view_records())) {
+            throw new invalid_parameter_exception('View not available.');
+        }
+        if (!$DB->record_exists('datalynx_entries', ['id' => $params['entryid'], 'dataid' => $dlx->id()])) {
+            throw new invalid_parameter_exception('Entry not found.');
+        }
 
-        self::validate_context($context);
-        require_login($cm->course, true, $cm);
-        require_capability('mod/datalynx:approve', $context);
-
-        $dlx = new datalynx($params['d']);
         $entries = new datalynx_entries($dlx);
 
         return $entries->toggle_entry_approval($params['entryid'], $params['viewid'], $params['action']);

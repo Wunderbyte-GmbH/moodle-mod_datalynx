@@ -123,6 +123,7 @@ $functions = [
                 'type'        => 'write',
                 'capabilities' => 'mod/datalynx:approve',
                 'ajax'        => true,
+                'services'    => [MOODLE_OFFICIAL_MOBILE_SERVICE],
         ],
         'mod_datalynx_geocode_search' => [
                 'classname'   => 'mod_datalynx\external\geocode_search',

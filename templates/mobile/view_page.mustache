@@ -64,6 +64,7 @@
     <ng-container *ngIf="CONTENT_OTHERDATA.state.supported && CONTENT_OTHERDATA.state.customfilters.length">
     <div class="ion-padding-horizontal mod-datalynx-mobile-customfilters">
         <ion-chip *ngFor="let cf of CONTENT_OTHERDATA.state.customfilters" [outline]="!cf.active"
+                role="button" [attr.aria-pressed]="cf.active"
                 core-site-plugins-new-content [samePage]="true"
                 [args]="{cmid: <% cmid %>, courseid: <% courseid %>, viewid: CONTENT_OTHERDATA.state.viewid, customfilterid: cf.active ? 0 : cf.id}">
             <ion-icon name="fas-filter" aria-hidden="true"></ion-icon>
@@ -192,7 +193,7 @@
             </div>
         </ng-container>
         <ng-container *ngIf="CONTENT_OTHERDATA.state.entriesfiltercount">
-            <p class="ion-padding-horizontal mod-datalynx-mobile-count">
+            <p class="ion-padding-horizontal mod-datalynx-mobile-count" aria-live="polite">
                 {{ 'plugin.mod_datalynx.mobileshowingxofy' | translate: { $a: {
                     count: CONTENT_OTHERDATA.state.entries.length, total: CONTENT_OTHERDATA.state.entriesfiltercount
                 } } }}
@@ -216,7 +217,19 @@
                     </ion-label>
                 </ion-item>
             </ion-list>
-            <ion-card-content *ngIf="entry.canedit || entry.candelete" class="mod-datalynx-mobile-actions">
+            <ion-card-content *ngIf="entry.canedit || entry.candelete || entry.canapprove" class="mod-datalynx-mobile-actions"
+                    role="group" [attr.aria-label]="entry.title || null">
+                <ion-button *ngIf="entry.canapprove" fill="clear" size="small" [color]="entry.approved ? 'medium' : 'success'"
+                        core-site-plugins-call-ws name="mod_datalynx_toggle_entry_approval"
+                        [params]="{d: CONTENT_OTHERDATA.state.datalynxid, viewid: CONTENT_OTHERDATA.state.viewid, entryid: entry.id,
+                            action: entry.approved ? 'disapprove' : 'approve'}"
+                        [preSets]="{getFromCache: false, saveToCache: false}"
+                        [successMessage]="(entry.approved ? 'plugin.mod_datalynx.datalynxentrydisapproved'
+                            : 'plugin.mod_datalynx.datalynxentryapproved') | translate"
+                        refreshOnSuccess="true">
+                    <ion-icon [name]="entry.approved ? 'fas-xmark' : 'fas-check'" slot="start" aria-hidden="true"></ion-icon>
+                    {{ (entry.approved ? 'plugin.mod_datalynx.mobiledisapproveentry' : 'plugin.mod_datalynx.mobileapproveentry') | translate }}
+                </ion-button>
                 <ion-button *ngIf="entry.canedit" fill="clear" size="small" core-site-plugins-new-content
                         component="mod_datalynx" method="mobile_edit_entry" [title]="'core.edit' | translate"
                         [args]="{cmid: <% cmid %>, courseid: <% courseid %>, viewid: CONTENT_OTHERDATA.state.viewid, entryid: entry.id}">

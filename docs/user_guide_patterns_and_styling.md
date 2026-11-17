@@ -367,7 +367,7 @@ Custom CSS can improve readability and visual consistency across views.
 |---|---|
 | Readability | Use clear spacing and line-height |
 | Status clarity | Use consistent color coding for states |
-| Mobile support | Avoid fixed-width blocks for core content |
+| Mobile support | Avoid fixed-width blocks for core content; see [Moodle App](user_guide_moodle_app.md) for how entries look in the app |
 | Reuse | Keep one small style system for all views |
 
 ---

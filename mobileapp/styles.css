@@ -40,3 +40,38 @@
     background: none;
     color: var(--ion-color-primary);
 }
+
+/* Nothing in an entry may be wider than the screen, whatever its inline width, and long words
+   such as URLs and e-mail addresses wrap instead of widening the page. */
+.mod-datalynx-mobile .mod-datalynx-mobile-entry * {
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.mod-datalynx-mobile .mod-datalynx-mobile-entry {
+    overflow-wrap: anywhere;
+}
+
+/* Table cells of entry templates have no spacing in the app; without it their texts run together. */
+.mod-datalynx-mobile .mod-datalynx-mobile-entry td,
+.mod-datalynx-mobile .mod-datalynx-mobile-entry th {
+    padding: 0.25em 0.5em 0.25em 0;
+    vertical-align: top;
+}
+
+/* The approval state a read-only ##approve## shows, as a badge like on the web. */
+.mod-datalynx-mobile .mod-datalynx-mobile-entry .datalynxfield_approve-readonly {
+    display: inline-block;
+    padding: 0.25em 0.6em;
+    border-radius: 1em;
+    background: var(--ion-color-light);
+    color: var(--ion-color-light-contrast);
+    font-size: 0.75em;
+    font-weight: bold;
+}
+
+.mod-datalynx-mobile .mod-datalynx-mobile-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25em;
+}

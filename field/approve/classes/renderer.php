@@ -50,8 +50,7 @@ class renderer extends datalynxfield_renderer {
     public function accepts_input(string $tag, stdClass $entry): bool {
         $dlx = $this->field->dlx();
 
-        return trim($tag, '@') === '##approve##' && $dlx->data->approval
-            && has_capability('mod/datalynx:approve', $dlx->context);
+        return trim($tag, '@') === '##approve##' && $dlx->user_can_approve_entries();
     }
 
     /**
@@ -65,7 +64,7 @@ class renderer extends datalynxfield_renderer {
     public function replacements(?array $tags = null, $entry = null, ?array $options = null): array {
         $dlx = $this->field->dlx();
 
-        $canapprove = has_capability('mod/datalynx:approve', $dlx->context);
+        $canapprove = $dlx->user_can_approve_entries();
         $edit = !empty($options['edit']) ? $options['edit'] && $canapprove : false;
         $replacements = [];
         // Just one tag, empty until we check df settings.
@@ -161,7 +160,7 @@ class renderer extends datalynxfield_renderer {
             'aria-label' => $statelabel,
         ];
 
-        if (has_capability('mod/datalynx:approve', $field->dlx()->context)) {
+        if ($field->dlx()->user_can_approve_entries()) {
             $PAGE->requires->js_call_amd('mod_datalynx/approve', 'init');
 
             $currentview = $this->field->dlx()->get_current_view();

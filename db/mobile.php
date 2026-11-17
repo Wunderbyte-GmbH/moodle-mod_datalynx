@@ -40,12 +40,16 @@ $addons = [
                 'method' => 'mobile_course_view',
                 'styles' => [
                     'url' => $CFG->wwwroot . '/mod/datalynx/mobileapp/styles.css',
-                    'version' => 1,
+                    'version' => 2,
                 ],
             ],
         ],
         'lang' => [
             ['pluginname', 'datalynx'],
+            ['datalynxentryapproved', 'datalynx'],
+            ['datalynxentrydisapproved', 'datalynx'],
+            ['mobileapproveentry', 'datalynx'],
+            ['mobiledisapproveentry', 'datalynx'],
             ['mobilecheckentry', 'datalynx'],
             ['mobileentrysaved', 'datalynx'],
             ['mobilelinktext', 'datalynx'],

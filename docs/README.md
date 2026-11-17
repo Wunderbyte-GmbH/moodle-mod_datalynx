@@ -25,7 +25,9 @@ This documentation is written for:
 | Store a place on an entry and filter by distance | [User Guide — Location Field](user_guide_location_field.md) |
 | Store a journey with several stops and match routes | [User Guide — Itinerary Field](user_guide_itinerary_field.md) |
 | Build a ridesharing / carpooling board (worked example) | [User Guide — Ridesharing Example](user_guide_ridesharing.md) |
+| Use Datalynx in the Moodle App, and build views that work on a phone | [User Guide — Moodle App](user_guide_moodle_app.md) |
 | **(Administrators)** Choose and configure the map, address-lookup and routing services | [User Guide — Map Services](user_guide_map_services.md) |
+| **(Developers)** Work on the Moodle App support | [Developer Notes — Moodle App](developer_moodle_app.md) |
 
 ---
 
@@ -39,6 +41,7 @@ This documentation is written for:
 6. Define daily operation in **Managing Entries**.
 7. Finalize governance in **Permissions**.
 8. Optimize UX with **Patterns, Styling, and Tools**.
+9. Check your views on a phone with **Moodle App**.
 
 ### Working with maps
 

@@ -16,6 +16,7 @@
 
 namespace mod_datalynx\local\mobile;
 
+use datalynxfield_approve\field as approvefield;
 use invalid_parameter_exception;
 use mod_datalynx\datalynx;
 use mod_datalynx\external\browse_request;
@@ -48,9 +49,10 @@ use stdClass;
  *   the app lists rather than draws as a table), for accessible labels, and as the fallback when
  *   a grid view has no entry template.
  *
- * What the user may do with the entries (canadd, canedit, candelete) is decided by the checks the
- * services that do it apply: the user's rights on the entry and the action tags of the view, as
- * on the web, where a view without ##edit## offers no editing.
+ * What the user may do with the entries (canadd, canedit, candelete, canapprove) is decided by the
+ * checks the services that do it apply: the user's rights on the entry and the action tags of the
+ * view, as on the web, where a view without ##edit## offers no editing and a view without
+ * ##approve## no approval switch.
  *
  * The filter state arrives with every request and is never stored, unlike the desktop's user
  * preferences: two devices of one user would otherwise overwrite each other's filter.
@@ -352,6 +354,8 @@ final class entries_payload_builder {
             'edit' => $view->confirm_view_action('edit', $viewid),
             'delete' => $view->confirm_view_action('delete', $viewid),
         ];
+        $canapprove = $this->dlx->user_can_approve_entries()
+            && !empty(($view->get__patterns('field') ?? [])[approvefield::_APPROVED]);
         $entries = [];
 
         foreach ($records as $record) {
@@ -375,6 +379,7 @@ final class entries_payload_builder {
                 'timemodified' => (int) $record->timemodified,
                 'canedit' => $manageable && $viewallows['edit'],
                 'candelete' => $manageable && $viewallows['delete'],
+                'canapprove' => $canapprove,
             ];
         }
 

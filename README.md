@@ -23,7 +23,8 @@ Interested in more features? [Contact us for a quote.](mailto:info@edulabs.org)
 ## Features
 + More then 20 different data types for structured data (from text to date to teammembers)
 + Create views visible to certain roles
-+ Filter data with powerful filtering and search methods including a custom filter and an advanced filter
++ Filter data with powerful filtering and search methods including custom filters
++ Browse, search, add, edit, delete and approve entries in the Moodle App
 + Create renderers in order to display your data the way you want it
 + Define notifications to be sent to certain roles triggered by events like "comment added"
 + Export your data to CSV, PDF
@@ -35,6 +36,10 @@ Interested in more features? [Contact us for a quote.](mailto:info@edulabs.org)
 
 
 ## Documentation
+The current documentation is in the [docs](docs/README.md) folder, including
+[using Datalynx in the Moodle App](docs/user_guide_moodle_app.md) and
+[developer notes for the Moodle App](docs/developer_moodle_app.md).
+
 [Visit Moodle docs wiki](https://docs.moodle.org/36/en/Datalynx_module) for documentation. Installation documentation see [installation](https://docs.moodle.org/35/en/Installing_plugins)
 
 ## Communication

@@ -157,6 +157,10 @@ class get_mobile_entries extends external_api {
                 'timemodified' => new external_value(PARAM_INT, 'Time modified'),
                 'canedit' => new external_value(PARAM_BOOL, 'Whether the user may edit the entry through this view'),
                 'candelete' => new external_value(PARAM_BOOL, 'Whether the user may delete the entry through this view'),
+                'canapprove' => new external_value(
+                    PARAM_BOOL,
+                    'Whether the user may approve or disapprove the entry through this view'
+                ),
             ])),
             'views' => new external_multiple_structure(new external_single_structure([
                 'id' => new external_value(PARAM_INT, 'View ID'),
