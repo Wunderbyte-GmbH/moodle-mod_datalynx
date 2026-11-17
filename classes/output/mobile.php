@@ -18,6 +18,8 @@ namespace mod_datalynx\output;
 
 use context_module;
 use mod_datalynx\datalynx;
+use mod_datalynx\external\submit_entry;
+use mod_datalynx\local\entry\entry_edit_form;
 use mod_datalynx\local\mobile\customfilter_form;
 use mod_datalynx\local\mobile\entries_payload_builder;
 use stdClass;
@@ -110,6 +112,111 @@ class mobile {
             'javascript' => '',
             'otherdata' => self::otherdata($otherdata),
         ];
+    }
+
+    /**
+     * Add or edit an entry (mod_datalynx#273).
+     *
+     * The form is the one get_entry_edit_form serves (local\entry\entry_edit_form); saving goes
+     * through submit_entry, the same path as every other client. The app sends the form's inputs
+     * (ef_{fieldid}__{input}) with save=1, and status=1 (draft) or 2 (final submission) where the
+     * form has a status. On errors the page comes back with the values entered and the errors at
+     * their fields.
+     *
+     * @param array $args arguments of tool_mobile_get_content, all strings
+     * @return array templates, javascript and otherdata
+     */
+    public static function mobile_edit_entry(array $args): array {
+        global $OUTPUT;
+
+        $rawargs = $args;
+        $args = self::args($args, [
+            'cmid' => PARAM_INT,
+            'courseid' => PARAM_INT,
+            'viewid' => PARAM_INT,
+            'entryid' => PARAM_INT,
+            'save' => PARAM_INT,
+            'status' => PARAM_INT,
+        ]);
+        [$cm] = self::context($args->cmid);
+        $dlx = new datalynx($cm->instance);
+        $records = $dlx->get_view_records();
+        if (empty($records[$args->viewid])) {
+            throw new \invalid_parameter_exception('View not available.');
+        }
+        $record = $records[$args->viewid];
+        $builder = new entry_edit_form($dlx->get_view($record->type, $record));
+
+        $entryid = max(0, $args->entryid);
+        $form = $builder->build($entryid);
+        $saved = false;
+        $message = '';
+        if ($args->save && $form['allowed'] && $form['supported']) {
+            $status = $form['hasstatus'] && in_array($args->status, [1, 2], true) ? $args->status : null;
+            [$data, $posted] = entry_edit_form::submission($form, $rawargs, $status);
+            $result = submit_entry::execute($dlx->id(), $args->viewid, $entryid, $data);
+            if ($result['status']) {
+                $saved = true;
+                $entryid = (int) $result['entryid'];
+                $form = $builder->build($entryid);
+                $message = get_string('mobileentrysaved', 'datalynx');
+            } else {
+                $form = $builder->build($entryid, $posted);
+                $errors = [];
+                foreach ($result['errors'] as $error) {
+                    $errors[(string) $error['fieldid']] = $error['message'];
+                }
+                foreach ($form['fields'] as &$field) {
+                    $field['error'] = $errors[(string) $field['fieldid']] ?? '';
+                }
+                unset($field);
+                $message = $result['errors']
+                    ? get_string('mobilecheckentry', 'datalynx')
+                    : implode(' ', array_column($result['warnings'], 'message'));
+            }
+        }
+
+        $html = $OUTPUT->render_from_template('mod_datalynx/mobile/edit_entry', [
+            'cmid' => (int) $cm->id,
+            'courseid' => (int) $cm->course,
+        ]);
+
+        return [
+            'templates' => [
+                ['id' => 'main', 'html' => $html],
+            ],
+            'javascript' => '',
+            'otherdata' => self::otherdata(self::edit_state($form) + [
+                'viewid' => (int) $args->viewid,
+                'saved' => $saved,
+                'message' => $message,
+            ]),
+        ];
+    }
+
+    /**
+     * The form as the edit template shows it: each input with the value its control shows (a day
+     * for a datetime, minutes for a duration).
+     *
+     * @param array $form see entry_edit_form::build()
+     * @return array
+     */
+    private static function edit_state(array $form): array {
+        foreach ($form['fields'] as &$field) {
+            foreach ($field['inputs'] as &$input) {
+                $value = $input['value'];
+                $input['show'] = match ($field['control']) {
+                    'datetime' => entry_edit_form::to_date_input((string) $value, !empty($field['includetime'])),
+                    'duration' => $value === '' ? '' : (string) round(((int) $value) / 60, 2),
+                    default => $value,
+                };
+            }
+            unset($input);
+        }
+        unset($field);
+        $form['unsupportedlist'] = implode(', ', $form['unsupportedfields']);
+
+        return $form;
     }
 
     /**

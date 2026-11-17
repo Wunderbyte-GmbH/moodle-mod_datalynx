@@ -1,0 +1,131 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_datalynx/mobile/edit_entry
+
+    Moodle App: add or edit an entry.
+
+    Rendered on the server, compiled by Angular in the app; the delimiters are switched to <% %>
+    so that the double curly braces stay Angular's. The form comes from CONTENT_OTHERDATA.state
+    (see \mod_datalynx\output\mobile::mobile_edit_entry()): one block per field, switching on its
+    control. The inputs are named ef_{fieldid}__{input}; Save sends them with the form.
+
+    Example context (json):
+    {
+        "cmid": 12,
+        "courseid": 3
+    }
+}}
+{{=<% %>=}}
+<div class="mod-datalynx-mobile mod-datalynx-mobile-edit">
+    <ng-container *ngIf="CONTENT_OTHERDATA.state.message">
+        <ion-card [color]="CONTENT_OTHERDATA.state.saved ? 'success' : 'danger'">
+            <ion-card-content>{{ CONTENT_OTHERDATA.state.message }}</ion-card-content>
+        </ion-card>
+    </ng-container>
+
+    <ng-container *ngIf="!CONTENT_OTHERDATA.state.allowed">
+        <ion-card>
+            <ion-card-content>{{ CONTENT_OTHERDATA.state.denyreason }}</ion-card-content>
+        </ion-card>
+    </ng-container>
+
+    <ng-container *ngIf="CONTENT_OTHERDATA.state.allowed && !CONTENT_OTHERDATA.state.supported">
+        <ion-card>
+            <ion-card-content>
+                <p>{{ 'plugin.mod_datalynx.mobileunsupportedfields' | translate: {$a: CONTENT_OTHERDATA.state.unsupportedlist} }}</p>
+                <ion-button expand="block" fill="outline" [href]="CONTENT_OTHERDATA.state.browserurl" core-link autoLogin="yes">
+                    {{ 'plugin.mod_datalynx.mobileopeninbrowser' | translate }}
+                </ion-button>
+            </ion-card-content>
+        </ion-card>
+    </ng-container>
+
+    <ng-container *ngIf="CONTENT_OTHERDATA.state.allowed && CONTENT_OTHERDATA.state.supported">
+    <form name="dlxeditentry">
+        <ion-list>
+            <ng-container *ngFor="let f of CONTENT_OTHERDATA.state.fields">
+                <!-- Hidden controls (e.g. the identifier flag) are filled in by the server on save. -->
+                <ion-item *ngIf="f.control === 'static'" class="ion-text-wrap">
+                    <ion-label>
+                        <p class="item-heading">{{ f.name }}</p>
+                        <core-format-text [text]="f.html" component="mod_datalynx" [componentId]="<% cmid %>"
+                                contextLevel="module" [contextInstanceId]="<% cmid %>" [courseId]="<% courseid %>"></core-format-text>
+                    </ion-label>
+                </ion-item>
+                <ng-container *ngIf="f.control === 'text' || f.control === 'number' || f.control === 'url' || f.control === 'duration'">
+                    <ion-item *ngFor="let i of f.inputs">
+                        <ion-input labelPlacement="stacked" [name]="i.formname" [value]="i.show"
+                                [label]="(i.name === 'alt' ? ('plugin.mod_datalynx.mobilelinktext' | translate)
+                                    : f.control === 'duration' ? f.name + ' (' + ('plugin.mod_datalynx.mobileminutes' | translate) + ')'
+                                    : f.name) + (f.required && i.name !== 'alt' ? ' *' : '')"
+                                [type]="f.control === 'number' || f.control === 'duration' ? 'text' : (i.name === 'url' ? 'url' : 'text')"
+                                [attr.inputmode]="f.control === 'duration' ? 'decimal' : f.inputmode"></ion-input>
+                    </ion-item>
+                </ng-container>
+                <ion-item *ngIf="f.control === 'textarea'">
+                    <ion-textarea labelPlacement="stacked" [label]="f.name + (f.required ? ' *' : '')" [autoGrow]="true"
+                            [name]="f.inputs[0].formname" [value]="f.inputs[0].show"></ion-textarea>
+                </ion-item>
+                <ion-item *ngIf="f.control === 'datetime'">
+                    <ion-input labelPlacement="stacked" [label]="f.name + (f.required ? ' *' : '')"
+                            [type]="f.includetime ? 'datetime-local' : 'date'"
+                            [name]="f.inputs[0].formname" [value]="f.inputs[0].show"></ion-input>
+                </ion-item>
+                <ion-item *ngIf="f.control === 'select' || f.control === 'radio' || f.control === 'multiselect' || f.control === 'checkbox'">
+                    <ion-select labelPlacement="stacked" [label]="f.name + (f.required ? ' *' : '')" interface="alert"
+                            [multiple]="f.multiple" [name]="f.inputs[0].formname" [value]="f.inputs[0].show">
+                        <ion-select-option *ngIf="!f.multiple" value="">{{ 'core.choosedots' | translate }}</ion-select-option>
+                        <ion-select-option *ngFor="let o of f.choices" [value]="o.value" [disabled]="o.disabled">{{ o.label }}</ion-select-option>
+                    </ion-select>
+                </ion-item>
+                <ng-container *ngIf="f.error">
+                    <ion-item lines="none">
+                        <ion-note color="danger">{{ f.error }}</ion-note>
+                    </ion-item>
+                </ng-container>
+            </ng-container>
+        </ion-list>
+        <ng-container *ngIf="CONTENT_OTHERDATA.state.unsupportedfields.length">
+            <p class="ion-padding-horizontal">
+                {{ 'plugin.mod_datalynx.mobileunsupportedfields' | translate: {$a: CONTENT_OTHERDATA.state.unsupportedlist} }}
+            </p>
+        </ng-container>
+        <div class="ion-padding-horizontal">
+            <ng-container *ngIf="CONTENT_OTHERDATA.state.hasstatus">
+                <ion-button expand="block" fill="outline" type="button" form="dlxeditentry" core-site-plugins-new-content [samePage]="true"
+                        [args]="{cmid: <% cmid %>, courseid: <% courseid %>, viewid: CONTENT_OTHERDATA.state.viewid,
+                            entryid: CONTENT_OTHERDATA.state.entryid, save: 1, status: 1}">
+                    {{ 'plugin.mod_datalynx.mobilesavedraft' | translate }}
+                </ion-button>
+                <ion-button expand="block" type="button" form="dlxeditentry" core-site-plugins-new-content [samePage]="true"
+                        [args]="{cmid: <% cmid %>, courseid: <% courseid %>, viewid: CONTENT_OTHERDATA.state.viewid,
+                            entryid: CONTENT_OTHERDATA.state.entryid, save: 1, status: 2}">
+                    {{ 'plugin.mod_datalynx.mobilesubmitentry' | translate }}
+                </ion-button>
+            </ng-container>
+            <ng-container *ngIf="!CONTENT_OTHERDATA.state.hasstatus">
+                <ion-button expand="block" type="button" form="dlxeditentry" core-site-plugins-new-content [samePage]="true"
+                        [args]="{cmid: <% cmid %>, courseid: <% courseid %>, viewid: CONTENT_OTHERDATA.state.viewid,
+                            entryid: CONTENT_OTHERDATA.state.entryid, save: 1}">
+                    {{ 'plugin.mod_datalynx.mobilesaveentry' | translate }}
+                </ion-button>
+            </ng-container>
+        </div>
+    </form>
+    </ng-container>
+</div>

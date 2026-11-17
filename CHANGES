@@ -20,6 +20,22 @@ mod_datalynx changes
   and entries left to add, the same check as the web's "Add entry" link,
   which now lives in datalynx::user_can_add_new_entry()), and a plain text
   title per entry.
+- Moodle App (#272, #273): entries can be added and edited in the app.
+  - mod_datalynx_get_entry_edit_form (mobile service) serves the form of an
+    entry through a view. local\entry\entry_edit_form builds it once, for
+    the service and for the app's edit screen:
+    - whether the user may add or edit: the checks of the save;
+    - what each field shows: entry_submission_service::get_field_states();
+    - its control: get_edit_control() (#271);
+    - fields without a control are listed; a required one sends the user to
+      the web.
+  - The app's edit screen (output\mobile::mobile_edit_entry, template
+    mobile/edit_entry) loops over the controls. Saving goes through
+    submit_entry; errors come back at their fields with the values kept.
+    "Save draft" and "Submit" are offered where the view has a status.
+  - The browse page offers "Add a new entry" (canadd) and "Edit"
+    (canedit).
+  - Version 2026111804.
 - Entry editing outside the web form (#271): each field type describes the
   control that edits it (datalynxfield_renderer::get_edit_control()): the
   control, its inputs named after the field's input contract with their

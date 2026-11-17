@@ -375,4 +375,74 @@ final class submit_entry_test extends externallib_advanced_testcase {
 
         $this->assertSame(1, $this->dlx->user_num_entries());
     }
+
+    /**
+     * Empty items of a list are no options (#272).
+     */
+    public function test_list_ignores_empty_items(): void {
+        $result = $this->call([$this->value('Title', 'List'), $this->value('Tags', ['1', '', '2'])]);
+
+        $this->assertTrue($result['status'], json_encode($result));
+        $this->assertSame('#1#,#2#', $this->contents($result['entryid'])['Tags']);
+    }
+
+    /**
+     * An empty submission is an error at the required field, without a PHP warning.
+     */
+    public function test_empty_submission(): void {
+        $this->expectOutputString('');
+
+        $result = $this->call([]);
+
+        $this->assertFalse($result['status']);
+        $this->assertSame((string) $this->fieldids['Title'], $result['errors'][0]['fieldid']);
+    }
+
+    /**
+     * Adding fires entry_created, editing entry_updated: rules and notifications run as on the web.
+     */
+    public function test_events(): void {
+        $sink = $this->redirectEvents();
+        $entryid = $this->call([$this->value('Title', 'First')])['entryid'];
+        $this->call([$this->value('Title', 'Changed')], $entryid);
+        $events = array_map(fn($event) => get_class($event), $sink->get_events());
+        $sink->close();
+
+        $this->assertContains(\mod_datalynx\event\entry_created::class, $events);
+        $this->assertContains(\mod_datalynx\event\entry_updated::class, $events);
+    }
+
+    /**
+     * Draft to final submission stamps timesubmitted once; the final submission is locked for its
+     * author.
+     */
+    public function test_final_submission(): void {
+        global $DB;
+
+        $statusview = $this->add_mobile_view($this->dlx, 'grid', 'Submit', '[[Title|Required]] ##status## ##edit##', [
+            'section' => '##addnewentry## ##entries##',
+        ]);
+        $status = fn(int $value) => ['fieldid' => 'status', 'name' => '', 'value' => (string) $value];
+        $student = $this->create_mobile_student($this->course);
+        $this->setUser($student);
+
+        $entryid = $this->call([$this->value('Title', 'Draft'), $status(1)], 0, $statusview)['entryid'];
+        $this->assertEmpty($DB->get_field('datalynx_entries', 'timesubmitted', ['id' => $entryid]));
+
+        $result = $this->call([$this->value('Title', 'Final'), $status(2)], $entryid, $statusview);
+        $this->assertTrue($result['status'], json_encode($result));
+        $submitted = $DB->get_field('datalynx_entries', 'timesubmitted', ['id' => $entryid]);
+        $this->assertNotEmpty($submitted);
+
+        // Locked for the author now.
+        $result = $this->call([$this->value('Title', 'Changed after'), $status(2)], $entryid, $statusview);
+        $this->assertFalse($result['status']);
+        $this->assertSame('Final', $this->contents($entryid)['Title']);
+
+        // A manager edits it, still final: submitted stays the first time.
+        $this->setAdminUser();
+        $DB->set_field('datalynx_entries', 'timesubmitted', $submitted - 100, ['id' => $entryid]);
+        $this->assertTrue($this->call([$this->value('Title', 'Corrected'), $status(2)], $entryid, $statusview)['status']);
+        $this->assertEquals($submitted - 100, $DB->get_field('datalynx_entries', 'timesubmitted', ['id' => $entryid]));
+    }
 }

@@ -181,6 +181,16 @@
     </ion-card>
 
     <ng-container *ngIf="CONTENT_OTHERDATA.state.hasview && CONTENT_OTHERDATA.state.supported">
+        <ng-container *ngIf="CONTENT_OTHERDATA.state.canadd">
+            <div class="ion-padding-horizontal">
+                <ion-button expand="block" core-site-plugins-new-content component="mod_datalynx" method="mobile_edit_entry"
+                        [title]="'plugin.mod_datalynx.entryaddnew' | translate"
+                        [args]="{cmid: <% cmid %>, courseid: <% courseid %>, viewid: CONTENT_OTHERDATA.state.viewid, entryid: 0}">
+                    <ion-icon name="fas-plus" slot="start" aria-hidden="true"></ion-icon>
+                    {{ 'plugin.mod_datalynx.entryaddnew' | translate }}
+                </ion-button>
+            </div>
+        </ng-container>
         <ng-container *ngIf="CONTENT_OTHERDATA.state.entriesfiltercount">
             <p class="ion-padding-horizontal mod-datalynx-mobile-count">
                 {{ 'plugin.mod_datalynx.mobileshowingxofy' | translate: { $a: {
@@ -206,8 +216,14 @@
                     </ion-label>
                 </ion-item>
             </ion-list>
-            <ion-card-content *ngIf="entry.candelete" class="mod-datalynx-mobile-actions">
-                <ion-button fill="clear" color="danger" size="small" core-site-plugins-call-ws
+            <ion-card-content *ngIf="entry.canedit || entry.candelete" class="mod-datalynx-mobile-actions">
+                <ion-button *ngIf="entry.canedit" fill="clear" size="small" core-site-plugins-new-content
+                        component="mod_datalynx" method="mobile_edit_entry" [title]="'core.edit' | translate"
+                        [args]="{cmid: <% cmid %>, courseid: <% courseid %>, viewid: CONTENT_OTHERDATA.state.viewid, entryid: entry.id}">
+                    <ion-icon name="fas-pen" slot="start" aria-hidden="true"></ion-icon>
+                    {{ 'core.edit' | translate }}
+                </ion-button>
+                <ion-button *ngIf="entry.candelete" fill="clear" color="danger" size="small" core-site-plugins-call-ws
                         name="mod_datalynx_delete_entry"
                         [params]="{d: CONTENT_OTHERDATA.state.datalynxid, viewid: CONTENT_OTHERDATA.state.viewid, entryid: entry.id}"
                         [preSets]="{getFromCache: false, saveToCache: false}"

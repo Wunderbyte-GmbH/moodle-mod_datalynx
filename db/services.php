@@ -171,6 +171,16 @@ $functions = [
                 'ajax'        => true,
                 'services'    => [MOODLE_OFFICIAL_MOBILE_SERVICE],
         ],
+        'mod_datalynx_get_entry_edit_form' => [
+                'classname'   => 'mod_datalynx\\external\\get_entry_edit_form',
+                'methodname'  => 'execute',
+                'classpath'   => '',
+                'description' => 'The form to add or edit an entry through a view, with the control of each field.',
+                'type'        => 'read',
+                'capabilities' => 'mod/datalynx:viewentry',
+                'ajax'        => true,
+                'services'    => [MOODLE_OFFICIAL_MOBILE_SERVICE],
+        ],
         'mod_datalynx_submit_entry' => [
                 'classname'   => 'mod_datalynx\external\submit_entry',
                 'methodname'  => 'execute',
