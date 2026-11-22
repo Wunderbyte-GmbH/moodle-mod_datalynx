@@ -68,11 +68,15 @@ class renderer extends SelectRenderer {
             $separator = $field->separators[$param3]['chr'];
         }
 
+        // An option used up by other entries can't be chosen, unless this entry has chosen it already.
+        $disabled = array_diff($this->get_disabled_options(), [$selected]);
+
         $elemgrp = [];
         // Only the labels: the default value above is matched against the raw option text.
         // Radio labels are rendered as html, so keep the default escaping.
         foreach ($this->format_option_labels($menuoptions, true) as $id => $option) {
-            $radio = &$mform->createElement('radio', $fieldname, '', $option, $id);
+            $attributes = in_array($id, $disabled) ? ['disabled' => 'disabled'] : null;
+            $radio = &$mform->createElement('radio', $fieldname, '', $option, $id, $attributes);
             if ($id == $selected) {
                 $radio->setChecked(true);
             }
@@ -204,9 +208,11 @@ class renderer extends SelectRenderer {
      */
     public function get_edit_control(stdClass $entry, array $options): ?array {
         $selected = $this->get_selected_option($entry);
+        // An option chosen before it was used up stays choosable.
+        $disabled = array_diff($this->get_disabled_options(), [$selected]);
 
         return $this->edit_control('radio', ['' => $selected ?: ''], $options, [
-            'choices' => self::edit_choices($this->format_option_labels($this->field->options_menu())),
+            'choices' => self::edit_choices($this->format_option_labels($this->field->options_menu()), $disabled),
         ]);
     }
 }

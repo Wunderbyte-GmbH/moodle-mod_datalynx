@@ -187,7 +187,9 @@ class renderer extends datalynxfield_renderer {
                 $content = clean_param($formdata->{$formfieldname}, PARAM_INT);
                 if (array_search($content, $disabled) !== false) {
                     $menu = $this->field->options_menu();
-                    $errors[$formfieldname] = get_string('limitchoiceerror', 'datalynx', $menu[$content]);
+                    // Shown where the field renders its error, e.g. the group of radio buttons.
+                    $errors[$this->get_error_element($formfieldname)] =
+                        get_string('limitchoiceerror', 'datalynx', $menu[$content]);
                 }
             }
         }
