@@ -101,7 +101,9 @@ abstract class base {
 
                 // Variable $rule is a rule id.
             } else {
-                if ($ruleobj = $this->dlx->get_rule_from_id($rule)) {
+                $rulemanager = $this->dlx->get_rule_manager();
+                $ruleobj = $rulemanager->get_rule_from_id($rule) ?? $rulemanager->get_rule_from_id($rule, true);
+                if ($ruleobj) {
                     $this->rule = $ruleobj->rule;
                 } else {
                     throw new moodle_exception('invalidrule', 'datalynx', null, null, $rule);
