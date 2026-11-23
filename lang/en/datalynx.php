@@ -932,7 +932,6 @@ $string['statuslockeddesc'] = 'The entry has been submitted bindingly. Its statu
 $string['statusmarkfinal'] = 'Mark as final submission';
 $string['statusnotcreated'] = 'Not set';
 $string['statusrequired'] = 'Status must be set!';
-$string['statussubmission'] = 'Submission';
 $string['statustoggledesc'] = 'If you save the application as a draft, you can finalise and submit it later. If you submit the application bindingly, it can no longer be changed afterwards. Please review your submission beforehand.';
 $string['student'] = 'Student';
 $string['subfieldactions'] = 'Actions';

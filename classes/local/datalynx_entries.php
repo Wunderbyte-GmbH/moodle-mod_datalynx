@@ -1510,8 +1510,13 @@ class datalynx_entries {
 
         $dlx = $this->dlx;
 
+        // The status is decided once below, from the submitted value only if it is a status.
+        $previousstatus = $entry->status ?? null;
         if ($data && has_capability('mod/datalynx:manageentries', $dlx->context)) {
             foreach ($data as $key => $value) {
+                if ($key === 'status') {
+                    continue;
+                }
                 if ($key == 'name') {
                     $entry->userid = $value;
                 } else {
@@ -1544,7 +1549,7 @@ class datalynx_entries {
                     $entry->timemodified = $this->current_time();
                 }
 
-                $entry->status = isset($data['status']) ? $data['status'] : $entry->status;
+                $entry->status = datalynxfield_status::to_status($data['status'] ?? null) ?? $previousstatus;
 
                 // Stamp the final-submission date exactly once and never overwrite it afterwards.
                 $oldsubmitted = $DB->get_field('datalynx_entries', 'timesubmitted', ['id' => $entry->id]);
@@ -1584,7 +1589,9 @@ class datalynx_entries {
                 if (!isset($entry->timemodified)) {
                     $entry->timemodified = $this->current_time();
                 }
-                $entry->status = isset($data['status']) ? $data['status'] : (isset($entry->status) ? $entry->status : 0);
+                $entry->status = datalynxfield_status::to_status($data['status'] ?? null)
+                    ?? datalynxfield_status::to_status($previousstatus)
+                    ?? datalynxfield_status::STATUS_NOT_SET;
                 // Stamp the final-submission date if the entry is created directly as final.
                 if ((int) $entry->status === datalynxfield_status::STATUS_FINAL_SUBMISSION) {
                     $entry->timesubmitted = $this->current_time();

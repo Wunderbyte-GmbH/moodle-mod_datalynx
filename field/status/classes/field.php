@@ -61,8 +61,23 @@ class field extends datalynxfield_no_content {
     /** @var int Status final submission value. */
     const STATUS_FINAL_SUBMISSION = 2;
 
-    /** @var int Status submission value. */
-    const STATUS_SUBMISSION = 3;
+    /**
+     * The status a submitted value stands for, or null when it is not one of the statuses above.
+     *
+     * Forms, the app and imports pass the status on as they receive it; only these values may be
+     * stored, anything else leaves the entry's status as it is.
+     *
+     * @param mixed $value
+     * @return int|null
+     */
+    public static function to_status($value): ?int {
+        if (!is_int($value) && !(is_string($value) && preg_match('/^\d+$/', $value))) {
+            return null;
+        }
+        $status = (int) $value;
+        $valid = [self::STATUS_NOT_SET, self::STATUS_DRAFT, self::STATUS_FINAL_SUBMISSION];
+        return in_array($status, $valid, true) ? $status : null;
+    }
 
     /**
      * Returns field objects for the internal status field.

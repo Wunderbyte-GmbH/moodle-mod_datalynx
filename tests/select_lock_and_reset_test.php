@@ -163,7 +163,7 @@ final class select_lock_and_reset_test extends advanced_testcase {
             'param6' => '', 'param7' => '', 'param8' => '', 'param9' => '', 'param10' => '',
         ]);
         \mod_datalynx\local\definition_cache::purge();
-        $entryid = $this->make_entry(datalynxfield_status::STATUS_SUBMISSION, 1);
+        $entryid = $this->make_entry(datalynxfield_status::STATUS_DRAFT, 1);
         $this->set_content($selectid, $entryid, '1');
         $this->set_content($textid, $entryid, 'some answer');
         $this->assertEquals(2, $DB->count_records('datalynx_contents', ['entryid' => $entryid]));

@@ -930,7 +930,6 @@ $string['statuslockeddesc'] = 'Der Eintrag wurde verbindlich eingereicht. Der St
 $string['statusmarkfinal'] = 'Als endgültige Abgabe markieren';
 $string['statusnotcreated'] = 'Nicht gesetzt';
 $string['statusrequired'] = 'Status muss gesetzt werden!';
-$string['statussubmission'] = 'Abgabe';
 $string['statustoggledesc'] = 'Wenn Sie den Antrag als Entwurf speichern, können sie ihn später finalisieren und zur Abgabe einreichen. Wenn Sie den Antrag verbindlich einreichen, kann er nachträglich nicht mehr geändert werden. Prüfen Sie vorab Ihre Einreichung.';
 $string['student'] = 'Teilnehmer/in';
 $string['subfieldactions'] = 'Aktionen';

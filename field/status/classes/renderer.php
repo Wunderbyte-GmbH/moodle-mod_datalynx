@@ -192,7 +192,8 @@ class renderer extends datalynxfield_renderer {
     protected function display_browse($entry, $params = []): ?string {
         $menu = $this->menu_status(true);
         if (isset($entry) && isset($entry->status)) {
-            return $menu[$entry->status];
+            // A value that is not a status (none is set by datalynx) shows as nothing, not as a warning.
+            return $menu[(int) $entry->status] ?? '';
         } else {
             return $menu[field::STATUS_NOT_SET];
         }
