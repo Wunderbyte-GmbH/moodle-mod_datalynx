@@ -50,13 +50,20 @@ final class media_accessibility_test extends advanced_testcase {
      * @param string $filename file name
      * @param string $content file content
      * @param string $alt link/alt text (content1)
+     * @param array $params field settings (param1..param10)
      * @return array [field, entry]
      */
-    private function field_with_file(string $type, string $filename, string $content, string $alt = ''): array {
+    private function field_with_file(
+        string $type,
+        string $filename,
+        string $content,
+        string $alt = '',
+        array $params = []
+    ): array {
         global $DB;
-        $fieldid = (int) $DB->insert_record('datalynx_fields', (object) [
+        $fieldid = (int) $DB->insert_record('datalynx_fields', (object) ([
             'dataid' => $this->dlx->id(), 'type' => $type, 'name' => $type . 'field', 'description' => '',
-        ]);
+        ] + $params));
         \mod_datalynx\local\definition_cache::purge();
         $contentid = (int) $DB->insert_record('datalynx_contents', (object) [
             'fieldid' => $fieldid, 'entryid' => 1, 'content' => 1, 'content1' => $alt,
@@ -92,6 +99,29 @@ final class media_accessibility_test extends advanced_testcase {
         [$field, $entry] = $this->field_with_file('picture', 'photo_2026.png', $this->png());
         $html = $field->renderer()->render_display_mode($entry, []);
         $this->assertMatchesRegularExpression('~<img[^>]+alt="photo_2026.png"~', $html);
+    }
+
+    /**
+     * A video in a picture field without configured dimensions is shown without a style (#259).
+     */
+    public function test_picture_video_without_dimensions(): void {
+        [$field, $entry] = $this->field_with_file('picture', 'clip.mp4', 'not really a video');
+        $html = $field->renderer()->render_display_mode($entry, []);
+
+        $this->assertMatchesRegularExpression('~<video controls[^>]+src="[^"]+clip.mp4"~', $html);
+        $this->assertStringNotContainsString('style=', $html);
+    }
+
+    /**
+     * A video in a picture field with configured dimensions gets them as its style.
+     */
+    public function test_picture_video_with_dimensions(): void {
+        [$field, $entry] = $this->field_with_file('picture', 'clip.mp4', 'not really a video', '', [
+            'param4' => '320', 'param5' => '240', 'param6' => 'px',
+        ]);
+        $html = $field->renderer()->render_display_mode($entry, []);
+
+        $this->assertStringContainsString('style="width:320px;height:240px"', $html);
     }
 
     /**

@@ -242,13 +242,17 @@ class renderer extends FileRenderer {
             $pluginfileurl = new moodle_url('/pluginfile.php');
             $videoattr['src'] = moodle_url::make_file_url($pluginfileurl, "$path/$filename");
 
+            // The video's display dimensions may be set in the field; without them it keeps its own size.
+            $styles = [];
             if ($field->get('param4')) {
-                $videoattr['style'][] = 'width:' . s($field->get('param4')) . s($field->get('param6'));
+                $styles[] = 'width:' . s($field->get('param4')) . s($field->get('param6'));
             }
             if ($field->get('param5')) {
-                $videoattr['style'][] = 'height:' . s($field->get('param5')) . s($field->get('param6'));
+                $styles[] = 'height:' . s($field->get('param5')) . s($field->get('param6'));
             }
-            $videoattr['style'] = implode(';', $videoattr['style']);
+            if ($styles) {
+                $videoattr['style'] = implode(';', $styles);
+            }
 
             $video = html_writer::empty_tag('video controls', $videoattr);
             return $video;
