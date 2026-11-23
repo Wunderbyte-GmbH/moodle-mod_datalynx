@@ -227,6 +227,27 @@ class renderer extends datalynxfield_renderer {
     }
 
     /**
+     * The stops as the Moodle App edits them: one address per stop, looked up on save.
+     *
+     * Without a geocoder an address cannot be turned into a position, so the field is then
+     * edited on the web.
+     *
+     * @param stdClass $entry
+     * @param array $options
+     * @return array|null
+     */
+    public function get_edit_control(stdClass $entry, array $options): ?array {
+        if (!$this->field->can_search_by_address()) {
+            return null;
+        }
+        $stops = $entry->id > 0 ? $this->field->get_itinerary($entry)->export() : [];
+
+        return $this->edit_control('itinerary', ['waypoints' => json_encode($stops, JSON_UNESCAPED_UNICODE)], $options, [
+            'maxstops' => $this->field->get_max_waypoints(),
+        ]);
+    }
+
+    /**
      * The route search in a custom filter: from, to and a radius, the addresses looked up on the
      * server. Without a geocoder the app cannot search by address, and the web keeps its own
      * elements either way.
@@ -448,6 +469,8 @@ class renderer extends datalynxfield_renderer {
      * @return array
      */
     public function validate($entryid, $tags, $formdata): array {
+        global $DB;
+
         $fieldid = $this->field->id();
         $elementname = "field_{$fieldid}_{$entryid}_waypoints";
         $errors = [];
@@ -456,7 +479,20 @@ class renderer extends datalynxfield_renderer {
             return $errors;
         }
 
-        $journey = itinerary::from_json($formdata->$elementname, $this->field->get_max_waypoints());
+        // Stops typed in the Moodle App come as addresses; one that cannot be found is the
+        // user's to fix, rather than silently dropped from the journey.
+        $previous = $entryid > 0 ? $DB->get_field(
+            'datalynx_contents',
+            'content',
+            ['entryid' => (int) $entryid, 'fieldid' => $fieldid],
+            IGNORE_MULTIPLE
+        ) : null;
+        [$json, $notfound] = $this->field->resolve_stops((string) $formdata->$elementname, $previous ?: null);
+        if ($notfound) {
+            $errors[$elementname] = get_string('stopnotfound', 'datalynxfield_itinerary', implode('; ', $notfound));
+            return $errors;
+        }
+        $journey = itinerary::from_json($json, $this->field->get_max_waypoints());
 
         // An empty value is only an error when the field is required, which the
         // behavior layer enforces separately; a single stop is always an error,

@@ -108,9 +108,14 @@ class submit_entry extends external_api {
                 'message' => strip_tags($result['message'])];
         }
 
+        $saved = !$result['errors'] && (bool) $result['entryids'];
+        $next = $saved ? $view->get_next_step() : ['viewid' => 0, 'continueediting' => false];
+
         return [
-            'status' => !$result['errors'] && (bool) $result['entryids'],
+            'status' => $saved,
             'entryid' => (int) ($result['entryids'][0] ?? 0),
+            'nextviewid' => $next['viewid'],
+            'continueediting' => $next['continueediting'],
             'errors' => self::to_errors($result['errors']),
             'warnings' => $warnings,
         ];
@@ -199,6 +204,8 @@ class submit_entry extends external_api {
         return new external_single_structure([
             'status' => new external_value(PARAM_BOOL, 'Whether the entry was saved'),
             'entryid' => new external_value(PARAM_INT, 'The saved entry, 0 if none'),
+            'nextviewid' => new external_value(PARAM_INT, 'After a save: the view to open next (Redirect on submit), 0 to stay'),
+            'continueediting' => new external_value(PARAM_BOOL, 'After a save: open the saved entry in edit mode there'),
             'errors' => new external_multiple_structure(new external_single_structure([
                 'fieldid' => new external_value(PARAM_ALPHANUMEXT, 'The field the error is about'),
                 'name' => new external_value(PARAM_ALPHANUMEXT, 'The input of the field, e.g. url or group'),

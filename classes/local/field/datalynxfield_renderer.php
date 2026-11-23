@@ -785,14 +785,14 @@ abstract class datalynxfield_renderer {
     }
 
     /**
-     * A field shown, not edited: its display as in browse mode.
+     * A field shown, not edited: its display as in browse mode in the app (no map, no script).
      *
      * @param stdClass $entry
      * @param array $options
      * @return array see edit_control()
      */
     public function get_static_control(stdClass $entry, array $options): array {
-        $html = $entry->id > 0 ? $this->render_display_mode($entry, ['edit' => false] + $options) : '';
+        $html = $entry->id > 0 ? $this->render_display_mode($entry, ['edit' => false, 'app' => true] + $options) : '';
 
         return $this->edit_control('static', [], $options, ['html' => $html]);
     }
@@ -801,7 +801,7 @@ abstract class datalynxfield_renderer {
      * Describe a control; each input must be one the field's input contract names.
      *
      * @param string $control text, number, textarea, url, select, radio, multiselect, checkbox,
-     *                        datetime, duration, toggle, hidden or static
+     *                        datetime, duration, itinerary, schedule, toggle, hidden or static
      * @param array $values content name, as the input contract names it ('' for the value itself) =>
      *                      the current value: text, or a list of texts for a list input
      * @param array $options the render options the input contract is read with

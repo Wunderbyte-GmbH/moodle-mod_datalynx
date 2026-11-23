@@ -262,4 +262,17 @@ final class customfilter_form_test extends advanced_testcase {
         $this->expectException(invalid_parameter_exception::class);
         $this->page(['viewid' => $other, 'customfilterid' => $this->customfilter->id]);
     }
+
+    /**
+     * A hidden custom filter is not offered, as the web does not show its tag either.
+     */
+    public function test_hidden_custom_filter_is_not_offered(): void {
+        global $DB;
+
+        $this->assertCount(1, $this->page([])['customfilters']);
+        $DB->set_field('datalynx_customfilters', 'visible', 0, ['id' => $this->customfilter->id]);
+        \mod_datalynx\local\definition_cache::purge();
+
+        $this->assertSame([], $this->page([])['customfilters']);
+    }
 }

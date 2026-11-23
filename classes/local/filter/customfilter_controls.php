@@ -16,8 +16,7 @@
 
 namespace mod_datalynx\local\filter;
 
-use core_date;
-use DateTime;
+use mod_datalynx\local\date_input;
 use mod_datalynx\local\view\base;
 use stdClass;
 
@@ -136,8 +135,8 @@ final class customfilter_controls {
                 'text', 'presence', 'approve', 'status' => self::scalar($inputs[$key] ?? ''),
                 'range' => ['from' => self::scalar($inputs["{$key}_from"] ?? ''), 'to' => self::scalar($inputs["{$key}_to"] ?? '')],
                 'daterange' => [
-                    'from' => self::day_to_timestamp($inputs["{$key}_from"] ?? '', false),
-                    'to' => self::day_to_timestamp($inputs["{$key}_to"] ?? '', true),
+                    'from' => date_input::to_day($inputs["{$key}_from"] ?? ''),
+                    'to' => date_input::to_day($inputs["{$key}_to"] ?? '', true),
                 ],
                 'select' => self::split($inputs[$key] ?? ''),
                 'multiselect' => [
@@ -269,35 +268,6 @@ final class customfilter_controls {
         if ($control !== 'daterange') {
             return self::scalar($value);
         }
-        $timestamp = self::day_to_timestamp($value, false);
-
-        return $timestamp ? userdate($timestamp, '%Y-%m-%d', core_date::get_user_timezone(), false) : '';
-    }
-
-    /**
-     * The start (or the end) of a day, sent as YYYY-MM-DD or as the timestamp of its start, in
-     * the user's timezone.
-     *
-     * @param mixed $day
-     * @param bool $end the last second of the day rather than the first
-     * @return int 0 when no day
-     */
-    public static function day_to_timestamp($day, bool $end): int {
-        $tz = core_date::get_user_timezone_object();
-        if (is_numeric($day) && (int) $day > 0) {
-            $date = (new DateTime('@' . (int) $day))->setTimezone($tz)->setTime(0, 0);
-        } else if (
-            is_string($day) && preg_match('/^(\d{4})-(\d{2})-(\d{2})/', $day, $m)
-                && checkdate((int) $m[2], (int) $m[3], (int) $m[1])
-        ) {
-            $date = new DateTime(sprintf('%04d-%02d-%02d 00:00:00', $m[1], $m[2], $m[3]), $tz);
-        } else {
-            return 0;
-        }
-        if ($end) {
-            $date->modify('+1 day')->modify('-1 second');
-        }
-
-        return $date->getTimestamp();
+        return date_input::to_string(date_input::to_day($value));
     }
 }

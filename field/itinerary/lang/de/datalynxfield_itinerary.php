@@ -26,6 +26,9 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['activeservices'] = 'Verwendete Kartendienste';
 $string['addwaypoint'] = 'Station hinzufügen';
+$string['appstopend'] = 'Ziel';
+$string['appstopstart'] = 'Start';
+$string['appstopvia'] = 'Zwischenstopp';
 $string['apptext'] = '{$a->stops} ({$a->distance} km, {$a->duration})';
 $string['apptextunrouted'] = '{$a->stops} (rund {$a->distance} km)';
 $string['default_zoom'] = 'Standard-Zoomstufe';
@@ -73,6 +76,7 @@ $string['searchnotfound'] = 'Kein Ort gefunden für „{$a}“. Versuchen Sie ei
 $string['searchradius'] = 'Im Umkreis von (km)';
 $string['searchto'] = 'Fahrt nach';
 $string['stopcount'] = '{$a->count} von höchstens {$a->max} Stationen';
+$string['stopnotfound'] = 'Kein Ort gefunden für: {$a}. Versuchen Sie einen Ort, einen Bahnhof oder eine Straße mit Ort.';
 $string['stopswithoutplace'] = 'Für {$a} Station(en) ist noch kein Ort gewählt; sie werden nicht gespeichert. Bitte einen Vorschlag auswählen oder in die Karte klicken.';
 $string['traveltime'] = 'Fahrzeit ca. {$a}';
 $string['waypoint'] = 'Station {$a}';

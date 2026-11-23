@@ -20,6 +20,7 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/mod/datalynx/tests/fixtures/mobile_test_trait.php');
+require_once($CFG->dirroot . '/mod/datalynx/tests/fixtures/stub_geocoder.php');
 
 use advanced_testcase;
 use datalynxfield_itinerary\field as itinerary_field;
@@ -28,10 +29,9 @@ use mod_datalynx\datalynx;
 use mod_datalynx\local\datalynx_entries;
 use mod_datalynx\local\filter\datalynx_filter;
 use mod_datalynx\local\filter\search_criteria;
-use mod_datalynx\local\map\geocoder;
 use mod_datalynx\local\map\geocoder_factory;
-use mod_datalynx\local\map\place;
 use mod_datalynx\mobile_test_trait;
+use mod_datalynx\stub_geocoder;
 use mod_datalynx\output\mobile;
 use stdClass;
 
@@ -86,7 +86,7 @@ final class ride_search_app_test extends advanced_testcase {
         parent::setUp();
         $this->resetAfterTest();
         $this->setAdminUser();
-        geocoder_factory::set_geocoder_for_testing($this->stub_geocoder());
+        geocoder_factory::set_geocoder_for_testing(new stub_geocoder(self::PLACES));
         itinerary_field::reset_resolved_addresses();
 
         [$this->course, $dlx] = $this->create_mobile_instance();
@@ -179,7 +179,7 @@ final class ride_search_app_test extends advanced_testcase {
         $state = $this->page($this->search(['_date' => $monday], 'Termin'));
         $this->assertSame(['commute', 'south', 'request'], $this->names($state));
 
-        $day = \mod_datalynx\local\filter\customfilter_controls::day_to_timestamp($monday, false);
+        $day = \mod_datalynx\local\date_input::to_day($monday);
         $web = $this->payload_with_criteria([$this->ids['Termin'] => ['AND' => [['', '', [
             'date' => $day, 'minute' => '', 'tolerance' => 1440,
         ]]]]]);
@@ -356,68 +356,5 @@ final class ride_search_app_test extends advanced_testcase {
         $dlx->get_field_from_id($this->ids['Termin'])->update_content($entry, ['schedule' => json_encode($schedule)]);
 
         return $entryid;
-    }
-
-    /**
-     * A geocoder that knows PLACES.
-     *
-     * @return geocoder
-     */
-    private function stub_geocoder(): geocoder {
-        return new class (self::PLACES) implements geocoder {
-            /**
-             * Constructor.
-             *
-             * @param array $places
-             */
-            public function __construct(
-                /** @var array lower case query => [label, lat, lng] */
-                private array $places
-            ) {
-            }
-
-            /**
-             * Look up a known place.
-             *
-             * @param string $query
-             * @param array $options
-             * @return place[]
-             */
-            public function search(string $query, array $options = []): array {
-                $known = $this->places[\core_text::strtolower(trim($query))] ?? null;
-
-                return $known ? [new place($known[0], $known[1], $known[2], 'at')] : [];
-            }
-
-            /**
-             * Not used.
-             *
-             * @param float $lat
-             * @param float $lng
-             * @param array $options
-             * @return place|null
-             */
-            public function reverse(float $lat, float $lng, array $options = []): ?place {
-                return null;
-            }
-
-            /**
-             * Not used.
-             *
-             * @return bool
-             */
-            public function supports_typeahead(): bool {
-                return false;
-            }
-
-            /**
-             * Not used.
-             *
-             * @return int
-             */
-            public function minimum_query_length(): int {
-                return 3;
-            }
-        };
     }
 }

@@ -23,6 +23,7 @@ use mod_datalynx\local\map\geocoder_factory;
 use mod_datalynx\local\map\place;
 use mod_datalynx\local\map\provider_config;
 use mod_datalynx\local\map\route_result;
+use mod_datalynx\local\map\router_factory;
 use mod_datalynx\local\ride\itinerary;
 use mod_datalynx\local\ride\matcher;
 use mod_datalynx\local\ride\waypoint;
@@ -73,7 +74,16 @@ class field extends datalynxfield_base {
      */
     public function is_submitted_value_empty(string $name, stdClass $data): bool {
         $json = (string) ($data->{$name . '_waypoints'} ?? '');
-        return $json === '' || itinerary::from_json($json, $this->get_max_waypoints())->count() === 0;
+        if ($json === '') {
+            return true;
+        }
+        // A stop given by its address only (the Moodle App) is resolved on save.
+        foreach ((array) json_decode($json, true) as $stop) {
+            if (is_array($stop) && (trim((string) ($stop['address'] ?? '')) !== '' || is_numeric($stop['lat'] ?? null))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /** @var string Field type */
@@ -214,7 +224,8 @@ class field extends datalynxfield_base {
         // as JSON; the visible rows are managed client side. An import may pass
         // the same JSON positionally.
         $raw = array_key_exists('waypoints', $values) ? $values['waypoints'] : reset($values);
-        $journey = itinerary::from_json((string) $raw, $this->get_max_waypoints());
+        [$raw, , $resolved] = $this->resolve_stops((string) $raw, $oldcontents[0] ?? null);
+        $journey = itinerary::from_json($raw, $this->get_max_waypoints());
 
         // A single stop is not a journey, and nothing can be matched against it.
         if (!$journey->is_route()) {
@@ -228,9 +239,64 @@ class field extends datalynxfield_base {
         // When a ride happens is a schedule field's business now - a date on a stop could not
         // describe a commute that runs every Monday, and left one that did unconstrained in time.
         $contents[] = '';
-        $contents[] = $this->resolve_route($journey, $values, $oldcontents);
+        $contents[] = $this->resolve_route($journey, $values, $oldcontents, $resolved);
 
         return [$contents, $oldcontents];
+    }
+
+    /**
+     * Give the stops that come with an address only their coordinates.
+     *
+     * The web form sends each stop with the coordinates of the suggestion picked; the Moodle App
+     * sends what was typed. A stop whose address is the same as one stored before keeps that
+     * stop's position; any other is looked up with the site's geocoder, and the place found names
+     * the stop, as a suggestion picked on the web does. Empty rows are dropped.
+     *
+     * @param string $json the submitted stops
+     * @param string|null $previousjson the stops stored before, if any
+     * @return array [the stops as JSON, the addresses not found, whether any stop was looked up]
+     */
+    public function resolve_stops(string $json, ?string $previousjson): array {
+        $stops = json_decode($json, true);
+        if (!is_array($stops)) {
+            return [$json, [], false];
+        }
+
+        $known = [];
+        foreach (itinerary::from_json($previousjson)->waypoints() as $waypoint) {
+            $known[core_text::strtolower(trim($waypoint->address))] = $waypoint;
+        }
+
+        $result = [];
+        $notfound = [];
+        $resolved = false;
+        foreach ($stops as $stop) {
+            if (!is_array($stop)) {
+                continue;
+            }
+            if (is_numeric($stop['lat'] ?? null) && is_numeric($stop['lng'] ?? null)) {
+                $result[] = $stop;
+                continue;
+            }
+            $address = trim(clean_param((string) ($stop['address'] ?? ''), PARAM_TEXT));
+            if ($address === '') {
+                continue;
+            }
+            $waypoint = $known[core_text::strtolower($address)] ?? null;
+            if ($waypoint) {
+                $result[] = $waypoint->to_array();
+                continue;
+            }
+            $place = core_text::strlen($address) <= self::MAX_ADDRESS_LENGTH ? $this->resolve_address($address) : null;
+            if ($place === null) {
+                $notfound[] = $address;
+                continue;
+            }
+            $resolved = true;
+            $result[] = ['address' => $place->address, 'lat' => $place->lat, 'lng' => $place->lng];
+        }
+
+        return [json_encode($result), $notfound, $resolved];
     }
 
     /**
@@ -241,14 +307,29 @@ class field extends datalynxfield_base {
      * only while the stops are unchanged, because a cached route for a journey that
      * has been re-routed would be worse than none at all.
      *
+     * Stops looked up from their addresses (the Moodle App) come without a summary; their route
+     * is calculated here with the site's router.
+     *
      * @param itinerary $journey The journey being saved.
      * @param array $values Submitted values.
      * @param array $oldcontents Previously stored contents, indexed like get_content_parts().
+     * @param bool $lookedup Whether stops were looked up from their addresses.
      * @return string JSON route summary, or an empty string.
      */
-    protected function resolve_route(itinerary $journey, array $values, array $oldcontents): string {
+    protected function resolve_route(itinerary $journey, array $values, array $oldcontents, bool $lookedup = false): string {
         if (!empty($values['route'])) {
             $route = route_result::from_json((string) $values['route']);
+            if ($route !== null) {
+                return $route->to_json();
+            }
+        }
+
+        if ($lookedup) {
+            $router = router_factory::instance();
+            $route = $router?->route(array_map(
+                static fn(waypoint $stop): array => [$stop->lat, $stop->lng],
+                $journey->waypoints()
+            ));
             if ($route !== null) {
                 return $route->to_json();
             }

@@ -82,14 +82,13 @@ class delete_entry extends external_api {
         if (!$entry) {
             throw new invalid_parameter_exception('Entry not found.');
         }
-        if (!$dlx->user_can_manage_entry($entry)) {
-            throw new moodle_exception('entrydeletenotallowed', 'datalynx');
-        }
-
         $record = $records[$params['viewid']];
         $view = $dlx->get_view($record->type, $record);
-        if (!$view->confirm_view_action('delete', (int) $record->id)) {
-            throw new moodle_exception('viewdeletenotallowed', 'datalynx');
+        if (!$view->user_can_act_on_entry('delete', $entry)) {
+            throw new moodle_exception(
+                $dlx->user_can_manage_entry($entry) ? 'viewdeletenotallowed' : 'entrydeletenotallowed',
+                'datalynx'
+            );
         }
 
         $entries = $view->get_entries_manager();

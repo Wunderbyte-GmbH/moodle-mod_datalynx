@@ -26,6 +26,9 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['activeservices'] = 'Map services in use';
 $string['addwaypoint'] = 'Add a stop';
+$string['appstopend'] = 'Destination';
+$string['appstopstart'] = 'Start';
+$string['appstopvia'] = 'Stop on the way';
 $string['apptext'] = '{$a->stops} ({$a->distance} km, {$a->duration})';
 $string['apptextunrouted'] = '{$a->stops} (approx. {$a->distance} km)';
 $string['default_zoom'] = 'Default zoom level';
@@ -73,6 +76,7 @@ $string['searchnotfound'] = 'No place found for "{$a}". Try a town, a station or
 $string['searchradius'] = 'Within (km)';
 $string['searchto'] = 'Travelling to';
 $string['stopcount'] = '{$a->count} of at most {$a->max} stops';
+$string['stopnotfound'] = 'No place found for: {$a}. Try a town, a station or a street with its town.';
 $string['stopswithoutplace'] = '{$a} stop(s) have no place chosen yet and will not be saved. Pick a suggestion or click the map.';
 $string['traveltime'] = 'Travel time approx. {$a}';
 $string['waypoint'] = 'Stop {$a}';

@@ -16,50 +16,22 @@
 
 namespace mod_datalynx\local\mobile;
 
-use mod_datalynx\datalynx;
 use mod_datalynx\local\filter\customfilter_controls;
-use stdClass;
 
 /**
  * The custom filter in the Moodle App: the transport only (mod_datalynx#270).
  *
- * Which custom filters a view offers, and the inputs a request of the app's browse page carries:
- * the form's inputs when the filter was just applied, otherwise the ones the page state carries
- * on. The controls, their inputs and what they search are the same as on the web
- * (\mod_datalynx\local\filter\customfilter_controls, customfilter_search).
+ * The inputs a request of the app's browse page carries: the form's inputs when the filter was
+ * just applied, otherwise the ones the page state carries on. Which custom filters a view offers
+ * is the view's rule (view\base::get_offered_customfilters()). The controls, their inputs and
+ * what they search are the same as on the web (\mod_datalynx\local\filter\customfilter_controls,
+ * customfilter_search).
  *
  * @package    mod_datalynx
  * @copyright  2026 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class customfilter_form {
-    /**
-     * The custom filters a view offers: those whose ##customfilter:NAME## tag it contains, as the
-     * web shows them.
-     *
-     * @param datalynx $dlx
-     * @param stdClass $viewrecord
-     * @return stdClass[] id => datalynx_customfilters record, in the order of the tags
-     */
-    public static function offered(datalynx $dlx, stdClass $viewrecord): array {
-        $text = ($viewrecord->section ?? '') . ' ' . ($viewrecord->param2 ?? '');
-        if (!preg_match_all('/##customfilter:(.+?)##/', $text, $matches)) {
-            return [];
-        }
-        $byname = [];
-        foreach (\mod_datalynx\local\definition_cache::get_records($dlx->id(), 'customfilters') as $record) {
-            $byname[$record->name] ??= $record;
-        }
-        $offered = [];
-        foreach (array_unique($matches[1]) as $name) {
-            if (isset($byname[$name])) {
-                $offered[(int) $byname[$name]->id] = $byname[$name];
-            }
-        }
-
-        return $offered;
-    }
-
     /**
      * The inputs the app sent, without the prefix: from the form when it was just applied,
      * otherwise as the page state carries them on (JSON).

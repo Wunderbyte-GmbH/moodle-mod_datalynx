@@ -146,12 +146,15 @@ These field types can be edited in the app:
 | Multiple choice, Checkboxes | Choice list with several selections |
 | Date / time | Date picker, with a time if the field stores a time |
 | Duration | Number of minutes |
+| Itinerary (route) | One address per stop; stops can be added, removed and moved. On saving, each address is looked up, and the place found names the stop |
+| Schedule | Once on a date or weekly on some days, with the departure (and arrival) time |
 | Status | **Save draft** and **Submit** buttons |
 | Identifier | Filled in automatically |
 | Grade item | Shown as text |
 
-Other field types, such as the text editor, files and pictures, team members, location and
-itinerary, are edited on the web:
+Other field types, such as the text editor, files and pictures, team members and location, are
+edited on the web. An itinerary is also edited on the web when the site has no address lookup
+service configured.
 
 - If such a field is **optional**, the app saves the other fields and lists the ones to complete
   on the web.
@@ -159,6 +162,14 @@ itinerary, are edited on the web:
   instead, so nobody can save an incomplete entry.
 
 If the server rejects a value, the app shows the message at the field and keeps what was typed.
+An address that cannot be found is such an error: type a town, a station or a street with its town.
+
+The save button carries the text of the view's `##submit:text=…##` tag.
+
+**Forms in several steps.** A view whose **Redirect on submit** names another view continues
+there after saving, as on the web. With **continue editing**, the same entry opens in the next
+view's form (the next step), otherwise the next view's list. This is how the Mitfahrbörse offer
+wizard runs in the app, step by step, ending on "Meine Fahrten".
 
 > **Important Note**  
 > After saving, go back to the list and pull down to refresh it. The list does not update by itself.

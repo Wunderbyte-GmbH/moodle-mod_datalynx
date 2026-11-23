@@ -1044,6 +1044,25 @@ abstract class base {
     }
 
     /**
+     * Where the user goes after an entry was saved in this view.
+     *
+     * The view's "Redirect on submit" (param10) names the next view; "continue editing" (param9)
+     * opens the saved entry there in edit mode, or in this view when there is no other one. The
+     * web redirect, the submit_entry service and the Moodle App all follow this one rule.
+     *
+     * @return array ['viewid' => the next view, 0 to stay, 'continueediting' => bool]
+     */
+    public function get_next_step(): array {
+        $continue = !empty($this->view->param9);
+        $redirectid = (int) ($this->redirect ?: 0);
+        if ($redirectid && $redirectid !== (int) $this->id()) {
+            return ['viewid' => $redirectid, 'continueediting' => $continue];
+        }
+
+        return ['viewid' => $continue ? (int) $this->id() : 0, 'continueediting' => $continue];
+    }
+
+    /**
      * Process submitted data.
      *
      * @return void
@@ -1078,31 +1097,18 @@ abstract class base {
                 redirect($url);
             }
 
-            $redirectid = $this->redirect ?: 0;
-            if ($redirectid && $redirectid != $this->id()) {
+            $next = $this->get_next_step();
+            if ($next['viewid']) {
                 if (!empty($strnotify)) {
                     \core\notification::success($strnotify);
                 }
-                $params = ['view' => $redirectid];
-                if (!empty($this->view->param9)) {
+                $params = ['view' => $next['viewid']];
+                if ($next['continueediting']) {
                     $entryid = reset($successfullyprocessedeids);
                     $params['editentries'] = $entryid;
                     $params['eids'] = $entryid;
                 }
-                $url = new moodle_url($this->baseurl, $params);
-                redirect($url);
-            } else if (!empty($this->view->param9)) {
-                if (!empty($strnotify)) {
-                    \core\notification::success($strnotify);
-                }
-                $redirectid = $this->id();
-                $entryid = reset($successfullyprocessedeids);
-                $url = new moodle_url($this->baseurl, [
-                    'view' => $redirectid,
-                    'editentries' => $entryid,
-                    'eids' => $entryid,
-                ]);
-                redirect($url);
+                redirect(new moodle_url($this->baseurl, $params));
             }
         } else {
             if (!empty($strnotify)) {
@@ -2895,11 +2901,7 @@ abstract class base {
         }
 
         if ($new) {
-            if (
-                confirm_sesskey() &&
-                    ($this->confirm_view_action("addnewentry") ||
-                            $this->confirm_view_action("addnewentries"))
-            ) {
+            if (confirm_sesskey() && $this->offers_adding()) {
                 return $this->editentries = [-$new];
             } else {
                 $illegalaction = true;
@@ -2999,6 +3001,87 @@ abstract class base {
             }
         }
         return false;
+    }
+
+    /**
+     * Whether this view offers adding entries: it has ##addnewentry##, ##addnewentries## or a
+     * ##submit## button.
+     *
+     * @return bool
+     */
+    public function offers_adding(): bool {
+        $viewid = (int) $this->id();
+
+        return $this->confirm_view_action('addnewentry', $viewid) || $this->confirm_view_action('addnewentries', $viewid);
+    }
+
+    /**
+     * Whether the current user may add an entry through this view: the activity lets them add
+     * one (rights, entry limit) and the view offers adding.
+     *
+     * @return bool
+     */
+    public function user_can_add_entry(): bool {
+        return $this->dlx->user_can_add_new_entry() && $this->offers_adding();
+    }
+
+    /**
+     * Whether the current user may edit or delete an entry through this view: they may manage the
+     * entry, and the view offers the action (##edit## / ##delete##). The web services and the
+     * Moodle App use this one check.
+     *
+     * @param string $action 'edit' or 'delete'
+     * @param stdClass $entry
+     * @return bool
+     */
+    public function user_can_act_on_entry(string $action, stdClass $entry): bool {
+        return $this->dlx->user_can_manage_entry($entry) && $this->confirm_view_action($action, (int) $this->id());
+    }
+
+    /**
+     * The custom filters this view offers: those whose ##customfilter:NAME## tag is in its view
+     * or entry template and that are visible, as the web replaces only the tags of visible ones.
+     * The first custom filter of a name counts.
+     *
+     * @return stdClass[] custom filter records by id, in the order of their tags
+     */
+    public function get_offered_customfilters(): array {
+        $text = ($this->view->section ?? '') . ' ' . ($this->view->param2 ?? '');
+        if (!preg_match_all('/##customfilter:(.+?)##/', $text, $matches)) {
+            return [];
+        }
+        $byname = [];
+        foreach (definition_cache::get_records($this->dlx->id(), 'customfilters') as $record) {
+            if ((int) $record->visible === 1) {
+                $byname[$record->name] ??= $record;
+            }
+        }
+        $offered = [];
+        foreach (array_unique($matches[1]) as $name) {
+            if (isset($byname[$name])) {
+                $offered[(int) $byname[$name]->id] = $byname[$name];
+            }
+        }
+
+        return $offered;
+    }
+
+    /**
+     * The saved filters a user may switch to in this view: none when the view forces its
+     * filter, else the visible filters, narrowed to the permitted ones when a whitelist is active.
+     *
+     * @return array filter id => name
+     */
+    public function get_filter_menu(): array {
+        if ($this->is_forcing_filter()) {
+            return [];
+        }
+        $menu = $this->dlx->get_filter_manager()->get_filters(null, true) ?: [];
+        if ($this->is_filter_whitelist_active()) {
+            $menu = array_intersect_key($menu, array_flip($this->get_permitted_filter_ids()));
+        }
+
+        return $menu;
     }
 
     /**

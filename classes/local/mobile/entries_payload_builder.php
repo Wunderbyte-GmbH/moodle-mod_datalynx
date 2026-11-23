@@ -163,7 +163,7 @@ final class entries_payload_builder {
         // ignores what the client sends for it rather than letting it widen what the view lists.
         $view = $manager->open_view($this->dlx, (int) $record->id, $options);
         $canfilter = !$view->is_forcing_filter();
-        $filtermenu = $canfilter ? $this->get_filter_menu($view) : [];
+        $filtermenu = $view->get_filter_menu();
         if ($options['filterid'] && !array_key_exists($options['filterid'], $filtermenu)) {
             throw new invalid_parameter_exception('Filter not available in this view.');
         }
@@ -183,10 +183,7 @@ final class entries_payload_builder {
         $payload['entriesfiltercount'] = $entries->get_count(true);
         $payload['hasmore'] = $filter->perpage > 0
             && ($payload['page'] + 1) * $payload['perpage'] < $payload['entriesfiltercount'];
-        $payload['canadd'] = $this->dlx->user_can_add_new_entry() && (
-            $view->confirm_view_action('addnewentry', (int) $record->id)
-            || $view->confirm_view_action('addnewentries', (int) $record->id)
-        );
+        $payload['canadd'] = $view->user_can_add_entry();
         $links = new app_links($this->dlx);
         $payload['section'] = $this->build_section($view, $payload, $links);
         $payload['listsentries'] = in_array(true, array_column($payload['section'], 'entries'), true);
@@ -214,7 +211,7 @@ final class entries_payload_builder {
      */
     private function apply_customfilter(stdClass $record, array $request, array &$payload): array {
         $view = $this->dlx->get_view($record->type, $record, false);
-        $offered = $view->is_forcing_filter() ? [] : customfilter_form::offered($this->dlx, $record);
+        $offered = $view->is_forcing_filter() ? [] : $view->get_offered_customfilters();
         $activeid = (int) $request['customfilterid'];
         if ($activeid && !isset($offered[$activeid])) {
             throw new invalid_parameter_exception('Custom filter not available in this view.');
@@ -321,36 +318,6 @@ final class entries_payload_builder {
     }
 
     /**
-     * The saved filters this view lets the user switch to, as the desktop filter menu offers them.
-     *
-     * @param base $view
-     * @return array filter id => name
-     */
-    private function get_filter_menu(base $view): array {
-        return self::filter_menu($this->dlx, $view);
-    }
-
-    /**
-     * The saved filters a view lets the user switch to, as the desktop filter menu offers them:
-     * none in a view that forces its filter.
-     *
-     * @param datalynx $dlx
-     * @param base $view
-     * @return array filter id => name
-     */
-    public static function filter_menu(datalynx $dlx, base $view): array {
-        if ($view->is_forcing_filter()) {
-            return [];
-        }
-        $menu = $dlx->get_filter_manager()->get_filters(null, true) ?: [];
-        if ($view->is_filter_whitelist_active()) {
-            $menu = array_intersect_key($menu, array_flip($view->get_permitted_filter_ids()));
-        }
-
-        return $menu;
-    }
-
-    /**
      * The view template (section) as parts: its HTML, its links, and where the entries are listed.
      *
      * A view without a section lists its entries only.
@@ -404,17 +371,11 @@ final class entries_payload_builder {
     private function build_entries(view_manager $manager, base $view, array $records, app_links $links): array {
         $usetemplate = $manager->uses_entry_template($view);
         $shown = $this->get_shown_fields($view, $manager->get_content_fields($view));
-        $viewid = (int) $view->id();
-        $viewallows = [
-            'edit' => $view->confirm_view_action('edit', $viewid),
-            'delete' => $view->confirm_view_action('delete', $viewid),
-        ];
         $canapprove = $this->dlx->user_can_approve_entries()
             && !empty(($view->get__patterns('field') ?? [])[approvefield::_APPROVED]);
         $entries = [];
 
         foreach ($records as $record) {
-            $manageable = $this->dlx->user_can_manage_entry($record);
             $fields = $this->build_field_values($manager, $shown, $record);
             $record->baseurl = $view->get_navigationurl();
             $parts = $usetemplate
@@ -432,8 +393,8 @@ final class entries_payload_builder {
                 'status' => (int) ($record->status ?? 0),
                 'timecreated' => (int) $record->timecreated,
                 'timemodified' => (int) $record->timemodified,
-                'canedit' => $manageable && $viewallows['edit'],
-                'candelete' => $manageable && $viewallows['delete'],
+                'canedit' => $view->user_can_act_on_entry('edit', $record),
+                'candelete' => $view->user_can_act_on_entry('delete', $record),
                 'canapprove' => $canapprove,
             ];
         }

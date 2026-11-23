@@ -228,7 +228,7 @@ final class app_links {
             $projected['eids'] = isset($query['eids']) ? clean_param((string) $query['eids'], PARAM_SEQUENCE) : '';
             $filterid = isset($query['filter']) ? (int) $query['filter'] : 0;
             // As on the web, a filter the target view does not offer is not applied.
-            if ($filterid && array_key_exists($filterid, entries_payload_builder::filter_menu($this->dlx, $this->view($record)))) {
+            if ($filterid && array_key_exists($filterid, $this->view($record)->get_filter_menu())) {
                 $projected['filterid'] = $filterid;
             }
         }

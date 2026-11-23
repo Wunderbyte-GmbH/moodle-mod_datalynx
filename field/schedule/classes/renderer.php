@@ -73,48 +73,36 @@ class renderer extends datalynxfield_renderer {
      */
     public function render_edit_mode(MoodleQuickForm &$mform, stdClass $entry, array $options): void {
         $field = $this->field;
-        $fieldid = $field->id();
-        $prefix = "field_{$fieldid}_{$entry->id}";
-        $current = $field->schedule_of($entry);
-        $allowed = $field->get_allowed_mode();
-
-        $modes = [
-            schedule::MODE_ONCE => get_string('modeonce', 'datalynxfield_schedule'),
-            schedule::MODE_WEEKLY => get_string('modeweekly', 'datalynxfield_schedule'),
-        ];
-        if ($allowed !== 'both') {
-            $modes = [$allowed => $modes[$allowed]];
-        }
-        $mode = $current->is_valid() ? $current->mode() : array_key_first($modes);
+        $prefix = "field_{$field->id()}_{$entry->id}";
+        $modes = $this->edit_modes();
+        $values = $this->edit_values($entry);
 
         if (count($modes) > 1) {
             $mform->addElement('select', "{$prefix}_mode", get_string('mode', 'datalynxfield_schedule'), $modes);
         } else {
-            $mform->addElement('hidden', "{$prefix}_mode", $mode);
+            $mform->addElement('hidden', "{$prefix}_mode", $values['mode']);
             $mform->setType("{$prefix}_mode", PARAM_ALPHA);
         }
-        $mform->setDefault("{$prefix}_mode", $mode);
+        $mform->setDefault("{$prefix}_mode", $values['mode']);
 
         // One-off: the date it happens.
         $mform->addElement('date_selector', "{$prefix}_date", get_string('ondate', 'datalynxfield_schedule'));
-        $mform->setDefault("{$prefix}_date", $current->date() !== '' ? schedule::day_start($current->date()) : time());
+        $mform->setDefault("{$prefix}_date", $values['date'] !== '' ? (int) $values['date'] : time());
         $mform->hideIf("{$prefix}_date", "{$prefix}_mode", 'neq', schedule::MODE_ONCE);
 
         // Weekly: which days it runs on.
         $daygroup = [];
         foreach (field::weekdays_menu() as $day => $label) {
             $daygroup[] = $mform->createElement('advcheckbox', "{$prefix}_day{$day}", '', $label, ['class' => 'me-2']);
+            $mform->setDefault("{$prefix}_day{$day}", (int) $values["day{$day}"]);
         }
         $mform->addGroup($daygroup, "{$prefix}_days", get_string('ondays', 'datalynxfield_schedule'), ' ', false);
-        foreach ($current->days() as $day) {
-            $mform->setDefault("{$prefix}_day{$day}", 1);
-        }
         $mform->hideIf("{$prefix}_days", "{$prefix}_mode", 'neq', schedule::MODE_WEEKLY);
 
         // Both: the departure, and optionally the arrival.
         $times = $field->times_menu();
         $mform->addElement('select', "{$prefix}_start", get_string('departure', 'datalynxfield_schedule'), $times);
-        $mform->setDefault("{$prefix}_start", self::nearest_time($current->start_minute(), $times));
+        $mform->setDefault("{$prefix}_start", $values['start']);
 
         if ($field->wants_arrival()) {
             $mform->addElement(
@@ -123,7 +111,7 @@ class renderer extends datalynxfield_renderer {
                 get_string('arrival', 'datalynxfield_schedule'),
                 ['' => get_string('choosedots')] + $times
             );
-            $mform->setDefault("{$prefix}_end", $current->end_minute());
+            $mform->setDefault("{$prefix}_end", $values['end']);
         }
 
         // Weekly: how long the pattern holds.
@@ -135,10 +123,69 @@ class renderer extends datalynxfield_renderer {
                 get_string($stringid, 'datalynxfield_schedule'),
                 ['optional' => true]
             );
-            $value = $key === 'from' ? $current->from() : $current->until();
-            $mform->setDefault($name, $value !== '' ? schedule::day_start($value) : 0);
+            $mform->setDefault($name, (int) $values[$key]);
             $mform->hideIf($name, "{$prefix}_mode", 'neq', schedule::MODE_WEEKLY);
         }
+    }
+
+    /**
+     * The schedule as the Moodle App edits it: the parts and values of the web form.
+     *
+     * @param stdClass $entry
+     * @param array $options
+     * @return array|null
+     */
+    public function get_edit_control(stdClass $entry, array $options): ?array {
+        return $this->edit_control('schedule', $this->edit_values($entry), $options, [
+            'modes' => self::edit_choices($this->edit_modes()),
+            'times' => self::edit_choices($this->field->times_menu()),
+            'weekdays' => self::edit_choices(field::weekdays_menu()),
+        ]);
+    }
+
+    /**
+     * The shapes the field may be given: mode => label.
+     *
+     * @return array
+     */
+    protected function edit_modes(): array {
+        $modes = [
+            schedule::MODE_ONCE => get_string('modeonce', 'datalynxfield_schedule'),
+            schedule::MODE_WEEKLY => get_string('modeweekly', 'datalynxfield_schedule'),
+        ];
+        $allowed = $this->field->get_allowed_mode();
+
+        return $allowed === 'both' ? $modes : [$allowed => $modes[$allowed]];
+    }
+
+    /**
+     * The current value of each input, as the field's input contract names them; both the web
+     * form and the app's control start from it.
+     *
+     * @param stdClass $entry
+     * @return array mode, date, start, end (with an arrival), from, until (day timestamps, '' for
+     *               none), day1 to day7 ('1' or '0')
+     */
+    protected function edit_values(stdClass $entry): array {
+        $field = $this->field;
+        $current = $field->schedule_of($entry);
+        $day = static fn(string $date): string => $date !== '' ? (string) schedule::day_start($date) : '';
+
+        $values = [
+            'mode' => $current->is_valid() ? $current->mode() : (string) array_key_first($this->edit_modes()),
+            'date' => $day($current->date()),
+            'start' => (string) self::nearest_time($current->start_minute(), $field->times_menu()),
+        ];
+        if ($field->wants_arrival()) {
+            $values['end'] = $current->end_minute() === null ? '' : (string) $current->end_minute();
+        }
+        $values['from'] = $day($current->from());
+        $values['until'] = $day($current->until());
+        foreach (array_keys(field::weekdays_menu()) as $weekday) {
+            $values["day{$weekday}"] = in_array($weekday, $current->days()) ? '1' : '0';
+        }
+
+        return $values;
     }
 
     /**

@@ -1274,16 +1274,7 @@ class datalynxview_patterns {
         $filterjump = '';
 
         if (!$view->is_forcing_filter() && ($filter->id || !empty($options['entriescount']))) {
-            $fm = $dlx->get_filter_manager();
-            if (!$menufilters = $fm->get_filters(null, true)) {
-                $menufilters = [];
-            }
-            // When a permitted-filters whitelist is the active restriction, offer only the default
-            // and whitelisted filters.
-            if ($view->is_filter_whitelist_active()) {
-                $allowed = $view->get_permitted_filter_ids();
-                $menufilters = array_intersect_key($menufilters, array_flip($allowed));
-            }
+            $menufilters = $view->get_filter_menu();
 
             $baseurl = $baseurl->out_omit_querystring();
             $baseurlparams = ['d' => $dlx->id(), 'sesskey' => sesskey(), 'view' => $view->id()];

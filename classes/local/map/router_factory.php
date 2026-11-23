@@ -27,6 +27,25 @@ use mod_datalynx\local\map\router\osrm;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class router_factory {
+    /** @var router|null A router tests put in place of the configured one. */
+    private static ?router $testrouter = null;
+
+    /**
+     * Use the given router instead of the configured one, in PHPUnit tests only.
+     *
+     * For code that routes by itself rather than taking a client (an itinerary saved from the
+     * Moodle App). Pass null to restore the configured router.
+     *
+     * @param router|null $router
+     * @return void
+     */
+    public static function set_router_for_testing(?router $router): void {
+        if (!defined('PHPUNIT_TEST') || !PHPUNIT_TEST) {
+            throw new \coding_exception('set_router_for_testing() is for PHPUnit tests only');
+        }
+        self::$testrouter = $router;
+    }
+
     /**
      * The configured router, or null when routing is switched off.
      *
@@ -34,6 +53,9 @@ class router_factory {
      * @return router|null
      */
     public static function instance(?http_client $client = null): ?router {
+        if (self::$testrouter !== null && defined('PHPUNIT_TEST') && PHPUNIT_TEST) {
+            return self::$testrouter;
+        }
         $engine = provider_config::router_engine();
         $url = provider_config::router_url();
         $key = provider_config::router_key();

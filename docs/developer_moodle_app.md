@@ -19,11 +19,15 @@ same code as the web, and app code only adds the projection the app needs.
 |---|---|
 | Browsing a view | `local\view\manager\view_manager` (open, filter, load) and `external\browse_request` |
 | Search criteria | `local\filter\search_criteria` (strict JSON contract) |
-| Custom filters | `local\filter\customfilter_controls` (one description, one parser) and `customfilter_search` |
+| Custom filters | `local\filter\customfilter_controls` (one description, one parser), `customfilter_search`, and `view\base::get_offered_customfilters()` (which a view offers) |
 | Saving an entry | `local\entry\entry_submission_service` and the input contract of each field type |
 | Edit controls | `datalynxfield_renderer::get_edit_control()` per field type |
 | Edit form | `local\entry\entry_edit_form` |
-| Rights | `datalynx::user_can_manage_entry()`, `user_can_add_new_entry()`, `user_can_approve_entries()`, `view\base::confirm_view_action()` |
+| Next view after a save | `view\base::get_next_step()` (Redirect on submit + continue editing): the web redirect, `submit_entry` and the app |
+| Addresses of an itinerary | `datalynxfield_itinerary\field::resolve_stops()`: a stop sent with an address only is looked up on save (validation and storage) |
+| Rights | Through a view: `view\base::user_can_add_entry()` (`offers_adding()`, also the web's `new=1`), `user_can_act_on_entry('edit'\|'delete', $entry)`; below them `datalynx::user_can_manage_entry()`, `user_can_add_new_entry()`, `user_can_approve_entries()`, `view\base::confirm_view_action()` |
+| Filter menu | `view\base::get_filter_menu()` (web filter menu, app menu, app links) |
+| Dates of inputs | `local\date_input` (YYYY-MM-DD[THH:MM] in the user's timezone; custom filters and the app form) |
 | Links to other views | `datalynxview_patterns::get_view_link()` (every rule of `##viewlink##` / `##viewsesslink##`) |
 | View template | `view\base::get_section_html()` (the section as `display()` shows it, without changing the view) |
 
@@ -57,7 +61,7 @@ HTML, and so on, plus one part in the section that marks where the entries are l
    cleaned on its own (`html_sanitiser`); end tags a part does not open are dropped first.
 3. A link opens `mobile_course_view` (a list), `mobile_edit_entry` (`new=1`, or `editentries=` with
    one entry) or, for anything else, the web page through `core-link`. A `filter=` is passed only
-   where the target view offers it (`entries_payload_builder::filter_menu()`).
+   where the target view offers it (`view\base::get_filter_menu()`, also the web's filter menu).
 
 The template draws every link from one `ng-template` (`#dlxlink`), and the section and the
 entries share it. `core-site-plugins-new-content` opens a new page, so the app's back button
@@ -108,6 +112,12 @@ activity, and the app's `core-format-text` fetches them with the user's token.
 - Endless lists use `core-infinite-loading`.
 - Forms: `core-site-plugins-new-content` with `[samePage]="true"` and `form="<name>"` posts the
   form's inputs as arguments. A multiple `ion-select` posts a comma-separated string.
+- After a save that leads to another view (a chain of steps), `mobile_edit_entry` answers with one
+  line of JavaScript, `this.updateContent(args, component, method)`. It replaces the page with the
+  next step, and with arguments that no longer hold the form, so pulling to refresh does not save
+  again. A content method cannot switch to another method without it.
+- Rows the user adds or moves (the stops of an itinerary) live in `CONTENT_OTHERDATA.state` and are
+  changed by template expressions (`splice`), not by JavaScript.
 - Entry HTML is bound with `[text]` on `core-format-text`, never written into the template source.
 - `moodle-plugin-ci mustache` fails on warnings. The validator rejects `*ngIf` on native `p`, `div`
   and `form`, and Angular bindings on native `input`; use `ng-container` or an Ionic element.

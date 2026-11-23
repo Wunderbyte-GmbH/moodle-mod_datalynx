@@ -106,7 +106,7 @@ class get_entry_edit_form extends external_api {
                 'fieldid' => new external_value(PARAM_ALPHANUMEXT, 'Field ID, or the name of an internal field'),
                 'name' => new external_value(PARAM_TEXT, 'Field name'),
                 'control' => new external_value(PARAM_ALPHA, 'text, number, textarea, url, select, radio, multiselect, '
-                    . 'checkbox, datetime, duration, toggle, hidden or static'),
+                    . 'checkbox, datetime, duration, itinerary, schedule, toggle, hidden or static'),
                 'required' => new external_value(PARAM_BOOL, 'Whether a value is required'),
                 'multiple' => new external_value(PARAM_BOOL, 'Whether several choices can be chosen'),
                 'inputs' => new external_multiple_structure(new external_single_structure([
@@ -127,11 +127,35 @@ class get_entry_edit_form extends external_api {
                 ),
                 'description' => new external_value(PARAM_TEXT, 'Help text', VALUE_OPTIONAL),
                 'html' => new external_value(PARAM_RAW, 'For a static field: its display', VALUE_OPTIONAL),
+                'maxstops' => new external_value(
+                    PARAM_INT,
+                    'For an itinerary: the most stops. The waypoints input is a JSON list of stops; a stop with an '
+                        . 'address and no lat/lng is looked up on save',
+                    VALUE_OPTIONAL
+                ),
+                'modes' => self::choices('For a schedule: the shapes it may take (once, weekly)'),
+                'times' => self::choices('For a schedule: the times of day, in minutes'),
+                'weekdays' => self::choices('For a schedule: the weekdays, 1 (Monday) to 7'),
             ])),
             'hasstatus' => new external_value(PARAM_BOOL, 'Whether the form saves a draft or a final submission'),
             'status' => new external_value(PARAM_INT, 'The current status of the entry'),
             'browserurl' => new external_value(PARAM_URL, 'The entry form on the web'),
+            'submitlabel' => new external_value(PARAM_TEXT, 'The label of the save button the view names, empty for the default'),
             'warnings' => new external_warnings(),
         ]);
+    }
+
+    /**
+     * An optional list of choices of a control.
+     *
+     * @param string $description
+     * @return external_multiple_structure
+     */
+    private static function choices(string $description): external_multiple_structure {
+        return new external_multiple_structure(new external_single_structure([
+            'value' => new external_value(PARAM_RAW, 'Value'),
+            'label' => new external_value(PARAM_TEXT, 'Label'),
+            'disabled' => new external_value(PARAM_BOOL, 'Whether it cannot be chosen'),
+        ]), $description, VALUE_OPTIONAL);
     }
 }

@@ -117,6 +117,85 @@
                         <ion-select-option *ngFor="let o of f.choices" [value]="o.value" [disabled]="o.disabled">{{ o.label }}</ion-select-option>
                     </ion-select>
                 </ion-item>
+                <!-- An itinerary: one address per stop, looked up on save. Stops can be added, removed and moved. -->
+                <ng-container *ngIf="f.control === 'itinerary'">
+                    <ion-item lines="none" class="ion-text-wrap">
+                        <ion-label><p class="item-heading">{{ f.name + (f.required ? ' *' : '') }}</p></ion-label>
+                    </ion-item>
+                    <ion-item *ngFor="let s of f.stops; let i = index; let last = last">
+                        <ion-input class="mod-datalynx-mobile-control" labelPlacement="stacked"
+                                [label]="i === 0 ? f.labels.start : (last ? f.labels.end : f.labels.via)"
+                                [name]="f.formnames.waypoints + '__' + i" [value]="s.address"
+                                (ionInput)="s.address = $event.detail.value"></ion-input>
+                        <ion-button *ngIf="i > 0" slot="end" fill="clear" type="button" [attr.aria-label]="f.labels.up"
+                                (click)="f.stops.splice(i - 1, 0, f.stops.splice(i, 1)[0])">
+                            <ion-icon name="fas-arrow-up" aria-hidden="true"></ion-icon>
+                        </ion-button>
+                        <ion-button *ngIf="!last" slot="end" fill="clear" type="button" [attr.aria-label]="f.labels.down"
+                                (click)="f.stops.splice(i + 1, 0, f.stops.splice(i, 1)[0])">
+                            <ion-icon name="fas-arrow-down" aria-hidden="true"></ion-icon>
+                        </ion-button>
+                        <ion-button *ngIf="f.stops.length > 2" slot="end" fill="clear" color="danger" type="button"
+                                [attr.aria-label]="f.labels.remove" (click)="f.stops.splice(i, 1)">
+                            <ion-icon name="fas-xmark" aria-hidden="true"></ion-icon>
+                        </ion-button>
+                    </ion-item>
+                    <ion-item *ngIf="f.stops.length < f.maxstops" lines="none">
+                        <ion-button fill="outline" size="small" type="button" (click)="f.stops.splice(f.stops.length - 1, 0, {address: ''})">
+                            <ion-icon name="fas-plus" slot="start" aria-hidden="true"></ion-icon>
+                            {{ f.labels.add }}
+                        </ion-button>
+                    </ion-item>
+                </ng-container>
+                <!-- A schedule: once on a date, or weekly on some days; the departure, and the arrival if asked for. -->
+                <ng-container *ngIf="f.control === 'schedule'">
+                    <ion-item lines="none" class="ion-text-wrap">
+                        <ion-label><p class="item-heading">{{ f.name + (f.required ? ' *' : '') }}</p></ion-label>
+                    </ion-item>
+                    <ion-item *ngIf="f.modes.length > 1">
+                        <ion-select class="mod-datalynx-mobile-control" labelPlacement="stacked" interface="alert"
+                                [name]="f.formnames.mode" [value]="f.mode" (ionChange)="f.mode = $event.detail.value">
+                            <div slot="label" class="mod-datalynx-mobile-label">{{ f.labels.mode }}</div>
+                            <ion-select-option *ngFor="let o of f.modes" [value]="o.value">{{ o.label }}</ion-select-option>
+                        </ion-select>
+                    </ion-item>
+                    <ion-item *ngIf="f.mode === 'once'">
+                        <ion-input class="mod-datalynx-mobile-control" labelPlacement="stacked" type="date" [label]="f.labels.date"
+                                [name]="f.formnames.date" [value]="f.show.date"></ion-input>
+                    </ion-item>
+                    <ion-item *ngIf="f.mode === 'weekly'">
+                        <ion-select class="mod-datalynx-mobile-control" labelPlacement="stacked" interface="alert" [multiple]="true"
+                                [name]="f.daysname" [value]="f.days">
+                            <div slot="label" class="mod-datalynx-mobile-label">{{ f.labels.days }}</div>
+                            <ion-select-option *ngFor="let o of f.weekdays" [value]="o.value">{{ o.label }}</ion-select-option>
+                        </ion-select>
+                    </ion-item>
+                    <ion-item>
+                        <ion-select class="mod-datalynx-mobile-control" labelPlacement="stacked" interface="alert"
+                                [name]="f.formnames.start" [value]="f.show.start">
+                            <div slot="label" class="mod-datalynx-mobile-label">{{ f.labels.start }}</div>
+                            <ion-select-option *ngFor="let o of f.times" [value]="o.value">{{ o.label }}</ion-select-option>
+                        </ion-select>
+                    </ion-item>
+                    <ion-item *ngIf="f.formnames.end">
+                        <ion-select class="mod-datalynx-mobile-control" labelPlacement="stacked" interface="alert"
+                                [name]="f.formnames.end" [value]="f.show.end">
+                            <div slot="label" class="mod-datalynx-mobile-label">{{ f.labels.end }}</div>
+                            <ion-select-option value="">{{ 'core.choosedots' | translate }}</ion-select-option>
+                            <ion-select-option *ngFor="let o of f.times" [value]="o.value">{{ o.label }}</ion-select-option>
+                        </ion-select>
+                    </ion-item>
+                    <ng-container *ngIf="f.mode === 'weekly'">
+                        <ion-item>
+                            <ion-input class="mod-datalynx-mobile-control" labelPlacement="stacked" type="date" [label]="f.labels.from"
+                                    [name]="f.formnames.from" [value]="f.show.from"></ion-input>
+                        </ion-item>
+                        <ion-item>
+                            <ion-input class="mod-datalynx-mobile-control" labelPlacement="stacked" type="date" [label]="f.labels.until"
+                                    [name]="f.formnames.until" [value]="f.show.until"></ion-input>
+                        </ion-item>
+                    </ng-container>
+                </ng-container>
                 <ng-container *ngIf="f.error">
                     <ion-item lines="none">
                         <ion-note color="danger">{{ f.error }}</ion-note>
@@ -147,7 +226,7 @@
                 <ion-button expand="block" type="button" form="dlxeditentry" core-site-plugins-new-content [samePage]="true"
                         [args]="{cmid: <% cmid %>, courseid: <% courseid %>, viewid: CONTENT_OTHERDATA.state.viewid,
                             entryid: CONTENT_OTHERDATA.state.entryid, save: 1}">
-                    {{ 'plugin.mod_datalynx.mobilesaveentry' | translate }}
+                    {{ CONTENT_OTHERDATA.state.submitlabel || ('plugin.mod_datalynx.mobilesaveentry' | translate) }}
                 </ion-button>
             </ng-container>
         </div>

@@ -16,10 +16,9 @@
 
 namespace datalynxfield_schedule;
 
-use core_date;
 use invalid_parameter_exception;
 use mod_datalynx\local\field\datalynxfield_base;
-use mod_datalynx\local\filter\customfilter_controls;
+use mod_datalynx\local\date_input;
 use mod_datalynx\local\ride\schedule;
 use mod_datalynx\local\rule\match_compiler;
 use stdClass;
@@ -412,7 +411,7 @@ class field extends datalynxfield_base {
             'datename' => get_string('searchdate', 'datalynxfield_schedule'),
             'minutename' => get_string('searchtime', 'datalynxfield_schedule'),
             'tolerancename' => get_string('searchtolerance', 'datalynxfield_schedule'),
-            'date' => $date ? userdate($date, '%Y-%m-%d', core_date::get_user_timezone(), false) : '',
+            'date' => date_input::to_string($date),
             'minute' => $minute === null ? '' : (string) $minute,
             'tolerance' => (string) $tolerance,
             'minuteoptions' => $menu(['' => get_string('anytime', 'datalynxfield_schedule')] + $this->times_menu(), $minute ?? ''),
@@ -451,7 +450,7 @@ class field extends datalynxfield_base {
      * @return array [int day timestamp or 0, int|null minute, int tolerance]
      */
     protected function search_inputs(array $inputs, string $key): array {
-        $date = customfilter_controls::day_to_timestamp($inputs["{$key}_date"] ?? '', false);
+        $date = date_input::to_day($inputs["{$key}_date"] ?? '');
         $minute = $inputs["{$key}_minute"] ?? '';
         $minute = (is_numeric($minute) && array_key_exists((int) $minute, $this->times_menu())) ? (int) $minute : null;
         $tolerance = $inputs["{$key}_tolerance"] ?? '';

@@ -18,6 +18,7 @@ namespace mod_datalynx\output;
 
 use context_module;
 use mod_datalynx\datalynx;
+use mod_datalynx\local\date_input;
 use mod_datalynx\external\submit_entry;
 use mod_datalynx\local\entry\entry_edit_form;
 use mod_datalynx\local\mobile\customfilter_form;
@@ -137,6 +138,7 @@ class mobile {
             'entryid' => PARAM_INT,
             'save' => PARAM_INT,
             'status' => PARAM_INT,
+            'saved' => PARAM_INT,
         ]);
         [$cm] = self::context($args->cmid);
         $dlx = new datalynx($cm->instance);
@@ -149,8 +151,9 @@ class mobile {
 
         $entryid = max(0, $args->entryid);
         $form = $builder->build($entryid);
-        $saved = false;
-        $message = '';
+        // A step of a chain of views opens with the confirmation of the step before.
+        $saved = $args->saved > 0;
+        $message = $saved ? get_string('mobileentrysaved', 'datalynx') : '';
         if ($args->save && $form['allowed'] && $form['supported']) {
             $status = $form['hasstatus'] && in_array($args->status, [1, 2], true) ? $args->status : null;
             [$data, $posted] = entry_edit_form::submission($form, $rawargs, $status);
@@ -158,6 +161,9 @@ class mobile {
             if ($result['status']) {
                 $saved = true;
                 $entryid = (int) $result['entryid'];
+                if ($result['nextviewid'] && $result['nextviewid'] !== $args->viewid) {
+                    return self::open_next_step($cm, $result);
+                }
                 $form = $builder->build($entryid);
                 $message = get_string('mobileentrysaved', 'datalynx');
             } else {
@@ -205,6 +211,83 @@ class mobile {
     }
 
     /**
+     * The rows of an itinerary in the app: one address per stop, at least a start and a
+     * destination, and the labels of the rows and their buttons.
+     *
+     * @param array $field the itinerary control
+     * @return array stops (each with its address), labels
+     */
+    private static function itinerary_state(array $field): array {
+        $stops = [];
+        foreach ((array) json_decode((string) $field['show']['waypoints'], true) as $stop) {
+            if (is_array($stop) && trim((string) ($stop['address'] ?? '')) !== '') {
+                $stops[] = ['address' => (string) $stop['address']];
+            }
+        }
+        while (count($stops) < 2) {
+            $stops[] = ['address' => ''];
+        }
+        $strings = ['start' => 'appstopstart', 'via' => 'appstopvia', 'end' => 'appstopend', 'add' => 'addwaypoint',
+            'remove' => 'dropwaypoint', 'up' => 'moveup', 'down' => 'movedown'];
+        $labels = array_map(fn(string $stringid): string => get_string($stringid, 'datalynxfield_itinerary'), $strings);
+
+        return ['stops' => array_slice($stops, 0, max(2, (int) $field['maxstops'])), 'labels' => $labels];
+    }
+
+    /**
+     * A schedule in the app: the chosen shape, the chosen weekdays as one list, and the labels.
+     *
+     * @param array $field the schedule control
+     * @return array mode, days, labels
+     */
+    private static function schedule_state(array $field): array {
+        $days = [];
+        foreach ($field['show'] as $name => $value) {
+            if (preg_match('/^day(\d)$/', $name, $day) && (string) $value === '1') {
+                $days[] = $day[1];
+            }
+        }
+        $strings = ['mode' => 'mode', 'date' => 'ondate', 'days' => 'ondays', 'start' => 'departure', 'end' => 'arrival',
+            'from' => 'validfrom', 'until' => 'validuntil'];
+        $labels = array_map(fn(string $stringid): string => get_string($stringid, 'datalynxfield_schedule'), $strings);
+
+        return ['mode' => (string) $field['show']['mode'], 'days' => $days, 'labels' => $labels,
+            'daysname' => entry_edit_form::PREFIX . $field['fieldid'] . '__days'];
+    }
+
+    /**
+     * After a save, open the view the saved view leads to ("Redirect on submit"), as the web does:
+     * the saved entry in its edit form when the view continues editing, else its list.
+     *
+     * The page replaces its own content with the next one, without the save arguments, so that
+     * pulling to refresh shows the next step rather than saving again. A content method cannot
+     * switch to another one by itself, hence the line of JavaScript.
+     *
+     * @param stdClass $cm
+     * @param array $result of submit_entry
+     * @return array templates, javascript and otherdata
+     */
+    private static function open_next_step(stdClass $cm, array $result): array {
+        $args = ['cmid' => (int) $cm->id, 'courseid' => (int) $cm->course, 'viewid' => (int) $result['nextviewid']];
+        if ($result['continueediting']) {
+            $args += ['entryid' => (int) $result['entryid'], 'saved' => 1];
+        }
+        $method = $result['continueediting'] ? 'mobile_edit_entry' : 'mobile_course_view';
+
+        return [
+            'templates' => [
+                ['id' => 'main', 'html' => '<core-loading [hideUntil]="false"></core-loading>'],
+            ],
+            'javascript' => sprintf(
+                'this.updateContent(%s, "mod_datalynx", %s, undefined, {getFromCache: false});',
+                json_encode($args),
+                json_encode($method)
+            ),
+            'otherdata' => self::otherdata(['nextstep' => $args + ['method' => $method]]),
+        ];
+    }
+
+    /**
      * The form as the edit template shows it: each input with the value its control shows (a day
      * for a datetime, minutes for a duration).
      *
@@ -213,15 +296,26 @@ class mobile {
      */
     private static function edit_state(array $form): array {
         foreach ($form['fields'] as &$field) {
+            $field['show'] = [];
+            $field['formnames'] = [];
             foreach ($field['inputs'] as &$input) {
                 $value = $input['value'];
-                $input['show'] = match ($field['control']) {
-                    'datetime' => entry_edit_form::to_date_input((string) $value, !empty($field['includetime'])),
-                    'duration' => $value === '' ? '' : (string) round(((int) $value) / 60, 2),
+                $isdate = $field['control'] === 'datetime'
+                    || ($field['control'] === 'schedule' && in_array($input['name'], ['date', 'from', 'until'], true));
+                $input['show'] = match (true) {
+                    $isdate => date_input::to_string($value, !empty($field['includetime'])),
+                    $field['control'] === 'duration' => $value === '' ? '' : (string) round(((int) $value) / 60, 2),
                     default => $value,
                 };
+                $field['show'][$input['name']] = $input['show'];
+                $field['formnames'][$input['name']] = $input['formname'];
             }
             unset($input);
+            if ($field['control'] === 'itinerary') {
+                $field += self::itinerary_state($field);
+            } else if ($field['control'] === 'schedule') {
+                $field += self::schedule_state($field);
+            }
         }
         unset($field);
         $form['unsupportedlist'] = implode(', ', $form['unsupportedfields']);

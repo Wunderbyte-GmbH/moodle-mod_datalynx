@@ -59,29 +59,7 @@ class renderer extends datalynxfield_renderer {
 
         foreach ($tags as $tag) {
             if ($edit) {
-                $tagoptions = [];
-                $clean = trim($tag, '#@'); // E.g., "submit:arrow:text=Save" or "submit:myformat".
-                $parts = explode(':', $clean);
-                // Shift off the prefix 'submit'.
-                array_shift($parts);
-
-                if (!empty($parts[0])) {
-                    $format = \mod_datalynx\local\field_format\manager::get_format_by_name(
-                        $this->field->dlx()->id(),
-                        $parts[0]
-                    );
-                    if ($format && $format->get_fieldtype() === 'submit') {
-                        $tagoptions['field_format'] = $format;
-                    }
-                }
-
-                if (!isset($tagoptions['field_format'])) {
-                    foreach ($parts as $part) {
-                        $tagoptions[$part] = true;
-                    }
-                }
-
-                $replacements[$tag] = ['', [[$this, 'display_edit'], [$entry, $tagoptions]]];
+                $replacements[$tag] = ['', [[$this, 'display_edit'], [$entry, $this->tag_options($tag)]]];
             } else {
                 $replacements[$tag] = ['html', ''];
             }
@@ -98,6 +76,61 @@ class renderer extends datalynxfield_renderer {
      * @param array $options
      */
     public function display_edit(&$mform, $entry, array $options = []): void {
+        [$label, $class] = $this->button($options);
+        $mform->addElement('submit', 'submitbutton', $label, [
+            'class' => $class,
+        ]);
+    }
+
+    /**
+     * The label of the button a submit tag stands for, e.g. "Weiter zum Termin" for
+     * ##submit:text=Weiter_zum_Termin##. The Moodle App labels its save button with it.
+     *
+     * @param string $tag
+     * @return string
+     */
+    public function get_button_label(string $tag): string {
+        return $this->button($this->tag_options($tag))[0];
+    }
+
+    /**
+     * The options of a submit tag: its field format, or its flags (arrow, text=..., class=...).
+     *
+     * @param string $tag e.g. ##submit:arrow:text=Save## or ##submit:myformat##
+     * @return array
+     */
+    protected function tag_options(string $tag): array {
+        $tagoptions = [];
+        $parts = explode(':', trim($tag, '#@'));
+        // Shift off the prefix 'submit'.
+        array_shift($parts);
+
+        if (!empty($parts[0])) {
+            $format = \mod_datalynx\local\field_format\manager::get_format_by_name(
+                $this->field->dlx()->id(),
+                $parts[0]
+            );
+            if ($format && $format->get_fieldtype() === 'submit') {
+                $tagoptions['field_format'] = $format;
+            }
+        }
+
+        if (!isset($tagoptions['field_format'])) {
+            foreach ($parts as $part) {
+                $tagoptions[$part] = true;
+            }
+        }
+
+        return $tagoptions;
+    }
+
+    /**
+     * Label and CSS classes of the button.
+     *
+     * @param array $options see tag_options()
+     * @return array [label, class]
+     */
+    protected function button(array $options): array {
         $label = get_string('savechanges');
         $class = 'datalynx-custom-submit';
 
@@ -127,9 +160,7 @@ class renderer extends datalynxfield_renderer {
             }
         }
 
-        $mform->addElement('submit', 'submitbutton', $label, [
-            'class' => $class,
-        ]);
+        return [$label, $class];
     }
 
     /**
