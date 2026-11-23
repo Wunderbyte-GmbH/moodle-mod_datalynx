@@ -67,6 +67,7 @@ final class get_text_field_names_test extends advanced_testcase {
                 'param9' => '',
                 'param10' => '',
             ]);
+            \mod_datalynx\local\definition_cache::purge();
         }
 
         $DB->insert_record('datalynx_fields', (object) [
@@ -85,6 +86,7 @@ final class get_text_field_names_test extends advanced_testcase {
             'param9' => '',
             'param10' => '',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
 
         $result = get_text_field_names::execute($instance->id);
         $result = external_api::clean_returnvalue(get_text_field_names::execute_returns(), $result);

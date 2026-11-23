@@ -203,7 +203,9 @@ final class rule_test extends advanced_testcase {
         for ($i = 1; $i <= 10; $i++) {
             $record->{"param$i"} = $params["param$i"] ?? '';
         }
-        return (int) $DB->insert_record('datalynx_fields', $record);
+        $result = (int) $DB->insert_record('datalynx_fields', $record);
+        \mod_datalynx\local\definition_cache::purge();
+        return $result;
     }
 
     /**
@@ -330,6 +332,7 @@ final class rule_test extends advanced_testcase {
             'param10' => null,
         ];
         $record->id = (int) $DB->insert_record('datalynx_rules', $record);
+        \mod_datalynx\local\definition_cache::purge();
         return new rule($this->dlx, $record);
     }
 

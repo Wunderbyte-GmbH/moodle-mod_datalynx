@@ -82,6 +82,7 @@ final class view_text_filter_test extends advanced_testcase {
             'param2' => $param2,
         ];
         $record->id = (int) $DB->insert_record('datalynx_views', $record);
+        \mod_datalynx\local\definition_cache::purge();
 
         return $this->dlx->get_view('grid', $record, false);
     }
@@ -125,6 +126,7 @@ final class view_text_filter_test extends advanced_testcase {
             'param6' => '', 'param7' => '', 'param8' => '', 'param9' => '', 'param10' => '',
         ];
         $field->id = (int) $DB->insert_record('datalynx_fields', $field);
+        \mod_datalynx\local\definition_cache::purge();
 
         $entryid = (int) $DB->insert_record('datalynx_entries', (object) [
             'dataid' => $this->dlx->id(),

@@ -77,7 +77,9 @@ final class definition_names_test extends advanced_testcase {
         if ($table === 'datalynx_renderers') {
             $record->type = '';
         }
-        return (int) $DB->insert_record($table, $record);
+        $id = (int) $DB->insert_record($table, $record);
+        \mod_datalynx\local\definition_cache::invalidate($dataid);
+        return $id;
     }
 
     /**

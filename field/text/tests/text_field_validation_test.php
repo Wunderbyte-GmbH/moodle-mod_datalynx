@@ -69,6 +69,7 @@ final class text_field_validation_test extends advanced_testcase {
         $field->param10 = '';
 
         $field->id = $DB->insert_record('datalynx_fields', $field);
+        \mod_datalynx\local\definition_cache::purge();
 
         // Fetch field object via datalynx to ensure it instantiates the correct subclass.
         $fields = $dlx->get_fields(null, false, true);

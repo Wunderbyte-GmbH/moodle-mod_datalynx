@@ -60,12 +60,14 @@ final class rule_conditions_test extends advanced_testcase {
      */
     private function make_field(string $type, string $name, string $param1 = ''): int {
         global $DB;
-        return (int) $DB->insert_record('datalynx_fields', (object) [
+        $result = (int) $DB->insert_record('datalynx_fields', (object) [
             'dataid' => $this->dlx->id(), 'type' => $type, 'name' => $name, 'description' => '',
             'required' => 0, 'visibleto' => 0, 'editableby' => 0,
             'param1' => $param1, 'param2' => '', 'param3' => '', 'param4' => '', 'param5' => '',
             'param6' => '', 'param7' => '', 'param8' => '', 'param9' => '', 'param10' => '',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
+        return $result;
     }
 
     /**
@@ -111,6 +113,7 @@ final class rule_conditions_test extends advanced_testcase {
             'param1' => json_encode(['entry_created']),
             'param9' => $conditions ? json_encode($conditions) : null,
         ]);
+        \mod_datalynx\local\definition_cache::purge();
         return $this->dlx->get_rule_manager()->get_rule_from_id($ruleid);
     }
 
@@ -170,6 +173,7 @@ final class rule_conditions_test extends advanced_testcase {
             'param10' => json_encode(['1', '3']), // Red and Blue.
         ];
         $ruleid = $DB->insert_record('datalynx_rules', $rule);
+        \mod_datalynx\local\definition_cache::purge();
         $ruleobj = $this->dlx->get_rule_manager()->get_rule_from_id($ruleid);
 
         // Matching entry (stored checkbox format is #1#,#3#).
@@ -212,6 +216,7 @@ final class rule_conditions_test extends advanced_testcase {
             'param10' => '2', // Medium option (key 2).
         ];
         $ruleid = $DB->insert_record('datalynx_rules', $rule);
+        \mod_datalynx\local\definition_cache::purge();
         $ruleobj = $this->dlx->get_rule_manager()->get_rule_from_id($ruleid);
 
         // Matching entry.
@@ -397,6 +402,7 @@ final class rule_conditions_test extends advanced_testcase {
             'param1' => json_encode(['entry_updated']),
             'param9' => json_encode(['_onlyonchangefields' => [$fieldid]]),
         ]);
+        \mod_datalynx\local\definition_cache::purge();
         $formclass = \datalynxrule_eventnotification\form\rule_form::class;
         $ajaxdata = [
             'd' => $this->dlx->id(),
@@ -584,6 +590,7 @@ final class rule_conditions_test extends advanced_testcase {
                 \datalynxrule_eventnotification\rule::ONCHANGE_KEY => [$statusid],
             ]),
         ]);
+        \mod_datalynx\local\definition_cache::purge();
 
         $entryid = $this->make_entry(0, null, \datalynxfield_status\field::STATUS_DRAFT);
 
@@ -633,6 +640,7 @@ final class rule_conditions_test extends advanced_testcase {
             'param1' => json_encode(['entry_created']),
             'param3' => json_encode(['author' => 1, 'roles' => [datalynx::PERMISSION_MANAGER]]),
         ]);
+        \mod_datalynx\local\definition_cache::purge();
         $rule = $this->dlx->get_rule_manager()->get_rule_from_id($ruleid);
 
         // Entry authored by the student.
@@ -719,6 +727,7 @@ final class rule_conditions_test extends advanced_testcase {
             'param2' => \datalynxrule_eventnotification\rule::FROM_AUTHOR,
             'param3' => json_encode(['specificuserid' => (int) $recipient->id]),
         ]);
+        \mod_datalynx\local\definition_cache::purge();
         $rule = $this->dlx->get_rule_manager()->get_rule_from_id($ruleid);
 
         $entryid = (int) $DB->insert_record('datalynx_entries', (object) [

@@ -73,6 +73,7 @@ final class mobile_edit_template_test extends advanced_testcase {
                 . '<small>Locked after saving.</small></div>',
             'noteditabletemplate' => '___2___',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
         $this->viewid = $this->add_mobile_view(
             $this->dlx,
             'grid',

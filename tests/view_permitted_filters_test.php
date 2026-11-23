@@ -59,7 +59,7 @@ final class view_permitted_filters_test extends advanced_testcase {
      */
     private function make_filter(string $name): int {
         global $DB;
-        return (int) $DB->insert_record('datalynx_filters', (object) [
+        $result = (int) $DB->insert_record('datalynx_filters', (object) [
             'dataid' => $this->dlx->id(),
             'name' => $name,
             'description' => '',
@@ -72,6 +72,8 @@ final class view_permitted_filters_test extends advanced_testcase {
             'page' => 0,
             'eids' => '',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
+        return $result;
     }
 
     /**
@@ -102,6 +104,7 @@ final class view_permitted_filters_test extends advanced_testcase {
             'param2' => '',
         ];
         $record->id = (int) $DB->insert_record('datalynx_views', $record);
+        \mod_datalynx\local\definition_cache::purge();
         return $this->dlx->get_view('grid', $DB->get_record('datalynx_views', ['id' => $record->id]));
     }
 

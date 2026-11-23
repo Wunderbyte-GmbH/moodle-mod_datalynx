@@ -63,6 +63,7 @@ final class get_email_view_data_test extends advanced_testcase {
             'param2' => '<p>##notificationentrylink##</p><p>##entryid##</p>',
         ];
         $view->id = (int) $DB->insert_record('datalynx_views', $view);
+        \mod_datalynx\local\definition_cache::purge();
 
         $entryid = (int) $DB->insert_record('datalynx_entries', (object) [
             'dataid' => $dlx->id(),

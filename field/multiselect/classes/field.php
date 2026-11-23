@@ -209,6 +209,7 @@ class field extends datalynxfield_option_multiple {
             $update->id = $this->field->id;
             $update->param1 = implode("\n", $knownvalues);
             $DB->update_record('datalynx_fields', $update);
+            \mod_datalynx\local\definition_cache::invalidate($this->dlx->id());
         }
         return parent::update_content($entry, $values);
     }

@@ -68,6 +68,7 @@ final class location_field_test extends advanced_testcase {
         $field->param10 = '';
 
         $field->id = $DB->insert_record('datalynx_fields', $field);
+        \mod_datalynx\local\definition_cache::purge();
 
         $fields = $dlx->get_fields(null, false, true);
         $fieldobj = $fields[$field->id];

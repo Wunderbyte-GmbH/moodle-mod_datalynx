@@ -155,6 +155,7 @@ if (empty($fields[$schedulename])) {
             'param5' => 1,
         ];
         $record->id = $DB->insert_record('datalynx_fields', $record);
+        \mod_datalynx\local\definition_cache::invalidate($dataid);
         $fields[$schedulename] = $record;
     }
 } else {
@@ -176,6 +177,7 @@ if (!$DB->record_exists('datalynx_renderers', ['dataid' => $dataid, 'name' => $l
             . 'Wochentage, Uhrzeit und bis wann sie gilt.</div></div>',
         'noteditabletemplate' => '___5___',
     ]);
+    \mod_datalynx\local\definition_cache::invalidate($dataid);
     $report[] = "  create field layout: $layoutname";
 }
 
@@ -372,6 +374,7 @@ foreach ($DB->get_records('datalynx_views', ['dataid' => $dataid]) as $view) {
             // The parsed pattern cache has to go with the template it was parsed from.
             $update->patterns = null;
             $DB->update_record('datalynx_views', $update);
+            \mod_datalynx\local\definition_cache::invalidate($dataid);
         }
     }
 }
@@ -414,6 +417,7 @@ foreach (
         $config['criteria'] = $criteria;
         $param9[\mod_datalynx\local\rule\base::MATCH_KEY] = $config;
         $DB->set_field('datalynx_rules', 'param9', json_encode($param9), ['id' => $rule->id]);
+        \mod_datalynx\local\definition_cache::invalidate($dataid);
     }
 }
 
@@ -437,6 +441,7 @@ foreach ($DB->get_records('datalynx_customfilters', ['dataid' => $dataid]) as $c
         $report[] = "  update search form {$customfilter->id}: {$customfilter->name}";
         if (!$dryrun) {
             $DB->set_field('datalynx_customfilters', 'fieldlist', json_encode($new), ['id' => $customfilter->id]);
+            \mod_datalynx\local\definition_cache::invalidate($dataid);
         }
     }
 }

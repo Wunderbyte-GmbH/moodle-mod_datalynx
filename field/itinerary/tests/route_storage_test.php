@@ -69,6 +69,7 @@ final class route_storage_test extends advanced_testcase {
             'param1' => 10,
         ];
         $record->id = $DB->insert_record('datalynx_fields', $record);
+        \mod_datalynx\local\definition_cache::purge();
         $this->field = $this->dlx->get_fields(null, false, true)[$record->id];
     }
 

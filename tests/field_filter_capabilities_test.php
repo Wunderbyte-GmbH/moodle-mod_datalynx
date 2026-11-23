@@ -67,7 +67,9 @@ final class field_filter_capabilities_test extends advanced_testcase {
         for ($i = 1; $i <= 10; $i++) {
             $record->{"param$i"} = $params["param$i"] ?? '';
         }
-        return (int) $DB->insert_record('datalynx_fields', $record);
+        $result = (int) $DB->insert_record('datalynx_fields', $record);
+        \mod_datalynx\local\definition_cache::purge();
+        return $result;
     }
 
     /**
@@ -163,6 +165,7 @@ final class field_filter_capabilities_test extends advanced_testcase {
             'page' => 0,
             'eids' => '',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
         $filter = new datalynx_filter($DB->get_record('datalynx_filters', ['id' => $filterid]));
         $filter->contentfields = [$fileid];
         $entriesclass = new datalynx_entries($dlx, $filter);

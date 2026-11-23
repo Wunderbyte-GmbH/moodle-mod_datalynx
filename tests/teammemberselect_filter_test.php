@@ -75,6 +75,7 @@ final class teammemberselect_filter_test extends advanced_testcase {
             'param10' => '',
         ];
         $fieldid = (int) $DB->insert_record('datalynx_fields', $fieldrecord);
+        \mod_datalynx\local\definition_cache::purge();
 
         // Entry A: stored as integer array [user1->id].
         $entryaid = (int) $DB->insert_record('datalynx_entries', (object) [
@@ -128,6 +129,7 @@ final class teammemberselect_filter_test extends advanced_testcase {
             'eids' => '',
         ];
         $filterid = (int) $DB->insert_record('datalynx_filters', $filterrecord);
+        \mod_datalynx\local\definition_cache::purge();
         $filter = new datalynx_filter($DB->get_record('datalynx_filters', ['id' => $filterid]));
         $filter->contentfields = [$fieldid];
 
@@ -194,6 +196,7 @@ final class teammemberselect_filter_test extends advanced_testcase {
             'param10' => '',
         ];
         $fieldid = (int) $DB->insert_record('datalynx_fields', $fieldrecord);
+        \mod_datalynx\local\definition_cache::purge();
 
         // Entry A: Alice (integer).
         $entryaid = (int) $DB->insert_record('datalynx_entries', (object) [
@@ -228,6 +231,7 @@ final class teammemberselect_filter_test extends advanced_testcase {
             'eids' => '',
         ];
         $filterid = (int) $DB->insert_record('datalynx_filters', $filterrecord);
+        \mod_datalynx\local\definition_cache::purge();
         $filter = new datalynx_filter($DB->get_record('datalynx_filters', ['id' => $filterid]));
         $filter->contentfields = [$fieldid];
 
@@ -256,11 +260,13 @@ final class teammemberselect_filter_test extends advanced_testcase {
         $otherdlx = new datalynx($other->id);
 
         $makefield = static function (datalynx $d) use ($DB): int {
-            return (int) $DB->insert_record('datalynx_fields', (object) [
+            $result = (int) $DB->insert_record('datalynx_fields', (object) [
                 'dataid' => $d->id(), 'type' => 'teammemberselect', 'name' => 'Team', 'description' => '',
                 'param1' => '20', 'param2' => json_encode([0, 1, 2, 3]), 'param3' => '0', 'param4' => '4',
                 'param5' => '0', 'param6' => '0', 'param7' => '0', 'param8' => '0', 'param9' => '', 'param10' => '',
             ]);
+            \mod_datalynx\local\definition_cache::purge();
+            return $result;
         };
         $makeentry = static function (datalynx $d, int $fieldid, string $content) use ($DB): int {
             $entryid = (int) $DB->insert_record('datalynx_entries', (object) [

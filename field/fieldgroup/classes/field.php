@@ -113,6 +113,7 @@ class field extends datalynxfield_base {
             ));
             if ($param1 !== $fieldgroup->param1) {
                 $DB->set_field('datalynx_fields', 'param1', $param1, ['id' => $fieldgroup->id]);
+                \mod_datalynx\local\definition_cache::invalidate((int) $fieldgroup->dataid);
                 $updated++;
             }
         }

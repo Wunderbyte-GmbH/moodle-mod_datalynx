@@ -54,6 +54,7 @@ final class teammember_can_edit_test extends advanced_testcase {
             'dataid' => $dlx->id(), 'type' => 'teammemberselect', 'name' => 'team', 'description' => '',
             'param1' => '5', 'param2' => '[1,2]', 'param9' => '1',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
         $entryid = (int) $DB->insert_record('datalynx_entries', (object) [
             'dataid' => $dlx->id(), 'userid' => $author->id, 'groupid' => 0, 'approved' => 1,
             'status' => 2, 'timecreated' => time(), 'timemodified' => time(),

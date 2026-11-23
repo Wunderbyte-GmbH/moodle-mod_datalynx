@@ -60,6 +60,7 @@ trait mobile_test_trait {
             $field["param$i"] = $params["param$i"] ?? '';
         }
         $id = (int) $DB->insert_record('datalynx_fields', (object) $field);
+        \mod_datalynx\local\definition_cache::invalidate($dlx->id());
         $dlx->get_fields(null, false, true);
 
         return $id;
@@ -99,7 +100,9 @@ trait mobile_test_trait {
             'param2' => $entrytemplate,
         ];
 
-        return (int) $DB->insert_record('datalynx_views', (object) $view);
+        $id = (int) $DB->insert_record('datalynx_views', (object) $view);
+        \mod_datalynx\local\definition_cache::invalidate($dlx->id());
+        return $id;
     }
 
     /**
@@ -113,7 +116,7 @@ trait mobile_test_trait {
     private function add_mobile_filter(datalynx $dlx, string $name, array $settings = []): int {
         global $DB;
 
-        return (int) $DB->insert_record('datalynx_filters', (object) ($settings + [
+        $id = (int) $DB->insert_record('datalynx_filters', (object) ($settings + [
             'dataid' => $dlx->id(),
             'name' => $name,
             'description' => '',
@@ -121,6 +124,8 @@ trait mobile_test_trait {
             'perpage' => 0,
             'selection' => 0,
         ]));
+        \mod_datalynx\local\definition_cache::invalidate($dlx->id());
+        return $id;
     }
 
     /**
@@ -152,7 +157,9 @@ trait mobile_test_trait {
             'conditions' => ['match' => 'all', 'rules' => []],
         ]));
 
-        return (int) $DB->insert_record('datalynx_behaviors', $record);
+        $id = (int) $DB->insert_record('datalynx_behaviors', $record);
+        \mod_datalynx\local\definition_cache::invalidate($dlx->id());
+        return $id;
     }
 
     /**

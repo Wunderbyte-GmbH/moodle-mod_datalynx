@@ -61,7 +61,7 @@ final class select_lock_and_reset_test extends advanced_testcase {
      */
     private function make_field(string $type, int $lock): int {
         global $DB;
-        return (int) $DB->insert_record('datalynx_fields', (object) [
+        $result = (int) $DB->insert_record('datalynx_fields', (object) [
             'dataid' => $this->dlx->id(),
             'type' => $type,
             'name' => $type . '_' . $lock,
@@ -71,6 +71,8 @@ final class select_lock_and_reset_test extends advanced_testcase {
             'param7' => $lock,
             'param8' => '', 'param9' => '', 'param10' => '',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
+        return $result;
     }
 
     /**
@@ -160,6 +162,7 @@ final class select_lock_and_reset_test extends advanced_testcase {
             'param1' => '', 'param2' => '', 'param3' => '', 'param4' => '', 'param5' => '',
             'param6' => '', 'param7' => '', 'param8' => '', 'param9' => '', 'param10' => '',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
         $entryid = $this->make_entry(datalynxfield_status::STATUS_SUBMISSION, 1);
         $this->set_content($selectid, $entryid, '1');
         $this->set_content($textid, $entryid, 'some answer');

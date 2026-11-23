@@ -58,6 +58,7 @@ final class field_layout_dependent_test extends advanced_testcase {
             'param10' => '',
         ];
         $fieldrecord->id = (int) $DB->insert_record('datalynx_fields', $fieldrecord);
+        \mod_datalynx\local\definition_cache::purge();
 
         // Create a custom renderer layout.
         $DB->insert_record('datalynx_renderers', (object) [
@@ -68,6 +69,7 @@ final class field_layout_dependent_test extends advanced_testcase {
             'displaytemplate' => 'Display: #value',
             'noteditabletemplate' => '___5___',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
 
         // Create a non-editable behavior.
         $DB->insert_record('datalynx_behaviors', (object) [
@@ -86,6 +88,7 @@ final class field_layout_dependent_test extends advanced_testcase {
             'editableafterfinal' => 0,
             'conditions' => '',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
 
         // Get the field instance and its renderer.
         $field = $dlx->get_field_from_id($fieldrecord->id);

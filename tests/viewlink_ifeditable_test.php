@@ -133,6 +133,7 @@ final class viewlink_ifeditable_test extends advanced_testcase {
     public function test_select_locked_after_save_does_not_count(): void {
         global $DB;
         $DB->set_field('datalynx_fields', 'param7', 1, ['id' => $this->selectid]);
+        \mod_datalynx\local\definition_cache::purge();
         $this->dlx->get_fields(null, false, true);
         $this->assertSame('', $this->render_link('[[phase|b_afterfinal]]', datalynxfield_status::STATUS_DRAFT, true, '1'));
     }
@@ -194,7 +195,9 @@ final class viewlink_ifeditable_test extends advanced_testcase {
 
         // Each call builds its own views, so remove them again for the next call.
         $DB->delete_records('datalynx_views', ['id' => $target->id]);
+        \mod_datalynx\local\definition_cache::purge();
         $DB->delete_records('datalynx_views', ['id' => $list->id]);
+        \mod_datalynx\local\definition_cache::purge();
         return (string) ($replacements[$tag] ?? '');
     }
 
@@ -213,6 +216,7 @@ final class viewlink_ifeditable_test extends advanced_testcase {
             'section' => '##entries##', 'param2' => $template,
         ];
         $view->id = $DB->insert_record('datalynx_views', $view);
+        \mod_datalynx\local\definition_cache::purge();
         return $view;
     }
 
@@ -231,6 +235,7 @@ final class viewlink_ifeditable_test extends advanced_testcase {
             $record->{"param$i"} = $params["param$i"] ?? '';
         }
         $id = (int) $DB->insert_record('datalynx_fields', $record);
+        \mod_datalynx\local\definition_cache::purge();
         $this->dlx->get_fields(null, false, true);
         return $id;
     }
@@ -256,5 +261,6 @@ final class viewlink_ifeditable_test extends advanced_testcase {
             'conditions' => $conditions ? json_encode($conditions) : null,
             'editableafterfinal' => $afterfinal ? 1 : 0,
         ]);
+        \mod_datalynx\local\definition_cache::purge();
     }
 }

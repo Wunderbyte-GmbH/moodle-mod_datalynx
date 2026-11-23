@@ -38,13 +38,15 @@ final class layout_render_pattern_test extends advanced_testcase {
      */
     private function create_renderer(int $dataid, string $name): int {
         global $DB;
-        return (int) $DB->insert_record('datalynx_renderers', (object) [
+        $result = (int) $DB->insert_record('datalynx_renderers', (object) [
             'dataid' => $dataid,
             'type' => 'field',
             'name' => $name,
             'description' => '',
             'displaytemplate' => '#value',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
+        return $result;
     }
 
     /**
@@ -71,6 +73,7 @@ final class layout_render_pattern_test extends advanced_testcase {
             'patterns' => null,
             'param2' => null,
         ]);
+        \mod_datalynx\local\definition_cache::purge();
 
         $rendererid = $this->create_renderer($dlx->id(), 'My layout');
 
@@ -105,6 +108,7 @@ final class layout_render_pattern_test extends advanced_testcase {
             'patterns' => '[[Title||My layout]]',
             'param2' => '##entries## [[Title||My layout]]',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
 
         datalynxfield_layout::delete_renderer($rendererid);
 
@@ -136,6 +140,7 @@ final class layout_render_pattern_test extends advanced_testcase {
             'patterns' => '[[Title||My layout]]',
             'param2' => '##entries## [[Title||My layout]]',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
 
         datalynxfield_layout::update_render_pattern($rendererid, 'My new layout');
 

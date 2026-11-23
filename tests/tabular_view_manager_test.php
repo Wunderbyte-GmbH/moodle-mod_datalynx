@@ -55,6 +55,7 @@ final class tabular_view_manager_test extends advanced_testcase {
             'param2' => '',
         ];
         $view->id = (int) $DB->insert_record('datalynx_views', $view);
+        \mod_datalynx\local\definition_cache::purge();
 
         $field = (object) [
             'dataid' => $dlx->id(),
@@ -73,6 +74,7 @@ final class tabular_view_manager_test extends advanced_testcase {
             'param10' => '',
         ];
         $field->id = (int) $DB->insert_record('datalynx_fields', $field);
+        \mod_datalynx\local\definition_cache::purge();
 
         $entryid = (int) $DB->insert_record('datalynx_entries', (object) [
             'dataid' => $dlx->id(),
@@ -160,6 +162,7 @@ final class tabular_view_manager_test extends advanced_testcase {
             'param10' => '',
         ];
         $fieldid = (int) $DB->insert_record('datalynx_fields', $fieldrecord);
+        \mod_datalynx\local\definition_cache::purge();
 
         // Create a filter: approved entries only (selection=1), sort by duration field ASC (0=ASC).
         $filterrecord = (object) [
@@ -175,6 +178,7 @@ final class tabular_view_manager_test extends advanced_testcase {
             'search' => '',
         ];
         $filterid = (int) $DB->insert_record('datalynx_filters', $filterrecord);
+        \mod_datalynx\local\definition_cache::purge();
 
         // Create a tabular view with the filter assigned.
         $viewrecord = (object) [
@@ -192,6 +196,7 @@ final class tabular_view_manager_test extends advanced_testcase {
             'param2' => '',
         ];
         $viewrecord->id = (int) $DB->insert_record('datalynx_views', $viewrecord);
+        \mod_datalynx\local\definition_cache::purge();
 
         // Create two approved entries with different duration values (in seconds).
         $entry1id = (int) $DB->insert_record('datalynx_entries', (object) [

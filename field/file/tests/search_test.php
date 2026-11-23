@@ -197,8 +197,10 @@ final class search_test extends advanced_testcase {
             'name' => 'Rule', 'description' => '', 'param9' => json_encode([
                 $fileid => ['AND' => [['', '', '1']]], '_onlyonchangefields' => [$textid],
             ])]);
+        \mod_datalynx\local\definition_cache::purge();
         $legacy = $DB->insert_record('datalynx_rules', (object) ['dataid' => $this->dlx->id(), 'type' => 'eventnotification',
             'name' => 'Legacy', 'description' => '', 'param5' => (string) $fileid, 'param10' => '0']);
+        \mod_datalynx\local\definition_cache::purge();
 
         mod_datalynx_upgrade_file_search_criteria();
 

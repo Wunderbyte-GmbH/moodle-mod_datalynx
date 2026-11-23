@@ -77,6 +77,7 @@ final class tool_test extends advanced_testcase {
             'param10' => 0,
         ];
         $view1->id = $DB->insert_record('datalynx_views', $view1);
+        \mod_datalynx\local\definition_cache::purge();
 
         // 2. Create another view with ##edit## tag in eparam2.
         $view2 = (object) [
@@ -90,6 +91,7 @@ final class tool_test extends advanced_testcase {
             'param10' => 0,
         ];
         $view2->id = $DB->insert_record('datalynx_views', $view2);
+        \mod_datalynx\local\definition_cache::purge();
 
         // 3. Create a view without ##edit## tag.
         $view3 = (object) [
@@ -104,6 +106,7 @@ final class tool_test extends advanced_testcase {
             'param10' => 0,
         ];
         $view3->id = $DB->insert_record('datalynx_views', $view3);
+        \mod_datalynx\local\definition_cache::purge();
 
         // Verify view properties search logic.
         $views = $dlx->get_views([], true);
@@ -158,6 +161,7 @@ final class tool_test extends advanced_testcase {
             'description' => '',
         ];
         $fieldid = $DB->insert_record('datalynx_fields', $fieldrecord);
+        \mod_datalynx\local\definition_cache::purge();
 
         // Simulate submitting Step 2 of the form with default values.
         $formdata = new stdClass();
@@ -234,6 +238,7 @@ final class tool_test extends advanced_testcase {
             'param10' => 0,
         ];
         $view->id = $DB->insert_record('datalynx_views', $view);
+        \mod_datalynx\local\definition_cache::purge();
 
         // Add a text field.
         $fieldrecord = (object) [
@@ -243,6 +248,7 @@ final class tool_test extends advanced_testcase {
             'description' => '',
         ];
         $DB->insert_record('datalynx_fields', $fieldrecord);
+        \mod_datalynx\local\definition_cache::purge();
 
         // Add a required behavior.
         $behaviorrecord = (object) [
@@ -256,6 +262,7 @@ final class tool_test extends advanced_testcase {
             'timemodified' => time(),
         ];
         $DB->insert_record('datalynx_behaviors', $behaviorrecord);
+        \mod_datalynx\local\definition_cache::purge();
 
         // Instantiate the form. This will run the definition and definition_step_2.
         // It shouldn't crash now.

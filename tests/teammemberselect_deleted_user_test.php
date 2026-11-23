@@ -48,6 +48,7 @@ final class teammemberselect_deleted_user_test extends advanced_testcase {
             'name' => 'Team',
             'description' => '',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
     }
 
     /**

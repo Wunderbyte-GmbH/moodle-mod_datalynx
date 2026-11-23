@@ -814,6 +814,9 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
     protected function after_execute() {
         global $DB;
 
+        // The definition tables were written directly; forget what may be cached for the instance.
+        \mod_datalynx\local\definition_cache::invalidate((int) $this->get_new_parentid('datalynx'));
+
         // Add data related files, no need to match by itemname (just internally handled context).
         $this->add_related_files('mod_datalynx', 'intro', null);
 

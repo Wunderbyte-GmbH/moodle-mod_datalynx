@@ -68,6 +68,7 @@ if ($mform->is_cancelled()) {
             // For text fields: Store the field itself as autocompletion reference field if no other field is chosen.
             if ($field->type == 'text' && $param10 <= 0 && $data->param9 == $dlx->id()) {
                 $DB->set_field('datalynx_fields', 'param10', $fieldid, ['id' => $fieldid]);
+                \mod_datalynx\local\definition_cache::invalidate($dlx->id());
             }
             $other = ['dataid' => $dlx->id()];
             $event = \mod_datalynx\event\field_created::create(

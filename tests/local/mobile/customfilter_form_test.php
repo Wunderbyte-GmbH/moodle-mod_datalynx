@@ -105,6 +105,7 @@ final class customfilter_form_test extends advanced_testcase {
             ]),
         ];
         $this->customfilter->id = (int) $DB->insert_record('datalynx_customfilters', $this->customfilter);
+        \mod_datalynx\local\definition_cache::purge();
         $this->dlx = new datalynx($dlx->id());
     }
 

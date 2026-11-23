@@ -113,6 +113,7 @@ final class rule_ride_matching_test extends advanced_testcase {
             'param5' => 5,
         ];
         $itinerary->id = $DB->insert_record('datalynx_fields', $itinerary);
+        \mod_datalynx\local\definition_cache::purge();
 
         $this->typefield = (object) [
             'dataid' => $this->dlx->id(),
@@ -122,6 +123,7 @@ final class rule_ride_matching_test extends advanced_testcase {
             'param1' => "Offer a ride\nLooking for a ride",
         ];
         $this->typefield->id = $DB->insert_record('datalynx_fields', $this->typefield);
+        \mod_datalynx\local\definition_cache::purge();
 
         $schedule = (object) [
             'dataid' => $this->dlx->id(),
@@ -132,6 +134,7 @@ final class rule_ride_matching_test extends advanced_testcase {
             'param2' => \datalynxfield_schedule\field::TOLERANCE_WHOLE_DAY,
         ];
         $schedule->id = $DB->insert_record('datalynx_fields', $schedule);
+        \mod_datalynx\local\definition_cache::purge();
 
         $fields = $this->dlx->get_fields(null, false, true);
         $this->itineraryfield = $fields[$itinerary->id];
@@ -170,7 +173,7 @@ final class rule_ride_matching_test extends advanced_testcase {
             ],
         ];
 
-        return (int) $DB->insert_record('datalynx_rules', (object) [
+        $result = (int) $DB->insert_record('datalynx_rules', (object) [
             'dataid' => $this->dlx->id(),
             'type' => 'eventnotification',
             'name' => $name,
@@ -181,6 +184,8 @@ final class rule_ride_matching_test extends advanced_testcase {
             'param3' => json_encode(['matchauthors' => 1, 'subjectauthorpermatch' => 1]),
             'param9' => json_encode($param9),
         ]);
+        \mod_datalynx\local\definition_cache::purge();
+        return $result;
     }
 
     /**
@@ -542,7 +547,9 @@ final class rule_ride_matching_test extends advanced_testcase {
         $request = $this->create_ride($this->passenger, self::REQUEST, ['wien', 'graz']);
 
         $DB->set_field('datalynx_rules', 'enabled', 0, ['id' => $this->offerruleid]);
+        \mod_datalynx\local\definition_cache::purge();
         $DB->set_field('datalynx_rules', 'param9', null, ['id' => $this->requestruleid]);
+        \mod_datalynx\local\definition_cache::purge();
 
         // A rule with no criteria is an ordinary notification rule again, and this one has no
         // recipients configured beyond the matching ones, so nothing is sent.
@@ -578,7 +585,9 @@ final class rule_ride_matching_test extends advanced_testcase {
         global $DB;
 
         $DB->delete_records('datalynx_rules', ['id' => $this->offerruleid]);
+        \mod_datalynx\local\definition_cache::purge();
         $DB->delete_records('datalynx_rules', ['id' => $this->requestruleid]);
+        \mod_datalynx\local\definition_cache::purge();
         // No trigger condition: this rule fires for offers and requests alike.
         $this->offerruleid = $this->requestruleid = (int) $DB->insert_record('datalynx_rules', (object) [
             'dataid' => $this->dlx->id(),
@@ -603,6 +612,7 @@ final class rule_ride_matching_test extends advanced_testcase {
                 ],
             ]),
         ]);
+        \mod_datalynx\local\definition_cache::purge();
 
         // Saved from the request side: the offer's route carries it.
         $this->create_ride($this->driver, self::OFFER, ['wien', 'wienerneustadt', 'graz']);

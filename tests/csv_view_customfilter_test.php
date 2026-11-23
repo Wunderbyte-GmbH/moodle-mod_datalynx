@@ -66,6 +66,7 @@ final class csv_view_customfilter_test extends advanced_testcase {
             'section' => '',
         ];
         $view->id = (int) $DB->insert_record('datalynx_views', $view);
+        \mod_datalynx\local\definition_cache::purge();
 
         $textfield = (object) [
             'dataid'  => $dlx->id(),
@@ -77,6 +78,7 @@ final class csv_view_customfilter_test extends advanced_testcase {
             'param6'  => '', 'param7' => '', 'param8' => '', 'param9' => '', 'param10' => '',
         ];
         $textfield->id = (int) $DB->insert_record('datalynx_fields', $textfield);
+        \mod_datalynx\local\definition_cache::purge();
 
         $multifield = (object) [
             'dataid'  => $dlx->id(),
@@ -88,6 +90,7 @@ final class csv_view_customfilter_test extends advanced_testcase {
             'param6'  => '', 'param7' => '', 'param8' => '', 'param9' => '', 'param10' => '',
         ];
         $multifield->id = (int) $DB->insert_record('datalynx_fields', $multifield);
+        \mod_datalynx\local\definition_cache::purge();
 
         $now = time();
         $entryone = (int) $DB->insert_record('datalynx_entries', (object) [

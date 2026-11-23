@@ -66,6 +66,7 @@ final class get_pdf_view_data_test extends advanced_testcase {
             'section' => '',
         ];
         $view->id = (int) $DB->insert_record('datalynx_views', $view);
+        \mod_datalynx\local\definition_cache::purge();
 
         $field = (object) [
             'dataid' => $dlx->id(),
@@ -84,6 +85,7 @@ final class get_pdf_view_data_test extends advanced_testcase {
             'param10' => '',
         ];
         $field->id = (int) $DB->insert_record('datalynx_fields', $field);
+        \mod_datalynx\local\definition_cache::purge();
 
         $entryid = (int) $DB->insert_record('datalynx_entries', (object) [
             'dataid' => $dlx->id(),
@@ -134,6 +136,7 @@ final class get_pdf_view_data_test extends advanced_testcase {
             'section' => '',
         ];
         $view->id = (int) $DB->insert_record('datalynx_views', $view);
+        \mod_datalynx\local\definition_cache::purge();
 
         $textfield = (object) [
             'dataid' => $dlx->id(),
@@ -152,6 +155,7 @@ final class get_pdf_view_data_test extends advanced_testcase {
             'param10' => '',
         ];
         $textfield->id = (int) $DB->insert_record('datalynx_fields', $textfield);
+        \mod_datalynx\local\definition_cache::purge();
 
         $multiselectfield = (object) [
             'dataid' => $dlx->id(),
@@ -170,6 +174,7 @@ final class get_pdf_view_data_test extends advanced_testcase {
             'param10' => '',
         ];
         $multiselectfield->id = (int) $DB->insert_record('datalynx_fields', $multiselectfield);
+        \mod_datalynx\local\definition_cache::purge();
 
         $entryone = (int) $DB->insert_record('datalynx_entries', (object) [
             'dataid' => $dlx->id(),
@@ -244,6 +249,7 @@ final class get_pdf_view_data_test extends advanced_testcase {
             'section' => '',
         ];
         $view->id = (int) $DB->insert_record('datalynx_views', $view);
+        \mod_datalynx\local\definition_cache::purge();
 
         $field = (object) [
             'dataid' => $dlx->id(),
@@ -262,6 +268,7 @@ final class get_pdf_view_data_test extends advanced_testcase {
             'param10' => '',
         ];
         $field->id = (int) $DB->insert_record('datalynx_fields', $field);
+        \mod_datalynx\local\definition_cache::purge();
 
         $entryone = (int) $DB->insert_record('datalynx_entries', (object) [
             'dataid' => $dlx->id(),
@@ -305,6 +312,7 @@ final class get_pdf_view_data_test extends advanced_testcase {
             'customsearch' => '',
             'search' => 'Beta',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
 
         return [$dlx, $view, $filterid, $entryone, $entrytwo];
     }

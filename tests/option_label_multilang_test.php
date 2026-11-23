@@ -83,6 +83,7 @@ final class option_label_multilang_test extends advanced_testcase {
             'param2' => '', 'param3' => '', 'param4' => '', 'param5' => '',
             'param6' => '', 'param7' => '', 'param8' => '', 'param9' => '', 'param10' => '',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
 
         // Force a re-read: get_fields() caches and each test creates its fields one at a time.
         return $this->dlx->get_field_from_id($fieldid, true);

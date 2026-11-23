@@ -245,7 +245,7 @@ class manager {
         if (!$this->customrules || $forceget) {
             $this->customrules = [];
             // Collate user rules.
-            if ($rules = $DB->get_records('datalynx_rules', ['dataid' => $this->dlx->id()])) {
+            if ($rules = \mod_datalynx\local\definition_cache::get_records($this->dlx->id(), 'rules')) {
                 foreach ($rules as $ruleid => $rule) {
                     $this->customrules[$ruleid] = $this->get_rule($rule);
                 }
@@ -402,6 +402,7 @@ class manager {
                                 $enabled,
                                 ['id' => $rid]
                             );
+                            \mod_datalynx\local\definition_cache::invalidate($this->dlx->id());
 
                             $processedrids[] = $rid;
 
@@ -423,6 +424,7 @@ class manager {
                                 $rule->rule->name .= '_1';
                             }
                             $ruleid = $DB->insert_record('datalynx_rules', $rule->rule);
+                            \mod_datalynx\local\definition_cache::invalidate($this->dlx->id());
                             $processedrids[] = $ruleid;
 
                             $other = ['dataid' => $this->dlx->id()];

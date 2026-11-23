@@ -56,6 +56,7 @@ final class datalynxview_field_renderer_test extends advanced_testcase {
             'param2' => '<div class="remote-entry">[[Remote title]]</div>',
         ];
         $remoteview->id = (int) $DB->insert_record('datalynx_views', $remoteview);
+        \mod_datalynx\local\definition_cache::purge();
 
         $remotetextfield = (object) [
             'dataid' => $remotedlx->id(),
@@ -74,6 +75,7 @@ final class datalynxview_field_renderer_test extends advanced_testcase {
             'param10' => '',
         ];
         $remotetextfield->id = (int) $DB->insert_record('datalynx_fields', $remotetextfield);
+        \mod_datalynx\local\definition_cache::purge();
 
         $remoteentryid = (int) $DB->insert_record('datalynx_entries', (object) [
             'dataid' => $remotedlx->id(),
@@ -110,6 +112,7 @@ final class datalynxview_field_renderer_test extends advanced_testcase {
             'param10' => '',
         ];
         $localfield->id = (int) $DB->insert_record('datalynx_fields', $localfield);
+        \mod_datalynx\local\definition_cache::purge();
 
         $localentry = (object) $DB->get_record('datalynx_entries', [
             'id' => (int) $DB->insert_record('datalynx_entries', (object) [

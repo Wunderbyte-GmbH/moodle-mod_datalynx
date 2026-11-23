@@ -77,6 +77,7 @@ final class entries_sorting_test extends advanced_testcase {
             'param10' => '',
         ];
         $fieldid = (int) $DB->insert_record('datalynx_fields', $fieldrecord);
+        \mod_datalynx\local\definition_cache::purge();
 
         // 3. Create three entries with different duration contents (e.g. 100, 300, 200).
         $entry1id = (int) $DB->insert_record('datalynx_entries', (object) [
@@ -136,6 +137,7 @@ final class entries_sorting_test extends advanced_testcase {
             'eids' => '',
         ];
         $filterid = (int) $DB->insert_record('datalynx_filters', $filterrecord);
+        \mod_datalynx\local\definition_cache::purge();
         $filter = new datalynx_filter($DB->get_record('datalynx_filters', ['id' => $filterid]));
         $filter->contentfields = [$fieldid];
 
@@ -156,6 +158,7 @@ final class entries_sorting_test extends advanced_testcase {
         $filterrecord->id = $filterid;
         $filterrecord->customsort = serialize([$fieldid => 1]); // DESC sorting.
         $DB->update_record('datalynx_filters', $filterrecord);
+        \mod_datalynx\local\definition_cache::purge();
         $filter = new datalynx_filter($DB->get_record('datalynx_filters', ['id' => $filterid]));
         $filter->contentfields = [$fieldid];
 
@@ -203,6 +206,7 @@ final class entries_sorting_test extends advanced_testcase {
             'param10' => '',
         ];
         $fieldid = (int) $DB->insert_record('datalynx_fields', $fieldrecord);
+        \mod_datalynx\local\definition_cache::purge();
 
         // 3. Create three entries with different duration contents (e.g. 100, 300, 200).
         $entry1id = (int) $DB->insert_record('datalynx_entries', (object) [
@@ -270,6 +274,7 @@ final class entries_sorting_test extends advanced_testcase {
             'eids' => '',
         ];
         $filterid = (int) $DB->insert_record('datalynx_filters', $filterrecord);
+        \mod_datalynx\local\definition_cache::purge();
         $filter = new datalynx_filter($DB->get_record('datalynx_filters', ['id' => $filterid]));
         $filter->contentfields = [$fieldid];
 

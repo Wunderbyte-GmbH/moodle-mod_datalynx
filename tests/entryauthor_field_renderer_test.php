@@ -98,6 +98,7 @@ final class entryauthor_field_renderer_test extends advanced_testcase {
         $viewrecord->description = '';
         $viewrecord->param10 = 0;
         $viewid = $DB->insert_record('datalynx_views', $viewrecord);
+        \mod_datalynx\local\definition_cache::purge();
 
         // Call get_view on $dlx.
         $view = $dlx->get_view('grid', $viewid);

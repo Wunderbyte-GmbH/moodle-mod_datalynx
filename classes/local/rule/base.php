@@ -380,6 +380,7 @@ abstract class base {
             $this->set_rule($fromform);
         }
         $this->rule->id = $DB->insert_record('datalynx_rules', $this->rule);
+        \mod_datalynx\local\definition_cache::invalidate($this->dlx->id());
         if (!$this->rule->id) {
             echo $OUTPUT->notification('Insertion of new rule failed!');
             return false;
@@ -405,6 +406,7 @@ abstract class base {
             echo $OUTPUT->notification('updating of rule failed!');
             return false;
         }
+        \mod_datalynx\local\definition_cache::invalidate($this->dlx->id());
         return true;
     }
 
@@ -419,6 +421,7 @@ abstract class base {
 
         if (!empty($this->rule->id)) {
             $DB->delete_records('datalynx_rules', ['id' => $this->rule->id]);
+            \mod_datalynx\local\definition_cache::invalidate($this->dlx->id());
         }
         return true;
     }

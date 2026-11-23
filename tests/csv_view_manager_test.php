@@ -57,6 +57,7 @@ final class csv_view_manager_test extends advanced_testcase {
             'section' => '',
         ];
         $view->id = (int) $DB->insert_record('datalynx_views', $view);
+        \mod_datalynx\local\definition_cache::purge();
 
         $field = (object) [
             'dataid' => $dlx->id(),
@@ -75,6 +76,7 @@ final class csv_view_manager_test extends advanced_testcase {
             'param10' => '',
         ];
         $field->id = (int) $DB->insert_record('datalynx_fields', $field);
+        \mod_datalynx\local\definition_cache::purge();
 
         $entryid = (int) $DB->insert_record('datalynx_entries', (object) [
             'dataid' => $dlx->id(),
@@ -144,6 +146,7 @@ final class csv_view_manager_test extends advanced_testcase {
             'param2' => "[[Alpha]]|Alpha\n[[Beta]]|Beta\n##author:name##|Author", 'param3' => 'csv',
             'param5' => 0, 'param10' => 0, 'section' => '',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
         $entryid = (int) $DB->insert_record('datalynx_entries', (object) [
             'dataid' => $dlx->id(), 'userid' => $USER->id, 'groupid' => 0, 'approved' => 1, 'status' => 0,
             'timecreated' => time(), 'timemodified' => time(),
@@ -152,6 +155,7 @@ final class csv_view_manager_test extends advanced_testcase {
             $fieldid = (int) $DB->insert_record('datalynx_fields', (object) [
                 'dataid' => $dlx->id(), 'type' => 'text', 'name' => $name, 'description' => '',
             ]);
+            \mod_datalynx\local\definition_cache::purge();
             $DB->insert_record('datalynx_contents', (object) [
                 'fieldid' => $fieldid, 'entryid' => $entryid, 'content' => $value,
             ]);

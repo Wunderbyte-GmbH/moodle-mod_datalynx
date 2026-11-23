@@ -107,6 +107,7 @@ final class viewlink_pattern_test extends advanced_testcase {
         $targetview->param10 = 0;
         $targetview->section = '';
         $targetview->id = $DB->insert_record('datalynx_views', $targetview);
+        \mod_datalynx\local\definition_cache::purge();
 
         // Insert a template view whose section contains the tag under test.
         $templateview = clone $targetview;
@@ -114,6 +115,7 @@ final class viewlink_pattern_test extends advanced_testcase {
         $templateview->section = $taginsection;
         unset($templateview->id);
         $templateview->id = $DB->insert_record('datalynx_views', $templateview);
+        \mod_datalynx\local\definition_cache::purge();
 
         // Instantiate view objects (filteroptions=false avoids URL param processing).
         $targetobj = new tabular_view($dlx, $targetview, false);
@@ -160,6 +162,7 @@ final class viewlink_pattern_test extends advanced_testcase {
             'section' => 'Restricted marker',
         ];
         $targetview->id = $DB->insert_record('datalynx_views', $targetview);
+        \mod_datalynx\local\definition_cache::purge();
 
         $templateview = (object) [
             'dataid' => $datalynxrecord->id,
@@ -175,6 +178,7 @@ final class viewlink_pattern_test extends advanced_testcase {
             'section' => $taginsection,
         ];
         $templateview->id = $DB->insert_record('datalynx_views', $templateview);
+        \mod_datalynx\local\definition_cache::purge();
 
         $DB->update_record('datalynx', (object) [
             'id' => $datalynxrecord->id,
@@ -552,6 +556,7 @@ final class viewlink_pattern_test extends advanced_testcase {
             'section' => '',
         ];
         $DB->insert_record('datalynx_views', $hiddenview);
+        \mod_datalynx\local\definition_cache::purge();
 
         $menu = $templateobj->patternclass()->get_menu(false, false);
         $this->assertArrayHasKey(get_string('reference', 'datalynx'), $menu);
@@ -585,6 +590,7 @@ final class viewlink_pattern_test extends advanced_testcase {
             'section' => '',
         ];
         $DB->insert_record('datalynx_views', $emailview);
+        \mod_datalynx\local\definition_cache::purge();
 
         $menu = $templateobj->patternclass()->get_menu(false, false);
         $this->assertArrayHasKey(get_string('reference', 'datalynx'), $menu);

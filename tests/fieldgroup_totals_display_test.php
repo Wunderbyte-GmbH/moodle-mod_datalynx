@@ -51,7 +51,9 @@ final class fieldgroup_totals_display_test extends advanced_testcase {
             for ($i = 1; $i <= 10; $i++) {
                 $record->{"param$i"} = $params["param$i"] ?? '';
             }
-            return (int) $DB->insert_record('datalynx_fields', $record);
+            $result = (int) $DB->insert_record('datalynx_fields', $record);
+            \mod_datalynx\local\definition_cache::purge();
+            return $result;
         };
         $dateid = $mk('time', 'Invoicedate', ['param1' => '1']);
         $amountid = $mk('number', 'Amount', ['param1' => '2', 'param4' => '1']);

@@ -128,6 +128,7 @@ final class field_formats_test extends advanced_testcase {
         $view->description = '';
         $view->section = '##mytime:customdate##';
         $DB->insert_record('datalynx_views', $view);
+        \mod_datalynx\local\definition_cache::purge();
 
         // Attempt deletion, expecting exception.
         $this->expectException(\moodle_exception::class);
@@ -148,6 +149,7 @@ final class field_formats_test extends advanced_testcase {
         $field->type = 'time';
         $field->description = '';
         $DB->insert_record('datalynx_fields', $field);
+        \mod_datalynx\local\definition_cache::purge();
 
         // Create a view with legacy patterns.
         $view = new stdClass();
@@ -159,6 +161,7 @@ final class field_formats_test extends advanced_testcase {
         $view->param1 = 'Details: [[mytime:anotherlegacy]]';
         $view->param2 = 'Author info: ##author:idnumber##';
         $DB->insert_record('datalynx_views', $view);
+        \mod_datalynx\local\definition_cache::purge();
 
         // Verify formats do not exist yet.
         $this->assertNull(\mod_datalynx\local\field_format\manager::get_format_by_name($dlx->id(), 'legacyformat'));
@@ -338,6 +341,7 @@ final class field_formats_test extends advanced_testcase {
         $field->type = 'rating';
         $field->description = '';
         $DB->insert_record('datalynx_fields', $field);
+        \mod_datalynx\local\definition_cache::purge();
 
         // 2. Create a view template containing legacy double-colon tags.
         $view = new stdClass();
@@ -347,6 +351,7 @@ final class field_formats_test extends advanced_testcase {
         $view->description = '';
         $view->section = 'Rating displays: ##ratings:avg:bar## and [[ratings:avg:star]]';
         $viewid = $DB->insert_record('datalynx_views', $view);
+        \mod_datalynx\local\definition_cache::purge();
 
         // 3. Create a legacy format record with a double-colon name.
         $formatrec = new stdClass();
@@ -355,6 +360,7 @@ final class field_formats_test extends advanced_testcase {
         $formatrec->fieldtype = 'rating';
         $formatrec->settings = json_encode([]);
         $DB->insert_record('datalynx_field_formats', $formatrec);
+        \mod_datalynx\local\definition_cache::purge();
 
         // 4. Run the replacement and upgrade migration logic (simulating what upgrade.php does).
         // A. View templates replacement
@@ -375,6 +381,7 @@ final class field_formats_test extends advanced_testcase {
                 }
             }
             $DB->update_record('datalynx_views', $view);
+            \mod_datalynx\local\definition_cache::purge();
         }
 
         // B. Formats table migration.
@@ -392,8 +399,10 @@ final class field_formats_test extends advanced_testcase {
                     $format->name = $newname;
                     $format->settings = json_encode(['option' => $newname]);
                     $DB->update_record('datalynx_field_formats', $format);
+                    \mod_datalynx\local\definition_cache::purge();
                 } else {
                     $DB->delete_records('datalynx_field_formats', ['id' => $format->id]);
+                    \mod_datalynx\local\definition_cache::purge();
                 }
             }
         }
@@ -517,6 +526,7 @@ final class field_formats_test extends advanced_testcase {
         $DB->insert_record('datalynx_fields', (object)[
             'dataid' => $dlx->id(), 'name' => 'mytime', 'type' => 'time', 'description' => '',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
 
         // The ##group:id## resolves to the entrygroup field type (has_options() === false); the time
         // suffix resolves to an option-bearing type.
@@ -524,6 +534,7 @@ final class field_formats_test extends advanced_testcase {
             'dataid' => $dlx->id(), 'name' => 'View', 'type' => 'grid', 'description' => '',
             'section' => 'Group: ##group:id## Time: ##mytime:datey##',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
 
         \mod_datalynx\local\field_format\manager::auto_create_formats_from_templates($dlx->id());
 
@@ -549,6 +560,7 @@ final class field_formats_test extends advanced_testcase {
             'param1' => "Confirmed\nProcessing\nDelivered",
         ];
         $fieldid = $DB->insert_record('datalynx_fields', $fieldrecord);
+        \mod_datalynx\local\definition_cache::purge();
 
         // 2. Save the stepper format
         $formatid = \mod_datalynx\local\field_format\manager::save_format((object)[
@@ -610,6 +622,7 @@ final class field_formats_test extends advanced_testcase {
             'dataid' => $dlx->id(), 'name' => 'Status', 'type' => 'radiobutton', 'description' => '',
             'param1' => "Draft\nReview\nApproved\nRejected\nInformation needed",
         ]);
+        \mod_datalynx\local\definition_cache::purge();
         $formatid = \mod_datalynx\local\field_format\manager::save_format((object) [
             'dataid' => $dlx->id(), 'name' => 'progress', 'fieldtype' => 'radiobutton',
             'settings' => json_encode(['option' => 'stepper', 'stepper_special' => "4::danger\n5:1"]),

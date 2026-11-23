@@ -23,6 +23,28 @@
 defined('MOODLE_INTERNAL') || die();
 
 $definitions = [
+    // The definition records of one instance (fields, views, filters, custom filters, behaviors,
+    // layouts, field formats, rules), keyed by instance id. They change only through the
+    // management pages, presets and restore, all of which invalidate the key through
+    // \mod_datalynx\local\definition_cache. The records are stored as arrays of scalars, so
+    // they qualify as simple data: static acceleration then hands out copies without
+    // unserialising the whole instance definition on every read.
+    'definitions' => [
+        'mode' => cache_store::MODE_APPLICATION,
+        'simplekeys' => true,
+        'simpledata' => true,
+        'staticacceleration' => true,
+        'staticaccelerationsize' => 10,
+    ],
+
+    // Instances whose definitions this request changed inside a database transaction; they are
+    // read from the database until the transaction is over, and invalidated again after it.
+    'definitionspending' => [
+        'mode' => cache_store::MODE_REQUEST,
+        'simplekeys' => true,
+        'simpledata' => true,
+    ],
+
     // Parsed view tags per view id, valid while their signature matches (see view base::set__patterns()).
     'patterns' => ['mode' => cache_store::MODE_APPLICATION, 'simplekeys' => true],
 

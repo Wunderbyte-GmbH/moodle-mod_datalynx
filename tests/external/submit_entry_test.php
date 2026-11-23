@@ -303,6 +303,7 @@ final class submit_entry_test extends externallib_advanced_testcase {
         $this->assertSame("Red\nBlue", $DB->get_field('datalynx_fields', 'param1', ['id' => $tagsid]));
 
         $DB->set_field('datalynx_fields', 'param6', 1, ['id' => $tagsid]);
+        \mod_datalynx\local\definition_cache::purge();
         $viewid = $this->add_mobile_view($this->dlx, 'grid', 'Add new', '[[Title]] [[Tags:addnew]] ##edit##', [
             'section' => '##addnewentry## ##entries##',
         ]);

@@ -79,6 +79,7 @@ final class entry_form_validation_test extends advanced_testcase {
             'param2' => '<div>[[Title]]</div>',
         ];
         $view->id = (int) $DB->insert_record('datalynx_views', $view);
+        \mod_datalynx\local\definition_cache::purge();
 
         $textfield = (object) [
             'dataid' => $dlx->id(),
@@ -97,6 +98,7 @@ final class entry_form_validation_test extends advanced_testcase {
             'param10' => '',
         ];
         $textfield->id = (int) $DB->insert_record('datalynx_fields', $textfield);
+        \mod_datalynx\local\definition_cache::purge();
 
         return [$dlx, $view, $textfield, 'Driver'];
     }

@@ -63,12 +63,14 @@ final class rule_test extends advanced_testcase {
      */
     private function make_field(string $type, string $name, string $param1 = ''): int {
         global $DB;
-        return (int) $DB->insert_record('datalynx_fields', (object) [
+        $result = (int) $DB->insert_record('datalynx_fields', (object) [
             'dataid' => $this->dlx->id(), 'type' => $type, 'name' => $name, 'description' => '',
             'required' => 0, 'visibleto' => 0, 'editableby' => 0,
             'param1' => $param1, 'param2' => '', 'param3' => '', 'param4' => '', 'param5' => '',
             'param6' => '', 'param7' => '', 'param8' => '', 'param9' => '', 'param10' => '',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
+        return $result;
     }
 
     /**
@@ -143,6 +145,7 @@ final class rule_test extends advanced_testcase {
             'param4' => $cascade ? '1' : null,
             'param9' => $conditions ? json_encode($conditions) : null,
         ]);
+        \mod_datalynx\local\definition_cache::purge();
         return $this->dlx->get_rule_manager()->get_rule_from_id($ruleid);
     }
 

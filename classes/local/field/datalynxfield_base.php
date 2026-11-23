@@ -19,6 +19,7 @@ use coding_exception;
 use dml_exception;
 use mod_datalynx;
 use mod_datalynx\datalynx;
+use mod_datalynx\local\definition_cache;
 use mod_datalynx\local\rule\match_compiler;
 use moodle_exception;
 use moodle_url;
@@ -147,6 +148,7 @@ abstract class datalynxfield_base {
             echo $OUTPUT->notification('Insertion of new field failed!');
             return false;
         } else {
+            definition_cache::invalidate((int) $this->field->dataid);
             return $this->field->id;
         }
     }
@@ -169,6 +171,7 @@ abstract class datalynxfield_base {
             echo $OUTPUT->notification('updating of field failed!');
             return false;
         }
+        definition_cache::invalidate((int) $this->field->dataid);
 
         if ($oldname !== '' && $oldname !== $newname) {
             $this->dlx->replace_field_in_views($oldname, $newname);
@@ -192,6 +195,7 @@ abstract class datalynxfield_base {
             }
             $this->delete_content();
             $DB->delete_records('datalynx_fields', ['id' => $this->field->id]);
+            definition_cache::invalidate((int) $this->field->dataid);
         }
         return true;
     }

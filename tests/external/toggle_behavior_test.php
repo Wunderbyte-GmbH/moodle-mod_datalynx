@@ -57,6 +57,7 @@ final class toggle_behavior_test extends advanced_testcase {
             'editableby' => serialize([1, 2]),
             'required' => 0,
         ]);
+        \mod_datalynx\local\definition_cache::purge();
 
         $requiredresult = toggle_behavior::execute($behaviorid, 'required');
         $requiredresult = external_api::clean_returnvalue(toggle_behavior::execute_returns(), $requiredresult);

@@ -210,6 +210,7 @@ final class fieldgroup_empty_lines_test extends advanced_testcase {
             $record->{"param$i"} = $params["param$i"] ?? '';
         }
         $id = (int) $DB->insert_record('datalynx_fields', $record);
+        \mod_datalynx\local\definition_cache::purge();
         $this->dlx->get_fields(null, false, true);
         return $id;
     }

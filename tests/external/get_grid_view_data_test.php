@@ -63,6 +63,7 @@ final class get_grid_view_data_test extends advanced_testcase {
             'param2' => '',
         ];
         $view->id = (int) $DB->insert_record('datalynx_views', $view);
+        \mod_datalynx\local\definition_cache::purge();
 
         $field = (object) [
             'dataid' => $dlx->id(),
@@ -81,6 +82,7 @@ final class get_grid_view_data_test extends advanced_testcase {
             'param10' => '',
         ];
         $field->id = (int) $DB->insert_record('datalynx_fields', $field);
+        \mod_datalynx\local\definition_cache::purge();
 
         $entryid = (int) $DB->insert_record('datalynx_entries', (object) [
             'dataid' => $dlx->id(),
@@ -132,6 +134,7 @@ final class get_grid_view_data_test extends advanced_testcase {
             'param2' => '[[Teamgroup]]',
         ];
         $view->id = (int) $DB->insert_record('datalynx_views', $view);
+        \mod_datalynx\local\definition_cache::purge();
 
         $teammemberfield = (object) [
             'dataid' => $dlx->id(),
@@ -150,6 +153,7 @@ final class get_grid_view_data_test extends advanced_testcase {
             'param10' => '',
         ];
         $teammemberfield->id = (int) $DB->insert_record('datalynx_fields', $teammemberfield);
+        \mod_datalynx\local\definition_cache::purge();
 
         $fieldgroup = (object) [
             'dataid' => $dlx->id(),
@@ -168,6 +172,7 @@ final class get_grid_view_data_test extends advanced_testcase {
             'param10' => '',
         ];
         $fieldgroup->id = (int) $DB->insert_record('datalynx_fields', $fieldgroup);
+        \mod_datalynx\local\definition_cache::purge();
 
         $entryid = (int) $DB->insert_record('datalynx_entries', (object) [
             'dataid' => $dlx->id(),
@@ -215,6 +220,7 @@ final class get_grid_view_data_test extends advanced_testcase {
             'param2' => '',
         ];
         $view->id = (int) $DB->insert_record('datalynx_views', $view);
+        \mod_datalynx\local\definition_cache::purge();
 
         $textfield = (object) [
             'dataid' => $dlx->id(),
@@ -233,6 +239,7 @@ final class get_grid_view_data_test extends advanced_testcase {
             'param10' => '',
         ];
         $textfield->id = (int) $DB->insert_record('datalynx_fields', $textfield);
+        \mod_datalynx\local\definition_cache::purge();
 
         $multiselectfield = (object) [
             'dataid' => $dlx->id(),
@@ -251,6 +258,7 @@ final class get_grid_view_data_test extends advanced_testcase {
             'param10' => '',
         ];
         $multiselectfield->id = (int) $DB->insert_record('datalynx_fields', $multiselectfield);
+        \mod_datalynx\local\definition_cache::purge();
 
         $entryone = (int) $DB->insert_record('datalynx_entries', (object) [
             'dataid' => $dlx->id(),

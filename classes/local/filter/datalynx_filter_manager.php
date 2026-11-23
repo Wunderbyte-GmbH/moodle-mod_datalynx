@@ -153,7 +153,9 @@ class datalynx_filter_manager {
         global $DB;
         if (!$this->filters || $forceget) {
             $this->filters = [];
-            if ($filters = $DB->get_records('datalynx_filters', ['dataid' => $this->dlx->id()], 'name')) {
+            $filters = \mod_datalynx\local\definition_cache::get_records($this->dlx->id(), 'filters');
+            \core_collator::asort_objects_by_property($filters, 'name');
+            if ($filters) {
                 foreach ($filters as $filterid => $filterdata) {
                     $this->filters[$filterid] = new datalynx_filter($filterdata);
                 }
@@ -282,6 +284,7 @@ class datalynx_filter_manager {
                                     $filter->name = 'Copy of ' . $filter->name;
                                 }
                                 $filterid = $DB->insert_record('datalynx_filters', $filter);
+                                \mod_datalynx\local\definition_cache::invalidate($this->dlx->id());
 
                                 $processedfids[] = $filterid;
 
@@ -303,6 +306,7 @@ class datalynx_filter_manager {
                             $updatefilter->id = $filter->id;
                             $updatefilter->visible = (int) !$filter->visible;
                             $DB->update_record('datalynx_filters', $updatefilter);
+                            \mod_datalynx\local\definition_cache::invalidate($this->dlx->id());
                             // Update cached filters.
                             $filter->visible = $updatefilter->visible;
 
@@ -323,6 +327,7 @@ class datalynx_filter_manager {
                     case 'delete':
                         foreach ($filters as $filter) {
                             $DB->delete_records('datalynx_filters', ['id' => $filter->id]);
+                            \mod_datalynx\local\definition_cache::invalidate($this->dlx->id());
 
                             // Reset default filter if needed.
                             if ($filter->id == $dlx->data->defaultfilter) {
@@ -418,9 +423,11 @@ class datalynx_filter_manager {
 
         if ($filter->id) {
             $DB->update_record('datalynx_filters', $filter);
+            \mod_datalynx\local\definition_cache::invalidate($this->dlx->id());
             $eventclass = '\mod_datalynx\event\field_updated';
         } else {
             $filter->id = $DB->insert_record('datalynx_filters', $filter, true);
+            \mod_datalynx\local\definition_cache::invalidate($this->dlx->id());
             $eventclass = '\mod_datalynx\event\field_created';
         }
 
@@ -950,7 +957,8 @@ class datalynx_filter_manager {
 
         // Custom filter form.
         if ($customfilter) {
-            $customfilter = $DB->get_record('datalynx_customfilters', ['id' => $customfilter]);
+            $customfilter = \mod_datalynx\local\definition_cache::get_record($this->dlx->id(), 'customfilters', (int) $customfilter)
+                ?? $DB->get_record('datalynx_customfilters', ['id' => $customfilter]);
             $filterform = $this->get_customfilter_frontend_form($filter, $view, $customfilter);
             // Return to form (on reload button press).
             if ($filterform->no_submit_button_pressed()) {

@@ -66,6 +66,7 @@ final class select_not_anyof_filter_test extends advanced_testcase {
             'param2' => '', 'param3' => '', 'param4' => '', 'param5' => '',
             'param6' => '', 'param7' => '', 'param8' => '', 'param9' => '', 'param10' => '',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
 
         return [$dlx, $fieldid];
     }
@@ -118,6 +119,7 @@ final class select_not_anyof_filter_test extends advanced_testcase {
             'page' => 0,
             'eids' => '',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
 
         $filter = new datalynx_filter($DB->get_record('datalynx_filters', ['id' => $filterid]));
         $filter->contentfields = [$fieldid];

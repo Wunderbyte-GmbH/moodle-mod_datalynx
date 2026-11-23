@@ -56,6 +56,7 @@ final class datalynx_process_views_test extends advanced_testcase {
             'param10' => 0,
             'section' => '',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
 
         return [$dlx, $viewid];
     }

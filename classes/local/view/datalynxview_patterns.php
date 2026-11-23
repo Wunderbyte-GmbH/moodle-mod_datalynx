@@ -937,8 +937,11 @@ class datalynxview_patterns {
         $patterns = ['##quicksearch##' => [true, $cat],
                 '##quickperpage##' => [true, $cat]];
         $dataid = $this->view->view->dataid;
-        $where = ['dataid' => $dataid, 'visible' => '1'];
-        $rs = $DB->get_records('datalynx_customfilters', $where, 'name', 'id,name');
+        $rs = array_filter(
+            \mod_datalynx\local\definition_cache::get_records((int) $dataid, 'customfilters'),
+            fn($customfilter) => (int) $customfilter->visible === 1
+        );
+        \core_collator::asort_objects_by_property($rs, 'name');
         foreach ($rs as $customfilter) {
             $patterns['##customfilter:' . $customfilter->name . '##'] = [true, $cat];
         }
@@ -1414,7 +1417,8 @@ class datalynxview_patterns {
         $dlx = $view->get_dlx();
         $customfiltername = str_replace('##', '', str_replace('##customfilter:', '', $tag));
         $where = ['name' => $customfiltername, 'dataid' => $dlx->id()];
-        $customfilter = $DB->get_record('datalynx_customfilters', $where);
+        $customfilter = \mod_datalynx\local\definition_cache::get_record_by_name($dlx->id(), 'customfilters', $customfiltername)
+            ?? $DB->get_record('datalynx_customfilters', $where);
         $fm = $dlx->get_filter_manager();
         $filterform = $fm->get_customfilter_frontend_form($filter, $view, $customfilter);
 

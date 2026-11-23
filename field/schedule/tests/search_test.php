@@ -80,6 +80,7 @@ final class search_test extends advanced_testcase {
             'param5' => 0,
         ];
         $record->id = $DB->insert_record('datalynx_fields', $record);
+        \mod_datalynx\local\definition_cache::purge();
         $this->field = $this->dlx->get_fields(null, false, true)[$record->id];
     }
 
@@ -292,6 +293,7 @@ final class search_test extends advanced_testcase {
         // The filter reads the field through the datalynx instance, which caches it, so the whole
         // instance has to be rebuilt for the changed setting to be seen.
         $DB->set_field('datalynx_fields', 'param5', 1, ['id' => $this->field->id()]);
+        \mod_datalynx\local\definition_cache::purge();
         $fieldid = (int) $this->field->id();
         $this->dlx = new datalynx($this->dlx->id());
         $this->field = $this->dlx->get_fields(null, false, true)[$fieldid];

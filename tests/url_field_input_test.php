@@ -63,6 +63,7 @@ final class url_field_input_test extends advanced_testcase {
         $fieldid = (int) $DB->insert_record('datalynx_fields', (object) [
             'dataid' => $instance->id, 'type' => 'url', 'name' => 'Link', 'description' => '',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
         $field = (new datalynx($instance->id))->get_field_from_id($fieldid, true);
 
         $mform = new \MoodleQuickForm('urltest', 'post', 'index.php');

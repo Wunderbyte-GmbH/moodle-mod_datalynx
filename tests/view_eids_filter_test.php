@@ -96,6 +96,7 @@ final class view_eids_filter_test extends advanced_testcase {
             'page' => 0,
             'eids' => '',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
 
         // A view that FORCES the filter: overridefilter (param5) is off, so is_forcing_filter()
         // returns the filter id and set_filter() is called with $ignoreurl = true.
@@ -115,6 +116,7 @@ final class view_eids_filter_test extends advanced_testcase {
             'param2' => '',
         ];
         $viewrecord->id = (int) $DB->insert_record('datalynx_views', $viewrecord);
+        \mod_datalynx\local\definition_cache::purge();
 
         // Simulate the request ...&editentries=1&eids=<entry>. optional_param() reads from $_POST.
         $target = $entryids[1];
@@ -160,6 +162,7 @@ final class view_eids_filter_test extends advanced_testcase {
             'param6' => '', 'param7' => '', 'param8' => '', 'param9' => '', 'param10' => '',
         ];
         $fieldid = (int) $DB->insert_record('datalynx_fields', $fieldrecord);
+        \mod_datalynx\local\definition_cache::purge();
 
         // Entry A (100) is excluded by the filter; entry B (300) is included.
         $entryaid = (int) $DB->insert_record('datalynx_entries', (object) [
@@ -193,6 +196,7 @@ final class view_eids_filter_test extends advanced_testcase {
             'eids' => '',
         ];
         $filterid = (int) $DB->insert_record('datalynx_filters', $filterrecord);
+        \mod_datalynx\local\definition_cache::purge();
 
         // Requesting the filtered-out entry A via eids yields nothing.
         $filter = new datalynx_filter($DB->get_record('datalynx_filters', ['id' => $filterid]));

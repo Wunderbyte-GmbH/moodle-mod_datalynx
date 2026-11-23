@@ -70,6 +70,7 @@ final class identifier_field_test extends advanced_testcase {
             $record->{"param$i"} = $params["param$i"] ?? '';
         }
         $fieldid = (int) $DB->insert_record('datalynx_fields', $record);
+        \mod_datalynx\local\definition_cache::purge();
         return [new datalynx($instance->id), $fieldid];
     }
 

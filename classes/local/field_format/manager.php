@@ -16,6 +16,8 @@
 
 namespace mod_datalynx\local\field_format;
 
+use mod_datalynx\local\definition_cache;
+
 /**
  * Manager class for Field Formats in mod_datalynx.
  *
@@ -31,6 +33,16 @@ class manager {
     private static array $namecache = [];
 
     /**
+     * Forget the format objects built in this request, e.g. after the definitions changed.
+     *
+     * @return void
+     */
+    public static function reset_static_caches(): void {
+        self::$instancecache = [];
+        self::$namecache = [];
+    }
+
+    /**
      * Fetch all formats defined for a specific Datalynx instance.
      *
      * @param int $datalynxid The datalynx instance ID.
@@ -44,11 +56,11 @@ class manager {
             return self::$instancecache[$cachekey];
         }
 
-        $params = ['dataid' => $datalynxid];
+        $records = definition_cache::get_records($datalynxid, 'field_formats');
         if ($fieldtype !== '') {
-            $params['fieldtype'] = $fieldtype;
+            $records = array_filter($records, fn(\stdClass $record): bool => $record->fieldtype === $fieldtype);
         }
-        $records = $DB->get_records('datalynx_field_formats', $params, 'name ASC');
+        \core_collator::asort_objects_by_property($records, 'name');
         $formats = [];
         foreach ($records as $record) {
             $instance = self::get_format_instance($record);
@@ -89,7 +101,8 @@ class manager {
             return self::$namecache[$cachekey];
         }
 
-        $record = $DB->get_record('datalynx_field_formats', ['dataid' => $datalynxid, 'name' => $name]);
+        $record = definition_cache::get_record_by_name($datalynxid, 'field_formats', $name)
+            ?? $DB->get_record('datalynx_field_formats', ['dataid' => $datalynxid, 'name' => $name]);
         $result = $record ? self::get_format_instance($record) : null;
         self::$namecache[$cachekey] = $result;
         return $result;
@@ -106,7 +119,9 @@ class manager {
         self::$instancecache = [];
         self::$namecache = [];
         if (empty($record->id)) {
-            return $DB->insert_record('datalynx_field_formats', $record);
+            $id = $DB->insert_record('datalynx_field_formats', $record);
+            definition_cache::invalidate((int) $record->dataid);
+            return $id;
         } else {
             $oldname = $DB->get_field('datalynx_field_formats', 'name', ['id' => $record->id]);
             if ($oldname !== $record->name) {
@@ -114,6 +129,7 @@ class manager {
                 $dlx->replace_format_in_views($oldname, $record->name);
             }
             $DB->update_record('datalynx_field_formats', $record);
+            definition_cache::invalidate_for_record('field_formats', (int) $record->id);
             return $record->id;
         }
     }
@@ -141,7 +157,9 @@ class manager {
             throw new \moodle_exception('errorformatinuse', 'mod_datalynx', '', $viewslist);
         }
 
-        return $DB->delete_records('datalynx_field_formats', ['id' => $formatid]);
+        $deleted = $DB->delete_records('datalynx_field_formats', ['id' => $formatid]);
+        definition_cache::invalidate((int) $format->get_record()->dataid);
+        return $deleted;
     }
 
     /**
@@ -416,6 +434,7 @@ class manager {
             if ($shortname === '') {
                 // No target profile field; nothing meaningful to migrate. Drop the dangling field.
                 $DB->delete_records('datalynx_fields', ['id' => $field->id]);
+                definition_cache::invalidate($dataid);
                 continue;
             }
 
@@ -454,6 +473,7 @@ class manager {
 
             // Remove the legacy field row (userinfo stored no datalynx content of its own).
             $DB->delete_records('datalynx_fields', ['id' => $field->id]);
+            definition_cache::invalidate($dataid);
         }
 
         // Drop cached formats so freshly created ones are visible immediately.
@@ -491,6 +511,7 @@ class manager {
                 // Invalidate the serialized pattern cache so it is re-derived from the new tags.
                 $view->patterns = null;
                 $DB->update_record('datalynx_views', $view);
+                definition_cache::invalidate($datalynxid);
             }
         }
     }

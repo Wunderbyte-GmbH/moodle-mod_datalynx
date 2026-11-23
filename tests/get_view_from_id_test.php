@@ -61,6 +61,7 @@ final class get_view_from_id_test extends advanced_testcase {
                 'groupby' => '',
                 'section' => '',
             ]);
+            \mod_datalynx\local\definition_cache::purge();
         }
         $DB->set_field('datalynx', 'defaultview', $withdefault ? $viewids[1] : 0, ['id' => $instance->id]);
 

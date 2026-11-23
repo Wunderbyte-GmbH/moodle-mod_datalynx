@@ -67,6 +67,7 @@ final class performance_query_budget_test extends advanced_testcase {
             $fieldids[$name] = (int) $DB->insert_record('datalynx_fields', (object) [
                 'dataid' => $dlx->id(), 'type' => 'text', 'name' => $name, 'description' => '',
             ]);
+            \mod_datalynx\local\definition_cache::purge();
         }
 
         $behavior = datalynxfield_behavior::form_to_db((object) [
@@ -80,11 +81,13 @@ final class performance_query_budget_test extends advanced_testcase {
             'editableafterfinal' => 0, 'conditions' => ['match' => 'all', 'rules' => []],
         ]);
         $DB->insert_record('datalynx_behaviors', $behavior);
+        \mod_datalynx\local\definition_cache::purge();
         $DB->insert_record('datalynx_renderers', (object) [
             'dataid' => $dlx->id(), 'type' => '', 'name' => 'L1', 'description' => '',
             'notvisibletemplate' => '___0___', 'displaytemplate' => '<span class="l1">#value</span>',
             'novaluetemplate' => '___0___', 'edittemplate' => '___0___', 'noteditabletemplate' => '___1___',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
 
         for ($e = 1; $e <= $entrycount; $e++) {
             $entryid = (int) $DB->insert_record('datalynx_entries', (object) [
@@ -112,11 +115,13 @@ final class performance_query_budget_test extends advanced_testcase {
      */
     private function create_view(datalynx $dlx, string $type, string $entrytemplate = ''): int {
         global $DB;
-        return (int) $DB->insert_record('datalynx_views', (object) [
+        $result = (int) $DB->insert_record('datalynx_views', (object) [
             'dataid' => $dlx->id(), 'type' => $type, 'name' => $type, 'description' => '',
             'visible' => 7, 'filter' => 0, 'perpage' => 0, 'groupby' => '',
             'param5' => 0, 'param10' => 0, 'section' => '', 'param2' => $entrytemplate,
         ]);
+        \mod_datalynx\local\definition_cache::purge();
+        return $result;
     }
 
     /**
@@ -250,7 +255,8 @@ final class performance_query_budget_test extends advanced_testcase {
     }
 
     /**
-     * Behaviors, layouts and permissions are read once per instance.
+     * Behaviors, layouts and permissions are read once per instance: behaviors and layouts come
+     * with the definitions of the instance, which are loaded once.
      *
      * @covers \mod_datalynx\datalynx::get_behavior_by_name
      * @covers \mod_datalynx\datalynx::get_layout_by_name
@@ -260,12 +266,13 @@ final class performance_query_budget_test extends advanced_testcase {
         $this->resetAfterTest();
         [$dlx] = $this->create_instance(1, 0);
 
+        \mod_datalynx\local\definition_cache::get_records($dlx->id(), 'behaviors');
         [$reads, $behavior] = $this->count_reads(fn() => $dlx->get_behavior_by_name('B1'));
         $this->assertSame('B1', $behavior->get_name());
-        $this->assertSame(1, $reads);
+        $this->assertSame(0, $reads);
         [$reads, $layout] = $this->count_reads(fn() => $dlx->get_layout_by_name('L1'));
         $this->assertSame('L1', $layout->get_name());
-        $this->assertSame(1, $reads);
+        $this->assertSame(0, $reads);
 
         [$reads] = $this->count_reads(function () use ($dlx, $behavior, $layout) {
             $this->assertSame($behavior, $dlx->get_behavior_by_name('B1'));
@@ -298,6 +305,7 @@ final class performance_query_budget_test extends advanced_testcase {
         $record = $DB->get_record('datalynx_behaviors', ['dataid' => $dlx->id(), 'name' => 'B1']);
         $record->name = 'B2';
         $DB->update_record('datalynx_behaviors', $record);
+        \mod_datalynx\local\definition_cache::purge();
 
         $this->assertFalse($dlx->get_behavior_by_name('B2'));
         $dlx->reset_definition_cache();

@@ -77,6 +77,7 @@ class migrate_tags_task extends \core\task\adhoc_task {
                 // The cached pattern list is built again from the changed templates.
                 $view->patterns = null;
                 $DB->update_record('datalynx_views', $view);
+                \mod_datalynx\local\definition_cache::invalidate((int) $view->dataid);
                 $changedviews++;
             }
         }

@@ -50,6 +50,7 @@ final class fieldgroup_accessibility_test extends advanced_testcase {
         $this->subfieldid = (int) $DB->insert_record('datalynx_fields', (object) [
             'dataid' => $this->dlx->id(), 'type' => 'text', 'name' => 'kost_pos', 'description' => '',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
     }
 
     /**
@@ -67,6 +68,7 @@ final class fieldgroup_accessibility_test extends advanced_testcase {
             'param1' => json_encode([(string) $this->subfieldid]), 'param2' => '2', 'param3' => '2', 'param4' => '0',
             'param5' => $addtext,
         ]);
+        \mod_datalynx\local\definition_cache::purge();
         $group = (new datalynx($this->dlx->id()))->get_field_from_id($groupid, true);
         $mform = new \MoodleQuickForm('fga11y' . $groupid, 'post', 'index.php');
         $group->renderer()->render_edit_mode($mform, (object) ['id' => -1], $options + ['edit' => true]);
@@ -122,10 +124,12 @@ final class fieldgroup_accessibility_test extends advanced_testcase {
             'notvisibletemplate' => '___0___', 'displaytemplate' => '#value', 'novaluetemplate' => '___0___',
             'edittemplate' => '<label>Item · Position</label>#input', 'noteditabletemplate' => '___1___',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
         $groupid = (int) $DB->insert_record('datalynx_fields', (object) [
             'dataid' => $this->dlx->id(), 'type' => 'fieldgroup', 'name' => 'Kosten', 'description' => '',
             'param1' => json_encode([$this->subfieldid . ':||r_pos']), 'param2' => '2', 'param3' => '2', 'param4' => '0',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
         $group = (new datalynx($this->dlx->id()))->get_field_from_id($groupid, true);
         $mform = new \MoodleQuickForm('fgnested', 'post', 'index.php');
         $group->renderer()->prerender_edit_mode($mform, (object) ['id' => 7], [

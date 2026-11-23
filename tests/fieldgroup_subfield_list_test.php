@@ -117,6 +117,7 @@ final class fieldgroup_subfield_list_test extends advanced_testcase {
         $groupid = $this->add_mobile_field($dlx, 'fieldgroup', 'Group', ['param2' => '3']);
         $laterid = $this->add_mobile_field($dlx, 'number', 'Later');
         $DB->set_field('datalynx_fields', 'param1', json_encode([$textid, '', "$laterid:|beh||"]), ['id' => $groupid]);
+        \mod_datalynx\local\definition_cache::purge();
 
         $bc = new backup_controller(
             backup::TYPE_1ACTIVITY,

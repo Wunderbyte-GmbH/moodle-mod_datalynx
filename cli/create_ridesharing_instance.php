@@ -305,6 +305,7 @@ foreach ($fielddefs as $key => $def) {
         'description' => '',
     ], $def['params']);
     $fieldids[$key] = (int) $DB->insert_record('datalynx_fields', $record);
+    \mod_datalynx\local\definition_cache::invalidate($dataid);
 }
 cli_writeln('Created ' . count($fieldids) . ' fields.');
 
@@ -345,6 +346,7 @@ foreach ($fielddefs as $key => $def) {
         // instead of leaving an empty caption behind.
         'noteditabletemplate' => \mod_datalynx\local\field\datalynxfield_layout::NOT_EDITABLE_SHOW_DEPENDENT,
     ]);
+    \mod_datalynx\local\definition_cache::invalidate($dataid);
 }
 cli_writeln('Created ' . count($layoutnames) . ' field layouts.');
 
@@ -422,6 +424,7 @@ foreach ($behaviordefs as $bname => $def) {
         'editableafterfinal' => 0,
         'conditions' => $def['conditions'],
     ]);
+    \mod_datalynx\local\definition_cache::invalidate($dataid);
     $behaviornames[] = $bname;
 }
 cli_writeln('Created ' . count($behaviornames) . ' behaviors.');
@@ -429,7 +432,7 @@ cli_writeln('Created ' . count($behaviornames) . ' behaviors.');
 // Filters.
 
 $makefilter = function (string $fname, $customsearch, int $perpage = 20) use ($DB, $dataid): int {
-    return (int) $DB->insert_record('datalynx_filters', (object) [
+    $filterid = (int) $DB->insert_record('datalynx_filters', (object) [
         'dataid' => $dataid,
         'name' => $fname,
         'description' => '',
@@ -441,6 +444,8 @@ $makefilter = function (string $fname, $customsearch, int $perpage = 20) use ($D
         'customsort' => '',
         'customsearch' => $customsearch ? serialize($customsearch) : '',
     ]);
+    \mod_datalynx\local\definition_cache::invalidate($dataid);
+    return $filterid;
 };
 
 $filterids = [
@@ -749,6 +754,7 @@ $chain = [
 ];
 foreach ($chain as $from => $to) {
     $DB->set_field('datalynx_views', 'param10', $viewids[$to], ['id' => $viewids[$from]]);
+    \mod_datalynx\local\definition_cache::invalidate($dataid);
 }
 $DB->set_field('datalynx', 'defaultview', $viewids['portal'], ['id' => $dataid]);
 cli_writeln('Created ' . count($viewids) . ' views and wired the step chain.');
@@ -777,6 +783,7 @@ $DB->insert_record('datalynx_customfilters', (object) [
     'status' => 0,
     'fieldlist' => json_encode($customfilterfields),
 ]);
+\mod_datalynx\local\definition_cache::invalidate($dataid);
 cli_writeln('Created the search form.');
 
 // The ride matching rules: one fires when an offer is saved and looks for the requests its route
@@ -814,6 +821,7 @@ foreach ([['Angebote', '1', 'reverse'], ['Gesuche', '2', 'forward']] as [$side, 
             ],
         ]),
     ]);
+    \mod_datalynx\local\definition_cache::invalidate($dataid);
     cli_writeln("Created the ride matching rule for $side ($ruleid).");
 }
 

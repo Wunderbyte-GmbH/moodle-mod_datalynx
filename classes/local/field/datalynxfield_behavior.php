@@ -27,6 +27,7 @@ use coding_exception;
 use dml_exception;
 use mod_datalynx;
 use mod_datalynx\datalynx;
+use mod_datalynx\local\definition_cache;
 use moodle_exception;
 use stdClass;
 
@@ -408,7 +409,9 @@ class datalynxfield_behavior {
     public static function insert_behavior(stdClass $formdata): int {
         global $DB;
         $record = self::form_to_db($formdata);
-        return $DB->insert_record('datalynx_behaviors', $record);
+        $id = $DB->insert_record('datalynx_behaviors', $record);
+        definition_cache::invalidate((int) $record->dataid);
+        return $id;
     }
 
     /**
@@ -459,6 +462,7 @@ class datalynxfield_behavior {
             self::update_behavior_pattern($record->id, $record->name);
         }
         $DB->update_record('datalynx_behaviors', $record);
+        definition_cache::invalidate_for_record('behaviors', (int) $record->id);
         return $record->id;
     }
 
@@ -472,6 +476,7 @@ class datalynxfield_behavior {
     public static function delete_behavior($behaviorid): bool {
         global $DB;
         self::update_behavior_pattern($behaviorid);
+        definition_cache::invalidate_for_record('behaviors', (int) $behaviorid);
         return $DB->delete_records('datalynx_behaviors', ['id' => $behaviorid]);
     }
 
@@ -579,6 +584,7 @@ class datalynxfield_behavior {
         global $DB;
 
         $DB->update_record('datalynx_behaviors', $this->record);
+        definition_cache::invalidate_for_record('behaviors', (int) $this->record->id);
     }
 
     /**

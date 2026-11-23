@@ -62,6 +62,7 @@ final class file_field_renderer_test extends advanced_testcase {
             'description' => '',
             'param2' => '2',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
 
         return [$dlx, $fieldid];
     }

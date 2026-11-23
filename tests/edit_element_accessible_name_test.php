@@ -60,6 +60,7 @@ final class edit_element_accessible_name_test extends advanced_testcase {
         $id = (int) $DB->insert_record('datalynx_fields', (object) ([
             'dataid' => $this->dlx->id(), 'type' => $type, 'name' => $name, 'description' => $description,
         ] + $params));
+        \mod_datalynx\local\definition_cache::purge();
         return $this->dlx->get_field_from_id($id, true);
     }
 

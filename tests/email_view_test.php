@@ -92,6 +92,7 @@ final class email_view_test extends advanced_testcase {
             'param2' => $param2,
         ];
         $view->id = $DB->insert_record('datalynx_views', $view);
+        \mod_datalynx\local\definition_cache::purge();
 
         return $view;
     }

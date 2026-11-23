@@ -73,6 +73,7 @@ final class rule_matching_test extends advanced_testcase {
             'param1' => '', 'param2' => '', 'param3' => '', 'param4' => '', 'param5' => '',
             'param6' => '', 'param7' => '', 'param8' => '', 'param9' => '', 'param10' => '',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
     }
 
     /**
@@ -128,6 +129,7 @@ final class rule_matching_test extends advanced_testcase {
             'param3' => json_encode($recipients ?: ['matchauthors' => 1, 'subjectauthorpermatch' => 1]),
             'param9' => json_encode([rule::MATCH_KEY => $config]),
         ]);
+        \mod_datalynx\local\definition_cache::purge();
 
         return new rule($this->dlx, $DB->get_record('datalynx_rules', ['id' => $ruleid]));
     }
@@ -375,6 +377,7 @@ final class rule_matching_test extends advanced_testcase {
             'param2' => rule::FROM_AUTHOR,
             'param3' => json_encode(['author' => 1]),
         ]);
+        \mod_datalynx\local\definition_cache::purge();
         $rule = new rule($this->dlx, $DB->get_record('datalynx_rules', ['id' => $ruleid]));
 
         $sink = $this->redirectMessages();

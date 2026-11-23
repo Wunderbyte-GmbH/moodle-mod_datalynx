@@ -86,6 +86,7 @@ final class field_rename_test extends advanced_testcase {
             'name' => 'oldfield',
             'description' => '',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
         $field = $dlx->get_field_from_id($fieldrecordid);
 
         // Setup a view containing the field tag in multiple columns.
@@ -98,6 +99,7 @@ final class field_rename_test extends advanced_testcase {
             'param1' => 'Param1 [[oldfield:format]]',
             'param2' => 'Param2 [[oldfield_extended]]', // Partial, should not change.
         ]);
+        \mod_datalynx\local\definition_cache::purge();
 
         // Rename the field.
         $formdata = new stdClass();
@@ -133,6 +135,7 @@ final class field_rename_test extends advanced_testcase {
             'name' => 'oldfield',
             'description' => '',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
         $field = $dlx->get_field_from_id($fieldrecordid);
 
         // Setup a custom filter referencing the field name.
@@ -152,6 +155,7 @@ final class field_rename_test extends advanced_testcase {
             'name' => 'My Custom Filter',
             'fieldlist' => json_encode($fieldlist),
         ]);
+        \mod_datalynx\local\definition_cache::purge();
 
         // Rename the field.
         $formdata = new stdClass();
@@ -187,6 +191,7 @@ final class field_rename_test extends advanced_testcase {
             'name' => 'oldfield',
             'description' => '',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
         $field = $dlx->get_field_from_id($fieldrecordid);
 
         // Setup a view containing the field tag.
@@ -197,6 +202,7 @@ final class field_rename_test extends advanced_testcase {
             'description' => '',
             'section' => 'Section [[oldfield|behavior]]',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
 
         // Setup a custom filter referencing the field name.
         $fieldlist = [
@@ -211,6 +217,7 @@ final class field_rename_test extends advanced_testcase {
             'name' => 'My Custom Filter',
             'fieldlist' => json_encode($fieldlist),
         ]);
+        \mod_datalynx\local\definition_cache::purge();
 
         // Delete the field using bulk action case.
         $dlx->replace_field_in_views('oldfield', '');
@@ -282,6 +289,7 @@ final class field_rename_test extends advanced_testcase {
             'required' => serialize([]),
             'description' => '',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
 
         // Setup a view with behavior tags.
         $viewid = $DB->insert_record('datalynx_views', (object) [
@@ -291,6 +299,7 @@ final class field_rename_test extends advanced_testcase {
             'description' => 'Desc [[field|oldbehavior]]',
             'section' => 'Section [[field|oldbehavior|layout]]',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
 
         // Rename behavior.
         $formdata = \mod_datalynx\local\field\datalynxfield_behavior::get_behavior($behaviorid);
@@ -330,6 +339,7 @@ final class field_rename_test extends advanced_testcase {
             'type' => 'text',
             'name' => 'oldlayout',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
 
         // Setup a view with layout tags.
         $viewid = $DB->insert_record('datalynx_views', (object) [
@@ -339,6 +349,7 @@ final class field_rename_test extends advanced_testcase {
             'description' => 'Desc [[field|behavior|oldlayout]]',
             'section' => 'Section [[field||oldlayout]]',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
 
         // Rename layout.
         $formdata = \mod_datalynx\local\field\datalynxfield_layout::get_renderer($rendererid);
@@ -379,6 +390,7 @@ final class field_rename_test extends advanced_testcase {
             'name' => 'oldformat',
             'fieldtype' => 'text',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
 
         // Setup a view with format tags.
         $viewid = $DB->insert_record('datalynx_views', (object) [
@@ -388,6 +400,7 @@ final class field_rename_test extends advanced_testcase {
             'description' => 'Desc [[field:oldformat]]',
             'section' => 'Section [[field:oldformat|behavior]]',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
 
         // Rename format.
         $record = (object) [
@@ -423,6 +436,7 @@ final class field_rename_test extends advanced_testcase {
             'required' => serialize([]),
             'description' => '',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
 
         $viewid = $DB->insert_record('datalynx_views', (object) [
             'dataid' => $dlx->id(),
@@ -431,6 +445,7 @@ final class field_rename_test extends advanced_testcase {
             'description' => 'Desc [[field|oldbehavior]]',
             'section' => 'Section [[field|oldbehavior|layout]]',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
 
         // Rename behavior.
         $formdata = \mod_datalynx\local\field\datalynxfield_behavior::get_behavior($behaviorid);
@@ -466,6 +481,7 @@ final class field_rename_test extends advanced_testcase {
             'name' => 'oldfield',
             'description' => '',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
         $field = $dlx->get_field_from_id($fieldrecordid);
 
         $viewid = $DB->insert_record('datalynx_views', (object) [
@@ -475,6 +491,7 @@ final class field_rename_test extends advanced_testcase {
             'description' => '',
             'section' => 'Section [[oldfield|behavior]]',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
 
         // Rename field.
         $formdata = new stdClass();

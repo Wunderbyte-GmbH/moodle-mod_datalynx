@@ -48,6 +48,7 @@ final class entries_update_existing_test extends advanced_testcase {
         $fieldid = (int) $DB->insert_record('datalynx_fields', (object) [
             'dataid' => $dlx->id(), 'type' => 'text', 'name' => 'title', 'description' => '',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
         $entryid = (int) $DB->insert_record('datalynx_entries', (object) [
             'dataid' => $dlx->id(), 'userid' => $USER->id, 'groupid' => 0, 'approved' => 1,
             'status' => 0, 'timecreated' => time(), 'timemodified' => time(),

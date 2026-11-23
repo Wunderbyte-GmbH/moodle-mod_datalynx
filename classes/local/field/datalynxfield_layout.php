@@ -24,6 +24,7 @@
 namespace mod_datalynx\local\field;
 use mod_datalynx;
 use mod_datalynx\datalynx;
+use mod_datalynx\local\definition_cache;
 use stdClass;
 
 /**
@@ -295,7 +296,9 @@ class datalynxfield_layout {
     public static function insert_renderer($formdata): int {
         global $DB;
         $record = self::form_to_db($formdata);
-        return $DB->insert_record('datalynx_renderers', $record);
+        $id = $DB->insert_record('datalynx_renderers', $record);
+        definition_cache::invalidate((int) $record->dataid);
+        return $id;
     }
 
     /**
@@ -341,6 +344,7 @@ class datalynxfield_layout {
             self::update_render_pattern($formdata->id, $formdata->name);
         }
         $DB->update_record('datalynx_renderers', $formdata);
+        definition_cache::invalidate((int) $formdata->dataid);
         return $formdata->id;
     }
 
@@ -353,6 +357,7 @@ class datalynxfield_layout {
     public static function delete_renderer($rendererid): bool {
         global $DB;
         self::update_render_pattern($rendererid);
+        definition_cache::invalidate_for_record('renderers', (int) $rendererid);
         return $DB->delete_records('datalynx_renderers', ['id' => $rendererid]);
     }
 

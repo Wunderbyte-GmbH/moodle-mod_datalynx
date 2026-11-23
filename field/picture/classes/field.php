@@ -128,6 +128,7 @@ class field extends FileField {
             }
             $this->delete_content();
             $DB->delete_records('datalynx_fields', ['id' => $this->field->id]);
+            \mod_datalynx\local\definition_cache::invalidate($this->dlx->id());
         }
         return true;
     }

@@ -53,6 +53,7 @@ final class entries_unchanged_option_test extends advanced_testcase {
                 'dataid' => $dlx->id(), 'type' => $type, 'name' => "f_$type", 'description' => '',
                 'param1' => "One\nTwo\nThree",
             ]);
+            \mod_datalynx\local\definition_cache::purge();
         }
         $entryid = (int) $DB->insert_record('datalynx_entries', (object) [
             'dataid' => $dlx->id(), 'userid' => $USER->id, 'groupid' => 0, 'approved' => 1,

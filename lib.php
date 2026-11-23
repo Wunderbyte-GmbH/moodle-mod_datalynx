@@ -217,6 +217,7 @@ function datalynx_delete_instance($id) {
     $DB->delete_records('datalynx_filters', ['dataid' => $id]);
     $DB->delete_records('datalynx_entries', ['dataid' => $id]);
     $DB->delete_records('datalynx_rules', ['dataid' => $id]);
+    \mod_datalynx\local\definition_cache::invalidate((int) $id);
 
     // Delete the instance itself.
     $result = $DB->delete_records('datalynx', ['id' => $id]);
@@ -603,7 +604,7 @@ function mod_datalynx_pluginfile($course, $cm, $context, $filearea, $args, $forc
         if (!$content) {
             return false;
         }
-        $field = $DB->get_record('datalynx_fields', ['id' => $content->fieldid]);
+        $field = \mod_datalynx\local\definition_cache::get_record((int) $cm->instance, 'fields', (int) $content->fieldid);
         if (!$field) {
             return false;
         }

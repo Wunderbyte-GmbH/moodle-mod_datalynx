@@ -58,6 +58,7 @@ final class pdf_view_manager_test extends advanced_testcase {
             'section' => '',
         ];
         $view->id = (int) $DB->insert_record('datalynx_views', $view);
+        \mod_datalynx\local\definition_cache::purge();
 
         $field = (object) [
             'dataid' => $dlx->id(),
@@ -76,6 +77,7 @@ final class pdf_view_manager_test extends advanced_testcase {
             'param10' => '',
         ];
         $field->id = (int) $DB->insert_record('datalynx_fields', $field);
+        \mod_datalynx\local\definition_cache::purge();
 
         $entryid = (int) $DB->insert_record('datalynx_entries', (object) [
             'dataid' => $dlx->id(),

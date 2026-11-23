@@ -112,6 +112,7 @@ final class customfilter_search_test extends advanced_testcase {
             ]),
         ];
         $record->id = (int) $DB->insert_record('datalynx_customfilters', $record);
+        \mod_datalynx\local\definition_cache::purge();
         $this->customfilter = $record;
         $this->dlx = new datalynx($dlx->id());
     }

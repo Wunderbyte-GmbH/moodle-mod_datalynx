@@ -79,7 +79,9 @@ final class field_deletion_blocks_test extends advanced_testcase {
         for ($i = 1; $i <= 10; $i++) {
             $record->{"param$i"} = $params["param$i"] ?? '';
         }
-        return (int) $DB->insert_record('datalynx_fields', $record);
+        $result = (int) $DB->insert_record('datalynx_fields', $record);
+        \mod_datalynx\local\definition_cache::purge();
+        return $result;
     }
 
     /**
@@ -153,6 +155,7 @@ final class field_deletion_blocks_test extends advanced_testcase {
             'perpage' => 10,
             'selection' => 0,
         ]);
+        \mod_datalynx\local\definition_cache::purge();
 
         $this->expectException(\coding_exception::class);
         $this->expectExceptionMessage('deleteblocked');
@@ -179,6 +182,7 @@ final class field_deletion_blocks_test extends advanced_testcase {
             'fulltextsearch' => 0,
             'fieldlist' => json_encode($fieldlist),
         ]);
+        \mod_datalynx\local\definition_cache::purge();
 
         $this->expectException(\coding_exception::class);
         $this->expectExceptionMessage('deleteblocked');

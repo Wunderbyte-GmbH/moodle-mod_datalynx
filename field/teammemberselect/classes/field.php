@@ -144,7 +144,6 @@ class field extends datalynxfield_base {
      */
     public function __construct($dlx = 0, $field = 0) {
         parent::__construct($dlx, $field);
-        global $DB;
         if (empty($this->field->param2)) {
             $this->admissibleroles = [];
         } else {
@@ -169,14 +168,12 @@ class field extends datalynxfield_base {
             self::TEAMMEMBERSELECT_FORMAT_UL => get_string('listformatul', 'datalynx'),
         ];
 
-        $query = "SELECT r.id, r.name
-                    FROM {datalynx_rules} r
-                   WHERE r.dataid = :dataid
-                     AND r.type LIKE :type";
-        $this->rules = $DB->get_records_sql_menu(
-            $query,
-            ['dataid' => $dlx->id(), 'type' => 'eventnotification']
-        );
+        $this->rules = [];
+        foreach (\mod_datalynx\local\definition_cache::get_records($dlx->id(), 'rules') as $rule) {
+            if ($rule->type === 'eventnotification') {
+                $this->rules[$rule->id] = $rule->name;
+            }
+        }
     }
 
     /**
@@ -354,17 +351,13 @@ class field extends datalynxfield_base {
      * @return bool
      */
     public function is_fieldgroup_subfield(): bool {
-        global $DB;
-
         if ($this->infieldgroup === null) {
             $this->infieldgroup = false;
-            $fieldgroups = $DB->get_fieldset_select(
-                'datalynx_fields',
-                'param1',
-                'dataid = ? AND type = ?',
-                [$this->dlx->id(), 'fieldgroup']
+            $fieldgroups = array_filter(
+                \mod_datalynx\local\definition_cache::get_records($this->dlx->id(), 'fields'),
+                fn(stdClass $field): bool => $field->type === 'fieldgroup'
             );
-            foreach ($fieldgroups as $param1) {
+            foreach (array_column($fieldgroups, 'param1') as $param1) {
                 $entries = json_decode((string) $param1, true);
                 foreach (\datalynxfield_fieldgroup\field::normalise_subfields(is_array($entries) ? $entries : []) as $entry) {
                     if ((int) explode(':', $entry, 2)[0] === (int) $this->id()) {

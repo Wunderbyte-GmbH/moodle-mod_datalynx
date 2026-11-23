@@ -540,6 +540,7 @@ class datalynx_preset_manager {
             $rc->execute_plan();
 
             $transaction->allow_commit();
+            \mod_datalynx\local\definition_cache::invalidate($this->dlx->id());
             // Rc cleanup.
             $rc->destroy();
             // Anonymous users cleanup.

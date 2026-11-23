@@ -61,6 +61,7 @@ final class field_search_operator_test extends advanced_testcase {
             $record->{"param$i"} = '';
         }
         $DB->insert_record('datalynx_fields', $record);
+        \mod_datalynx\local\definition_cache::purge();
         $dlx->get_fields(null, false, true);
 
         foreach ($dlx->get_fields() as $field) {

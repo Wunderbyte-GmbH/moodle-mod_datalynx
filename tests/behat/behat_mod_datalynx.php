@@ -257,6 +257,7 @@ class behat_mod_datalynx extends behat_base {
             'param5' => 0,
             'param10' => 0,
         ]);
+        \mod_datalynx\local\definition_cache::invalidate($dlx->id());
     }
 
     /**
@@ -311,6 +312,7 @@ class behat_mod_datalynx extends behat_base {
                 'customsort' => '',
                 'customsearch' => serialize($customsearch),
             ]);
+            \mod_datalynx\local\definition_cache::invalidate($dlx->id());
         }
     }
 
@@ -495,8 +497,10 @@ class behat_mod_datalynx extends behat_base {
         if ($existing = $DB->get_record('datalynx_customfilters', ['dataid' => $dlx->id(), 'name' => $name])) {
             $customfilter->id = $existing->id;
             $DB->update_record('datalynx_customfilters', $customfilter);
+            \mod_datalynx\local\definition_cache::invalidate($dlx->id());
         } else {
             $DB->insert_record('datalynx_customfilters', $customfilter);
+            \mod_datalynx\local\definition_cache::invalidate($dlx->id());
         }
     }
 
@@ -994,6 +998,7 @@ class behat_mod_datalynx extends behat_base {
                 'required' => 0,
                 'conditions' => $conditions,
             ]);
+            \mod_datalynx\local\definition_cache::invalidate($dlx->id());
         }
     }
 
@@ -1026,6 +1031,7 @@ class behat_mod_datalynx extends behat_base {
                 'noteditabletemplate' => \mod_datalynx\local\field\datalynxfield_layout::NOT_EDITABLE_SHOW_AS_DISPLAY_MODE,
             ]);
         }
+        \mod_datalynx\local\definition_cache::invalidate((int) $dataid);
     }
 
     /**
@@ -1049,6 +1055,7 @@ class behat_mod_datalynx extends behat_base {
         );
         $view->param2 = $template;
         $DB->update_record('datalynx_views', $view);
+        \mod_datalynx\local\definition_cache::invalidate((int) $view->dataid);
     }
 
     /**
@@ -1081,6 +1088,7 @@ class behat_mod_datalynx extends behat_base {
         $view->param10 = (int) $targetview->id;
         $view->param9 = (int) $flag;
         $DB->update_record('datalynx_views', $view);
+        \mod_datalynx\local\definition_cache::invalidate((int) $view->dataid);
     }
 
     /**

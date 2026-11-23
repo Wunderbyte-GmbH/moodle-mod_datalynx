@@ -76,6 +76,7 @@ final class filter_groups_test extends advanced_testcase {
             'customsort' => '', 'customsearch' => '', 'search' => '', 'groupby' => '',
             'perpage' => 50, 'selection' => 0, 'page' => 0, 'eids' => '',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
         $filter = new datalynx_filter($DB->get_record('datalynx_filters', ['id' => $filterid]));
         $filter->groups = $groups;
         return (new datalynx_entries($this->dlx, $filter))->get_entries();

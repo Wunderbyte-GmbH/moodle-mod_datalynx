@@ -57,6 +57,7 @@ final class media_accessibility_test extends advanced_testcase {
         $fieldid = (int) $DB->insert_record('datalynx_fields', (object) [
             'dataid' => $this->dlx->id(), 'type' => $type, 'name' => $type . 'field', 'description' => '',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
         $contentid = (int) $DB->insert_record('datalynx_contents', (object) [
             'fieldid' => $fieldid, 'entryid' => 1, 'content' => 1, 'content1' => $alt,
         ]);

@@ -413,6 +413,10 @@ class restore_datalynx_activity_task extends restore_activity_task {
      * Post-execution custom actions.
      */
     public function after_restore(): void {
+        // The restore wrote the definition tables directly; a preset applied to an existing
+        // instance must not be shadowed by its cached definitions.
+        \mod_datalynx\local\definition_cache::invalidate((int) $this->get_activityid());
+
         // Field formats came in 2026060600: create the formats the view templates use and the
         // backup does not hold (only missing ones are created).
         if ($this->datalynx_backup_predates(2026060600)) {
@@ -466,5 +470,6 @@ class restore_datalynx_activity_task extends restore_activity_task {
                 }
             }
         }
+        \mod_datalynx\local\definition_cache::invalidate((int) $this->get_activityid());
     }
 }

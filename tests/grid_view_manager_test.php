@@ -64,6 +64,7 @@ final class grid_view_manager_test extends advanced_testcase {
             'param2' => $param2,
         ];
         $view->id = (int) $DB->insert_record('datalynx_views', $view);
+        \mod_datalynx\local\definition_cache::purge();
 
         $field = (object) [
             'dataid' => $dlx->id(),
@@ -82,6 +83,7 @@ final class grid_view_manager_test extends advanced_testcase {
             'param10' => '',
         ];
         $field->id = (int) $DB->insert_record('datalynx_fields', $field);
+        \mod_datalynx\local\definition_cache::purge();
 
         $entryid = (int) $DB->insert_record('datalynx_entries', (object) [
             'dataid' => $dlx->id(),
@@ -157,6 +159,7 @@ final class grid_view_manager_test extends advanced_testcase {
             'param6' => '', 'param7' => '', 'param8' => '', 'param9' => '', 'param10' => '',
         ];
         $second->id = (int) $DB->insert_record('datalynx_fields', $second);
+        \mod_datalynx\local\definition_cache::purge();
         $DB->insert_record('datalynx_contents', (object) [
             'fieldid' => $second->id,
             'entryid' => $entryid,
@@ -168,6 +171,7 @@ final class grid_view_manager_test extends advanced_testcase {
         // A "tag only" entry template that references only the first field. Such a template contains
         // nothing but a field tag, which is exactly the case that used to be discarded.
         $DB->set_field('datalynx_views', 'param2', '[[Title]]', ['id' => $view->id]);
+        \mod_datalynx\local\definition_cache::purge();
         $payload = $manager->get_browse_payload($dlx->id(), $view->id);
         $entryhtml = $payload['groups'][0]['entries'][0]['entryhtml'];
 
@@ -178,6 +182,7 @@ final class grid_view_manager_test extends advanced_testcase {
 
         // Edit the template to reference the other field; the rendered output must follow the edit.
         $DB->set_field('datalynx_views', 'param2', '[[Subtitle]]', ['id' => $view->id]);
+        \mod_datalynx\local\definition_cache::purge();
         $payload = $manager->get_browse_payload($dlx->id(), $view->id);
         $entryhtml = $payload['groups'][0]['entries'][0]['entryhtml'];
 
@@ -206,6 +211,7 @@ final class grid_view_manager_test extends advanced_testcase {
 
         // 2. Bootstrap row-cols setting.
         $DB->set_field('datalynx_views', 'param3', 'col', ['id' => $view->id]);
+        \mod_datalynx\local\definition_cache::purge();
         $payload = $manager->get_browse_payload($dlx->id(), $view->id);
         $this->assertFalse($payload['nowrapper']);
         $this->assertSame('col', $payload['entrywrapperclass']);
@@ -213,7 +219,9 @@ final class grid_view_manager_test extends advanced_testcase {
 
         // 3. Custom class setting with col- definition.
         $DB->set_field('datalynx_views', 'param3', 'custom', ['id' => $view->id]);
+        \mod_datalynx\local\definition_cache::purge();
         $DB->set_field('datalynx_views', 'param4', 'col-12 col-md-6 col-lg-3', ['id' => $view->id]);
+        \mod_datalynx\local\definition_cache::purge();
         $payload = $manager->get_browse_payload($dlx->id(), $view->id);
         $this->assertFalse($payload['nowrapper']);
         $this->assertSame('col-12 col-md-6 col-lg-3', $payload['entrywrapperclass']);
@@ -221,7 +229,9 @@ final class grid_view_manager_test extends advanced_testcase {
 
         // 4. Custom class setting without col- definition.
         $DB->set_field('datalynx_views', 'param3', 'custom', ['id' => $view->id]);
+        \mod_datalynx\local\definition_cache::purge();
         $DB->set_field('datalynx_views', 'param4', 'my-custom-class', ['id' => $view->id]);
+        \mod_datalynx\local\definition_cache::purge();
         $payload = $manager->get_browse_payload($dlx->id(), $view->id);
         $this->assertFalse($payload['nowrapper']);
         $this->assertSame('my-custom-class', $payload['entrywrapperclass']);
@@ -229,6 +239,7 @@ final class grid_view_manager_test extends advanced_testcase {
 
         // 5. No wrapper setting.
         $DB->set_field('datalynx_views', 'param3', 'none', ['id' => $view->id]);
+        \mod_datalynx\local\definition_cache::purge();
         $payload = $manager->get_browse_payload($dlx->id(), $view->id);
         $this->assertTrue($payload['nowrapper']);
         $this->assertSame('', $payload['entrywrapperclass']);

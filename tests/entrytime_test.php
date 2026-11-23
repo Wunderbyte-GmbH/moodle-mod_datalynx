@@ -227,6 +227,7 @@ final class entrytime_test extends advanced_testcase {
             'settings' => json_encode(['dateformat' => '%Y-%m-%d']),
         ];
         $DB->insert_record('datalynx_field_formats', $formatrecord);
+        \mod_datalynx\local\definition_cache::purge();
 
         $replacements = $renderer->replacements(['##timesubmitted:customdate##'], $entry);
         $this->assertEquals(userdate($timestamp, '%Y-%m-%d'), $replacements['##timesubmitted:customdate##'][1]);
@@ -239,6 +240,7 @@ final class entrytime_test extends advanced_testcase {
             'settings' => json_encode(['dateformat' => 'timestamp']),
         ];
         $DB->insert_record('datalynx_field_formats', $formatrecordts);
+        \mod_datalynx\local\definition_cache::purge();
 
         $replacements = $renderer->replacements(['##timesubmitted:rawts##'], $entry);
         $this->assertEquals((string)$timestamp, $replacements['##timesubmitted:rawts##'][1]);
@@ -276,6 +278,7 @@ final class entrytime_test extends advanced_testcase {
             'settings' => json_encode(['dateformat' => '%Y']),
         ];
         $DB->insert_record('datalynx_field_formats', $formatrecord);
+        \mod_datalynx\local\definition_cache::purge();
 
         // Reset the manager instance cache so the new database format is loaded.
         $rc = new \ReflectionClass(\mod_datalynx\local\field_format\manager::class);

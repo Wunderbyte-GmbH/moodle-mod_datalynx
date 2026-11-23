@@ -143,6 +143,7 @@ class stored_criteria {
             $fieldtypes[$filter->dataid] ??= self::field_types((int) $filter->dataid);
             if (self::normalise_filter_record($filter, $fieldtypes[$filter->dataid])) {
                 $DB->update_record('datalynx_filters', $filter);
+                \mod_datalynx\local\definition_cache::invalidate((int) $filter->dataid);
                 $updated++;
             }
         }

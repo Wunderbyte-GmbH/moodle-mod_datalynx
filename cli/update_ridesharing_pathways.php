@@ -466,6 +466,7 @@ foreach ($matchrules as $record) {
         $record->param6 = $matchsubject;
         $record->param8 = $viewidbyname[$emailview];
         $DB->update_record('datalynx_rules', $record);
+        \mod_datalynx\local\definition_cache::invalidate($dataid);
     }
 }
 if (!$matchrules) {
@@ -507,11 +508,13 @@ if ($existing) {
     $report[] = "  update rule {$existing->id}: $stamprulename";
     if (!$dryrun) {
         $DB->update_record('datalynx_rules', $stamprule);
+        \mod_datalynx\local\definition_cache::invalidate($dataid);
     }
 } else {
     $report[] = "  create rule: $stamprulename";
     if (!$dryrun) {
         $DB->insert_record('datalynx_rules', $stamprule);
+        \mod_datalynx\local\definition_cache::invalidate($dataid);
     }
 }
 

@@ -70,6 +70,7 @@ final class editable_after_final_test extends advanced_testcase {
         $this->assertEquals(1, $record->editableafterfinal);
 
         $record->id = (int) $DB->insert_record('datalynx_behaviors', $record);
+        \mod_datalynx\local\definition_cache::purge();
         $behavior = datalynxfield_behavior::from_id($record->id);
         $this->assertTrue($behavior->is_editable_after_final());
 
@@ -99,6 +100,7 @@ final class editable_after_final_test extends advanced_testcase {
             'conditions' => ['match' => 'all', 'rules' => []],
         ]);
         $DB->insert_record('datalynx_behaviors', $behavior);
+        \mod_datalynx\local\definition_cache::purge();
 
         $noteid = $this->create_field('text', 'Note');
         $plainid = $this->create_field('text', 'Plain');
@@ -124,11 +126,13 @@ final class editable_after_final_test extends advanced_testcase {
                 'editableby' => [16], 'editable' => 1, 'required' => 0, 'editableafterfinal' => $eaf,
                 'conditions' => ['match' => 'all', 'rules' => []],
             ]));
+            \mod_datalynx\local\definition_cache::purge();
         }
         $amountid = $this->create_field('number', 'Amount');
         $noteid = $this->create_field('text', 'Note');
         $groupid = $this->create_field('fieldgroup', 'Rows');
         $DB->set_field('datalynx_fields', 'param1', json_encode(["$amountid:|", "$noteid:|lockedsub|"]), ['id' => $groupid]);
+        \mod_datalynx\local\definition_cache::purge();
         $this->dlx->get_fields(null, false, true);
 
         $viewrecord = $this->create_grid_view('<div>[[Rows|editfinal]] ##status##</div>');
@@ -272,6 +276,7 @@ final class editable_after_final_test extends advanced_testcase {
             $record->{"param$i"} = '';
         }
         $id = (int) $DB->insert_record('datalynx_fields', $record);
+        \mod_datalynx\local\definition_cache::purge();
         $this->dlx->get_fields(null, false, true);
         return $id;
     }
@@ -313,6 +318,7 @@ final class editable_after_final_test extends advanced_testcase {
             'section' => '', 'param2' => $template, 'param5' => 0, 'param10' => 0,
         ];
         $view->id = (int) $DB->insert_record('datalynx_views', $view);
+        \mod_datalynx\local\definition_cache::purge();
         return $view;
     }
 

@@ -179,6 +179,7 @@ final class teammemberselect_fieldgroup_test extends advanced_testcase {
         global $DB;
 
         $DB->set_field('datalynx_fields', 'param5', -1, ['id' => $this->ingroup]);
+        \mod_datalynx\local\definition_cache::purge();
         $dlx = new datalynx($this->dlx->id());
         $entryid = $this->add_mobile_entry($dlx, get_admin()->id, [$this->ingroup => json_encode([(int) $this->member->id])]);
         $before = $DB->count_records('datalynx_entries', ['dataid' => $dlx->id()]);

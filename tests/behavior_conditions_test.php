@@ -62,12 +62,14 @@ final class behavior_conditions_test extends advanced_testcase {
      */
     private function make_field(string $type, string $name, string $param1 = ''): int {
         global $DB;
-        return (int) $DB->insert_record('datalynx_fields', (object) [
+        $result = (int) $DB->insert_record('datalynx_fields', (object) [
             'dataid' => $this->dlx->id(), 'type' => $type, 'name' => $name, 'description' => '',
             'required' => 0, 'visibleto' => 0, 'editableby' => 0,
             'param1' => $param1, 'param2' => '', 'param3' => '', 'param4' => '', 'param5' => '',
             'param6' => '', 'param7' => '', 'param8' => '', 'param9' => '', 'param10' => '',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
+        return $result;
     }
 
     /**
@@ -108,6 +110,7 @@ final class behavior_conditions_test extends advanced_testcase {
             'required' => 0,
             'conditions' => json_encode($conditions),
         ]);
+        \mod_datalynx\local\definition_cache::purge();
         return datalynxfield_behavior::from_id($id);
     }
 

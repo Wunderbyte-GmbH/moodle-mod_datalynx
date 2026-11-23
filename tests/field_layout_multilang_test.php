@@ -69,6 +69,7 @@ final class field_layout_multilang_test extends advanced_testcase {
             'param1' => '', 'param2' => '', 'param3' => '', 'param4' => '', 'param5' => '',
             'param6' => '', 'param7' => '', 'param8' => '', 'param9' => '', 'param10' => '',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
         $this->field = $this->dlx->get_field_from_id($fieldid, true);
 
         $label = '<label>' . $this->multilang_markup() . '</label>';
@@ -83,6 +84,7 @@ final class field_layout_multilang_test extends advanced_testcase {
             'edittemplate' => '<div>' . $label . '#input</div>',
             'noteditabletemplate' => '___1___',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
 
         $entryid = (int) $DB->insert_record('datalynx_entries', (object) [
             'dataid' => $this->dlx->id(), 'userid' => $USER->id, 'groupid' => 0, 'approved' => 1,
@@ -152,6 +154,7 @@ final class field_layout_multilang_test extends advanced_testcase {
             'dataid' => $this->dlx->id(), 'type' => 'fieldgroup', 'name' => 'rows', 'description' => '',
             'param1' => json_encode([$this->field->id() . ':||mllayout']), 'param2' => '2', 'param3' => '1', 'param4' => '0',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
         $group = (new datalynx($this->dlx->id()))->get_field_from_id($groupid, true);
 
         foreach (['de', 'en'] as $lang) {

@@ -66,6 +66,7 @@ final class field_format_menu_test extends advanced_testcase {
             'param2' => '1',
             'param3' => '1',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
         return [$dlx, $fieldid];
     }
 

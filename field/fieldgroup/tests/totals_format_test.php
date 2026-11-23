@@ -125,10 +125,12 @@ final class totals_format_test extends advanced_testcase {
         $numid = (int) $DB->insert_record('datalynx_fields', (object) [
             'dataid' => $dlx->id(), 'name' => 'price', 'type' => 'number', 'description' => '',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
         $fgid = (int) $DB->insert_record('datalynx_fields', (object) [
             'dataid' => $dlx->id(), 'name' => 'group', 'type' => 'fieldgroup', 'description' => '',
             'param1' => json_encode(["$numid"]), 'param2' => 3, 'param3' => 3, 'param4' => 0,
         ]);
+        \mod_datalynx\local\definition_cache::purge();
         manager::save_format((object) [
             'dataid' => $dlx->id(), 'name' => 'totals', 'fieldtype' => 'fieldgroup',
             'settings' => json_encode(['aggregation' => 'sum']),
@@ -168,10 +170,12 @@ final class totals_format_test extends advanced_testcase {
         $numid = (int) $DB->insert_record('datalynx_fields', (object) [
             'dataid' => $dlx->id(), 'name' => 'price', 'type' => 'number', 'description' => '',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
         $DB->insert_record('datalynx_fields', (object) [
             'dataid' => $dlx->id(), 'name' => 'kost', 'type' => 'fieldgroup', 'description' => '',
             'param1' => json_encode(["$numid"]), 'param2' => 3, 'param3' => 3, 'param4' => 0,
         ]);
+        \mod_datalynx\local\definition_cache::purge();
         manager::save_format((object) [
             'dataid' => $dlx->id(), 'name' => 'summe', 'fieldtype' => 'fieldgroup',
             'settings' => json_encode(['aggregation' => 'sum']),
@@ -184,6 +188,7 @@ final class totals_format_test extends advanced_testcase {
             'param2' => '<div>[[kost:summe]]</div>',
         ];
         $viewrecord->id = (int) $DB->insert_record('datalynx_views', $viewrecord);
+        \mod_datalynx\local\definition_cache::purge();
         $view = $dlx->get_view('grid', $viewrecord);
 
         // Reach validation() directly without building the whole moodleform.
@@ -221,15 +226,18 @@ final class totals_format_test extends advanced_testcase {
         $priceid = (int) $DB->insert_record('datalynx_fields', (object) [
             'dataid' => $dlx->id(), 'name' => 'price', 'type' => 'number', 'description' => '',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
         $qtyid = (int) $DB->insert_record('datalynx_fields', (object) [
             'dataid' => $dlx->id(), 'name' => 'qty', 'type' => 'number', 'description' => '',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
 
         // A fieldgroup grouping them, max 3 lines (param2).
         $fgid = (int) $DB->insert_record('datalynx_fields', (object) [
             'dataid' => $dlx->id(), 'name' => 'group', 'type' => 'fieldgroup', 'description' => '',
             'param1' => json_encode(["$priceid", "$qtyid"]), 'param2' => 3, 'param3' => 3, 'param4' => 0,
         ]);
+        \mod_datalynx\local\definition_cache::purge();
 
         // A totals format (sum, 2 decimals).
         manager::save_format((object) [

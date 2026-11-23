@@ -74,6 +74,7 @@ final class search_test extends advanced_testcase {
             'param5' => 5,
         ];
         $record->id = $DB->insert_record('datalynx_fields', $record);
+        \mod_datalynx\local\definition_cache::purge();
         $this->field = $this->dlx->get_fields(null, false, true)[$record->id];
     }
 

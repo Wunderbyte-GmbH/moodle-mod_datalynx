@@ -31,6 +31,7 @@ use core_course_category;
 use datalynx_preset_manager;
 use datalynxfield_status\field as datalynxfield_status;
 use html_writer;
+use mod_datalynx\local\definition_cache;
 use mod_datalynx\local\field\datalynxfield_behavior;
 use mod_datalynx\local\field\datalynxfield_layout;
 use mod_datalynx\local\filter\datalynx_filter_manager;
@@ -649,8 +650,7 @@ class datalynx {
                 $this->data->defaultview
             ) ? $this->data->defaultview : 0));
             if ($page == 'view' && $viewid) {
-                global $DB;
-                $viewname = $DB->get_field('datalynx_views', 'name', ['id' => $viewid]);
+                $viewname = definition_cache::get_record($this->id(), 'views', (int) $viewid)->name ?? false;
                 $pagestring = get_string('page');
                 $pageparam = optional_param('page', 0, PARAM_INT);
                 $pagenum = !empty($pageparam) ? $pageparam + 1 : 1;
@@ -1195,7 +1195,7 @@ class datalynx {
         if (!$this->fields || $forceget) {
             $this->fields = [];
             // Collate user fields.
-            if ($fields = $DB->get_records('datalynx_fields', ['dataid' => $this->id()], $sort)) {
+            if ($fields = $this->get_definition_records('fields', $sort)) {
                 foreach ($fields as $fieldid => $field) {
                     $this->fields[$fieldid] = $this->get_field($field);
                 }
@@ -1235,7 +1235,7 @@ class datalynx {
 
         $fieldnames = [];
         // Collate user fields.
-        if ($fields = $DB->get_records('datalynx_fields', ['dataid' => $this->id()], $sort)) {
+        if ($fields = $this->get_definition_records('fields', $sort)) {
             foreach ($fields as $fieldid => $field) {
                 $fieldnames[$fieldid] = $field->name;
             }
@@ -1256,7 +1256,7 @@ class datalynx {
      */
     private function find_filters_using_fields($fields): array {
         global $DB;
-        $filters = $DB->get_records('datalynx_filters', ['dataid' => $this->id()]);
+        $filters = definition_cache::get_records($this->id(), 'filters');
         $usedfilters = [];
         $fieldids = array_keys($fields);
         foreach ($filters as $filter) {
@@ -1307,7 +1307,7 @@ class datalynx {
      */
     private function find_customfilters_using_fields($fields): array {
         global $DB;
-        $customfilters = $DB->get_records('datalynx_customfilters', ['dataid' => $this->id()]);
+        $customfilters = definition_cache::get_records($this->id(), 'customfilters');
         $usedcustomfilters = [];
         $fieldids = array_keys($fields);
         foreach ($customfilters as $customfilter) {
@@ -1577,6 +1577,7 @@ class datalynx {
                                 $field->field->name .= '_1';
                             }
                             $fieldid = $DB->insert_record('datalynx_fields', $field->field);
+                            definition_cache::invalidate($this->id());
                             $processedfids[] = $fieldid;
 
                             $other = ['dataid' => $this->id()];
@@ -1634,6 +1635,7 @@ class datalynx {
                             }
                             // Convert field type to editor.
                             $DB->set_field('datalynx_fields', 'type', 'editor', ['id' => $fid]);
+                            definition_cache::invalidate($this->id());
 
                             $other = ['dataid' => $this->id()];
                             $event = event\field_updated::create(
@@ -1675,7 +1677,7 @@ class datalynx {
     public function get_view_records(bool $forceget = false, string $sort = ''): array {
         global $DB;
         if (empty($this->views) || $forceget) {
-            $views = $DB->get_records('datalynx_views', ['dataid' => $this->id()], $sort);
+            $views = $this->get_definition_records('views', $sort);
             // Reinitialise the views array.
             $this->views = [];
             if (empty($views)) {
@@ -1699,7 +1701,7 @@ class datalynx {
     public function get_views_editable_by_user(string $sort = ''): array {
         global $DB;
         if (has_capability('mod/datalynx:managetemplates', $this->context)) {
-            $views = $DB->get_records('datalynx_views', ['dataid' => $this->id()], $sort);
+            $views = $this->get_definition_records('views', $sort);
             $returnviews = [];
             if (!empty($views)) {
                 foreach ($views as $viewid => $view) {
@@ -1742,13 +1744,7 @@ class datalynx {
      * @return array of view objects indexed by view id, empty array if no views are found
      */
     public function get_all_views(): array {
-        global $DB;
-        $views = [];
-        if (!$views = $DB->get_records('datalynx_views', ['dataid' => $this->id()])) {
-            return [];
-        } else {
-            return $views;
-        }
+        return definition_cache::get_records($this->id(), 'views');
     }
 
     /**
@@ -1950,8 +1946,7 @@ class datalynx {
      * @return \mod_datalynx\local\view\base[] Array of view objects.
      */
     public function get_all_view_objects(string $sort = ''): array {
-        global $DB;
-        $views = $DB->get_records('datalynx_views', ['dataid' => $this->id()], $sort);
+        $views = $this->get_definition_records('views', $sort);
         if (empty($views)) {
             return [];
         }
@@ -2049,9 +2044,7 @@ class datalynx {
      * @return bool
      */
     protected function is_internal_view_id(int $viewid): bool {
-        global $DB;
-
-        $type = $DB->get_field('datalynx_views', 'type', ['id' => $viewid]);
+        $type = definition_cache::get_record($this->id(), 'views', $viewid)->type ?? '';
         return !empty($type) && $this->is_internal_view_type($type);
     }
 
@@ -2163,6 +2156,7 @@ class datalynx {
                         $customfilter->fieldlist = json_encode($fieldlist);
                     }
                     $DB->update_record('datalynx_customfilters', $customfilter);
+                    definition_cache::invalidate($this->id());
                 }
             }
         }
@@ -2237,6 +2231,7 @@ class datalynx {
                             } else {
                                 $updateview->id = $vid;
                                 $DB->update_record('datalynx_views', $updateview);
+                                definition_cache::invalidate($this->id());
 
                                 $other = ['dataid' => $this->id()];
                                 $event = event\view_updated::create(
@@ -2264,6 +2259,7 @@ class datalynx {
                                     $updateview->filter = $filterid;
                                 }
                                 $DB->update_record('datalynx_views', $updateview);
+                                definition_cache::invalidate($this->id());
 
                                 $other = ['dataid' => $this->id()];
                                 $event = event\view_updated::create(
@@ -3041,11 +3037,15 @@ class datalynx {
     }
 
     /**
-     * Forget the behaviors, layouts and permissions loaded by this instance, e.g. after changing them.
+     * Forget the definitions and permissions loaded by this instance, e.g. after changing them.
+     *
+     * Also invalidates the instance's entry in the definition cache, so other instance objects
+     * and later requests read the changes too.
      *
      * @return void
      */
     public function reset_definition_cache(): void {
+        definition_cache::invalidate($this->id());
         $this->behaviorrecords = null;
         $this->behaviorsbyname = [];
         $this->layoutrecords = null;
@@ -3067,16 +3067,17 @@ class datalynx {
      * @return string
      */
     public function get_pattern_signature(): string {
-        global $DB;
-
         if ($this->patternsignature === null) {
-            $instance = ['dataid' => $this->id()];
+            $columns = fn(array $records, array $keep): array => array_map(
+                fn(stdClass $record): array => array_intersect_key((array) $record, array_flip($keep)),
+                $records
+            );
             $this->patternsignature = sha1(serialize([
                 current_language(),
-                $DB->get_records('datalynx_fields', $instance, 'id'),
-                $DB->get_records('datalynx_field_formats', $instance, 'id'),
-                $DB->get_records('datalynx_views', $instance, 'id', 'id, type, name, visible'),
-                $DB->get_records('datalynx_customfilters', $instance, 'id', 'id, name, visible'),
+                definition_cache::get_records($this->id(), 'fields'),
+                definition_cache::get_records($this->id(), 'field_formats'),
+                $columns(definition_cache::get_records($this->id(), 'views'), ['id', 'type', 'name', 'visible']),
+                $columns(definition_cache::get_records($this->id(), 'customfilters'), ['id', 'name', 'visible']),
             ]));
         }
         return $this->patternsignature;
@@ -3089,12 +3090,29 @@ class datalynx {
      * @return stdClass[]
      */
     protected function get_definition_records_by_name(string $table): array {
-        global $DB;
         $records = [];
-        foreach ($DB->get_records($table, ['dataid' => $this->id()], 'id ASC') as $record) {
+        foreach (definition_cache::get_records($this->id(), $table) as $record) {
             $records[$record->name] ??= $record;
         }
         return $records;
+    }
+
+    /**
+     * The definition records of this instance, keyed by id.
+     *
+     * They come from the definition cache in ascending id order. An SQL sort (the sortable
+     * management tables) reads the database instead.
+     *
+     * @param string $table One of definition_cache::TABLES, without the datalynx_ prefix.
+     * @param string $sort SQL ORDER BY clause, or empty.
+     * @return stdClass[]
+     */
+    public function get_definition_records(string $table, string $sort = ''): array {
+        global $DB;
+        if ($sort !== '') {
+            return $DB->get_records('datalynx_' . $table, ['dataid' => $this->id()], $sort);
+        }
+        return definition_cache::get_records($this->id(), $table);
     }
 
     /**

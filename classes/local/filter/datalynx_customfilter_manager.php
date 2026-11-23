@@ -136,7 +136,7 @@ class datalynx_customfilter_manager {
         global $DB;
         if (!$this->customfilters || $forceget) {
             $this->customfilters = [];
-            if ($filters = $DB->get_records('datalynx_customfilters', ['dataid' => $this->dlx->id()])) {
+            if ($filters = \mod_datalynx\local\definition_cache::get_records($this->dlx->id(), 'customfilters')) {
                 foreach ($filters as $filterid => $filterdata) {
                     $this->customfilters[$filterid] = new datalynx_customfilter($filterdata);
                 }
@@ -235,6 +235,7 @@ class datalynx_customfilter_manager {
 
                             if ($filter->id) {
                                 $DB->update_record('datalynx_customfilters', $filter);
+                                \mod_datalynx\local\definition_cache::invalidate($this->dlx->id());
                                 $processedlids[] = $filter->id;
                                 $strnotify = 'filtersupdated';
 
@@ -251,6 +252,7 @@ class datalynx_customfilter_manager {
                                     $filter,
                                     true
                                 );
+                                \mod_datalynx\local\definition_cache::invalidate($this->dlx->id());
                                 $processedlids[] = $filter->id;
                                 $strnotify = 'filtersadded';
 
@@ -277,6 +279,7 @@ class datalynx_customfilter_manager {
                                     $filter->name = 'Copy of ' . $filter->name;
                                 }
                                 $filterid = $DB->insert_record('datalynx_customfilters', $filter);
+                                \mod_datalynx\local\definition_cache::invalidate($this->dlx->id());
 
                                 $processedlids[] = $filterid;
 
@@ -298,6 +301,7 @@ class datalynx_customfilter_manager {
                             $updatefilter->id = $filter->id;
                             $updatefilter->visible = (int) !$filter->visible;
                             $DB->update_record('datalynx_customfilters', $updatefilter);
+                            \mod_datalynx\local\definition_cache::invalidate($this->dlx->id());
                             $filter->visible = $updatefilter->visible;
 
                             $processedlids[] = $filter->id;
@@ -318,6 +322,7 @@ class datalynx_customfilter_manager {
                         foreach ($filters as $filter) {
                             $DB->delete_records('datalynx_customfilters', [
                                 'id' => $filter->id]);
+                            \mod_datalynx\local\definition_cache::invalidate($this->dlx->id());
 
                             $processedlids[] = $filter->id;
 

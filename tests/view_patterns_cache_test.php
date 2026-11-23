@@ -61,9 +61,11 @@ final class view_patterns_cache_test extends advanced_testcase {
      */
     private function create_field(int $dataid, string $name): int {
         global $DB;
-        return (int) $DB->insert_record('datalynx_fields', (object) [
+        $result = (int) $DB->insert_record('datalynx_fields', (object) [
             'dataid' => $dataid, 'type' => 'text', 'name' => $name, 'description' => '',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
+        return $result;
     }
 
     /**
@@ -76,11 +78,13 @@ final class view_patterns_cache_test extends advanced_testcase {
      */
     private function create_view(int $dataid, string $name, string $entrytemplate = ''): int {
         global $DB;
-        return (int) $DB->insert_record('datalynx_views', (object) [
+        $result = (int) $DB->insert_record('datalynx_views', (object) [
             'dataid' => $dataid, 'type' => 'grid', 'name' => $name, 'description' => '',
             'visible' => 7, 'filter' => 0, 'perpage' => 0, 'groupby' => '',
             'param5' => 0, 'param10' => 0, 'section' => '##entries##', 'param2' => $entrytemplate,
         ]);
+        \mod_datalynx\local\definition_cache::purge();
+        return $result;
     }
 
     /**
@@ -158,11 +162,13 @@ final class view_patterns_cache_test extends advanced_testcase {
 
         // A renamed field no longer matches its old tag.
         $DB->set_field('datalynx_fields', 'name', 'Gamma', ['id' => $betaid]);
+        \mod_datalynx\local\definition_cache::purge();
         $tags = $this->build_view($dataid, $viewid)->get__patterns();
         $this->assertSame([], array_values($tags['field'][$betaid]));
 
         // An edited template is parsed again.
         $DB->set_field('datalynx_views', 'param2', '[[Gamma]]', ['id' => $viewid]);
+        \mod_datalynx\local\definition_cache::purge();
         $tags = $this->build_view($dataid, $viewid)->get__patterns();
         $this->assertSame([], array_values($tags['field'][$alphaid]));
         $this->assertSame(['[[Gamma]]'], array_values($tags['field'][$betaid]));

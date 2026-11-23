@@ -50,6 +50,7 @@ final class textarea_word_count_test extends advanced_testcase {
             'param1' => '', 'param2' => '', 'param3' => '', 'param4' => '', 'param5' => '', 'param6' => '',
             'param7' => (string) $max, 'param8' => (string) $min, 'param9' => '', 'param10' => '',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
         return $dlx->get_field_from_id($fieldid, true);
     }
 

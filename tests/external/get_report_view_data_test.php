@@ -67,6 +67,7 @@ final class get_report_view_data_test extends advanced_testcase {
             'param10' => '',
         ];
         $selectfield->id = (int) $DB->insert_record('datalynx_fields', $selectfield);
+        \mod_datalynx\local\definition_cache::purge();
 
         $view = (object) [
             'dataid' => $dlx->id(),
@@ -86,6 +87,7 @@ final class get_report_view_data_test extends advanced_testcase {
             'section' => '',
         ];
         $view->id = (int) $DB->insert_record('datalynx_views', $view);
+        \mod_datalynx\local\definition_cache::purge();
 
         $entryone = (int) $DB->insert_record('datalynx_entries', (object) [
             'dataid' => $dlx->id(),

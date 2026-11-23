@@ -62,7 +62,9 @@ final class provider_test extends advanced_testcase {
         for ($i = 1; $i <= 10; $i++) {
             $record->{"param$i"} = '';
         }
-        return (int) $DB->insert_record('datalynx_fields', $record);
+        $result = (int) $DB->insert_record('datalynx_fields', $record);
+        \mod_datalynx\local\definition_cache::purge();
+        return $result;
     }
 
     /**
@@ -650,12 +652,14 @@ final class provider_test extends advanced_testcase {
      */
     private function create_tag_field(int $dataid): int {
         global $DB;
-        return (int) $DB->insert_record('datalynx_fields', (object) [
+        $result = (int) $DB->insert_record('datalynx_fields', (object) [
             'dataid' => $dataid,
             'type' => 'tag',
             'name' => 'Tags',
             'description' => '',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
+        return $result;
     }
 
     /**
@@ -845,12 +849,14 @@ final class provider_test extends advanced_testcase {
      */
     private function create_team_field(int $dataid): int {
         global $DB;
-        return (int) $DB->insert_record('datalynx_fields', (object) [
+        $result = (int) $DB->insert_record('datalynx_fields', (object) [
             'dataid' => $dataid,
             'type' => 'teammemberselect',
             'name' => 'Team',
             'description' => '',
         ]);
+        \mod_datalynx\local\definition_cache::purge();
+        return $result;
     }
 
     /**

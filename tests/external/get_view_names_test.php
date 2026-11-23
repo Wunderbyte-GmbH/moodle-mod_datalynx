@@ -81,6 +81,7 @@ final class get_view_names_test extends advanced_testcase {
         $expectedids = [];
         foreach ($viewrecords as $viewrecord) {
             $expectedids[$viewrecord->name] = (int) $DB->insert_record('datalynx_views', $viewrecord);
+            \mod_datalynx\local\definition_cache::purge();
         }
 
         $result = get_view_names::execute($instance->id);

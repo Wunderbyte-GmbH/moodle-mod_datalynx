@@ -131,6 +131,7 @@ final class team_updated_event_test extends advanced_testcase {
             'param2' => \datalynxrule_eventnotification\rule::FROM_CURRENT_USER,
             'param3' => json_encode(['teams' => [$this->teamid]]),
         ]);
+        \mod_datalynx\local\definition_cache::purge();
         $this->dlx = new datalynx($this->dlx->id());
 
         $this->save_team(['b', 'c']);

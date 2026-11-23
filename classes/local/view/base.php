@@ -34,6 +34,7 @@ use HTML_QuickForm;
 use html_writer;
 use mod_datalynx\datalynx;
 use mod_datalynx\local\datalynx_entries;
+use mod_datalynx\local\definition_cache;
 use mod_datalynx\local\filter\datalynx_filter;
 use mod_datalynx\local\filter\datalynx_filter_manager;
 use mod_datalynx\local\filter\search_criteria;
@@ -283,7 +284,8 @@ abstract class base {
             if (is_object($view)) {
                 $this->view = $view; // Programmer knows what they are doing, we hope.
             } else {
-                $this->view = $DB->get_record('datalynx_views', ['id' => $view]);
+                $this->view = definition_cache::get_record($this->dlx->id(), 'views', (int) $view)
+                    ?? $DB->get_record('datalynx_views', ['id' => $view]);
                 if (!$this->view) {
                     throw new moodle_exception('invalidview', 'datalynx', null, null, $view);
                 }
@@ -649,6 +651,7 @@ abstract class base {
             echo $OUTPUT->notification('Insertion of new view failed!');
             return false;
         }
+        definition_cache::invalidate($this->dlx->id());
 
         return $this->view->id;
     }
@@ -673,6 +676,7 @@ abstract class base {
             echo $OUTPUT->notification('updating view failed!');
             return false;
         }
+        definition_cache::invalidate($this->dlx->id());
 
         return true;
     }
@@ -695,7 +699,9 @@ abstract class base {
                     $this->id() . $key
                 );
             }
-            return $DB->delete_records('datalynx_views', ['id' => $this->view->id]);
+            $deleted = $DB->delete_records('datalynx_views', ['id' => $this->view->id]);
+            definition_cache::invalidate($this->dlx->id());
+            return $deleted;
         }
         return true;
     }
@@ -2959,7 +2965,7 @@ abstract class base {
         // Fall back to the current view when no explicit target view is given in the request, e.g.
         // when editing on the default view without a 'view' URL parameter.
         $targetview = $targetviewid ?: (optional_param('view', 0, PARAM_INT) ?: $this->id());
-        $view = $DB->get_record('datalynx_views', ['id' => $targetview, 'dataid' => $this->dlx->id()]);
+        $view = definition_cache::get_record($this->dlx->id(), 'views', (int) $targetview);
         if (!$view) {
             return false;
         }
@@ -3034,7 +3040,7 @@ abstract class base {
      */
     private function is_valid_redirect_view(int $viewid): bool {
         global $DB;
-        $view = $DB->get_record('datalynx_views', ['id' => $viewid, 'dataid' => $this->dlx->id()]);
+        $view = definition_cache::get_record($this->dlx->id(), 'views', $viewid);
         if (!$view) {
             return false;
         }

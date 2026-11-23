@@ -42,14 +42,12 @@ final class customfilter_form {
      * @return stdClass[] id => datalynx_customfilters record, in the order of the tags
      */
     public static function offered(datalynx $dlx, stdClass $viewrecord): array {
-        global $DB;
-
         $text = ($viewrecord->section ?? '') . ' ' . ($viewrecord->param2 ?? '');
         if (!preg_match_all('/##customfilter:(.+?)##/', $text, $matches)) {
             return [];
         }
         $byname = [];
-        foreach ($DB->get_records('datalynx_customfilters', ['dataid' => $dlx->id()], 'id') as $record) {
+        foreach (\mod_datalynx\local\definition_cache::get_records($dlx->id(), 'customfilters') as $record) {
             $byname[$record->name] ??= $record;
         }
         $offered = [];
