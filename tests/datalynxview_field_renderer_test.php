@@ -26,6 +26,7 @@ use advanced_testcase;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers \datalynxfield_datalynxview\renderer::render_display_mode
  * @covers \datalynxview_grid\view::display
+ * @covers \datalynxfield_datalynxview\field::__construct
  */
 final class datalynxview_field_renderer_test extends advanced_testcase {
     /**
@@ -143,5 +144,61 @@ final class datalynxview_field_renderer_test extends advanced_testcase {
 
         $this->assertStringContainsString('Inline remote entry', $output);
         $this->assertStringNotContainsString('mod-datalynx-view-browser-state-loading', $output);
+    }
+
+    /**
+     * A field whose referenced instance was deleted renders empty instead of failing (#262).
+     */
+    public function test_deleted_referenced_instance_renders_empty(): void {
+        global $DB;
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        [$localdlx, $fieldid, $localentry] = $this->create_fixture();
+        $remoteid = (int) $DB->get_field('datalynx_fields', 'param1', ['id' => $fieldid]);
+        $DB->delete_records('datalynx', ['id' => $remoteid]);
+
+        $field = (new datalynx($localdlx->id()))->get_field_from_id($fieldid);
+
+        $this->assertNull($field->refdatalynx);
+        $this->assertSame('', $field->renderer()->render_display_mode($localentry, []));
+    }
+
+    /**
+     * Custom sort and search patterns are resolved against the referenced view, in the referenced instance (#262).
+     */
+    public function test_sort_and_search_options_use_the_referenced_view(): void {
+        global $DB;
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        [$localdlx, $fieldid] = $this->create_fixture();
+        $remoteid = (int) $DB->get_field('datalynx_fields', 'param1', ['id' => $fieldid]);
+        $remotefieldid = (int) $DB->get_field('datalynx_fields', 'id', ['dataid' => $remoteid, 'name' => 'Remote title']);
+        $DB->update_record('datalynx_fields', (object) [
+            'id' => $fieldid,
+            'param4' => '[[Remote title]],DESC',
+            'param5' => "AND,[[Remote title]],,=,fixed value\nXOR,[[Remote title]],,=,ignored",
+        ]);
+        $localviewid = (int) $DB->insert_record('datalynx_views', (object) [
+            'dataid' => $localdlx->id(), 'type' => 'grid', 'name' => 'Local', 'description' => '', 'visible' => 7,
+            'filter' => 0, 'perpage' => 0, 'groupby' => '', 'section' => '##entries##', 'param2' => '[[Remote view field]]',
+        ]);
+        \mod_datalynx\local\definition_cache::purge();
+
+        $field = (new datalynx($localdlx->id()))->get_field_from_id($fieldid);
+        $field->localview = $localviewid;
+        $renderer = $field->renderer();
+        $call = function (string $method, ...$args) use ($renderer) {
+            $reflection = new \ReflectionMethod($renderer, $method);
+            $reflection->setAccessible(true);
+            return $reflection->invoke($renderer, ...$args);
+        };
+
+        $this->assertSame([$remotefieldid => 1], $call('get_sort_options'));
+        $this->assertEquals(
+            [$remotefieldid => ['AND' => [['', '=', 'fixed value']], 'OR' => []]],
+            $call('get_search_options', (object) ['id' => 0])
+        );
     }
 }

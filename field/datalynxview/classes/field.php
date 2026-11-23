@@ -74,9 +74,9 @@ class field extends datalynxfield_base {
 
         parent::__construct($dlx, $field);
 
-        // Get the datalynx.
+        // Get the referenced datalynx. Without one, or when it was deleted, the field renders empty.
         if (
-            empty($this->field->param1) &&
+            empty($this->field->param1) ||
                 !$DB->record_exists('datalynx', ['id' => $this->field->param1])
         ) {
             return;

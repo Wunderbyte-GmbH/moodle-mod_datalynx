@@ -205,9 +205,13 @@ class renderer extends datalynxfield_renderer {
     protected function get_sort_options(): array {
         $field = $this->field;
 
-        $refview = $field->dlx->get_view_from_id($field->refview);
-
         $soptions = [];
+        if (empty($field->refdatalynx) || empty($field->refview)) {
+            return $soptions;
+        }
+        // The referenced view belongs to the referenced instance, not to the one holding this field.
+        $refview = $field->refdatalynx->get_view_from_id($field->refview);
+
         // Custom sort (ref-field-patten,ASC/DESC).
         if (!empty($field->field->param4)) {
             foreach (explode("\n", $field->field->param4) as $sorty) {
@@ -239,11 +243,12 @@ class renderer extends datalynxfield_renderer {
             return $soptions;
         }
 
-        if (
-            empty($field->refdatalynx) || !$refview = $field->refview || !$localview = $field->localview
-        ) {
+        if (empty($field->refdatalynx) || empty($field->refview) || empty($field->localview)) {
             return $soptions;
         }
+        // The referenced view is looked up in the referenced instance, the local one in this instance.
+        $refviewview = $field->refdatalynx->get_view_from_id($field->refview);
+        $localviewview = $field->dlx->get_view_from_id($field->localview);
 
         foreach (explode("\n", $field->field->param5) as $searchy) {
             [$andor, $refpattern, $not, $operator, $localpattern] = explode(',', $searchy);
@@ -252,13 +257,11 @@ class renderer extends datalynxfield_renderer {
                 continue;
             }
             // Get the ref field id from pattern.
-            $refviewview = $field->dlx->get_view_from_id($refview);
             if (!$rfieldid = $refviewview->get_pattern_fieldid($refpattern)) {
                 continue;
             }
             // Get value for local pattern or use as value.
             $value = '';
-            $localviewview = $field->dlx->get_view_from_id($localview);
             if (!$localfieldid = $localviewview->get_pattern_fieldid($localpattern)) {
                 $value = $localpattern;
             } else {
