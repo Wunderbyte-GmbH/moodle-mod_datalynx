@@ -129,6 +129,43 @@
                         <ion-select-option *ngFor="let o of c.options" [value]="o.value">{{ o.label }}</ion-select-option>
                     </ion-select>
                 </ion-item>
+                <ng-container *ngIf="c.control === 'route'">
+                    <ion-item>
+                        <ion-input [label]="c.name + ': ' + c.fromname" labelPlacement="stacked"
+                                [name]="'cf_' + c.key + '_from'" [value]="c.from" autocomplete="off"></ion-input>
+                    </ion-item>
+                    <ng-container *ngIf="c.fromplace"><p class="ion-padding-horizontal ion-no-margin mod-datalynx-mobile-matched">{{ c.fromplace }}</p></ng-container>
+                    <ion-item>
+                        <ion-input [label]="c.name + ': ' + c.toname" labelPlacement="stacked"
+                                [name]="'cf_' + c.key + '_to'" [value]="c.to" autocomplete="off"></ion-input>
+                    </ion-item>
+                    <ng-container *ngIf="c.toplace"><p class="ion-padding-horizontal ion-no-margin mod-datalynx-mobile-matched">{{ c.toplace }}</p></ng-container>
+                    <ion-item>
+                        <ion-select [label]="c.radiusname" labelPlacement="stacked" [name]="'cf_' + c.key + '_radius'" [value]="c.radius"
+                                interface="popover">
+                            <ion-select-option *ngFor="let o of c.radiusoptions" [value]="o.value">{{ o.label }}</ion-select-option>
+                        </ion-select>
+                    </ion-item>
+                    <ng-container *ngFor="let note of c.notes"><p class="ion-padding-horizontal mod-datalynx-mobile-notfound">{{ note }}</p></ng-container>
+                </ng-container>
+                <ng-container *ngIf="c.control === 'schedule'">
+                    <ion-item>
+                        <ion-input [label]="c.name + ': ' + c.datename" labelPlacement="stacked" type="date"
+                                [name]="'cf_' + c.key + '_date'" [value]="c.date"></ion-input>
+                    </ion-item>
+                    <ion-item>
+                        <ion-select [label]="c.minutename" labelPlacement="stacked" [name]="'cf_' + c.key + '_minute'" [value]="c.minute"
+                                interface="popover">
+                            <ion-select-option *ngFor="let o of c.minuteoptions" [value]="o.value">{{ o.label }}</ion-select-option>
+                        </ion-select>
+                    </ion-item>
+                    <ion-item>
+                        <ion-select [label]="c.tolerancename" labelPlacement="stacked" [name]="'cf_' + c.key + '_tolerance'"
+                                [value]="c.tolerance" interface="popover">
+                            <ion-select-option *ngFor="let o of c.toleranceoptions" [value]="o.value">{{ o.label }}</ion-select-option>
+                        </ion-select>
+                    </ion-item>
+                </ng-container>
                 <ion-item *ngIf="c.control === 'presence'">
                     <ion-select [label]="c.name" labelPlacement="stacked" [name]="'cf_' + c.key" [value]="c.value" interface="popover">
                         <ion-select-option value="">{{ 'core.choosedots' | translate }}</ion-select-option>

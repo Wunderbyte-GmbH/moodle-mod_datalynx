@@ -580,6 +580,9 @@ abstract class base {
 
         $search = (string) ($urloptions['search'] ?? '');
         $usersearch = (string) ($urloptions['usersearch'] ?? '');
+        // A custom filter search applied by a client that sends its values (the app): like the
+        // custom filter form on the web, it searches all entries rather than within the view's filter.
+        $customfilterapplied = !empty($urloptions['customfilterapplied']);
 
         // Permitted-filters whitelist (strict). When a whitelist is configured and "allow all
         // filters" (param5) is off, only the default and whitelisted filters may be selected as the
@@ -591,12 +594,17 @@ abstract class base {
                 $fid = 0;
             }
             $cfilter = 0;
+            $customfilterapplied = false;
         }
 
         $filterid = $fid ? $fid : ($this->view->filter ? $this->view->filter : 0);
 
-        $this->filter = $fm->get_filter_from_id($filterid, ['view' => $this,
-                'customfilter' => $cfilter]);
+        if ($customfilterapplied && !$fid) {
+            $this->filter = new datalynx_filter((object) ['id' => 0, 'dataid' => $this->dlx->id()]);
+        } else {
+            $this->filter = $fm->get_filter_from_id($filterid, ['view' => $this,
+                    'customfilter' => $cfilter]);
+        }
 
         // Set specific entry id.
         $this->filter->eids = $eids;

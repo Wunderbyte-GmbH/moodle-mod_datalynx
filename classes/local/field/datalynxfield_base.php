@@ -1221,6 +1221,47 @@ abstract class datalynxfield_base {
     }
 
     /**
+     * The search value of a composite search from the inputs of a custom filter control.
+     *
+     * For the clients that send the control's inputs ({key}_{part}, see customfilter_controls)
+     * rather than the field's own web search elements: the Moodle App. Returns the same shape as
+     * {@see parse_search()}, or null when the inputs hold no search.
+     *
+     * @param array $inputs input name without the custom filter prefix => value
+     * @param string $key the field's key in the inputs (its id)
+     * @return array|null
+     */
+    public function customfilter_value(array $inputs, string $key): ?array {
+        return null;
+    }
+
+    /**
+     * What a custom filter control of a composite search shows besides its name: the values
+     * entered, the choices offered and notes on what was matched.
+     *
+     * @param array $inputs input name without the custom filter prefix => value
+     * @param string $key the field's key in the inputs (its id)
+     * @return array merged into the control, see customfilter_controls::describe()
+     */
+    public function customfilter_describe(array $inputs, string $key): array {
+        return [];
+    }
+
+    /**
+     * Check a composite search value that came from outside (a web service, the app).
+     *
+     * The shape is checked by search_criteria; this checks the meaning of the parts, e.g. that a
+     * latitude is one. Parts the field does not know are left as they are.
+     *
+     * @param array $value the named parts, as strings
+     * @return array the value to search with
+     * @throws \invalid_parameter_exception
+     */
+    public function clean_composite_search(array $value): array {
+        return $value;
+    }
+
+    /**
      * Formats the search parameters for display.
      *
      * @param array $searchparams

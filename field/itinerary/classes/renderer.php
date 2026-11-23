@@ -227,6 +227,17 @@ class renderer extends datalynxfield_renderer {
     }
 
     /**
+     * The route search in a custom filter: from, to and a radius, the addresses looked up on the
+     * server. Without a geocoder the app cannot search by address, and the web keeps its own
+     * elements either way.
+     *
+     * @return string
+     */
+    public function get_customfilter_control(): string {
+        return $this->field->can_search_by_address() ? 'route' : 'unsupported';
+    }
+
+    /**
      * The journey for the Moodle App: the stops, distance and travel time, and a link that opens
      * it in the maps app. No map is drawn there, and no coordinates are put into the page except
      * in that link, which carries only what the viewer may see.
@@ -377,7 +388,7 @@ class renderer extends datalynxfield_renderer {
         }
 
         $radii = [];
-        foreach ([1, 2, 5, 10, 20, 50] as $km) {
+        foreach (field::SEARCH_RADII as $km) {
             $radii[$km] = get_string('radiuskm', 'datalynxfield_location', $km);
         }
         $radiusname = "{$prefix}_radius";

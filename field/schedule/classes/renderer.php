@@ -242,6 +242,15 @@ class renderer extends datalynxfield_renderer {
     }
 
     /**
+     * The day, time and tolerance search in a custom filter; the web keeps its own elements.
+     *
+     * @return string
+     */
+    public function get_customfilter_control(): string {
+        return 'schedule';
+    }
+
+    /**
      * The tolerances a traveller can pick, in minutes.
      *
      * The whole day comes first and is the default: a rule exists to introduce two people who

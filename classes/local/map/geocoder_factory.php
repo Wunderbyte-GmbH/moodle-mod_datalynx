@@ -28,6 +28,25 @@ use mod_datalynx\local\map\geocoder\photon;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class geocoder_factory {
+    /** @var geocoder|null A geocoder tests put in place of the configured one. */
+    private static ?geocoder $testgeocoder = null;
+
+    /**
+     * Use the given geocoder instead of the configured one, in PHPUnit tests only.
+     *
+     * For code that looks up addresses itself rather than taking a client (a search, a save).
+     * Pass null to restore the configured geocoder.
+     *
+     * @param geocoder|null $geocoder
+     * @return void
+     */
+    public static function set_geocoder_for_testing(?geocoder $geocoder): void {
+        if (!defined('PHPUNIT_TEST') || !PHPUNIT_TEST) {
+            throw new \coding_exception('set_geocoder_for_testing() is for PHPUnit tests only');
+        }
+        self::$testgeocoder = $geocoder;
+    }
+
     /**
      * The configured geocoder, or null when geocoding is switched off.
      *
@@ -35,6 +54,9 @@ class geocoder_factory {
      * @return geocoder|null
      */
     public static function instance(?http_client $client = null): ?geocoder {
+        if (self::$testgeocoder !== null && defined('PHPUNIT_TEST') && PHPUNIT_TEST) {
+            return self::$testgeocoder;
+        }
         $engine = provider_config::geocoder_engine();
         $url = provider_config::geocoder_url();
         $key = provider_config::geocoder_key();

@@ -97,7 +97,12 @@ final class search_criteria {
                     throw self::invalid("conjunction '$conjunction' of field '$fieldid' is not a list of criteria");
                 }
                 foreach ($list as $criterion) {
-                    $criteria[$fieldid][$conjunction][] = self::criterion($criterion, $operators, $field->has_composite_search());
+                    $criterion = self::criterion($criterion, $operators, $field->has_composite_search());
+                    if (is_array($criterion[2]) && !array_is_list($criterion[2])) {
+                        // The shape is fine; whether a latitude is one, the field knows.
+                        $criterion[2] = $field->clean_composite_search($criterion[2]);
+                    }
+                    $criteria[$fieldid][$conjunction][] = $criterion;
                 }
             }
         }

@@ -175,8 +175,19 @@ Add the tag `##customfilter:NAME##` to a view, and that custom filter is offered
 4. Tapping the chip again switches the custom filter off.
 
 Most field types can be searched in the app: text, number, date, entry time, single and multiple
-choice, tags, files (present or missing), approval, status and team members. Fields such as
-location and itinerary can only be searched on the web; the app names them under the form.
+choice, tags, files (present or missing), approval, status and team members.
+
+- **Itinerary** (route search): the user types where they start and where they want to go, and
+  picks a radius. The site's address lookup finds the place for each and shows it under the
+  input ("Found: …"); an address it cannot find is named in a note and left out of the search.
+  Without an address lookup service configured for the site, the route can only be searched on
+  the web.
+- **Schedule**: a day, optionally a time of day, and how far off the time may be, as on the web.
+
+Fields that cannot be searched in the app are named under the form.
+
+As on the web, a search replaces the view's own filter: a ride board that lists only offers until
+someone searches lists everything that matches the search. **Clear** shows the view's list again.
 
 ---
 

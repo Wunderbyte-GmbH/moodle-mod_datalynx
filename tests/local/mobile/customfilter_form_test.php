@@ -185,9 +185,10 @@ final class customfilter_form_test extends advanced_testcase {
             (string) $this->ids['Count'] => 'range',
             (string) $this->ids['Colour'] => 'select',
             (string) $this->ids['Tags'] => 'multiselect',
-            (string) $this->ids['Place'] => 'unsupported',
+            // An itinerary searches by address in the app (with the site's geocoder, #277).
+            (string) $this->ids['Place'] => 'route',
         ], $controls);
-        $this->assertSame(['Place'], $state['customfilter']['unsupported']);
+        $this->assertSame([], $state['customfilter']['unsupported']);
         $this->assertSame([['value' => (string) $this->ids['Count'], 'label' => 'Count']], $state['customfilter']['sortfields']);
         $this->assertCount(3, $state['entries']);
 

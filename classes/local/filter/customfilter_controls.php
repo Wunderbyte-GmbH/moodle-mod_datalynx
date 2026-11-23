@@ -34,6 +34,13 @@ use stdClass;
  * - {key}: the value of a text, select, multiselect, approve, status or presence control
  * - {key}_from, {key}_to: the bounds of a range or daterange control
  * - {key}_mode: 'any' or 'all' options of a multiselect control
+ * - {key}_from, {key}_to, {key}_radius: the addresses and the radius of a route control
+ * - {key}_date, {key}_minute, {key}_tolerance: the day, time of day and tolerance of a schedule
+ *   control
+ *
+ * A route or schedule control (composite searches) stands for the field's own search elements
+ * on the web, where they stay; the app sends the inputs above, which the field turns into its
+ * search value (datalynxfield_base::customfilter_value()).
  * - sort, sortdir: the sort field and 0 ascending / 1 descending
  *
  * A list may arrive as an array or as "a,b"; a day as a timestamp of its start or as YYYY-MM-DD.
@@ -47,6 +54,9 @@ use stdClass;
 final class customfilter_controls {
     /** @var string The prefix of the inputs in a form. */
     const PREFIX = 'cf_';
+
+    /** @var string[] The controls of composite searches, which the field describes and reads itself. */
+    const COMPOSITE = ['route', 'schedule'];
 
     /**
      * The controls of the filter in a view, with the values entered so far.
@@ -80,7 +90,11 @@ final class customfilter_controls {
             if ($control === 'unsupported') {
                 $unsupported[] = $name;
             }
-            $controls[] = self::control((string) $fieldid, $control, $name, $renderer->get_customfilter_options(), $inputs);
+            $described = self::control((string) $fieldid, $control, $name, $renderer->get_customfilter_options(), $inputs);
+            if (in_array($control, self::COMPOSITE, true)) {
+                $described += $field->customfilter_describe($inputs, (string) $fieldid);
+            }
+            $controls[] = $described;
         }
 
         $sortfields = [];
@@ -130,6 +144,10 @@ final class customfilter_controls {
                     'ids' => self::split($inputs[$key] ?? ''),
                     'mode' => self::scalar($inputs["{$key}_mode"] ?? '') === 'all' ? 'all' : 'any',
                 ],
+                // The web posts the field's own elements, the app the control's inputs.
+                'route', 'schedule' => $formdata
+                    ? self::composite_value($field, $key, $formdata)
+                    : $field->customfilter_value($inputs, $key),
                 default => $formdata ? self::composite_value($field, $key, $formdata) : null,
             };
             if ($value !== null) {
@@ -264,7 +282,7 @@ final class customfilter_controls {
      * @param bool $end the last second of the day rather than the first
      * @return int 0 when no day
      */
-    private static function day_to_timestamp($day, bool $end): int {
+    public static function day_to_timestamp($day, bool $end): int {
         $tz = core_date::get_user_timezone_object();
         if (is_numeric($day) && (int) $day > 0) {
             $date = (new DateTime('@' . (int) $day))->setTimezone($tz)->setTime(0, 0);

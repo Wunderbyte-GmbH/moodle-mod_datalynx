@@ -16,7 +16,10 @@
 
 namespace datalynxfield_schedule;
 
+use core_date;
+use invalid_parameter_exception;
 use mod_datalynx\local\field\datalynxfield_base;
+use mod_datalynx\local\filter\customfilter_controls;
 use mod_datalynx\local\ride\schedule;
 use mod_datalynx\local\rule\match_compiler;
 use stdClass;
@@ -370,6 +373,92 @@ class field extends datalynxfield_base {
             'minute' => ($minute === null || $minute === '') ? null : (int) $minute,
             'tolerance' => $tolerance > 0 ? $tolerance : $this->get_match_tolerance(),
         ];
+    }
+
+    /**
+     * The search from the app's inputs: {key}_date (YYYY-MM-DD or the timestamp of the day),
+     * {key}_minute (minutes after midnight, empty for any time), {key}_tolerance (minutes).
+     *
+     * @param array $inputs
+     * @param string $key
+     * @return array|null the shape of parse_search(), null without a day or a time
+     */
+    public function customfilter_value(array $inputs, string $key): ?array {
+        [$date, $minute, $tolerance] = $this->search_inputs($inputs, $key);
+        if (!$date && $minute === null) {
+            return null;
+        }
+
+        return ['date' => $date, 'minute' => $minute, 'tolerance' => $tolerance];
+    }
+
+    /**
+     * The schedule control: the day, the time of day and the tolerance, with their choices.
+     *
+     * @param array $inputs
+     * @param string $key
+     * @return array
+     */
+    public function customfilter_describe(array $inputs, string $key): array {
+        [$date, $minute, $tolerance] = $this->search_inputs($inputs, $key);
+        $menu = fn(array $options, $selected): array => array_map(
+            fn($value, $label): array => ['value' => (string) $value, 'label' => (string) $label,
+                'selected' => (string) $value === (string) $selected],
+            array_keys($options),
+            $options
+        );
+
+        return [
+            'datename' => get_string('searchdate', 'datalynxfield_schedule'),
+            'minutename' => get_string('searchtime', 'datalynxfield_schedule'),
+            'tolerancename' => get_string('searchtolerance', 'datalynxfield_schedule'),
+            'date' => $date ? userdate($date, '%Y-%m-%d', core_date::get_user_timezone(), false) : '',
+            'minute' => $minute === null ? '' : (string) $minute,
+            'tolerance' => (string) $tolerance,
+            'minuteoptions' => $menu(['' => get_string('anytime', 'datalynxfield_schedule')] + $this->times_menu(), $minute ?? ''),
+            'toleranceoptions' => $menu(renderer::tolerance_menu(), $tolerance),
+        ];
+    }
+
+    /**
+     * Check a schedule search from outside: a day as a timestamp, a time of day, a tolerance.
+     *
+     * @param array $value
+     * @return array
+     * @throws invalid_parameter_exception
+     */
+    public function clean_composite_search(array $value): array {
+        $limits = ['date' => [0, PHP_INT_MAX], 'minute' => [0, schedule::DAY_MINUTES - 1],
+            'tolerance' => [1, self::TOLERANCE_WHOLE_DAY]];
+        foreach ($limits as $part => [$min, $max]) {
+            $number = $value[$part] ?? '';
+            if ($number === '' || $number === null) {
+                continue;
+            }
+            if (!is_numeric($number) || (int) $number != $number || $number < $min || $number > $max) {
+                throw new invalid_parameter_exception("Schedule search: '$part' is out of range");
+            }
+        }
+
+        return $value;
+    }
+
+    /**
+     * The day, time of day and tolerance of the app's inputs, each made sense of.
+     *
+     * @param array $inputs
+     * @param string $key
+     * @return array [int day timestamp or 0, int|null minute, int tolerance]
+     */
+    protected function search_inputs(array $inputs, string $key): array {
+        $date = customfilter_controls::day_to_timestamp($inputs["{$key}_date"] ?? '', false);
+        $minute = $inputs["{$key}_minute"] ?? '';
+        $minute = (is_numeric($minute) && array_key_exists((int) $minute, $this->times_menu())) ? (int) $minute : null;
+        $tolerance = $inputs["{$key}_tolerance"] ?? '';
+        $tolerance = (is_numeric($tolerance) && array_key_exists((int) $tolerance, renderer::tolerance_menu()))
+            ? (int) $tolerance : $this->get_match_tolerance();
+
+        return [$date, $minute, $tolerance];
     }
 
     /**

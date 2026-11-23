@@ -16,7 +16,12 @@
 
 namespace datalynxfield_itinerary;
 
+use core_text;
+use invalid_parameter_exception;
 use mod_datalynx\local\field\datalynxfield_base;
+use mod_datalynx\local\map\geocoder_factory;
+use mod_datalynx\local\map\place;
+use mod_datalynx\local\map\provider_config;
 use mod_datalynx\local\map\route_result;
 use mod_datalynx\local\ride\itinerary;
 use mod_datalynx\local\ride\matcher;
@@ -79,6 +84,18 @@ class field extends datalynxfield_base {
 
     /** @var int Waypoint limit used when the field has none configured. */
     const DEFAULT_MAX_WAYPOINTS = 10;
+
+    /** @var int[] The search radii offered, in kilometres. */
+    const SEARCH_RADII = [1, 2, 5, 10, 20, 50];
+
+    /** @var float Largest search radius accepted from outside, in kilometres. */
+    const MAX_SEARCH_RADIUS = 100;
+
+    /** @var int Longest address accepted in a search. */
+    const MAX_ADDRESS_LENGTH = 255;
+
+    /** @var array Addresses looked up in this request: "countries|address" => place or null. */
+    private static array $resolved = [];
 
     /**
      * The single submitted value: the waypoint array as JSON.
@@ -443,6 +460,176 @@ class field extends datalynxfield_base {
         $hasend = $search['fromlat'] !== null || $search['tolat'] !== null;
 
         return $hasend ? $search : false;
+    }
+
+    /**
+     * The route search from the app's inputs: {key}_from and {key}_to as addresses, {key}_radius.
+     *
+     * The addresses are looked up with the site's geocoder, the best match each. An end that is
+     * not found is left out, like an end without coordinates on the web; with neither end found
+     * there is no search.
+     *
+     * @param array $inputs
+     * @param string $key
+     * @return array|null
+     */
+    public function customfilter_value(array $inputs, string $key): ?array {
+        $value = [
+            'fromlat' => null, 'fromlng' => null, 'tolat' => null, 'tolng' => null,
+            'fromaddress' => '', 'toaddress' => '',
+            'radius' => $this->search_radius($inputs["{$key}_radius"] ?? ''),
+        ];
+        foreach (['from', 'to'] as $end) {
+            $text = self::search_text($inputs["{$key}_{$end}"] ?? '');
+            if ($text === '') {
+                continue;
+            }
+            $place = $this->resolve_address($text);
+            $value["{$end}address"] = $place ? $place->address : $text;
+            if ($place) {
+                $value["{$end}lat"] = $place->lat;
+                $value["{$end}lng"] = $place->lng;
+            }
+        }
+
+        return ($value['fromlat'] !== null || $value['tolat'] !== null) ? $value : null;
+    }
+
+    /**
+     * The route control: the addresses entered, the place each was matched to, the radius.
+     *
+     * @param array $inputs
+     * @param string $key
+     * @return array
+     */
+    public function customfilter_describe(array $inputs, string $key): array {
+        $radius = $this->search_radius($inputs["{$key}_radius"] ?? '');
+        $radii = self::SEARCH_RADII;
+        if (!in_array((int) $radius, $radii, true) && (float) (int) $radius === $radius) {
+            $radii[] = (int) $radius;
+            sort($radii);
+        }
+        $described = [
+            'fromname' => get_string('searchfrom', 'datalynxfield_itinerary'),
+            'toname' => get_string('searchto', 'datalynxfield_itinerary'),
+            'radiusname' => get_string('searchradius', 'datalynxfield_itinerary'),
+            'radius' => (string) $radius,
+            'radiusoptions' => array_map(fn(int $km): array => [
+                'value' => (string) $km,
+                'label' => get_string('radiuskm', 'datalynxfield_location', $km),
+                'selected' => (float) $km === $radius,
+            ], $radii),
+            'notes' => [],
+        ];
+        foreach (['from', 'to'] as $end) {
+            $text = self::search_text($inputs["{$key}_{$end}"] ?? '');
+            $described[$end] = $text;
+            $described["{$end}place"] = '';
+            if ($text === '') {
+                continue;
+            }
+            $place = $this->resolve_address($text);
+            if ($place) {
+                $described["{$end}place"] = get_string('searchmatched', 'datalynxfield_itinerary', $place->address);
+            } else {
+                $described['notes'][] = get_string('searchnotfound', 'datalynxfield_itinerary', $text);
+            }
+        }
+
+        return $described;
+    }
+
+    /**
+     * Check a route search from outside: coordinates in range, a sensible radius, short addresses.
+     *
+     * @param array $value
+     * @return array
+     * @throws invalid_parameter_exception
+     */
+    public function clean_composite_search(array $value): array {
+        foreach (['fromlat' => 90, 'fromlng' => 180, 'tolat' => 90, 'tolng' => 180] as $part => $limit) {
+            $coordinate = $value[$part] ?? '';
+            if ($coordinate === '' || $coordinate === null) {
+                continue;
+            }
+            if (!is_numeric($coordinate) || abs((float) $coordinate) > $limit) {
+                throw new invalid_parameter_exception("Route search: '$part' is not a coordinate");
+            }
+        }
+        $radius = $value['radius'] ?? '';
+        if ($radius !== '' && $radius !== null && (!is_numeric($radius) || $radius <= 0 || $radius > self::MAX_SEARCH_RADIUS)) {
+            throw new invalid_parameter_exception(
+                'Route search: the radius must be between 0 and ' . self::MAX_SEARCH_RADIUS . ' km'
+            );
+        }
+        foreach (['fromaddress', 'toaddress'] as $part) {
+            if (core_text::strlen((string) ($value[$part] ?? '')) > self::MAX_ADDRESS_LENGTH) {
+                throw new invalid_parameter_exception("Route search: '$part' is too long");
+            }
+        }
+
+        return $value;
+    }
+
+    /**
+     * Whether the route search can be offered outside the web: it needs the site's geocoder.
+     *
+     * @return bool
+     */
+    public function can_search_by_address(): bool {
+        return geocoder_factory::instance() !== null;
+    }
+
+    /**
+     * The best match of the site's geocoder for an address, looked up once per request.
+     *
+     * The geocoder caches its results across requests and keeps to the service's rate limit.
+     *
+     * @param string $address
+     * @return place|null
+     */
+    protected function resolve_address(string $address): ?place {
+        $countries = provider_config::clean_countries((string) ($this->field->param7 ?? ''))
+            ?: provider_config::geocoder_countries();
+        $memo = $countries . '|' . core_text::strtolower($address);
+        if (!array_key_exists($memo, self::$resolved)) {
+            $geocoder = geocoder_factory::instance();
+            $places = $geocoder ? $geocoder->search($address, ['countries' => $countries, 'limit' => 1]) : [];
+            self::$resolved[$memo] = $places ? reset($places) : null;
+        }
+
+        return self::$resolved[$memo];
+    }
+
+    /**
+     * Forget the addresses looked up in this request (tests switch geocoders).
+     *
+     * @return void
+     */
+    public static function reset_resolved_addresses(): void {
+        self::$resolved = [];
+    }
+
+    /**
+     * A radius from the inputs, the field's default when none or none that makes sense.
+     *
+     * @param mixed $radius
+     * @return float
+     */
+    protected function search_radius($radius): float {
+        $radius = is_numeric($radius) ? (float) $radius : 0.0;
+
+        return ($radius > 0 && $radius <= self::MAX_SEARCH_RADIUS) ? $radius : $this->get_match_radius();
+    }
+
+    /**
+     * An address as typed, trimmed and cut to the length a search accepts.
+     *
+     * @param mixed $text
+     * @return string
+     */
+    protected static function search_text($text): string {
+        return is_scalar($text) ? core_text::substr(trim((string) $text), 0, self::MAX_ADDRESS_LENGTH) : '';
     }
 
     /**

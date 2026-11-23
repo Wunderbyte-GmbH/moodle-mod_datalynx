@@ -152,6 +152,9 @@ final class entries_payload_builder {
             'customsearch' => (string) $request['criteria'],
             'customsort' => (string) $request['sort'],
         ], $this->dlx);
+        if (!empty($request['customfiltersearched'])) {
+            $options['customfilterapplied'] = true;
+        }
 
         $managerclass = self::MANAGERS[$record->type];
         /** @var view_manager $manager */
@@ -238,6 +241,8 @@ final class entries_payload_builder {
         if ($criteria['search'] !== '') {
             $request['search'] = $criteria['search'];
         }
+        // As on the web, a search replaces the view's filter; an empty form keeps it ("clear").
+        $request['customfiltersearched'] = $criteria['customsearch'] || $criteria['search'] !== '';
 
         $payload['customfilterid'] = $activeid;
         $payload['customfilterinputs'] = $inputs;
