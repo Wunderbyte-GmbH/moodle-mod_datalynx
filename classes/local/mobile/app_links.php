@@ -74,12 +74,14 @@ final class app_links {
     /**
      * The render options that make a view render its links through this object.
      *
-     * @return array linkrenderer and pagecontrols, see datalynxview_patterns::get_replacements()
+     * @return array linkrenderer, pagecontrols and app, see datalynxview_patterns::get_replacements()
      */
     public function render_options(): array {
         return [
             'linkrenderer' => fn(array $link): string => $this->placeholder($link),
             'pagecontrols' => false,
+            // Fields that draw on the web with JavaScript render their static form for the app.
+            'app' => true,
         ];
     }
 

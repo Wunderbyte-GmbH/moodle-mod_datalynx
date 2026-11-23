@@ -19,6 +19,7 @@ namespace datalynxfield_location;
 use html_writer;
 use mod_datalynx\local\field\datalynxfield_renderer;
 use mod_datalynx\local\map\geocoder_factory;
+use mod_datalynx\local\map\map_links;
 use mod_datalynx\local\map\provider_config;
 use MoodleQuickForm;
 use stdClass;
@@ -205,9 +206,18 @@ class renderer extends datalynxfield_renderer {
             );
         }
 
+        $hascoords = is_numeric($lat) && is_numeric($lng);
+
+        if (!empty($options['app'])) {
+            // No map in the app: the address and a link that opens directions in the maps app.
+            return $OUTPUT->render_from_template('mod_datalynx/field_location_app', [
+                'address' => $address,
+                'mapurl' => $hascoords ? map_links::directions_to((float) $lat, (float) $lng) : '',
+            ]);
+        }
+
         $this->require_js();
 
-        $hascoords = is_numeric($lat) && is_numeric($lng);
         $displaymode = $this->field->get('param6') ?: 'map_mini';
 
         $context = array_merge($this->get_tile_context(), [
@@ -221,6 +231,18 @@ class renderer extends datalynxfield_renderer {
         ]);
 
         return $OUTPUT->render_from_template('mod_datalynx/field_location_display', $context);
+    }
+
+    /**
+     * The address, as the one-line text of the field in the app.
+     *
+     * @param stdClass $entry
+     * @return string|null
+     */
+    public function get_app_text(stdClass $entry): ?string {
+        [$address] = $this->get_content($entry);
+
+        return $address !== '' ? $address : null;
     }
 
     /**

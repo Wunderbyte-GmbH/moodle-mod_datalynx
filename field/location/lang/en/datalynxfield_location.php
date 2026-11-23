@@ -53,6 +53,7 @@ $string['map_provider_help'] = 'Choose the provider for interactive maps and loc
 $string['maploadfailed'] = 'The map could not be loaded.';
 $string['no_location_selected'] = 'No location selected';
 $string['nosuggestions'] = 'No matching address found';
+$string['openinmaps'] = 'Directions';
 $string['pickerhint'] = 'Type an address and pick a suggestion, or click the map to drop the marker.';
 $string['pickerhintnogeocoder'] = 'No address lookup service is configured on this site, so the address is stored as you type it. Click the map to set the marker.';
 $string['pickerhintsearch'] = 'Type an address and press Enter or use the search button, then pick a suggestion. You can also click the map to drop the marker.';

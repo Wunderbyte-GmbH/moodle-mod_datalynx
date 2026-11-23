@@ -1,0 +1,70 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_datalynx/field_itinerary_app
+
+    Display of a datalynxfield_itinerary field in the Moodle App.
+
+    The app runs none of the plugin's JavaScript, so no map is drawn: the stops are listed and
+    a link opens the journey in the maps app of the device. The link carries the coordinates
+    the viewer may see (rounded when the field coarsens them); nothing else in this output
+    holds coordinates.
+
+    Context variables required for this template:
+    * waypoints - Ordered stops, each with address, isfirst, islast.
+    * approximate - Whether the coordinates in the link are rounded.
+    * lengthlabel - Human readable straight-line journey length.
+    * hasroute - Whether a routed distance and travel time are known.
+    * routelabel - Human readable road distance.
+    * traveltimelabel - Human readable travel time.
+    * mapurl - Link that opens the journey in a maps service.
+
+    Example context (json):
+    {
+        "waypoints": [
+            {"address": "Wien Hauptbahnhof", "isfirst": true, "islast": false},
+            {"address": "HLFS", "isfirst": false, "islast": true}
+        ],
+        "approximate": true,
+        "lengthlabel": "Approximately 145.2 km",
+        "hasroute": true,
+        "routelabel": "195.3 km by road",
+        "traveltimelabel": "Travel time approx. 2 h 10 min",
+        "mapurl": "https://www.openstreetmap.org/directions?engine=fossgis_osrm_car&route=48.19%2C16.38%3B47.07%2C15.42"
+    }
+}}
+<div class="datalynx-itinerary datalynx-itinerary--app">
+    <ol class="datalynx-itinerary__stops">
+        {{#waypoints}}
+            <li class="datalynx-itinerary__stop{{#isfirst}} datalynx-itinerary__stop--start{{/isfirst}}{{#islast}} datalynx-itinerary__stop--end{{/islast}}">
+                <span class="datalynx-itinerary__address">{{address}}</span>
+            </li>
+        {{/waypoints}}
+    </ol>
+    <p class="datalynx-itinerary__meta">
+        {{^hasroute}}{{lengthlabel}}{{/hasroute}}
+        {{#hasroute}}{{routelabel}} · {{traveltimelabel}}{{/hasroute}}
+        {{#approximate}} · {{#str}}precision_approximate, datalynxfield_itinerary{{/str}}{{/approximate}}
+    </p>
+    {{#mapurl}}
+        <p class="datalynx-itinerary__maplink">
+            <a href="{{mapurl}}" class="btn btn-outline-primary btn-sm" target="_blank" rel="noreferrer noopener">
+                {{#str}}openinmaps, datalynxfield_itinerary{{/str}}
+            </a>
+        </p>
+    {{/mapurl}}
+</div>

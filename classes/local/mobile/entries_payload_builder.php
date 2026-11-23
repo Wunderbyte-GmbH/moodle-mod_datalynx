@@ -465,11 +465,13 @@ final class entries_payload_builder {
     private function build_field_values(view_manager $manager, array $fields, stdClass $entry): array {
         $values = [];
         foreach ($fields as $field) {
-            $html = html_sanitiser::for_app($manager->render_field($field, $entry));
+            $html = html_sanitiser::for_app($manager->render_field($field, $entry, null, ['app' => true]));
             $text = trim(html_to_text($html, 0, false));
             if ($text === '' && !str_contains($html, '<img')) {
                 continue;
             }
+            // Some fields have a better one-line text than their HTML gives (a journey, a place).
+            $text = $field->renderer()->get_app_text($entry) ?? $text;
             $values[] = [
                 'fieldid' => (int) $field->field->id,
                 'name' => format_string($field->field->name, true, ['context' => $this->dlx->context]),

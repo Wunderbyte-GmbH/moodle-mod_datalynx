@@ -53,6 +53,7 @@ $string['map_provider_help'] = 'Wähle den Anbieter für interaktive Karten und 
 $string['maploadfailed'] = 'Die Karte konnte nicht geladen werden.';
 $string['no_location_selected'] = 'Kein Standort ausgewählt';
 $string['nosuggestions'] = 'Keine passende Adresse gefunden';
+$string['openinmaps'] = 'Route dorthin';
 $string['pickerhint'] = 'Adresse eingeben und einen Vorschlag auswählen oder in die Karte klicken, um die Markierung zu setzen.';
 $string['pickerhintnogeocoder'] = 'Für diese Website ist kein Adresssuchdienst konfiguriert; die Adresse wird daher so gespeichert, wie sie eingegeben wird. Klicke in die Karte, um die Markierung zu setzen.';
 $string['pickerhintsearch'] = 'Adresse eingeben und Eingabetaste drücken oder die Suchschaltfläche verwenden, dann einen Vorschlag auswählen. Du kannst auch in die Karte klicken, um die Markierung zu setzen.';

@@ -19,6 +19,7 @@ namespace datalynxfield_itinerary;
 use html_writer;
 use mod_datalynx\local\field\datalynxfield_renderer;
 use mod_datalynx\local\map\geocoder_factory;
+use mod_datalynx\local\map\map_links;
 use mod_datalynx\local\map\provider_config;
 use mod_datalynx\local\map\router_factory;
 use mod_datalynx\local\ride\itinerary;
@@ -197,11 +198,16 @@ class renderer extends datalynxfield_renderer {
             );
         }
 
+        $exact = $this->viewer_sees_exact($entry);
+        $waypoints = $journey->export($exact);
+
+        if (!empty($options['app'])) {
+            return $this->render_app_mode($entry, $waypoints, $exact);
+        }
+
         $this->require_js();
 
-        $exact = $this->viewer_sees_exact($entry);
         $displaymode = $this->field->get('param3') ?: 'both';
-        $waypoints = $journey->export($exact);
 
         $context = array_merge($this->get_map_context(), [
             'fieldid' => $this->field->id(),
@@ -218,6 +224,62 @@ class renderer extends datalynxfield_renderer {
         ], $this->get_route_context($entry));
 
         return $OUTPUT->render_from_template('mod_datalynx/field_itinerary_display', $context);
+    }
+
+    /**
+     * The journey for the Moodle App: the stops, distance and travel time, and a link that opens
+     * it in the maps app. No map is drawn there, and no coordinates are put into the page except
+     * in that link, which carries only what the viewer may see.
+     *
+     * @param stdClass $entry
+     * @param array $waypoints the stops as the viewer may see them, see itinerary::export()
+     * @param bool $exact whether those are the exact positions
+     * @return string HTML
+     */
+    protected function render_app_mode(stdClass $entry, array $waypoints, bool $exact): string {
+        global $OUTPUT;
+
+        $points = array_map(fn(array $stop): array => [$stop['lat'], $stop['lng']], $waypoints);
+        $context = array_merge([
+            'waypoints' => $waypoints,
+            'approximate' => !$exact,
+            'lengthlabel' => get_string(
+                'journeylength',
+                'datalynxfield_itinerary',
+                format_float($this->field->get_itinerary($entry)->length_km(), 1)
+            ),
+            'mapurl' => map_links::directions($points),
+        ], $this->get_route_context($entry));
+        unset($context['polyline']);
+
+        return $OUTPUT->render_from_template('mod_datalynx/field_itinerary_app', $context);
+    }
+
+    /**
+     * The journey as one line: "Wien → Wiener Neustadt → Graz (196 km, 2 h 5 min)".
+     *
+     * @param stdClass $entry
+     * @return string|null
+     */
+    public function get_app_text(stdClass $entry): ?string {
+        $journey = $this->field->get_itinerary($entry);
+        if (!$journey->is_route()) {
+            return null;
+        }
+        $stops = implode(' → ', array_map(fn($waypoint): string => $waypoint->address, $journey->waypoints()));
+        $route = $this->field->get_route($entry);
+        if ($route === null) {
+            return get_string('apptextunrouted', 'datalynxfield_itinerary', (object) [
+                'stops' => $stops,
+                'distance' => format_float($journey->length_km(), 0),
+            ]);
+        }
+
+        return get_string('apptext', 'datalynxfield_itinerary', (object) [
+            'stops' => $stops,
+            'distance' => format_float($route->distance_km(), 0),
+            'duration' => self::format_duration($route->duration_minutes()),
+        ]);
     }
 
     /**

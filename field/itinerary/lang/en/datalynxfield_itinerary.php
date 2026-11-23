@@ -26,6 +26,8 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['activeservices'] = 'Map services in use';
 $string['addwaypoint'] = 'Add a stop';
+$string['apptext'] = '{$a->stops} ({$a->distance} km, {$a->duration})';
+$string['apptextunrouted'] = '{$a->stops} (approx. {$a->distance} km)';
 $string['default_zoom'] = 'Default zoom level';
 $string['display_both'] = 'Map and list of stops';
 $string['display_format'] = 'Display format';
@@ -46,6 +48,7 @@ $string['movedown'] = 'Move this stop later';
 $string['moveup'] = 'Move this stop earlier';
 $string['needtworoutepoints'] = 'Please give at least a start and a destination.';
 $string['nowaypoints'] = 'No journey entered';
+$string['openinmaps'] = 'Open route in maps';
 $string['pluginname'] = 'Itinerary (route with stops)';
 $string['precision'] = 'Location precision for others';
 $string['precision_approximate'] = 'Approximate until matched';

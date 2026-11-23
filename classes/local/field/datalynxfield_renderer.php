@@ -451,8 +451,24 @@ abstract class datalynxfield_renderer {
     }
 
     /**
+     * A one-line text of the field's value for the Moodle App (entry titles, field lists).
+     *
+     * Null lets the app use the text of the rendered HTML, which suits most fields. A field whose
+     * display is more than its value (a map, a list with links) returns its own summary.
+     *
+     * @param stdClass $entry
+     * @return string|null
+     */
+    public function get_app_text(stdClass $entry): ?string {
+        return null;
+    }
+
+    /**
      * TODO: make abstract once all field types have been updated
      * Outputs the HTML representation of the field and its value
+     *
+     * With the option "app" the HTML is for the Moodle App, which runs none of the plugin's
+     * JavaScript: fields that draw something client side render a static form there.
      *
      * @param stdClass $entry object containing the entry data being rendered
      * @param array $options rendering options

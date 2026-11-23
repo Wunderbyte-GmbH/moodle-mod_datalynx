@@ -26,6 +26,8 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['activeservices'] = 'Verwendete Kartendienste';
 $string['addwaypoint'] = 'Station hinzufügen';
+$string['apptext'] = '{$a->stops} ({$a->distance} km, {$a->duration})';
+$string['apptextunrouted'] = '{$a->stops} (rund {$a->distance} km)';
 $string['default_zoom'] = 'Standard-Zoomstufe';
 $string['display_both'] = 'Karte und Liste der Stationen';
 $string['display_format'] = 'Anzeigeformat';
@@ -46,6 +48,7 @@ $string['movedown'] = 'Diese Station nach hinten verschieben';
 $string['moveup'] = 'Diese Station nach vorne verschieben';
 $string['needtworoutepoints'] = 'Bitte mindestens einen Start und ein Ziel angeben.';
 $string['nowaypoints'] = 'Keine Fahrt eingetragen';
+$string['openinmaps'] = 'Route in Karten öffnen';
 $string['pluginname'] = 'Route (Fahrt mit Stationen)';
 $string['precision'] = 'Ortsgenauigkeit für andere';
 $string['precision_approximate'] = 'Ungefähr, bis ein Treffer bestätigt ist';

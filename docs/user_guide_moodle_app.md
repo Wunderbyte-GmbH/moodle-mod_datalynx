@@ -78,6 +78,13 @@ Layout is adapted to a narrow screen:
 - Images and videos are never wider than the screen.
 - Links styled as buttons appear as plain links.
 
+**Maps** are not drawn in the app. An **Itinerary** field lists its stops with the road distance
+and travel time, and a link opens the route in the phone's maps app: Google Maps when the site
+routes or looks up addresses with Google, OpenStreetMap otherwise (which routes from the first to
+the last stop only). A **Location** field shows its address with a link for directions to it.
+When the itinerary field rounds positions for others, the link carries the rounded positions too;
+the stop names are shown as entered.
+
 A **Tabular** view is not drawn as a table in the app. Its entries are listed one below the other,
 with the name of each field above its value.
 
