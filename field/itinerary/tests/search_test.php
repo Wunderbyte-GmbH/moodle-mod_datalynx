@@ -312,7 +312,7 @@ final class search_test extends advanced_testcase {
         $filter = $this->dlx->get_filter_manager()
             ->get_filter_from_customfilterform($filter, $formdata, $customfilter);
 
-        $searchfields = unserialize($filter->customsearch);
+        $searchfields = \mod_datalynx\local\serialized::to_array($filter->customsearch);
         $this->assertCount(1, $searchfields[$fieldid]['AND'], 'The six elements must yield one criterion.');
         $this->assertSame('', $searchfields[$fieldid]['AND'][0][1], 'The corridor search takes no operator.');
         $this->assertEquals(5, $searchfields[$fieldid]['AND'][0][2]['radius']);

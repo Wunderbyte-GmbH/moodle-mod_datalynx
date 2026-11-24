@@ -21,6 +21,7 @@
  * @copyright 2026 Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'datalynxrule_updatefield';

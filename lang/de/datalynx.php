@@ -21,6 +21,7 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
  */
+
 $string['action'] = 'Aktion';
 $string['actionnotallowed'] = 'Sie dürfen diese Aktion in dieser Ansicht nicht ausführen.';
 $string['actions'] = 'Aktionen nach Hinzufügen eines Eintrags';

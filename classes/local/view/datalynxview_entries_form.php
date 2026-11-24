@@ -22,6 +22,7 @@
  */
 
 namespace mod_datalynx\local\view;
+
 use mod_datalynx\local\entry\entry_submission_service;
 use moodleform;
 

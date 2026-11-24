@@ -22,6 +22,7 @@
  * @copyright based on the work  by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 $string['displaydimensions'] = 'Display dimensions (width x height)';
 $string['maxdimensions'] = 'Max dimensions (width x height)px';
 $string['pluginname'] = 'Media files';

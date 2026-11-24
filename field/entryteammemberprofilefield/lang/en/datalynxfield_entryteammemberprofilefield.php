@@ -22,6 +22,7 @@
  * @copyright based on the work  by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 $string['literalvalue'] = 'literal value:';
 $string['myprofilefield'] = 'equal to the value in my profile';
 $string['pluginname'] = 'Entryteammemberprofilefield';

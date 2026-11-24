@@ -21,6 +21,7 @@
  * @copyright 2026 David Bogner
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 $string['mode'] = 'Vorhandene Teammitglieder';
 $string['mode_help'] = 'Wie mit bereits im Teammitglieder-Feld vorhandenen Mitgliedern umgegangen wird, wenn die Regel ausgeführt wird.
 

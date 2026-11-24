@@ -38,6 +38,7 @@ use mod_datalynx\local\definition_cache;
 use mod_datalynx\local\filter\datalynx_filter;
 use mod_datalynx\local\filter\datalynx_filter_manager;
 use mod_datalynx\local\filter\search_criteria;
+use mod_datalynx\local\serialized;
 use moodle_exception;
 use moodle_url;
 use moodleform;
@@ -358,7 +359,7 @@ abstract class base {
             $this->navigationurl->param('cfilter', $cfilter);
         }
         if (!empty($this->filter->customsearch)) {
-            $searchfields = unserialize($this->filter->customsearch);
+            $searchfields = serialized::to_array($this->filter->customsearch);
             $usearch = datalynx_filter_manager::get_search_url_query($searchfields);
             if ($usearch !== null) {
                 // Decode get_search_url_query urlencoded string because it is encoded again with ->param().
@@ -412,11 +413,13 @@ abstract class base {
      */
     protected function set__editors($data = null): void {
         $text = '';
-        foreach ($this->editors as $editor) { // New view or from DB so add editor fields.
+        foreach ($this->editors as $editor) {
+            // New view or from DB so add editor fields.
             if (is_null($data)) {
                 if (!empty($this->view->$editor)) {
                     $editordata = $this->view->$editor;
-                    if (strpos($editordata, 'ft:') === 0) { // Legacy support.
+                    if (strpos($editordata, 'ft:') === 0) {
+                        // Legacy support.
                         $text = substr($editordata, 11);
                     } else {
                         $text = $editordata;
@@ -427,7 +430,8 @@ abstract class base {
                 // Also normalize the source property so the immediately-following
                 // set__patterns() scan (which reads $this->view->$editor) sees clean tags.
                 $this->view->$editor = $text;
-            } else { // View from form or editor areas updated.
+            } else {
+                // View from form or editor areas updated.
                 $this->view->$editor = null;
                 if (isset($data->{"e{$editor}"})) {
                     $text = isset($data->{"e{$editor}"}) ? $data->{"e{$editor}"} : '';
@@ -631,7 +635,7 @@ abstract class base {
         // Append custom sort options.
         if ($csort) {
             if (is_string($csort)) {
-                $csort = unserialize($csort);
+                $csort = serialized::to_array($csort);
             }
             $this->filter->append_sort_options($csort);
         }
@@ -1275,17 +1279,13 @@ abstract class base {
             $args['eids'] = is_array($this->filter->eids) ? implode(',', $this->filter->eids) : (string) $this->filter->eids;
         }
         if (!empty($this->filter->customsort)) {
-            $customsort = is_array($this->filter->customsort)
-                ? $this->filter->customsort
-                : (unserialize($this->filter->customsort, ['allowed_classes' => false]) ?: []);
+            $customsort = serialized::to_array($this->filter->customsort);
             if ($customsort = search_criteria::accepted_sort($customsort, $this->dlx)) {
                 $args['customsort'] = search_criteria::encode($customsort);
             }
         }
         if (!empty($this->filter->customsearch)) {
-            $customsearch = is_array($this->filter->customsearch)
-                ? $this->filter->customsearch
-                : (unserialize($this->filter->customsearch, ['allowed_classes' => false]) ?: []);
+            $customsearch = serialized::to_array($this->filter->customsearch);
             if ($customsearch = search_criteria::accepted_search($customsearch, $this->dlx)) {
                 $args['customsearch'] = search_criteria::encode($customsearch);
             }
@@ -1367,10 +1367,12 @@ abstract class base {
     protected function display_no_entries(): string {
         global $OUTPUT, $DB;
 
-        if ($this->view->filter > 0) { // This view has a forced filter set.
+        if ($this->view->filter > 0) {
+            // This view has a forced filter set.
             $output = $OUTPUT->notification(get_string('noentries', 'datalynx'));
         } else {
-            if ($this->filter->id || $this->filter->search) { // This view has a user filter set.
+            if ($this->filter->id || $this->filter->search) {
+                // This view has a user filter set.
                 $output = $OUTPUT->notification(get_string('nomatchingentries', 'datalynx'));
                 $url = new moodle_url($this->baseurl, ['filter' => 0, 'usersearch' => 0]);
                 $output .= str_replace(
@@ -1379,7 +1381,8 @@ abstract class base {
                     $OUTPUT->continue_button($url)
                 );
             } else {
-                if ($this->filter->eids) { // This view displays only entries with chosen ids.
+                if ($this->filter->eids) {
+                    // This view displays only entries with chosen ids.
                     [$insql, $params] = $DB->get_in_or_equal($this->filter->eids, SQL_PARAMS_NAMED);
                     if (!$DB->record_exists_select('datalynx_entries', "id $insql", $params)) {
                         $output = $OUTPUT->notification(get_string('nosuchentries', 'datalynx')) .
@@ -1388,7 +1391,8 @@ abstract class base {
                         $output = $OUTPUT->notification(get_string('nopermission', 'datalynx')) .
                             $OUTPUT->continue_button($this->dlx->get_baseurl());
                     }
-                } else { // There are no entries in this datalynx.
+                } else {
+                    // There are no entries in this datalynx.
                     $output = $OUTPUT->notification(get_string('noentries', 'datalynx'));
                 }
             }
@@ -1864,7 +1868,8 @@ abstract class base {
                 }
             }
             // Get the files from the entries.
-            if ($this->entries && !empty($fids)) { // Set_content must have been called.
+            if ($this->entries && !empty($fids)) {
+                // Set_content must have been called.
                 $files = array_merge($files, $this->entries->get_embedded_files($fids));
             }
         }
@@ -2025,7 +2030,7 @@ abstract class base {
         $sortdir = 0;
         $sortfields = [];
         if ($this->filter->customsort) {
-            $sortfields = unserialize($this->filter->customsort);
+            $sortfields = serialized::to_array($this->filter->customsort);
             if (in_array($fieldid, array_keys($sortfields))) {
                 $sortdir = $sortfields[$fieldid];
                 unset($sortfields[$fieldid]);
@@ -2054,7 +2059,7 @@ abstract class base {
 
         $searchfields = [];
         if ($this->filter->customsearch) {
-            $searchfields = unserialize($this->filter->customsearch);
+            $searchfields = serialized::to_array($this->filter->customsearch);
         }
 
         $this->filter->customsearch = serialize($searchfields);

@@ -22,7 +22,9 @@
  * @copyright based on the work  by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace datalynxfield_picture;
+
 use datalynxfield_file\renderer as FileRenderer;
 use html_writer;
 use moodle_url;

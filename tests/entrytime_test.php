@@ -24,7 +24,6 @@
 
 namespace mod_datalynx;
 
-
 use advanced_testcase;
 use datalynxfield_status\field as datalynxfield_status;
 use mod_datalynx\local\datalynx_entries;

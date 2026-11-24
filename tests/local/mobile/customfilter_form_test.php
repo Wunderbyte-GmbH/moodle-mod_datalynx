@@ -161,8 +161,8 @@ final class customfilter_form_test extends advanced_testcase {
 
         $this->assertSame('a', $app['search']);
         $this->assertSame($web->search, $app['search']);
-        $this->assertEquals(unserialize($web->customsearch), $app['customsearch']);
-        $this->assertEquals(unserialize($web->customsort), $app['customsort']);
+        $this->assertEquals(\mod_datalynx\local\serialized::to_array($web->customsearch), $app['customsearch']);
+        $this->assertEquals(\mod_datalynx\local\serialized::to_array($web->customsort), $app['customsort']);
     }
 
     /**

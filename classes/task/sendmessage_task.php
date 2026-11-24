@@ -24,6 +24,8 @@
 
 namespace mod_datalynx\task;
 
+use mod_datalynx\local\serialized;
+
 /**
  * Adhock class, used to send notifications to users.
  *
@@ -37,8 +39,12 @@ class sendmessage_task extends \core\task\adhoc_task {
      * Send out messages.
      */
     public function execute() {
-        $data = unserialize(base64_decode($this->get_custom_data_as_string()));
-        foreach ($data as $message) {
+        // The queue keeps the serialized messages (the format of tasks queued before an upgrade).
+        $data = serialized::decode(
+            base64_decode($this->get_custom_data_as_string()),
+            [\core\message\message::class]
+        );
+        foreach (is_array($data) ? $data : [] as $message) {
             mtrace("Sending message to the user with id " . $message->userto->id);
             message_send($message);
             mtrace("Sent.");

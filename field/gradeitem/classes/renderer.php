@@ -21,6 +21,7 @@
  * @copyright 2014 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace datalynxfield_gradeitem;
 
 use mod_datalynx\local\field\datalynxfield_renderer;

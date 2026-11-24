@@ -22,6 +22,7 @@
  * @copyright based on the work  by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace datalynxfield_entrygroup;
 
 use mod_datalynx\local\field\datalynxfield_renderer;
@@ -66,7 +67,8 @@ class renderer extends datalynxfield_renderer {
 
         // Set the group object.
         $group = new stdClass();
-        if ($entry->id < 0) { // New record.
+        if ($entry->id < 0) {
+            // New record.
             $entry->groupid = $field->dlx()->currentgroup;
             $group->id = $entry->groupid;
             $group->name = null;

@@ -270,7 +270,8 @@ class datalynxfield_option_multiple extends datalynxfield_option {
                         $sqlfind = " (" . implode(" AND ", $conditions) . ") ";
 
                         $sql = ' 1 ';
-                        if ($eids = $this->get_entry_ids_for_content($sqlfind, $params)) { // There are.
+                        if ($eids = $this->get_entry_ids_for_content($sqlfind, $params)) {
+                            // There are.
                             // Non-empty.
                             // Contents.
                             [$contentids, $paramsnot] = $DB->get_in_or_equal(
@@ -286,11 +287,13 @@ class datalynxfield_option_multiple extends datalynxfield_option {
                         $sql = " (" . implode(" AND ", $conditions) . ") ";
                     }
                 } else {
-                    if ($operator === '') { // EMPTY.
+                    if ($operator === '') {
+                        // EMPTY.
                         $usecontent = false;
                         [$sqlnot, $params] = $this->get_has_value_sql(false, "df_{$fieldid}_e_");
 
-                        if ($eids = $this->get_entry_ids_for_content($sqlnot, $params)) { // There are non-empty.
+                        if ($eids = $this->get_entry_ids_for_content($sqlnot, $params)) {
+                            // There are non-empty.
                             // Contents.
                             [$contentids, $paramsnot] = $DB->get_in_or_equal(
                                 $eids,
@@ -300,7 +303,8 @@ class datalynxfield_option_multiple extends datalynxfield_option {
                             );
                             $params = array_merge($params, $paramsnot);
                             $sql = " (e.id $contentids) ";
-                        } else { // There are no non-empty contents.
+                        } else {
+                            // There are no non-empty contents.
                             if ($not) {
                                 $sql = " 1 = 0 ";
                             } else {
@@ -357,7 +361,8 @@ class datalynxfield_option_multiple extends datalynxfield_option {
      * @return int
      */
     public function get_argument_count(string $operator): int {
-        if ($operator === "") { // Empty operator requires no argument.
+        if ($operator === "") {
+            // Empty operator requires no argument.
             return 0;
         } else {
             return 1;

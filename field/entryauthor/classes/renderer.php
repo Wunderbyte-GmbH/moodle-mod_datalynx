@@ -151,7 +151,8 @@ class renderer extends datalynxfield_renderer {
      */
     public function display_edit(&$mform, $entry, ?array $options = null): void {
         global $USER;
-        if ($entry->id < 0) { // New entry.
+        if ($entry->id < 0) {
+            // New entry.
             $entry->firstname = $USER->firstname;
             $entry->lastname = $USER->lastname;
             $entry->email = $USER->email;
@@ -205,7 +206,8 @@ class renderer extends datalynxfield_renderer {
     public function display_name($entry): string {
         global $USER, $DB;
 
-        if ($entry->id < 0) { // New entry.
+        if ($entry->id < 0) {
+            // New entry.
             $entry->firstname = $USER->firstname;
             $entry->lastname = $USER->lastname;
             $entry->userid = $USER->id;
@@ -231,7 +233,8 @@ class renderer extends datalynxfield_renderer {
     public function display_namewithpicture($entry): string {
         global $OUTPUT, $USER, $DB;
 
-        if ($entry->id < 0) { // New entry.
+        if ($entry->id < 0) {
+            // New entry.
             $user = $USER;
         } else {
             $user = $DB->get_record('user', ['id' => $entry->userid]);
@@ -255,7 +258,8 @@ class renderer extends datalynxfield_renderer {
     public function display_firstname($entry): ?string {
         global $USER;
 
-        if ($entry->id < 0) { // New entry.
+        if ($entry->id < 0) {
+            // New entry.
             return $USER->firstname;
         } else {
             return $entry->firstname;
@@ -271,7 +275,8 @@ class renderer extends datalynxfield_renderer {
     public function display_lastname($entry): ?string {
         global $USER;
 
-        if ($entry->id < 0) { // New entry.
+        if ($entry->id < 0) {
+            // New entry.
             return $USER->lastname;
         } else {
             return $entry->lastname;
@@ -287,7 +292,8 @@ class renderer extends datalynxfield_renderer {
     public function display_username($entry): ?string {
         global $USER;
 
-        if ($entry->id < 0) { // New entry.
+        if ($entry->id < 0) {
+            // New entry.
             return $USER->username;
         } else {
             return $entry->username;
@@ -303,7 +309,8 @@ class renderer extends datalynxfield_renderer {
     public function display_id($entry): int|string {
         global $USER;
 
-        if ($entry->id < 0) { // New entry.
+        if ($entry->id < 0) {
+            // New entry.
             return $USER->id;
         } else {
             return $entry->userid;
@@ -319,7 +326,8 @@ class renderer extends datalynxfield_renderer {
     public function display_idnumber($entry): ?string {
         global $USER;
 
-        if ($entry->id < 0) { // New entry.
+        if ($entry->id < 0) {
+            // New entry.
             return $USER->idnumber;
         } else {
             return $entry->idnumber;
@@ -337,7 +345,8 @@ class renderer extends datalynxfield_renderer {
     public function display_picture($entry, $large = false): string {
         global $OUTPUT, $USER;
 
-        if ($entry->id < 0) { // New entry.
+        if ($entry->id < 0) {
+            // New entry.
             $user = $USER;
         } else {
             $user = new stdClass();
@@ -368,7 +377,8 @@ class renderer extends datalynxfield_renderer {
     public function display_email($entry): ?string {
         global $USER;
 
-        if ($entry->id < 0) { // New entry.
+        if ($entry->id < 0) {
+            // New entry.
             return $USER->email;
         } else {
             return $entry->email;
@@ -384,7 +394,8 @@ class renderer extends datalynxfield_renderer {
     public function display_institution($entry): ?string {
         global $USER;
 
-        if ($entry->id < 0) { // New entry.
+        if ($entry->id < 0) {
+            // New entry.
             return $USER->institution;
         } else {
             return $entry->institution;
@@ -400,7 +411,8 @@ class renderer extends datalynxfield_renderer {
     public function display_department($entry): ?string {
         global $USER;
 
-        if ($entry->id < 0) { // New entry.
+        if ($entry->id < 0) {
+            // New entry.
             return $USER->department;
         } else {
             return $entry->department;
@@ -417,7 +429,8 @@ class renderer extends datalynxfield_renderer {
     public function display_badges($entry): string {
         global $USER, $PAGE;
 
-        if ($entry->id < 0) { // New entry.
+        if ($entry->id < 0) {
+            // New entry.
             $userid = $USER->id;
         } else {
             $userid = $entry->userid;

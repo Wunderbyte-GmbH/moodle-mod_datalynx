@@ -154,6 +154,42 @@ final class backup_version_restore_test extends advanced_testcase {
     }
 
     /**
+     * The values stored serialized (filter sort and search, behaviour permissions) come through a
+     * backup and restore in the same format, with the field ids mapped to the restored fields.
+     */
+    public function test_serialized_values_are_restored(): void {
+        global $DB;
+
+        $fieldid = (int) $DB->get_field('datalynx_fields', 'id', ['dataid' => $this->dlx->id(), 'name' => 'mytime']);
+        $search = ['AND' => [['', '>', 5], ['NOT', 'ANY_OF', [1, 2]]]];
+        $DB->insert_record('datalynx_filters', (object) [
+            'dataid' => $this->dlx->id(), 'name' => 'Stored', 'description' => '', 'visible' => 1,
+            'perpage' => 0, 'selection' => 0, 'groupby' => '', 'search' => '',
+            'customsort' => serialize([$fieldid => 1, 'timecreated' => 0]),
+            'customsearch' => serialize([$fieldid => $search, 'approve' => ['OR' => [['', '', 1]]]]),
+        ]);
+        $visibleto = ['permissions' => [1, 2], 'users' => [], 'teammember' => []];
+        $DB->insert_record('datalynx_behaviors', (object) [
+            'dataid' => $this->dlx->id(), 'name' => 'Stored', 'description' => '',
+            'visibleto' => serialize($visibleto), 'editableby' => serialize([1]), 'required' => 0,
+        ]);
+
+        $dataid = $this->backup_and_restore();
+
+        $newfieldid = (int) $DB->get_field('datalynx_fields', 'id', ['dataid' => $dataid, 'name' => 'mytime']);
+        $this->assertNotSame($fieldid, $newfieldid);
+        $filter = $DB->get_record('datalynx_filters', ['dataid' => $dataid, 'name' => 'Stored'], '*', MUST_EXIST);
+        $this->assertSame(serialize([$newfieldid => 1, 'timecreated' => 0]), $filter->customsort);
+        $this->assertSame(
+            serialize([$newfieldid => $search, 'approve' => ['OR' => [['', '', 1]]]]),
+            $filter->customsearch
+        );
+        $behavior = $DB->get_record('datalynx_behaviors', ['dataid' => $dataid, 'name' => 'Stored'], '*', MUST_EXIST);
+        $this->assertSame(serialize($visibleto), $behavior->visibleto);
+        $this->assertSame(serialize([1]), $behavior->editableby);
+    }
+
+    /**
      * Back up the activity, optionally change its datalynx.xml, and restore it into a new course.
      *
      * @param callable|null $editxml changes the backup's datalynx.xml

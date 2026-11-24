@@ -22,5 +22,6 @@
  * @copyright based on the work  by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 $string['pluginname'] = 'Datalynx Approve Field';
 $string['privacy:metadata'] = 'The approve field stores no data of its own. The approval state is part of the entry, which mod_datalynx exports and deletes.';

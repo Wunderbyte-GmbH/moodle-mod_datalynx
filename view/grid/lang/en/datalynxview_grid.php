@@ -21,6 +21,7 @@
  * @copyright Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 $string['cols'] = 'Number of columns';
 $string['customwrapperclass'] = 'Custom entry wrapper CSS classes';
 $string['customwrapperclass_help'] = 'Enter custom CSS classes separated by spaces.';

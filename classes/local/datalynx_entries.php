@@ -203,7 +203,8 @@ class datalynx_entries {
 
         // USER filtering.
         $whereuser = '';
-        if (isset($optionsfilterusers)) { // Datalynxview_field goes first.
+        if (isset($optionsfilterusers)) {
+            // Datalynxview_field goes first.
             $whereuser = " AND e.userid = :{$this->sqlparams($params, 'userid', $optionsfilterusers)} ";
         } else {
             if (!$dlx->user_can_view_all_entries()) {
@@ -231,7 +232,8 @@ class datalynx_entries {
         // GROUP filtering.
         $wheregroup = '';
 
-        if (isset($optionsfiltergroups)) { // Datalynxview_field goes first.
+        if (isset($optionsfiltergroups)) {
+            // Datalynxview_field goes first.
             $wheregroup = " AND e.groupid = :{$this->sqlparams($params, 'groupid', $optionsfiltergroups)} ";
         } else {
             if ($dlx->currentgroup) {
@@ -299,7 +301,8 @@ class datalynx_entries {
             }
         }
 
-        if (isset($optionseids)) { // Datalynxview_field's entry-ids as an additional filter.
+        if (isset($optionseids)) {
+            // Datalynxview_field's entry-ids as an additional filter.
             // (= all entries which match the searched value).
             $eids = explode(",", $optionseids);
             [$ineids, $eidparams] = $DB->get_in_or_equal($eids, SQL_PARAMS_NAMED, 'eid');
@@ -1446,7 +1449,8 @@ class datalynx_entries {
 
         // Update existing entry (only authenticated users).
         if ($entry->id > 0) {
-            if ($dlx->user_can_manage_entry($entry, $allowfinalfieldedit)) { // Just in case two forms are open.
+            if ($dlx->user_can_manage_entry($entry, $allowfinalfieldedit)) {
+                // Just in case two forms are open.
                 if (
                         !has_capability('mod/datalynx:approve', $dlx->context)
                         && ($dlx->data->approval == mod_datalynx\datalynx::APPROVAL_ON_UPDATE)

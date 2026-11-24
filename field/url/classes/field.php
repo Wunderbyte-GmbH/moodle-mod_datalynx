@@ -111,7 +111,8 @@ class field extends datalynxfield_base {
         $url = $linktext = null;
         if (!empty($values)) {
             foreach ($values as $name => $value) {
-                if ($name) { // Update from form.
+                if ($name) {
+                    // Update from form.
                     switch ($name) {
                         case 'url':
                             $url = clean_param(self::normalise_url((string) $value), PARAM_URL);
@@ -120,7 +121,8 @@ class field extends datalynxfield_base {
                             $linktext = clean_param($value, PARAM_NOTAGS);
                             break;
                     }
-                } else { // Update from import.
+                } else {
+                    // Update from import.
                     if (strpos($value, '##') !== false) {
                         $value = explode('##', $value);
                         $url = clean_param(self::normalise_url((string) $value[0]), PARAM_URL);

@@ -279,8 +279,8 @@ final class customfilter_search_test extends advanced_testcase {
         $criteria = (new customfilter_search($this->dlx, $this->customfilter))->criteria($this->view(), $values);
 
         $this->assertSame('a', $filter->search);
-        $this->assertEquals($criteria['customsearch'], unserialize($filter->customsearch));
-        $this->assertEquals($criteria['customsort'], unserialize($filter->customsort));
+        $this->assertEquals($criteria['customsearch'], \mod_datalynx\local\serialized::to_array($filter->customsearch));
+        $this->assertEquals($criteria['customsort'], \mod_datalynx\local\serialized::to_array($filter->customsort));
         $this->assertEqualsCanonicalizing(
             [$this->ids['Title'], $count, $when, $colour, $tags, 'approve', 'timecreated'],
             array_keys($criteria['customsearch'])

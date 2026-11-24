@@ -18,7 +18,6 @@ namespace datalynxfield_cancel;
 
 use mod_datalynx\local\field\datalynxfield_no_content;
 
-
 /**
  * Cancel field class for datalynx.
  *

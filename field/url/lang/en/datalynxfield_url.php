@@ -22,6 +22,7 @@
  * @copyright based on the work  by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 $string['applymediafilter'] = 'Apply media filter';
 $string['displaylinktext'] = 'Display input field for specifying a link text in edit mode.';
 $string['fieldformatoption'] = 'Display format';

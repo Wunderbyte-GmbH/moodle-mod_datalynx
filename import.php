@@ -98,13 +98,16 @@ if ($urlparams->vid && confirm_sesskey()) {
 }
 
 // View actions.
-if ($urlparams->duplicate && confirm_sesskey()) { // Duplicate any requested views.
+if ($urlparams->duplicate && confirm_sesskey()) {
+    // Duplicate any requested views.
     $dlx->process_views('duplicate', $urlparams->duplicate, true);
 } else {
-    if ($urlparams->reset && confirm_sesskey()) { // Reset to default any requested views.
+    if ($urlparams->reset && confirm_sesskey()) {
+        // Reset to default any requested views.
         $dlx->process_views('reset', $urlparams->reset, true);
     } else {
-        if ($urlparams->delete && confirm_sesskey()) { // Delete any requested views.
+        if ($urlparams->delete && confirm_sesskey()) {
+            // Delete any requested views.
             $dlx->process_views('delete', $urlparams->delete, true);
         }
     }

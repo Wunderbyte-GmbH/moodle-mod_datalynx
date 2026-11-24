@@ -21,6 +21,7 @@
  * @copyright 2026 David Bogner
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 $string['decimals'] = 'Nachkommastellen';
 $string['errorslidernovalues'] = 'Diese Konfiguration ergibt keine zwei auswählbaren Werte. Erweitern Sie den Bereich oder wählen Sie eine kleinere Schrittweite.';
 $string['errorsliderrange'] = 'Der Endwert muss größer als der Startwert sein.';

@@ -22,6 +22,7 @@
  * @copyright based on the work  by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 $string['fieldformatseparator'] = 'Value separator';
 $string['fieldformatseparator_help'] = 'Controls how the checked values are joined together when displayed in a view. For example, "Comma (with space)" renders: Apple, Banana, Cherry.';
 $string['fieldformatseparatorcomma'] = 'Comma';

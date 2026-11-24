@@ -16,6 +16,8 @@
 
 namespace mod_datalynx\local\filter;
 
+use mod_datalynx\local\serialized;
+
 /**
  * The stored form of the search and sort criteria of saved filters.
  *
@@ -110,8 +112,7 @@ class stored_criteria {
             if (empty($filter->$column) || !is_string($filter->$column)) {
                 continue;
             }
-            $criteria = @unserialize($filter->$column, ['allowed_classes' => false]);
-            $criteria = is_array($criteria) ? $criteria : [];
+            $criteria = serialized::to_array($filter->$column);
             $criteria = $kind === 'search'
                 ? self::normalise_search($criteria, $fieldtypes, $mapuserid)
                 : self::normalise_sort($criteria, $fieldtypes);

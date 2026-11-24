@@ -22,6 +22,7 @@
  * @copyright based on the work  by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 $string['fieldformat_desc'] = 'Controls display of entry timestamps. Specify the Date format below.';
 $string['fieldformatdateformat'] = 'Date format';
 $string['fieldformatdateformat_help'] = 'Enter a PHP strftime format string to control how the date/time is shown. Enter "timestamp" to output a raw Unix integer. Leave empty to use Moodle\'s default date-time format.';

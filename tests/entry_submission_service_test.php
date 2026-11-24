@@ -591,7 +591,7 @@ final class entry_submission_service_test extends advanced_testcase {
         $view = $DB->get_record('datalynx_views', ['id' => $viewid]);
         $this->assertSame('<div>##status##</div>', $view->param2);
         $this->assertSame('##status## ##entries##', $view->section);
-        $this->assertSame(['tpl' => 'x ##status## y'], unserialize($view->param5));
+        $this->assertSame(['tpl' => 'x ##status## y'], \mod_datalynx\local\serialized::to_array($view->param5));
         $this->assertNull($view->patterns);
     }
 }

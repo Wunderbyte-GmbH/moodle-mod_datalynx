@@ -21,6 +21,7 @@
  * @copyright 2014 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace datalynxfield_text;
 
 use mod_datalynx\local\field\datalynxfield_renderer;
@@ -96,7 +97,8 @@ class renderer extends datalynxfield_renderer {
                     => get_string('choose')] + $field->dlx->get_distinct_textfieldvalues_by_id($reffieldid);
         }
 
-        if ($autocomplete) {  // Render as autocomplete field if param9 is not empty.
+        if ($autocomplete) {
+            // Render as autocomplete field if param9 is not empty.
             $fieldattr['tags'] = true;
             $mform->addElement('autocomplete', $fieldname, null, $menu, $fieldattr);
         } else {
@@ -193,7 +195,8 @@ class renderer extends datalynxfield_renderer {
             $content = $entry->{"c{$fieldid}_content"};
 
             $format = FORMAT_PLAIN;
-            if ($field->get('param1') == '1') { // We are autolinking this field, so disable
+            if ($field->get('param1') == '1') {
+                // We are autolinking this field, so disable
                                                 // linking.
                                                 // Within us.
                 $nolinkstart = '<span class="nolink">';

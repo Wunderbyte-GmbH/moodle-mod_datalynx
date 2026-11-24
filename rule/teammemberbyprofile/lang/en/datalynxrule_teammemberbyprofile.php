@@ -21,6 +21,7 @@
  * @copyright 2026 David Bogner
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 $string['mode'] = 'Existing team members';
 $string['mode_help'] = 'How to treat members already present in the team member field when the rule runs.
 

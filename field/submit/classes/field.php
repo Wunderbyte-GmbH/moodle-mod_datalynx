@@ -18,7 +18,6 @@ namespace datalynxfield_submit;
 
 use mod_datalynx\local\field\datalynxfield_no_content;
 
-
 /**
  * Submit field class for datalynx.
  *

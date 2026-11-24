@@ -89,7 +89,8 @@ abstract class base {
         } else {
             if ($dlx instanceof datalynx) {
                 $this->dlx = $dlx;
-            } else { // Datalynx id/object.
+            } else {
+                // Datalynx id/object.
                 $this->dlx = new datalynx($dlx);
             }
         }
@@ -111,7 +112,8 @@ abstract class base {
             }
         }
 
-        if (empty($this->rule)) { // We need to define some default values.
+        if (empty($this->rule)) {
+            // We need to define some default values.
             $this->set_rule();
         }
     }

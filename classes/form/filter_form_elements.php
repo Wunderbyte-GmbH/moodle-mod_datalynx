@@ -16,6 +16,8 @@
 
 namespace mod_datalynx\form;
 
+use mod_datalynx\local\serialized;
+
 /**
  * Shared custom sort/search row builders for the datalynx filter forms.
  *
@@ -55,7 +57,7 @@ trait filter_form_elements {
 
         // Add current options.
         if ($customsort) {
-            $sortfields = unserialize($customsort);
+            $sortfields = serialized::to_array($customsort);
 
             foreach ($sortfields as $fieldid => $sortdir) {
                 if (empty($fields[$fieldid])) {
@@ -127,7 +129,7 @@ trait filter_form_elements {
         if ($customsearch) {
             // Accept either a serialized string (saved filters) or an already-decoded
             // array (e.g. JSON-stored rule conditions).
-            $searchfields = is_array($customsearch) ? $customsearch : unserialize($customsearch);
+            $searchfields = serialized::to_array($customsearch);
             // If not from form then the searchfields is aggregated and we need.
             // To flatten them. An aggregated array should have a non-zero key.
             // (fieldid) in the first element.

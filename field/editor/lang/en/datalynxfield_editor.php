@@ -22,6 +22,7 @@
  * @copyright based on the work  by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 $string['cols'] = 'Columns';
 $string['pluginname'] = 'Text area with editor';
 $string['privacy:metadata'] = 'Editor does not store personal data.';

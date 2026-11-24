@@ -24,6 +24,7 @@
  */
 
 namespace mod_datalynx\local\filter;
+
 use stdClass;
 
 /**

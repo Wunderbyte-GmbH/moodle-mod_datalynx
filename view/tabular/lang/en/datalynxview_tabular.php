@@ -22,6 +22,7 @@
  * @copyright based on the work  by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 $string['headerrow'] = 'Table with header row';
 $string['pluginname'] = 'Tabular';
 $string['privacy:metadata'] = 'The tabular view does not store personal data.';

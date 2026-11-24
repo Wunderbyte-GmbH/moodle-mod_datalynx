@@ -22,6 +22,7 @@
  * @copyright based on the work by 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 $string['pluginname'] = 'Download files of all entries';
 $string['pluginname_help'] = 'Downloads a zip-file with all files of all entries sorted by author lastname';
 $string['privacy:metadata'] = 'Download of files does not store personal data.';

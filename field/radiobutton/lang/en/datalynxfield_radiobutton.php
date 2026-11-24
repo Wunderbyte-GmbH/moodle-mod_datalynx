@@ -22,6 +22,7 @@
  * @copyright based on the work  by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 $string['fieldformatoption'] = 'Display format';
 $string['fieldformatoption_help'] = 'What is printed in views in place of the tag "[[fieldname:formatname]]".
 

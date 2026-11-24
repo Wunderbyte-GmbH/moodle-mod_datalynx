@@ -21,6 +21,7 @@
  * @copyright  2026 David Bogner
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 $string['allowedmodes'] = 'Allowed patterns';
 $string['anytime'] = 'any time';
 $string['arrival'] = 'Arrival';

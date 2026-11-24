@@ -110,11 +110,13 @@ class field extends datalynxfield_base {
         $groupid = 0;
         if (!empty($values)) {
             foreach ($values as $name => $value) {
-                if ($name) { // Update from form.
+                if ($name) {
+                    // Update from form.
                     if (!empty($value)) {
                         ${$name} = $value;
                     }
-                } else { // Update from import.
+                } else {
+                    // Update from import.
                     if (strpos($value, '##') !== false) {
                         $value = explode('##', $value);
                         $course = clean_param($value[0], PARAM_INT);

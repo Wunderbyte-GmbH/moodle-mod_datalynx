@@ -21,6 +21,7 @@
  * @copyright 2013 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 $string['pluginname'] = 'Team member select';
 $string['privacy:metadata'] = 'The team member select field stores no data of its own. The user IDs of the selected team members are part of the entry content, which mod_datalynx discovers, exports and removes.';
 $string['teammembersnotoffered'] = 'These users are no longer available for selection here, e.g. because they are no longer enrolled: {$a}. Saving the entry removes them from the team, and with it the access the team gives them.';

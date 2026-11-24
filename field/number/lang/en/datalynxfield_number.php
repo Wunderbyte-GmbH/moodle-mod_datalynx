@@ -22,6 +22,7 @@
  * @copyright based on the work  by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 $string['decimals'] = 'Decimals';
 $string['errorslidernovalues'] = 'This configuration does not produce at least two selectable values. Widen the range or choose a smaller step size.';
 $string['errorsliderrange'] = 'The end value must be greater than the start value.';

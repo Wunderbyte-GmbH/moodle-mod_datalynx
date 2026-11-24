@@ -21,6 +21,7 @@
  * @copyright 2024 onwards Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 $string['customsql'] = 'The SQL query for the report';
 $string['customsql_help'] = 'Write the SQL query for the report. You can use placeholders for fields.';
 $string['entriesovertime'] = 'Entries over time';

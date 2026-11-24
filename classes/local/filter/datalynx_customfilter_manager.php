@@ -24,6 +24,7 @@
  */
 
 namespace mod_datalynx\local\filter;
+
 use html_table;
 use html_writer;
 use mod_datalynx\form\datalynx_customfilter_backend_form;

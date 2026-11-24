@@ -138,8 +138,8 @@ final class stored_criteria_test extends advanced_testcase {
         $this->assertSame(1, stored_criteria::normalize_stored_filters($this->dlx->id()));
         $this->assertSame(0, stored_criteria::normalize_stored_filters($this->dlx->id()), 'idempotent');
         $filter = $DB->get_record('datalynx_filters', ['id' => $filterid]);
-        $this->assertSame($this->stored_criteria(), unserialize($filter->customsearch));
-        $this->assertSame([$this->textid => 0], unserialize($filter->customsort));
+        $this->assertSame($this->stored_criteria(), \mod_datalynx\local\serialized::to_array($filter->customsearch));
+        $this->assertSame([$this->textid => 0], \mod_datalynx\local\serialized::to_array($filter->customsort));
     }
 
     /**
@@ -157,7 +157,7 @@ final class stored_criteria_test extends advanced_testcase {
 
         $this->assertSame(
             $this->stored_criteria(),
-            unserialize($DB->get_field('datalynx_filters', 'customsearch', ['id' => $saved->id]))
+            \mod_datalynx\local\serialized::to_array($DB->get_field('datalynx_filters', 'customsearch', ['id' => $saved->id]))
         );
     }
 
@@ -236,7 +236,7 @@ final class stored_criteria_test extends advanced_testcase {
                 $newteamid => ['AND' => [['', 'USER', ''], ['', 'ANY_OF', [(int) $member->id]]]],
                 "entryteammemberprofilefield_{$newteamid}_department" => ['AND' => [['', 'MY_PROFILE_FIELD', '']]],
             ],
-            unserialize($DB->get_field('datalynx_filters', 'customsearch', ['dataid' => $newdataid]))
+            \mod_datalynx\local\serialized::to_array($DB->get_field('datalynx_filters', 'customsearch', ['dataid' => $newdataid]))
         );
     }
 

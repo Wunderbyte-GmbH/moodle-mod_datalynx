@@ -21,6 +21,7 @@
  * @copyright 2016 David Bogner
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace datalynxfield_tag;
 
 use core_tag_tag;

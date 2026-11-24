@@ -22,6 +22,7 @@
  * @copyright based on the work  by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 $string['bicswift'] = 'BIC/SWIFT';
 $string['errbicswift'] = 'Please enter a valid BIC/SWIFT code.';
 $string['erriban'] = 'Please enter a valid IBAN.';

@@ -22,6 +22,7 @@
  * @copyright based on the work by 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 $string['condition'] = 'The value the selected field has to have';
 $string['condition_help'] = 'The value the selected field has to meet in order to be true.
 For checkboxes the selected rows have to be entered in comma separated way: First row and third row will be: 1,3

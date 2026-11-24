@@ -151,7 +151,8 @@ class field extends datalynxfield_base {
                 // Assuming any of year, month, day, hour, minute is passed.
                 $enabled = $year = $month = $day = $hour = $minute = 0;
                 foreach ($values as $name => $val) {
-                    if (!empty($name)) { // The time unit.
+                    if (!empty($name)) {
+                        // The time unit.
                         ${$name} = $val;
                     }
                 }

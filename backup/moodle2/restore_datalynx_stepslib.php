@@ -84,11 +84,13 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
         $data->timeavailable = $this->apply_date_offset($data->timeavailable);
         $data->timedue = $this->apply_date_offset($data->timedue);
 
-        if ($data->grade < 0) { // Scale found, get mapping.
+        if ($data->grade < 0) {
+            // Scale found, get mapping.
             $data->grade = -($this->get_mappingid('scale', abs($data->grade)));
         }
 
-        if ($data->rating < 0) { // Scale found, get mapping.
+        if ($data->rating < 0) {
+            // Scale found, get mapping.
             $data->rating = -($this->get_mappingid('scale', abs($data->rating)));
         }
 
@@ -239,7 +241,7 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
 
         // Adjust customsort field ids.
         if ($data->customsort) {
-            $customsort = unserialize($data->customsort);
+            $customsort = \mod_datalynx\local\serialized::to_array($data->customsort);
             $sortfields = [];
             foreach ($customsort as $sortfield => $sortdir) {
                 if (is_numeric($sortfield) && $sortfield > 0) {
@@ -253,7 +255,7 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
 
         // Adjust customsearch field ids.
         if ($data->customsearch) {
-            $customsearch = unserialize($data->customsearch);
+            $customsearch = \mod_datalynx\local\serialized::to_array($data->customsearch);
             $searchfields = [];
             foreach ($customsearch as $searchfield => $options) {
                 if (is_numeric($searchfield) && $searchfield > 0) {
@@ -432,7 +434,7 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
             return $decoded;
         }
         // Fallback for backups created before the JSON migration.
-        $unserialized = @unserialize($value);
+        $unserialized = \mod_datalynx\local\serialized::decode($value);
         return is_array($unserialized) ? $unserialized : [];
     }
 
@@ -779,7 +781,8 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
         $data = (object) $data;
 
         $data->contextid = $this->task->get_contextid();
-        if ($data->scaleid < 0) { // Scale found, get mapping.
+        if ($data->scaleid < 0) {
+            // Scale found, get mapping.
             $data->scaleid = -($this->get_mappingid('scale', abs($data->scaleid)));
         }
         $data->rating = $data->value;
@@ -796,7 +799,8 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
      */
     protected function process_datalynx_tag($data) {
         $data = (object) $data;
-        if (!core_tag_tag::is_enabled('mod_datalynx', 'datalynx_contents')) { // Tags disabled in server, nothing to process.
+        if (!core_tag_tag::is_enabled('mod_datalynx', 'datalynx_contents')) {
+            // Tags disabled in server, nothing to process.
             return;
         }
         $tag = $data->rawname;

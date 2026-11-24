@@ -194,7 +194,7 @@ foreach ($behaviors as $behaviorid => $behavior) {
     }
 
     $permissionnames = $dlx->get_datalynx_permission_names();
-    $visibleto = unserialize($behavior->visibleto);
+    $visibleto = \mod_datalynx\local\serialized::to_array($behavior->visibleto);
 
     $fieldvisible = '';
     foreach ($permissionnames as $permissionid => $permissionname) {
@@ -207,7 +207,7 @@ foreach ($behaviors as $behaviorid => $behavior) {
         );
     }
 
-    $editableby = unserialize($behavior->editableby);
+    $editableby = \mod_datalynx\local\serialized::to_array($behavior->editableby);
     $fieldeditable = '';
     foreach ($permissionnames as $permissionid => $permissionname) {
         $fieldeditable .= $renderbehaviortoggle(

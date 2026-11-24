@@ -29,6 +29,7 @@ use datalynxfield_select\field as datalynxfield_select;
 use datalynxfield_teammemberselect\field as datalynxfield_teammemberselect;
 use mod_datalynx\local\field\datalynxfield_option_multiple;
 use mod_datalynx\local\field\datalynxfield_option_single;
+use mod_datalynx\local\serialized;
 use stdClass;
 
 /**
@@ -188,14 +189,10 @@ class datalynx_filter {
         $this->sortselects = [];
 
         if ($this->customsearch) {
-            $this->searchfields = is_array($this->customsearch) ? $this->customsearch : unserialize(
-                $this->customsearch
-            );
+            $this->searchfields = serialized::to_array($this->customsearch);
         }
         if ($this->customsort) {
-            $this->sortfields = is_array($this->customsort) ? $this->customsort : unserialize(
-                $this->customsort
-            );
+            $this->sortfields = serialized::to_array($this->customsort);
         }
         // Defines what field should be sorted by.
         // Field ids may be internal string names (e.g. 'timecreated'), so do not coerce to int here.
@@ -612,7 +609,7 @@ class datalynx_filter {
      */
     public function append_sort_options(array $sorties): void {
         if ($sorties) {
-            $sortoptions = $this->customsort ? unserialize($this->customsort) : [];
+            $sortoptions = serialized::to_array($this->customsort);
             foreach ($sorties as $fieldid => $sortdir) {
                 $sortoptions[$fieldid] = $sortdir;
             }
@@ -627,7 +624,7 @@ class datalynx_filter {
      */
     public function append_search_options(array $searchies): void {
         if ($searchies) {
-            $searchoptions = $this->customsearch ? unserialize($this->customsearch) : [];
+            $searchoptions = serialized::to_array($this->customsearch);
             foreach (array_keys($searchies) as $fieldid) {
                 if (empty($searchoptions[$fieldid])) {
                     $searchoptions[$fieldid] = $searchies[$fieldid];

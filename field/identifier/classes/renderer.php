@@ -22,6 +22,7 @@
  * @copyright based on the work by 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace datalynxfield_identifier;
 
 use mod_datalynx\local\field\datalynxfield_renderer;

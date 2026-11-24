@@ -50,7 +50,8 @@ navigation_node::override_active_url(
 );
 
 // DATA PROCESSING.
-if ($urlparams->run && confirm_sesskey()) { // Run selected tool.
+if ($urlparams->run && confirm_sesskey()) {
+    // Run selected tool.
     $tooldir = "$CFG->dirroot/mod/datalynx/tool/$urlparams->run";
     $autoloadclass = "\\datalynxtool_$urlparams->run\\tool";
     $toolclass = "datalynxtool_$urlparams->run";

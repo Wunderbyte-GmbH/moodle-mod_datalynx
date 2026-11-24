@@ -564,7 +564,8 @@ class field extends datalynxfield_base {
             // Autocomplete stores [] if empty. Has content when at least [1].
             $params["{$name}_hascontent"] = "___%";
 
-            if ($eids = $this->get_entry_ids_for_content($sqlnot, $params)) { // There are
+            if ($eids = $this->get_entry_ids_for_content($sqlnot, $params)) {
+                // There are
                                                                               // non-empty.
                                                                               // Contents.
                 [$contentids, $paramsnot] = $DB->get_in_or_equal(
@@ -575,7 +576,8 @@ class field extends datalynxfield_base {
                 );
                 $params = array_merge($params, $paramsnot);
                 $sql = " (e.id $contentids) ";
-            } else { // There are no non-empty contents.
+            } else {
+                // There are no non-empty contents.
                 if ($not) {
                     $sql = " 1 = 0 ";
                 } else {
@@ -879,7 +881,8 @@ class field extends datalynxfield_base {
             $content = json_decode($record->content, true);
             if (is_array($content)) {
                 foreach ($content as $userid) {
-                    if (is_numeric($userid)) { // Ensure the value is a valid user ID.
+                    if (is_numeric($userid)) {
+                        // Ensure the value is a valid user ID.
                         $userarray[$userid][] = $record->entryid; // Use boolean to simplify counting.
                     }
                 }

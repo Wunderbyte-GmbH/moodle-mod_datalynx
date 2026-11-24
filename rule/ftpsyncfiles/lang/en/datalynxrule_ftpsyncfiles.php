@@ -21,6 +21,7 @@
  * @copyright 2023 Thomas Winkler
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 $string['event'] = 'Datalynx event';
 $string['filefield'] = 'Field where the file should be saved';
 $string['identifier'] = 'Identifier used in the filename to match a specific user.';

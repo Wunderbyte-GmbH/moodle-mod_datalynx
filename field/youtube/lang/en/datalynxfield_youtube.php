@@ -21,6 +21,7 @@
  * @copyright 2021 michael pollak <moodle@michaelpollak.org>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 $string['fieldformatdimensions'] = 'Player dimensions';
 $string['fieldformatdimensions_help'] = 'Sets the width and height of the embedded YouTube player in pixels. Leave empty to use the field\'s default dimensions.';
 $string['fieldformatheight'] = 'Player height (px)';

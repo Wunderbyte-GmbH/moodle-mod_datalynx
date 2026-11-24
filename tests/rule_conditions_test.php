@@ -610,7 +610,10 @@ final class rule_conditions_test extends advanced_testcase {
         $tasks = \core\task\manager::get_adhoc_tasks(\mod_datalynx\task\sendmessage_task::class);
         $this->assertCount(1, $tasks, 'The status-change rule should queue exactly one notification.');
 
-        $messages = unserialize(base64_decode(reset($tasks)->get_custom_data_as_string()));
+        $messages = \mod_datalynx\local\serialized::decode(
+            base64_decode(reset($tasks)->get_custom_data_as_string()),
+            [\core\message\message::class]
+        );
         $recipientids = array_map(fn($message) => (int) $message->userto->id, $messages);
         $this->assertSame([(int) $recipient->id], $recipientids);
     }
@@ -656,7 +659,10 @@ final class rule_conditions_test extends advanced_testcase {
 
         $tasks = \core\task\manager::get_adhoc_tasks(\mod_datalynx\task\sendmessage_task::class);
         $this->assertCount(1, $tasks, 'The rule should queue exactly one notification task.');
-        $messages = unserialize(base64_decode(reset($tasks)->get_custom_data_as_string()));
+        $messages = \mod_datalynx\local\serialized::decode(
+            base64_decode(reset($tasks)->get_custom_data_as_string()),
+            [\core\message\message::class]
+        );
         $recipientids = array_map(fn($message) => (int) $message->userto->id, $messages);
         sort($recipientids);
         $expected = [(int) $author->id, (int) $manager->id];
@@ -743,7 +749,10 @@ final class rule_conditions_test extends advanced_testcase {
 
         $tasks = \core\task\manager::get_adhoc_tasks(\mod_datalynx\task\sendmessage_task::class);
         $this->assertCount(1, $tasks);
-        $messages = unserialize(base64_decode(reset($tasks)->get_custom_data_as_string()));
+        $messages = \mod_datalynx\local\serialized::decode(
+            base64_decode(reset($tasks)->get_custom_data_as_string()),
+            [\core\message\message::class]
+        );
         $this->assertCount(1, $messages);
         $this->assertSame(
             (int) $author->id,

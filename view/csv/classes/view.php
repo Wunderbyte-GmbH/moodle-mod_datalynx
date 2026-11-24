@@ -488,7 +488,8 @@ class view extends base {
 
                 // Collect field import settings from formdata by field, tag and element.
                 foreach ($formdata as $name => $value) {
-                    if (strpos($name, 'f_') !== false) { // Assuming only field settings start with f_.
+                    if (strpos($name, 'f_') !== false) {
+                        // Assuming only field settings start with f_.
                         [, $fieldid, $tag, $elem] = explode('_', $name);
                         if (!array_key_exists($fieldid, $fieldsettings)) {
                             $fieldsettings[$fieldid] = [];
@@ -503,9 +504,11 @@ class view extends base {
 
                 // Process csv if any.
                 if ($this->view->param2) {
-                    if (!empty($formdata->csvtext)) { // Upload from text.
+                    if (!empty($formdata->csvtext)) {
+                        // Upload from text.
                         $csvcontent = $formdata->csvtext;
-                    } else { // Upload from file.
+                    } else {
+                        // Upload from file.
                         $csvcontent = $mform->get_file_content('importfile');
                     }
 

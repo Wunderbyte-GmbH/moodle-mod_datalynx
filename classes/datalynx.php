@@ -23,6 +23,7 @@
  */
 
 namespace mod_datalynx;
+
 use coding_exception;
 use comment;
 use completion_info;
@@ -37,6 +38,7 @@ use mod_datalynx\local\field\datalynxfield_layout;
 use mod_datalynx\local\filter\datalynx_filter_manager;
 use mod_datalynx\local\filter\stored_criteria;
 use mod_datalynx\local\rule\manager;
+use mod_datalynx\local\serialized;
 use mod_datalynx\local\view\base;
 use moodle_exception;
 use moodle_page;
@@ -180,7 +182,8 @@ class datalynx {
 
         // Initialize from datalynx id or object.
         if ($d) {
-            if (is_object($d)) { // Try object first.
+            if (is_object($d)) {
+                // Try object first.
                 $this->data = $d;
             } else {
                 if (!$this->data = $DB->get_record('datalynx', ['id' => $d])) {
@@ -1260,10 +1263,10 @@ class datalynx {
         $usedfilters = [];
         $fieldids = array_keys($fields);
         foreach ($filters as $filter) {
-            $custormsort = unserialize((string) $filter->customsort);
+            $custormsort = serialized::to_array($filter->customsort);
             $custormsort = $custormsort ? array_keys($custormsort) : [];
 
-            $customsearch = unserialize((string) $filter->customsearch);
+            $customsearch = serialized::to_array($filter->customsearch);
             $customsearch = $customsearch ? array_keys($customsearch) : [];
             // A criterion on a team member's profile field uses the team member select field.
             foreach ($customsearch as $key) {
@@ -2183,7 +2186,8 @@ class datalynx {
             return false;
         }
 
-        if ($vids) { // Some views are specified for action.
+        if ($vids) {
+            // Some views are specified for action.
             $views = [];
             $viewobjs = $this->get_views([], true);
             foreach (explode(',', $vids) as $vid) {
@@ -2375,7 +2379,8 @@ class datalynx {
                         break;
 
                     case 'default':
-                        foreach ($views as $vid => $view) { // There should be only one.
+                        foreach ($views as $vid => $view) {
+                            // There should be only one.
                             $this->set_default_view($vid);
                             $processedvids[] = $vid;
                             break;

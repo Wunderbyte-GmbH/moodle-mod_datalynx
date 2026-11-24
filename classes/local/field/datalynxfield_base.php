@@ -15,6 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace mod_datalynx\local\field;
+
 use coding_exception;
 use dml_exception;
 use mod_datalynx;
@@ -106,7 +107,8 @@ abstract class datalynxfield_base {
             }
         }
 
-        if (empty($this->field)) { // We need to define some default values.
+        if (empty($this->field)) {
+            // We need to define some default values.
             $this->set_field();
         }
     }
@@ -1547,7 +1549,8 @@ abstract class datalynxfield_base {
      * @return int
      */
     public function get_argument_count(string $operator): int {
-        if ($operator === "") { // Empty operator requires no argument.
+        if ($operator === "") {
+            // Empty operator requires no argument.
             return 0;
         } else {
             return 1;

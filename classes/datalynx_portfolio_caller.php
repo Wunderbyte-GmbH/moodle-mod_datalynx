@@ -15,6 +15,7 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 namespace mod_datalynx;
+
 use mod_datalynx;
 use moodle_url;
 use moodleform;

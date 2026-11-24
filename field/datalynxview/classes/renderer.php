@@ -22,6 +22,7 @@
  * @copyright based on the work by 2013 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace datalynxfield_datalynxview;
 
 use mod_datalynx\local\field\datalynxfield_renderer;
@@ -142,7 +143,8 @@ class renderer extends datalynxfield_renderer {
 
         $field = $this->field;
 
-        if (!empty($field->field->param6)) { // Param6: author,group.
+        if (!empty($field->field->param6)) {
+            // Param6: author,group.
             [$filterauthor, $filtergroup] = explode(',', $field->field->param6);
             // Entry author.
             if ($filterauthor) {
@@ -172,7 +174,8 @@ class renderer extends datalynxfield_renderer {
         // The content to search for.
         // Then we get the entry-IDs of the entries (eids) which match this content-value.
         // End add them to the options array.
-        if ($fieldid = $field->field->param7) {  // Field-ID of the external field.
+        if ($fieldid = $field->field->param7) {
+            // Field-ID of the external field.
             if (
                 $contents = $DB->get_fieldset_select(
                     'datalynx_contents',

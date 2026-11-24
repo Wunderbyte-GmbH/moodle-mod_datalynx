@@ -21,6 +21,7 @@
  * @copyright based on the work  by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 /**
  * This file keeps track of upgrades to
  * the datalynx module
@@ -167,7 +168,7 @@ function xmldb_datalynx_upgrade($oldversion) {
                 $update = false;
                 // Section field.
                 if (!empty($view->section)) {
-                    $editordata = @unserialize($view->section);
+                    $editordata = \mod_datalynx\local\serialized::decode($view->section);
                     if ($editordata !== false) {
                         [$text, $format, $trust] = $editordata;
                         $view->section = "ft:{$format}tr:{$trust}ct:$text";
@@ -178,7 +179,7 @@ function xmldb_datalynx_upgrade($oldversion) {
                 for ($i = 1; $i <= 10; ++$i) {
                     $param = "param$i";
                     if (!empty($view->$param)) {
-                        $editordata = @unserialize($view->$param);
+                        $editordata = \mod_datalynx\local\serialized::decode($view->$param);
                         if ($editordata !== false) {
                             [$text, $format, $trust] = $editordata;
                             $view->$param = "ft:{$format}tr:{$trust}ct:$text";
@@ -412,7 +413,7 @@ function xmldb_datalynx_upgrade($oldversion) {
             foreach ($views as $view) {
                 $update = false;
                 if ($view->patterns) {
-                    $patterns = unserialize($view->patterns);
+                    $patterns = \mod_datalynx\local\serialized::to_array($view->patterns);
                     $newpatterns = ['view' => $patterns['view'], 'field' => []];
                     foreach ($patterns['field'] as $fieldid => $tags) {
                         if ($fieldid < 0 && !empty($newfieldids[$fieldid])) {
@@ -436,7 +437,7 @@ function xmldb_datalynx_upgrade($oldversion) {
 
                 // Adjust customsort field ids.
                 if ($filter->customsort) {
-                    $customsort = unserialize($filter->customsort);
+                    $customsort = \mod_datalynx\local\serialized::to_array($filter->customsort);
                     $sortfields = [];
                     foreach ($customsort as $fieldid => $sortdir) {
                         if ($fieldid < 0 && !empty($newfieldids[$fieldid])) {
@@ -451,7 +452,7 @@ function xmldb_datalynx_upgrade($oldversion) {
 
                 // Adjust customsearch field ids.
                 if ($filter->customsearch) {
-                    $customsearch = unserialize($filter->customsearch);
+                    $customsearch = \mod_datalynx\local\serialized::to_array($filter->customsearch);
                     $searchfields = [];
                     foreach ($customsearch as $fieldid => $options) {
                         if ($fieldid < 0 && !empty($newfieldids[$fieldid])) {
@@ -792,7 +793,7 @@ function xmldb_datalynx_upgrade($oldversion) {
         );
         if (!empty($filtersearchfields)) {
             foreach ($filtersearchfields as $filterid => $serializedcustomsearch) {
-                $customsearch = unserialize($serializedcustomsearch);
+                $customsearch = \mod_datalynx\local\serialized::decode($serializedcustomsearch);
                 $newcustomsearch = (array) (object) $customsearch;
                 if (is_array($customsearch)) {
                     foreach ($customsearch as $fieldid => $queries) {
@@ -909,8 +910,8 @@ function xmldb_datalynx_upgrade($oldversion) {
         $checkboxes = $DB->get_records_sql($sql);
         if (!empty($checkboxes)) {
             foreach ($checkboxes as $checkbox) {
-                if ($checkbox->content) {
-                    $rawdata = unserialize($checkbox->content);
+                $rawdata = \mod_datalynx\local\serialized::decode($checkbox->content);
+                if (is_array($rawdata)) {
                     $new = implode(',', $rawdata);
                     $checkbox->content = $new;
                     $DB->update_record('datalynx_contents', $checkbox, true);
@@ -1468,7 +1469,7 @@ function mod_datalynx_upgrade_clean_team_updated_logs(int $chunksize = 500): int
             $lastid = (int) $row->id;
             $serialized = $row->other === 'N;' || preg_match('~^.:~', $row->other ?? '');
             $other = $serialized
-                ? @unserialize($row->other, ['allowed_classes' => false])
+                ? \mod_datalynx\local\serialized::decode($row->other)
                 : json_decode($row->other ?? '', true);
             if (!is_array($other)) {
                 continue;
@@ -1514,7 +1515,7 @@ function mod_datalynx_upgrade_file_search_criteria(): void {
         'id, customsearch'
     );
     foreach ($filters as $filter) {
-        $search = unserialize($filter->customsearch, ['allowed_classes' => false]);
+        $search = \mod_datalynx\local\serialized::decode($filter->customsearch);
         if (is_array($search) && ($converted = mod_datalynx_upgrade_convert_file_criteria($search, $fileids)) !== null) {
             $DB->set_field('datalynx_filters', 'customsearch', serialize($converted), ['id' => $filter->id]);
         }
@@ -1789,7 +1790,7 @@ function mod_datalynx_upgrade_behaviors(): void {
         foreach ($allbehaviorids as $behaviorid) {
             $formdata = datalynxfield_behavior::get_behavior($behaviorid);
             $visibleto = $DB->get_field('datalynx_behaviors', 'visibleto', ['id' => $behaviorid]);
-            $visibletoperm = unserialize($visibleto);
+            $visibletoperm = \mod_datalynx\local\serialized::to_array($visibleto);
             if (!empty($visibletoperm)) {
                 if (isset($visibletoperm['users'])) {
                     unset($visibletoperm['users']);
@@ -2069,7 +2070,7 @@ function mod_datalynx_upgrade_rule_params_to_json(): void {
         foreach (['param1', 'param2', 'param3', 'param4'] as $param) {
             $value = $rule->$param;
             if (!empty($value) && is_string($value)) {
-                $decoded = @unserialize($value);
+                $decoded = \mod_datalynx\local\serialized::decode($value);
                 if (is_array($decoded)) {
                     $update->$param = json_encode($decoded);
                     $changed = true;
@@ -2279,7 +2280,7 @@ function mod_datalynx_upgrade_replace_view_tag(string $search, string $replace):
             if ($value === null || strpos($value, $search) === false) {
                 continue;
             }
-            $unserialized = preg_match('/^a:\d+:\{/', $value) ? unserialize($value, ['allowed_classes' => false]) : false;
+            $unserialized = preg_match('/^a:\d+:\{/', $value) ? \mod_datalynx\local\serialized::decode($value) : false;
             if (is_array($unserialized)) {
                 array_walk_recursive($unserialized, function (&$item) use ($search, $replace) {
                     if (is_string($item)) {

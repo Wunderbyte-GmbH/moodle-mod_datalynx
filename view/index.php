@@ -62,38 +62,46 @@ navigation_node::override_active_url(
 );
 
 // DATA PROCESSING.
-if ($urlparams->duplicate && confirm_sesskey()) { // Duplicate any requested views.
+if ($urlparams->duplicate && confirm_sesskey()) {
+    // Duplicate any requested views.
     $dlx->process_views('duplicate', $urlparams->duplicate, $urlparams->confirmed);
 } else {
-    if ($urlparams->reset && confirm_sesskey()) { // Reset to default any requested views.
+    if ($urlparams->reset && confirm_sesskey()) {
+        // Reset to default any requested views.
         $patterncache = cache::make('mod_datalynx', 'patterns');
         $patterncache->delete($urlparams->vedit, true);
         $dlx->process_views('reset', $urlparams->reset, true);
     } else {
-        if ($urlparams->delete && confirm_sesskey()) { // Delete any requested views.
+        if ($urlparams->delete && confirm_sesskey()) {
+            // Delete any requested views.
             $dlx->process_views('delete', $urlparams->delete, $urlparams->confirmed);
         } else {
-            if ($urlparams->visible && confirm_sesskey()) { // Set view's visibility.
+            if ($urlparams->visible && confirm_sesskey()) {
+                // Set view's visibility.
                 $dlx->process_views('visible', $urlparams->visible, true); // Confirmed by default.
             } else {
-                if ($urlparams->default && confirm_sesskey()) { // Set view to default.
+                if ($urlparams->default && confirm_sesskey()) {
+                    // Set view to default.
                     $dlx->process_views('default', $urlparams->default, true); // Confirmed by default.
                 } else {
-                    if ($urlparams->singleedit && confirm_sesskey()) { // Set view to single edit.
+                    if ($urlparams->singleedit && confirm_sesskey()) {
+                        // Set view to single edit.
                         if ($urlparams->singleedit == -1) {
                             $dlx->set_single_edit_view(); // Reset.
                         } else {
                             $dlx->set_single_edit_view($urlparams->singleedit);
                         }
                     } else {
-                        if ($urlparams->singlemore && confirm_sesskey()) { // Set view to single more.
+                        if ($urlparams->singlemore && confirm_sesskey()) {
+                            // Set view to single more.
                             if ($urlparams->singlemore == -1) {
                                 $dlx->set_single_more_view(); // Reset.
                             } else {
                                 $dlx->set_single_more_view($urlparams->singlemore);
                             }
                         } else {
-                            if ($urlparams->setfilter && confirm_sesskey()) { // Re/set view filter.
+                            if ($urlparams->setfilter && confirm_sesskey()) {
+                                // Re/set view filter.
                                 $dlx->process_views('filter', $urlparams->setfilter, true); // Confirmed by default.
                             }
                         }

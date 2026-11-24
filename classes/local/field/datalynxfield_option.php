@@ -210,7 +210,8 @@ abstract class datalynxfield_option extends datalynxfield_base {
      * @return int
      */
     public function get_argument_count(string $operator): int {
-        if ($operator === "") { // Empty operator requires no argument.
+        if ($operator === "") {
+            // Empty operator requires no argument.
             return 0;
         } else {
             return 1;

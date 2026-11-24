@@ -68,14 +68,18 @@ final class toggle_behavior_test extends advanced_testcase {
         $visibleresult = external_api::clean_returnvalue(toggle_behavior::execute_returns(), $visibleresult);
         $this->assertTrue($visibleresult['enabled']);
 
-        $visibleto = unserialize($DB->get_field('datalynx_behaviors', 'visibleto', ['id' => $behaviorid]));
+        $visibleto = \mod_datalynx\local\serialized::to_array(
+            $DB->get_field('datalynx_behaviors', 'visibleto', ['id' => $behaviorid])
+        );
         $this->assertContains(3, $visibleto['permissions']);
 
         $editableresult = toggle_behavior::execute($behaviorid, 'editableby', 2);
         $editableresult = external_api::clean_returnvalue(toggle_behavior::execute_returns(), $editableresult);
         $this->assertFalse($editableresult['enabled']);
 
-        $editableby = unserialize($DB->get_field('datalynx_behaviors', 'editableby', ['id' => $behaviorid]));
+        $editableby = \mod_datalynx\local\serialized::to_array(
+            $DB->get_field('datalynx_behaviors', 'editableby', ['id' => $behaviorid])
+        );
         $this->assertSame([1], array_values($editableby));
     }
 }

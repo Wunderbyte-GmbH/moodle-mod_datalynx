@@ -15,10 +15,12 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 namespace mod_datalynx\local\filter;
+
 use html_table;
 use html_writer;
 use mod_datalynx\form\datalynx_customfilter_frontend_form;
 use mod_datalynx\form\datalynx_filter_form;
+use mod_datalynx\local\serialized;
 use moodle_url;
 use stdClass;
 
@@ -205,7 +207,8 @@ class datalynx_filter_manager {
         // Only users with managetemplates capability can process filters.
         if (has_capability('mod/datalynx:managetemplates', $dlx->context)) {
             // Don't need record from database for filter form submission.
-            if ($fids) { // Some filters are specified for action.
+            if ($fids) {
+                // Some filters are specified for action.
                 $filters = $DB->get_records_select('datalynx_filters', "id IN ($fids)");
             } else {
                 if ($action == 'update') {
@@ -783,7 +786,7 @@ class datalynx_filter_manager {
                 // CUSTOM SORT.
                 $sortfields = [];
                 if ($filter->customsort) {
-                    $sortfields = unserialize($filter->customsort);
+                    $sortfields = serialized::to_array($filter->customsort);
                 }
 
                 if ($sortfields) {
@@ -816,7 +819,7 @@ class datalynx_filter_manager {
                 // CUSTOM SEARCH.
                 $searchfields = [];
                 if ($filter->customsearch) {
-                    $searchfields = unserialize($filter->customsearch);
+                    $searchfields = serialized::to_array($filter->customsearch);
                 }
 
                 // Verbose search criteria.
@@ -963,7 +966,8 @@ class datalynx_filter_manager {
             // Return to form (on reload button press).
             if ($filterform->no_submit_button_pressed()) {
                 return $filter;
-            } else if ($formdata = $filterform->get_data()) { // Process validated.
+            } else if ($formdata = $filterform->get_data()) {
+                // Process validated.
                 $filter = $this->get_filter_from_customfilterform($filter, $formdata, $customfilter, $view);
             }
         }
@@ -983,10 +987,10 @@ class datalynx_filter_manager {
         $urlquery = [];
 
         if ($filter->customsort) {
-            $urlquery[] = 'usort=' . self::get_sort_url_query(unserialize($filter->customsort));
+            $urlquery[] = 'usort=' . self::get_sort_url_query(serialized::to_array($filter->customsort));
         }
         if ($filter->customsearch) {
-            $urlquery[] = 'usearch=' . self::get_search_url_query(unserialize($filter->customsearch));
+            $urlquery[] = 'usearch=' . self::get_search_url_query(serialized::to_array($filter->customsearch));
         }
 
         if ($urlquery) {

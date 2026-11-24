@@ -22,6 +22,7 @@
  * @copyright based on the work by 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 $string['dateformat'] = 'Date format';
 $string['dateformat_help'] = 'PHP date format string (e.g. %%d %%B %%Y) or "timestamp".';
 $string['dateonly'] = 'Date only';

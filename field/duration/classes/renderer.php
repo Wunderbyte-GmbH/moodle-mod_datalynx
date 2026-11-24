@@ -21,6 +21,7 @@
  * @copyright  2014 onwards by edulabs.org and associated programmers
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace datalynxfield_duration;
 
 use mod_datalynx\local\field\datalynxfield_renderer;

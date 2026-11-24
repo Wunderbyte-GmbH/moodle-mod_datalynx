@@ -22,6 +22,7 @@
  * @copyright  2026 David Bogner
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 $string['addbuttontext'] = 'Text der Hinzufügen-Schaltfläche';
 $string['addbuttontext_help'] = 'Text der Schaltfläche, mit der im Eintragsformular eine Zeile hinzugefügt wird, zum Beispiel "Beleg hinzufügen". Leer lassen, um "Füge <Feldname> hinzu" zu verwenden.';
 $string['fieldformataggavg'] = 'Durchschnitt';

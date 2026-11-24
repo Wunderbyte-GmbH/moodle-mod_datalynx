@@ -21,8 +21,8 @@
  * @copyright 2015 Ivan Šakić <ivan.sakic3@gmail.com>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-namespace mod_datalynx\event;
 
+namespace mod_datalynx\event;
 
 /**
  * The mod_datalynx rating added event class.

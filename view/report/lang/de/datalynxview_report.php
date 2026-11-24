@@ -21,6 +21,7 @@
  * @copyright 2026 onwards Wunderbyte GmbH
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 $string['customsql'] = 'Die SQL-Abfrage für den Bericht';
 $string['customsql_help'] = 'Schreiben Sie die SQL-Abfrage für den Bericht. Sie können Platzhalter für Felder verwenden.';
 $string['entriesovertime'] = 'Einträge im Zeitverlauf';

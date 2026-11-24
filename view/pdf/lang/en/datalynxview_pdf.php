@@ -21,6 +21,7 @@
  * @copyright Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 $string['A4'] = 'A4';
 $string['LETTER'] = 'LETTER';
 $string['auto'] = 'Auto';

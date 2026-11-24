@@ -31,6 +31,7 @@ use html_table;
 use html_table_cell;
 use html_table_row;
 use html_writer;
+use mod_datalynx\local\serialized;
 use mod_datalynx\local\view\base;
 use stdClass;
 
@@ -144,10 +145,10 @@ class view extends base {
                 $filteroptions['eids'] = $this->filter->eids;
             }
             if (!empty($this->filter->customsort)) {
-                $filteroptions['customsort'] = unserialize($this->filter->customsort);
+                $filteroptions['customsort'] = serialized::to_array($this->filter->customsort);
             }
             if (!empty($this->filter->customsearch)) {
-                $filteroptions['customsearch'] = unserialize($this->filter->customsearch);
+                $filteroptions['customsearch'] = serialized::to_array($this->filter->customsearch);
             }
             if (!empty($this->filter->search)) {
                 $filteroptions['search'] = (string) $this->filter->search;

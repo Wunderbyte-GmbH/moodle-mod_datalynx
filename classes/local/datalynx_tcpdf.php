@@ -45,8 +45,10 @@ class datalynx_tcpdf extends setasign\Fpdi\Tcpdf\Fpdi {
         $this->dlsettings = $settings;
     }
 
-    // Page header.
-    public function Header(): void { // phpcs:ignore  @codingStandardsIgnoreLine
+    /**
+     * The page header (TCPDF override, hence the name).
+     */
+    public function Header(): void { // phpcs:ignore moodle.NamingConventions.ValidFunctionName.LowercaseMethod
         // Adjust X to override left margin.
         $x = $this->GetX();
         $this->SetX($this->dlsettings->header->marginleft);
@@ -58,15 +60,15 @@ class datalynx_tcpdf extends setasign\Fpdi\Tcpdf\Fpdi {
         $this->SetX($x);
     }
 
-    // Page footer.
-    public function Footer(): void { // phpcs:ignore  @codingStandardsIgnoreLine
+    /**
+     * The page footer (TCPDF override, hence the name).
+     */
+    public function Footer(): void { // phpcs:ignore moodle.NamingConventions.ValidFunctionName.LowercaseMethod
         if (!empty($this->dlsettings->footer->text)) {
             $text = $this->set_page_numbers($this->dlsettings->footer->text);
             $this->writeHtml($text);
         }
     }
-
-    // Phpcs:enable.
 
     /**
      * Set page numbers in text

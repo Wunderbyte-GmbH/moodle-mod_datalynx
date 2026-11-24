@@ -220,7 +220,8 @@ class field extends datalynxfield_option_multiple {
                 }
             }
         } else {
-            if ($operator === '') { // EMPTY.
+            if ($operator === '') {
+                // EMPTY.
                 // Get all entry ids where tags are present and then add a NOT IN (these entry ids).
                 // Invert the $not operator in order to get correct results.
                 if ($not) {

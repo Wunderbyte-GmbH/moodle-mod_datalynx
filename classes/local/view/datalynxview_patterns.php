@@ -795,7 +795,8 @@ class datalynxview_patterns {
                         $baseurl,
                         'page'
                     );
-                } else { // No paging bar case at all:.
+                } else {
+                    // No paging bar case at all:.
                     return '';
                 }
             }

@@ -21,6 +21,7 @@
  * @copyright 2016 David Bogner
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 $string['fieldformattaglinked'] = 'Als Links darstellen';
 $string['pluginname'] = 'Tag';
 $string['privacy:metadata'] = 'Tags speichern keine persönlichen Daten.';

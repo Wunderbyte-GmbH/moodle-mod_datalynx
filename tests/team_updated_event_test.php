@@ -138,7 +138,10 @@ final class team_updated_event_test extends advanced_testcase {
 
         $tasks = \core\task\manager::get_adhoc_tasks(task\sendmessage_task::class);
         $this->assertCount(1, $tasks);
-        $messages = unserialize(base64_decode(reset($tasks)->get_custom_data_as_string()));
+        $messages = \mod_datalynx\local\serialized::decode(
+            base64_decode(reset($tasks)->get_custom_data_as_string()),
+            [\core\message\message::class]
+        );
         $recipients = array_map(fn($message) => (int) $message->userto->id, $messages);
         sort($recipients);
         $this->assertSame([(int) $this->students['b']->id, (int) $this->students['c']->id], $recipients);
@@ -206,7 +209,9 @@ final class team_updated_event_test extends advanced_testcase {
         $this->assertSame(2, mod_datalynx_upgrade_clean_team_updated_logs(1));
 
         $expected = ['addedmembers' => [(int) $c->id], 'removedmembers' => [(int) $a->id]];
-        $fromserialized = unserialize($DB->get_field('logstore_standard_log', 'other', ['id' => $serialized]));
+        $fromserialized = \mod_datalynx\local\serialized::to_array(
+            $DB->get_field('logstore_standard_log', 'other', ['id' => $serialized])
+        );
         $fromjson = json_decode($DB->get_field('logstore_standard_log', 'other', ['id' => $json]), true);
         foreach ([$fromserialized, $fromjson] as $other) {
             $this->assertSame($expected, array_intersect_key($other, $expected));

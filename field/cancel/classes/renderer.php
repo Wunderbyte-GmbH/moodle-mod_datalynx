@@ -20,7 +20,6 @@ use mod_datalynx\local\field\datalynxfield_renderer;
 use MoodleQuickForm;
 use stdClass;
 
-
 /**
  * Renderer for the cancel button field.
  *

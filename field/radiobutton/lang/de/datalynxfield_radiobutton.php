@@ -21,6 +21,7 @@
  * @copyright 2026 David Bogner
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 $string['fieldformatoption'] = 'Anzeigeformat';
 $string['fieldformatoption_help'] = 'Was in Ansichten anstelle des Tags "[[feldname:formatname]]" ausgegeben wird.
 

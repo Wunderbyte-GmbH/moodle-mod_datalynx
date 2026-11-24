@@ -21,7 +21,9 @@
  * @copyright 2014 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace datalynxfield_checkbox;
+
 use datalynxfield_multiselect\renderer as MultiSelectRenderer;
 use MoodleQuickForm;
 use stdClass;

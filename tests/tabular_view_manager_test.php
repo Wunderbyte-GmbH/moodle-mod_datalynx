@@ -244,7 +244,7 @@ final class tabular_view_manager_test extends advanced_testcase {
         $view->set_filter($filteroptions);
 
         // Verify the sort was applied: customsort on the filter object must contain the field.
-        $sortoptions = unserialize($view->get_filter()->customsort);
+        $sortoptions = \mod_datalynx\local\serialized::to_array($view->get_filter()->customsort);
         $this->assertIsArray($sortoptions, 'customsort must be unserializable to an array');
         $this->assertArrayHasKey($fieldid, $sortoptions, 'Sort options must contain the duration field id');
         $this->assertSame(0, $sortoptions[$fieldid], 'Sort direction must be 0 (ASC)');

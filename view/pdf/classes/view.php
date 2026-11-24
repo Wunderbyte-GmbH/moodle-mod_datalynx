@@ -30,6 +30,7 @@ use html_table_cell;
 use html_table_row;
 use html_writer;
 use mod_datalynx\local\datalynx_tcpdf;
+use mod_datalynx\local\serialized;
 use mod_datalynx\local\view\base;
 use moodle_url;
 use stdClass;
@@ -117,9 +118,9 @@ class view extends base {
         if ($serialized === false) {
             $serialized = $param1;
         }
-        $settings = @unserialize($serialized, ['allowed_classes' => [stdClass::class]]);
+        $settings = serialized::decode($serialized);
         if (!is_object($settings)) {
-            $settings = @unserialize(self::repair_string_lengths($serialized), ['allowed_classes' => [stdClass::class]]);
+            $settings = serialized::decode(self::repair_string_lengths($serialized));
         }
         if (!is_object($settings)) {
             $url = new moodle_url('/mod/datalynx/view/view_edit.php', ['d' => $this->dlx->id(), 'vedit' => $this->id()]);

@@ -28,6 +28,7 @@ use dml_exception;
 use mod_datalynx;
 use mod_datalynx\datalynx;
 use mod_datalynx\local\definition_cache;
+use mod_datalynx\local\serialized;
 use moodle_exception;
 use stdClass;
 
@@ -107,8 +108,8 @@ class datalynxfield_behavior {
         $this->name = $record->name;
         $this->description = $record->description;
         $this->dataid = $record->dataid;
-        $this->visibleto = isset($record->visibleto) ? unserialize($record->visibleto) : [];
-        $this->editableby = isset($record->editableby) ? unserialize($record->editableby) : [];
+        $this->visibleto = serialized::to_array($record->visibleto ?? null);
+        $this->editableby = serialized::to_array($record->editableby ?? null);
         $this->required = isset($record->required) ? $record->required : false;
         $this->editableafterfinal = !empty($record->editableafterfinal);
         $this->conditions = !empty($record->conditions) ? (json_decode($record->conditions, true) ?: []) : [];
@@ -341,13 +342,13 @@ class datalynxfield_behavior {
         $formdata->d = $record->dataid;
         $formdata->name = $record->name;
         $formdata->description = $record->description;
-        $visible = unserialize($record->visibleto);
+        $visible = serialized::to_array($record->visibleto);
         if (isset($visible['permissions'])) {
             $formdata->visibletopermission = $visible['permissions'];
         }
         $formdata->visibletouser = $visible['users'] ?? [];
         $formdata->visibletoteammember = $visible['teammember'] ?? [];
-        $formdata->editableby = unserialize($record->editableby);
+        $formdata->editableby = serialized::to_array($record->editableby);
         $formdata->required = $record->required;
         $formdata->editableafterfinal = $record->editableafterfinal ?? 0;
         $formdata->conditions = !empty($record->conditions)

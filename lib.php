@@ -1344,7 +1344,8 @@ function datalynx_upgrade_grades() {
  */
 function datalynx_grade_item_update($data, $grades = null) {
     global $CFG;
-    if (!function_exists('grade_update')) { // Workaround for buggy PHP versions.
+    if (!function_exists('grade_update')) {
+        // Workaround for buggy PHP versions.
         require_once($CFG->libdir . '/gradelib.php');
     }
 

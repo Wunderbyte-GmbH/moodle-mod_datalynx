@@ -24,6 +24,7 @@
  */
 
 namespace mod_datalynx\form;
+
 use mod_datalynx\customfilter\datalynx;
 use moodleform;
 

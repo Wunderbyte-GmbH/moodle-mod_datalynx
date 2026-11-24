@@ -65,19 +65,24 @@ navigation_node::override_active_url(
 $fm = $dlx->get_filter_manager();
 
 // DATA PROCESSING.
-if ($urlparams->update && confirm_sesskey()) { // Add/update a new filter.
+if ($urlparams->update && confirm_sesskey()) {
+    // Add/update a new filter.
     $fm->process_filters('update', $urlparams->fid, true);
 } else {
-    if ($urlparams->duplicate && confirm_sesskey()) { // Duplicate any requested filters.
+    if ($urlparams->duplicate && confirm_sesskey()) {
+        // Duplicate any requested filters.
         $fm->process_filters('duplicate', $urlparams->duplicate, $urlparams->confirmed);
     } else {
-        if ($urlparams->delete && confirm_sesskey()) { // Delete any requested filters.
+        if ($urlparams->delete && confirm_sesskey()) {
+            // Delete any requested filters.
             $fm->process_filters('delete', $urlparams->delete, $urlparams->confirmed);
         } else {
-            if ($urlparams->visible && confirm_sesskey()) { // Set filter's visibility.
+            if ($urlparams->visible && confirm_sesskey()) {
+                // Set filter's visibility.
                 $fm->process_filters('visible', $urlparams->visible, true); // Confirmed by default.
             } else {
-                if ($urlparams->default && confirm_sesskey()) { // Set filter to default.
+                if ($urlparams->default && confirm_sesskey()) {
+                    // Set filter to default.
                     if ($urlparams->default == -1) {
                         $dlx->set_default_filter(); // Reset.
                     } else {

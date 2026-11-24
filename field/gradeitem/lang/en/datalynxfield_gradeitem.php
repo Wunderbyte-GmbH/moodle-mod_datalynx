@@ -22,6 +22,7 @@
  * @copyright based on the work by 2012 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 $string['fieldformatdecimals'] = 'Decimal places';
 $string['fieldformatdecimals_help'] = 'Number of decimal places to display for the grade value. Defaults to 2 if not set. For example, a value of 1 renders 87.5, while 0 renders 88.';
 $string['gradeitem'] = 'Grade item';

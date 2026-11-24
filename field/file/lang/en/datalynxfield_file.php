@@ -22,6 +22,7 @@
  * @copyright based on the work  by 2011 Itamar Tzadok
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 $string['alttext'] = 'Alt text';
 $string['clearcontent'] = 'Clear content';
 $string['pdfpreviewalt'] = 'Image rendering of the PDF document {$a}. To access its content, open the PDF with the download link above.';

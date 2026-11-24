@@ -21,6 +21,7 @@
  * @copyright 2014 Ivan Šakić
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 $string['condition'] = 'Der Wert, den das ausgewählte Feld haben muss';
 $string['condition_help'] = 'Der Wert, den das ausgewählte Feld erfüllen muss, um die Bedingung zu erfüllen.
 Bei Checkboxen müssen die ausgewählten Zeilen eingegeben werden, getrennt durch einen Beistrich: Für erste Zeile und dritte Zeile: 1,3

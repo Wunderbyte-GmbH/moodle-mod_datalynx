@@ -21,7 +21,9 @@
  * @copyright  2025 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace datalynxfield_number;
+
 use datalynxfield_text\renderer as TextRenderer;
 use MoodleQuickForm;
 use stdClass;

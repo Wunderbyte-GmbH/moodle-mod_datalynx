@@ -229,7 +229,8 @@ class datalynxfield_option_single extends datalynxfield_option {
                 $usecontent = false;
                 [$sqlnot, $params] = $this->get_has_value_sql(false, "df_{$fieldid}_e_");
 
-                if ($eids = $this->get_entry_ids_for_content($sqlnot, $params)) { // There are non-empty.
+                if ($eids = $this->get_entry_ids_for_content($sqlnot, $params)) {
+                    // There are non-empty.
                     // Contents.
                     [$contentids, $paramsnot] = $DB->get_in_or_equal(
                         $eids,
@@ -239,7 +240,8 @@ class datalynxfield_option_single extends datalynxfield_option {
                     );
                     $params = array_merge($params, $paramsnot);
                     $sql = " (e.id $contentids) ";
-                } else { // There are no non-empty contents.
+                } else {
+                    // There are no non-empty contents.
                     if ($not) {
                         $sql = " 1 = 0 ";
                     } else {
