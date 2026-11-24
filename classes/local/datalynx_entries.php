@@ -36,7 +36,6 @@ use datalynxfield_entrytime\field as datalynxfield_entrytime;
 use datalynxfield_fieldgroup\field as fieldgroup_field;
 use datalynxfield_status\field as datalynxfield_status;
 use dml_exception;
-use invalid_parameter_exception;
 use mod_datalynx;
 use mod_datalynx\local\filter\datalynx_filter;
 use moodle_exception;
@@ -1175,7 +1174,8 @@ class datalynx_entries {
                         break;
 
                     case 'disapprove':
-                        $completiontype = COMPLETION_COMPLETE;
+                        // An entry that is no longer approved may no longer count towards completion.
+                        $completiontype = COMPLETION_INCOMPLETE;
                         // Disapprovable entries should be filtered above.
                         $entryids = array_keys($entries);
                         $ids = implode(',', $entryids);
@@ -1269,90 +1269,6 @@ class datalynx_entries {
                 return [$strnotify . $errorstring, array_keys($processed)];
             }
         }
-    }
-
-    /**
-     * Toggle approval for a single entry and return the resulting state.
-     *
-     * @param int $entryid Entry ID.
-     * @param int $viewid Current view ID.
-     * @param string $action Approval action.
-     * @return array
-     */
-    public function toggle_entry_approval(int $entryid, int $viewid, string $action): array {
-        global $DB;
-
-        $entry = $DB->get_record('datalynx_entries', [
-            'id' => $entryid,
-            'dataid' => $this->dlx->id(),
-        ], '*', MUST_EXIST);
-
-        if ($action === 'toggle-approval') {
-            $action = $entry->approved ? 'disapprove' : 'approve';
-        }
-
-        if (!in_array($action, ['approve', 'disapprove'], true)) {
-            throw new invalid_parameter_exception('Invalid action.');
-        }
-
-        $newapprovedstate = 0;
-        $completiontype = COMPLETION_UNKNOWN;
-
-        if ($action === 'approve') {
-            $DB->set_field('datalynx_entries', 'approved', 1, ['id' => $entryid]);
-            $entry->approved = 1;
-            $processed = $this->create_approved_entries_for_team([$entryid]);
-            if ($processed) {
-                $eventdata = (object) ['view' => $this->dlx->get_view_from_id($viewid), 'items' => $processed];
-                $this->dlx->events_trigger('entryapproved', $eventdata);
-            }
-            $newapprovedstate = 1;
-            $completiontype = COMPLETION_COMPLETE;
-        } else {
-            $DB->set_field('datalynx_entries', 'approved', 0, ['id' => $entryid]);
-            $entry->approved = 0;
-            $processed = [$entryid => $entry];
-            if ($processed) {
-                $eventdata = (object) ['view' => $this->dlx->get_view_from_id($viewid), 'items' => $processed];
-                $this->dlx->events_trigger('entrydisapproved', $eventdata);
-            }
-            $completiontype = COMPLETION_INCOMPLETE;
-        }
-
-        if ($completiontype !== COMPLETION_UNKNOWN) {
-            $completion = new completion_info($this->dlx->course);
-            if (
-                $completion->is_enabled($this->dlx->cm) &&
-                $this->dlx->cm->completion == COMPLETION_TRACKING_AUTOMATIC &&
-                $this->dlx->data->completionentries
-            ) {
-                $completion->update_state($this->dlx->cm, $completiontype, $entry->userid);
-            }
-        }
-
-        return [
-            'entryid' => $entryid,
-            'approved' => (bool) $newapprovedstate,
-            'controlhtml' => $this->render_entry_approval_control($entry, $viewid),
-        ];
-    }
-
-    /**
-     * Render the approval toggle markup for one entry.
-     *
-     * @param stdClass $entry Entry record.
-     * @param int $viewid Current view ID.
-     * @return string
-     */
-    private function render_entry_approval_control(stdClass $entry, int $viewid): string {
-        $fields = $this->dlx->get_fields();
-        $approvefield = $fields[datalynxfield_approve::_APPROVED] ?? null;
-
-        if (!$approvefield) {
-            return '';
-        }
-
-        return $approvefield->renderer()->render_toggle($entry, ['viewid' => $viewid]);
     }
 
     /**

@@ -16,7 +16,6 @@
 
 namespace mod_datalynx\local\mobile;
 
-use datalynxfield_approve\field as approvefield;
 use invalid_parameter_exception;
 use mod_datalynx\datalynx;
 use mod_datalynx\external\browse_request;
@@ -371,8 +370,7 @@ final class entries_payload_builder {
     private function build_entries(view_manager $manager, base $view, array $records, app_links $links): array {
         $usetemplate = $manager->uses_entry_template($view);
         $shown = $this->get_shown_fields($view, $manager->get_content_fields($view));
-        $canapprove = $this->dlx->user_can_approve_entries()
-            && !empty(($view->get__patterns('field') ?? [])[approvefield::_APPROVED]);
+        $canapprove = $view->user_can_approve_through_view();
         $entries = [];
 
         foreach ($records as $record) {

@@ -3039,6 +3039,16 @@ abstract class base {
     }
 
     /**
+     * Whether the current user may approve or disapprove entries through this view: they may
+     * approve in this activity, and the view shows ##approve##.
+     *
+     * @return bool
+     */
+    public function user_can_approve_through_view(): bool {
+        return $this->dlx->user_can_approve_entries() && $this->confirm_view_action('approve', (int) $this->id());
+    }
+
+    /**
      * The custom filters this view offers: those whose ##customfilter:NAME## tag is in its view
      * or entry template and that are visible, as the web replaces only the tags of visible ones.
      * The first custom filter of a name counts.

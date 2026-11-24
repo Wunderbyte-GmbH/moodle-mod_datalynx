@@ -20,17 +20,18 @@ use core_external\external_api;
 use core_external\external_function_parameters;
 use core_external\external_single_structure;
 use core_external\external_value;
+use datalynxfield_approve\field as datalynxfield_approve;
 use invalid_parameter_exception;
-use mod_datalynx\local\datalynx_entries;
 use moodle_exception;
 
 /**
  * Web service to toggle the approval state of a datalynx entry: the ##approve## switch on the web
  * and the approve button of the Moodle App.
  *
- * Who may approve is decided by datalynx::user_can_approve_entries(), the check the switch and
- * the bulk approve button are shown by. The view, when given, must be one the user can see; it is
- * passed on to the approval events.
+ * Who may approve through which view is one rule, view\base::user_can_approve_through_view(): the
+ * user may approve, and the view shows ##approve## (where the switch and the app's button are).
+ * Without a view, the default view counts, as on the web. The approval itself is the web's
+ * (datalynx_entries::process_entries()), with its team copies, events and completion.
  *
  * @package    mod_datalynx
  * @copyright  2026 Wunderbyte GmbH
@@ -76,16 +77,42 @@ class toggle_entry_approval extends external_api {
         if (!$dlx->user_can_approve_entries()) {
             throw new moodle_exception('entryapprovenotallowed', 'datalynx');
         }
-        if ($params['viewid'] && !array_key_exists($params['viewid'], $dlx->get_view_records())) {
+        // As on the web, the view the switch is in; without one, the view the activity opens.
+        $records = $dlx->get_view_records();
+        $record = $records[$params['viewid'] ?: $dlx->get_default_view_id()] ?? null;
+        if (!$record) {
             throw new invalid_parameter_exception('View not available.');
         }
-        if (!$DB->record_exists('datalynx_entries', ['id' => $params['entryid'], 'dataid' => $dlx->id()])) {
+        $entry = $DB->get_record('datalynx_entries', ['id' => $params['entryid'], 'dataid' => $dlx->id()]);
+        if (!$entry) {
             throw new invalid_parameter_exception('Entry not found.');
         }
+        $view = $dlx->get_view($record->type, $record);
+        if (!$view->user_can_approve_through_view()) {
+            throw new moodle_exception('viewapprovenotallowed', 'datalynx');
+        }
 
-        $entries = new datalynx_entries($dlx);
+        $action = $params['action'];
+        if ($action === 'toggle-approval') {
+            $action = $entry->approved ? 'disapprove' : 'approve';
+        }
+        if (!in_array($action, ['approve', 'disapprove'], true)) {
+            throw new invalid_parameter_exception('Invalid action.');
+        }
 
-        return $entries->toggle_entry_approval($params['entryid'], $params['viewid'], $params['action']);
+        // The same approval as the web's ?approve= / ?disapprove= and the bulk actions.
+        $entries = $view->get_entries_manager();
+        $entries->interactive = false;
+        $entries->process_entries($action, (string) $entry->id, null, true);
+
+        $entry = $DB->get_record('datalynx_entries', ['id' => $entry->id], '*', MUST_EXIST);
+        $approvefield = $dlx->get_field_from_id(datalynxfield_approve::_APPROVED);
+
+        return [
+            'entryid' => (int) $entry->id,
+            'approved' => (bool) $entry->approved,
+            'controlhtml' => $approvefield ? $approvefield->renderer()->render_toggle($entry, ['viewid' => (int) $record->id]) : '',
+        ];
     }
 
     /**

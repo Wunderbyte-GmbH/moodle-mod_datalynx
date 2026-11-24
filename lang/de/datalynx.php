@@ -1034,6 +1034,7 @@ $string['viewadd'] = 'Ansicht hinzufügen';
 $string['viewallowallfilters'] = 'Alle Filter erlauben';
 $string['viewallowallfilters_desc'] = 'BenutzerInnen dürfen zu jedem sichtbaren Filter wechseln.';
 $string['viewallowallfilters_help'] = 'Wenn aktiviert, können BenutzerInnen zu jedem sichtbaren Filter wechseln (auch zu später erstellten) und überschreiben damit die Liste der erlaubten Filter weiter unten. Unachtsame Verwendung dieser Funktion kann Nutzerdaten sichtbar machen, Vorsicht beim Aktivieren.';
+$string['viewapprovenotallowed'] = 'In dieser Ansicht können keine Einträge freigegeben werden.';
 $string['viewcharactertags'] = 'Character tags';
 $string['viewcreate'] = 'Neue Ansicht anlegen';
 $string['viewcurrent'] = 'Momentane Ansicht';

@@ -1036,6 +1036,7 @@ $string['viewadd'] = 'Add a view';
 $string['viewallowallfilters'] = 'Allow all filters';
 $string['viewallowallfilters_desc'] = 'Users may switch to any visible filter.';
 $string['viewallowallfilters_help'] = 'When enabled, users can switch to any visible filter (including ones created later), overriding the permitted filters list below. Improper use of this feature can display unintended information, be aware if using.';
+$string['viewapprovenotallowed'] = 'This view does not allow approving entries.';
 $string['viewcharactertags'] = 'Character tags';
 $string['viewcreate'] = 'Create a new view';
 $string['viewcurrent'] = 'Current view';

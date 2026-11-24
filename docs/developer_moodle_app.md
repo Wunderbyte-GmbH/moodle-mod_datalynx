@@ -25,7 +25,7 @@ same code as the web, and app code only adds the projection the app needs.
 | Edit form | `local\entry\entry_edit_form` |
 | Next view after a save | `view\base::get_next_step()` (Redirect on submit + continue editing): the web redirect, `submit_entry` and the app |
 | Addresses of an itinerary | `datalynxfield_itinerary\field::resolve_stops()`: a stop sent with an address only is looked up on save (validation and storage) |
-| Rights | Through a view: `view\base::user_can_add_entry()` (`offers_adding()`, also the web's `new=1`), `user_can_act_on_entry('edit'\|'delete', $entry)`; below them `datalynx::user_can_manage_entry()`, `user_can_add_new_entry()`, `user_can_approve_entries()`, `view\base::confirm_view_action()` |
+| Rights | Through a view: `view\base::user_can_add_entry()` (`offers_adding()`, also the web's `new=1`), `user_can_act_on_entry('edit'\|'delete', $entry)`, `user_can_approve_through_view()` (the `##approve##` switch, the app's button and `toggle_entry_approval`); below them `datalynx::user_can_manage_entry()`, `user_can_add_new_entry()`, `user_can_approve_entries()`, `view\base::confirm_view_action()` |
 | Filter menu | `view\base::get_filter_menu()` (web filter menu, app menu, app links) |
 | Dates of inputs | `local\date_input` (YYYY-MM-DD[THH:MM] in the user's timezone; custom filters and the app form) |
 | Links to other views | `datalynxview_patterns::get_view_link()` (every rule of `##viewlink##` / `##viewsesslink##`) |
@@ -77,7 +77,7 @@ returns, and `getFromCache: false` makes a view show entries saved in the meanti
 | `mod_datalynx_get_entry_edit_form` | The form to add or edit an entry, with a control per field |
 | `mod_datalynx_submit_entry` | Save an entry through a view, with the rules of its entry form |
 | `mod_datalynx_delete_entry` | Delete one entry through a view |
-| `mod_datalynx_toggle_entry_approval` | Approve or disapprove an entry |
+| `mod_datalynx_toggle_entry_approval` | Approve or disapprove an entry through a view with `##approve##` (also the web's switch); runs the web's approval (`process_entries`) |
 
 Files and images need no extra service: entry HTML carries absolute `pluginfile.php` URLs of the
 activity, and the app's `core-format-text` fetches them with the user's token.
