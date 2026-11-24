@@ -240,8 +240,6 @@ class manager {
      * @return array array of all rules (base[], or name strings keyed by id when $menu is set)
      */
     public function get_rules($exclude = null, $menu = false, $forceget = false): array {
-        global $DB;
-
         if (!$this->customrules || $forceget) {
             $this->customrules = [];
             // Collate user rules.

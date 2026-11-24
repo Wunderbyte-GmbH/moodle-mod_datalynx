@@ -154,7 +154,7 @@ abstract class base {
      *
      * @var ?array
      */
-    private ?array $preparedentrytemplate = null;
+    private ?array $preparedtemplate = null;
 
     /**
      * Cached entries handler.
@@ -1080,12 +1080,12 @@ abstract class base {
             if (count($processed) === 1 && (int) reset($processed) < 0) {
                 return;
             }
-            [$strnotify, $successfullyprocessedeids] = $processed;
+            [$strnotify, $processedeids] = $processed;
         } else {
-            [$strnotify, $successfullyprocessedeids] = ['', []];
+            [$strnotify, $processedeids] = ['', []];
         }
 
-        if (!empty($successfullyprocessedeids)) {
+        if (!empty($processedeids)) {
             $this->entriesprocessedsuccessfully = true;
             $this->notifications['good']['entries'] = $strnotify;
 
@@ -1108,7 +1108,7 @@ abstract class base {
                 }
                 $params = ['view' => $next['viewid']];
                 if ($next['continueediting']) {
-                    $entryid = reset($successfullyprocessedeids);
+                    $entryid = reset($processedeids);
                     $params['editentries'] = $entryid;
                     $params['eids'] = $entryid;
                 }
@@ -1121,7 +1121,7 @@ abstract class base {
         }
 
         // TODO: MDL-00000 Revise this. Does not seem to make sense. Old description: With one entry per page show the saved entry.
-        if ($successfullyprocessedeids && $this->user_is_editing() && !$this->returntoentriesform) {
+        if ($processedeids && $this->user_is_editing() && !$this->returntoentriesform) {
             if ($this->filter->perpage == 1) {
                 $this->filter->eids = implode(',', $this->editentries);
             }
@@ -1181,14 +1181,14 @@ abstract class base {
         $entriesplaceholder = $options['entriesplaceholder'] ?? null;
 
         // Build entries display definition.
-        $requiresmanageentries = $this->set_display_definition($options);
+        $needsmanage = $this->set_display_definition($options);
 
         // Set view specific tags.
         $viewoptions = array_merge($options, ['pluginfileurl' => $pluginfileurl,
                 'entriescount' => $this->entries->get_count(),
                 'entriesfiltercount' => $this->entries->get_count(true),
                 'hidenewentry' => ($this->user_is_editing() || $new) ? 1 : 0,
-                'showentryactions' => $requiresmanageentries && $showentryactions,
+                'showentryactions' => $needsmanage && $showentryactions,
         ]);
 
         $this->set_view_tags($viewoptions);
@@ -1938,10 +1938,10 @@ abstract class base {
         $lang = current_language();
 
         if (
-            $this->preparedentrytemplate !== null && $this->preparedentrytemplate[0] === $raw &&
-                $this->preparedentrytemplate[1] === $lang
+            $this->preparedtemplate !== null && $this->preparedtemplate[0] === $raw &&
+                $this->preparedtemplate[1] === $lang
         ) {
-            return $this->preparedentrytemplate[2];
+            return $this->preparedtemplate[2];
         }
 
         // No-op once an export has already resolved @@PLUGINFILE@@ through its own path.
@@ -1963,7 +1963,7 @@ abstract class base {
         ]);
         $text = $this->unmask_tags($text);
 
-        $this->preparedentrytemplate = [$raw, $lang, $text];
+        $this->preparedtemplate = [$raw, $lang, $text];
 
         return $text;
     }
@@ -2473,7 +2473,7 @@ abstract class base {
         $this->displaydefinition = [];
         // Indicate if there are managable entries in the display for the current user.
         // In which case edit/delete action.
-        $requiresmanageentries = false;
+        $needsmanage = false;
 
         $editentries = [];
         // Display a new entry to add in its own group.
@@ -2499,7 +2499,7 @@ abstract class base {
                 // Is this entry edited.
                 $editthisone = $editentries ? in_array($entryid, $editentries) : false;
                 // Set a flag if we are editing any entries.
-                $requiresmanageentries = $editthisone ? true : $requiresmanageentries;
+                $needsmanage = $editthisone ? true : $needsmanage;
                 // Calculate manageability for this entry only if action buttons can be displayed.
                 // And we're not already editing it.
                 $manageable = false;
@@ -2529,7 +2529,7 @@ abstract class base {
             // Collect remaining definitions (all of it if no groupby).
             $this->displaydefinition[$groupname] = $groupdefinition;
         }
-        return $requiresmanageentries;
+        return $needsmanage;
     }
 
     /**
@@ -2976,7 +2976,6 @@ abstract class base {
      * @return bool true, if the action is allowed; false otherwise.
      */
     public function confirm_view_action(string $action, int $targetviewid = 0): bool {
-        global $DB;
         // Fall back to the current view when no explicit target view is given in the request, e.g.
         // when editing on the default view without a 'view' URL parameter.
         $targetview = $targetviewid ?: (optional_param('view', 0, PARAM_INT) ?: $this->id());
@@ -3145,7 +3144,6 @@ abstract class base {
      * @return bool
      */
     private function is_valid_redirect_view(int $viewid): bool {
-        global $DB;
         $view = definition_cache::get_record($this->dlx->id(), 'views', $viewid);
         if (!$view) {
             return false;

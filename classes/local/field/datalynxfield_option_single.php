@@ -208,7 +208,6 @@ class datalynxfield_option_single extends datalynxfield_option {
 
         $sql = null;
         $params = [];
-        $name = "df_{$fieldid}_{$i}";
         $notinidsequal = false;
 
         // For all NOT criteria except NOT Empty, exclude entries.

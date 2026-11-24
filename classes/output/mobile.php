@@ -70,7 +70,7 @@ class mobile {
             'customfilterid' => PARAM_INT,
             'customvalues' => PARAM_RAW,
         ]);
-        [$cm, $context] = self::context($args->cmid);
+        [$cm] = self::context($args->cmid);
 
         $dlx = new datalynx($cm->instance);
         $payload = (new entries_payload_builder($dlx))->build([
@@ -224,9 +224,7 @@ class mobile {
                 $stops[] = ['address' => (string) $stop['address']];
             }
         }
-        while (count($stops) < 2) {
-            $stops[] = ['address' => ''];
-        }
+        $stops = array_pad($stops, 2, ['address' => '']);
         $strings = ['start' => 'appstopstart', 'via' => 'appstopvia', 'end' => 'appstopend', 'add' => 'addwaypoint',
             'remove' => 'dropwaypoint', 'up' => 'moveup', 'down' => 'movedown'];
         $labels = array_map(fn(string $stringid): string => get_string($stringid, 'datalynxfield_itinerary'), $strings);

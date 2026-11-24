@@ -597,16 +597,16 @@ class datalynx_entries {
         global $OUTPUT, $PAGE;
 
         echo $OUTPUT->header();
-        $confirmcontinueparams = [$action => implode(',', array_keys($entries)),
+        $continueparams = [$action => implode(',', array_keys($entries)),
                 'sesskey' => sesskey(), 'confirmed' => true];
         // Preserve the post-action return URL (set by the reset action) across the
         // confirmation step so the redirect after processing lands on the right URL.
         if ($returnurl = optional_param('returnurl', '', PARAM_LOCALURL)) {
-            $confirmcontinueparams['returnurl'] = $returnurl;
+            $continueparams['returnurl'] = $returnurl;
         }
         echo $OUTPUT->confirm(
             get_string("entriesconfirm$action", 'datalynx', count($entries)),
-            new moodle_url($PAGE->url, $confirmcontinueparams),
+            new moodle_url($PAGE->url, $continueparams),
             new moodle_url($PAGE->url)
         );
         echo $OUTPUT->footer();

@@ -85,7 +85,7 @@ final class backup_version_restore_test extends advanced_testcase {
         $dataid = $this->backup_and_restore();
 
         foreach ($this->grids as $key => $viewid) {
-            $this->assertSame($this->wrapper($this->dlx->id(), $viewid), $this->wrapper($dataid, $viewid, $key), $key);
+            $this->assertSame($this->wrapper($this->dlx->id(), $viewid), $this->wrapper($dataid, $viewid), $key);
         }
         $this->assertNull(format_manager::get_format_by_name($dataid, 'legacyformat'), 'no format migration');
         $this->assertStringContainsString('#{{viewlink:Other', $this->section($dataid), 'no tag migration');
@@ -100,10 +100,10 @@ final class backup_version_restore_test extends advanced_testcase {
 
         foreach (array_keys(\datalynxview_grid\view::ENTRY_WRAPPERS) as $wrapper) {
             $expected = [$wrapper, $wrapper === 'custom' ? 'my-card' : ''];
-            $this->assertSame($expected, $this->wrapper($dataid, $this->grids[$wrapper], $wrapper));
+            $this->assertSame($expected, $this->wrapper($dataid, $this->grids[$wrapper]));
         }
-        $this->assertSame(['entry', ''], $this->wrapper($dataid, $this->grids['empty'], 'empty'));
-        $this->assertSame(['entry', ''], $this->wrapper($dataid, $this->grids['unknown'], 'unknown'));
+        $this->assertSame(['entry', ''], $this->wrapper($dataid, $this->grids['empty']));
+        $this->assertSame(['entry', ''], $this->wrapper($dataid, $this->grids['unknown']));
         $this->assertNotNull(format_manager::get_format_by_name($dataid, 'legacyformat'));
         $this->assertStringContainsString('##viewlink:Other;Link;;##', $this->section($dataid));
     }
@@ -118,7 +118,7 @@ final class backup_version_restore_test extends advanced_testcase {
 
         $this->assertNotNull(format_manager::get_format_by_name($dataid, 'legacyformat'));
         $this->assertStringContainsString('##viewlink:Other;Link;;##', $this->section($dataid));
-        $this->assertSame(['col-12', ''], $this->wrapper($dataid, $this->grids['col-12'], 'col-12'));
+        $this->assertSame(['col-12', ''], $this->wrapper($dataid, $this->grids['col-12']));
     }
 
     /**
@@ -148,7 +148,7 @@ final class backup_version_restore_test extends advanced_testcase {
         $dataid = (int) $newcm->instance;
 
         foreach ($this->grids as $key => $viewid) {
-            $this->assertSame($this->wrapper($this->dlx->id(), $viewid), $this->wrapper($dataid, $viewid, $key), $key);
+            $this->assertSame($this->wrapper($this->dlx->id(), $viewid), $this->wrapper($dataid, $viewid), $key);
         }
         $this->assertSame(count($this->grids) + 1, $DB->count_records('datalynx_views', ['dataid' => $dataid]));
     }
@@ -240,10 +240,9 @@ final class backup_version_restore_test extends advanced_testcase {
      *
      * @param int $dataid
      * @param int $viewid the original view
-     * @param string $key for messages
      * @return array
      */
-    private function wrapper(int $dataid, int $viewid, string $key = ''): array {
+    private function wrapper(int $dataid, int $viewid): array {
         global $DB;
         $name = $DB->get_field('datalynx_views', 'name', ['id' => $viewid]);
         $view = $DB->get_record('datalynx_views', ['dataid' => $dataid, 'name' => $name], 'param3, param4', MUST_EXIST);

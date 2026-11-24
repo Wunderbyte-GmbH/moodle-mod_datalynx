@@ -97,7 +97,7 @@ function datalynx_limit_maxentries($maxentries): int {
  * @return $int
  */
 function datalynx_add_instance($data) {
-    global $CFG, $DB;
+    global $DB;
 
     $data->timemodified = time();
 

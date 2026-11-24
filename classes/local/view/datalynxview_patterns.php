@@ -932,8 +932,6 @@ class datalynxview_patterns {
      * @return array multidimensional
      */
     protected function userpref_patterns(): array {
-        global $DB;
-
         $cat = get_string('userpref', 'datalynx');
         $patterns = ['##quicksearch##' => [true, $cat],
                 '##quickperpage##' => [true, $cat]];

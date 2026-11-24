@@ -792,8 +792,8 @@ function xmldb_datalynx_upgrade($oldversion) {
             "SELECT id, customsearch FROM {datalynx_filters}"
         );
         if (!empty($filtersearchfields)) {
-            foreach ($filtersearchfields as $filterid => $serializedcustomsearch) {
-                $customsearch = \mod_datalynx\local\serialized::decode($serializedcustomsearch);
+            foreach ($filtersearchfields as $filterid => $serializedsearch) {
+                $customsearch = \mod_datalynx\local\serialized::decode($serializedsearch);
                 $newcustomsearch = (array) (object) $customsearch;
                 if (is_array($customsearch)) {
                     foreach ($customsearch as $fieldid => $queries) {
@@ -824,11 +824,11 @@ function xmldb_datalynx_upgrade($oldversion) {
                         }
                     }
                 }
-                $serializedcustomsearch = serialize($newcustomsearch);
+                $serializedsearch = serialize($newcustomsearch);
                 $DB->set_field(
                     'datalynx_filters',
                     'customsearch',
-                    $serializedcustomsearch,
+                    $serializedsearch,
                     ['id' => $filterid]
                 );
             }
@@ -1684,10 +1684,10 @@ function mod_datalynx_upgrade_repair_skipped_steps(): void {
     $hadtimesubmitted = $dbman->field_exists('datalynx_entries', 'timesubmitted');
     $hadpermittedfilters = $dbman->field_exists('datalynx_views', 'permittedfilters');
     $hadrulematches = $dbman->table_exists('datalynx_rule_matches');
-    $timesubmittednullable = false;
+    $timesubmittednull = false;
     if ($hadtimesubmitted) {
         $columns = $DB->get_columns('datalynx_entries', false);
-        $timesubmittednullable = empty($columns['timesubmitted']->not_null);
+        $timesubmittednull = empty($columns['timesubmitted']->not_null);
     }
 
     // Schema first, so that the data migrations below run against the final table structure.
@@ -1705,7 +1705,7 @@ function mod_datalynx_upgrade_repair_skipped_steps(): void {
     $field = new xmldb_field('timesubmitted', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'status');
     if (!$hadtimesubmitted) {
         $dbman->add_field($table, $field);
-    } else if (!$timesubmittednullable) {
+    } else if (!$timesubmittednull) {
         $dbman->change_field_notnull($table, $field);
         $dbman->change_field_default($table, $field);
     }
@@ -1730,7 +1730,7 @@ function mod_datalynx_upgrade_repair_skipped_steps(): void {
         mod_datalynx_upgrade_rule_condition_values_to_json();
         \datalynxfield_teammemberselect\field::normalize_stored_content();
     }
-    if (!$timesubmittednullable) {
+    if (!$timesubmittednull) {
         mod_datalynx_upgrade_rule_conditions_to_param9();
     }
     // Idempotent: no entry keeps 0 as its submission time.

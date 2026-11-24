@@ -310,7 +310,7 @@ final class entry_submission_service {
         // the hidden empty ones too, and saving drops the lines in which no subfield has a value
         // by the same test (the fieldgroup's line_has_value()).
         $lines = $requiredlines ? range(0, min($requiredlines, $maxlines) - 1) : [];
-        foreach ((array) $data as $name => $value) {
+        foreach (array_keys((array) $data) as $name) {
             if (
                 preg_match(self::ELEMENT_REGEX, (string) $name, $matches)
                 && (int) $matches[2] === $entryid

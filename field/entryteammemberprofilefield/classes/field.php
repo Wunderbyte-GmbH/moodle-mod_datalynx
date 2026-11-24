@@ -101,13 +101,13 @@ class field extends datalynxfield_no_content_can_join {
     public static function get_field_objects($dataid, $fields = []): array {
         $fieldobjects = [];
 
-        $teammemberselectfields = array_filter($fields, function ($field) {
+        $teamfields = array_filter($fields, function ($field) {
             return $field instanceof datalynxfield_teammemberselect;
         });
 
         $userprofilefields = self::PROFILE_FIELDS;
 
-        foreach ($teammemberselectfields as $field) {
+        foreach ($teamfields as $field) {
             $fieldname = $field->field->name;
             foreach ($userprofilefields as $profilefield) {
                 $fieldid = 'entryteammemberprofilefield_' . $field->field->id . "_$profilefield";

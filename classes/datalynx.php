@@ -1193,8 +1193,6 @@ class datalynx {
      * @return \datalynxfield_base[]
      */
     public function get_fields(?array $exclude = null, $menu = false, $forceget = false, $sort = ''): array {
-        global $DB;
-
         if (!$this->fields || $forceget) {
             $this->fields = [];
             // Collate user fields.
@@ -1234,8 +1232,6 @@ class datalynx {
      * @throws \dml_exception
      */
     public function get_fieldnames($sort = ''): array {
-        global $DB;
-
         $fieldnames = [];
         // Collate user fields.
         if ($fields = $this->get_definition_records('fields', $sort)) {
@@ -1258,7 +1254,6 @@ class datalynx {
      * @throws \dml_exception
      */
     private function find_filters_using_fields($fields): array {
-        global $DB;
         $filters = definition_cache::get_records($this->id(), 'filters');
         $usedfilters = [];
         $fieldids = array_keys($fields);
@@ -1309,7 +1304,6 @@ class datalynx {
      * @return array
      */
     private function find_customfilters_using_fields($fields): array {
-        global $DB;
         $customfilters = definition_cache::get_records($this->id(), 'customfilters');
         $usedcustomfilters = [];
         $fieldids = array_keys($fields);
@@ -1678,7 +1672,6 @@ class datalynx {
      * @return array an array of datalynx_views entry objects
      */
     public function get_view_records(bool $forceget = false, string $sort = ''): array {
-        global $DB;
         if (empty($this->views) || $forceget) {
             $views = $this->get_definition_records('views', $sort);
             // Reinitialise the views array.
@@ -1702,7 +1695,6 @@ class datalynx {
      * @return array an array of datalynx_views subclass objects
      */
     public function get_views_editable_by_user(string $sort = ''): array {
-        global $DB;
         if (has_capability('mod/datalynx:managetemplates', $this->context)) {
             $views = $this->get_definition_records('views', $sort);
             $returnviews = [];
@@ -2692,8 +2684,8 @@ class datalynx {
                 // Phew, within time limit, but wait, are we still in the same interval?
                 if ($timeinterval = $this->data->timeinterval) {
                     $elapsed = $now - $timeavailable;
-                    $currentintervalstarted = (floor($elapsed / $timeinterval) * $timeinterval) + $timeavailable;
-                    if ($entry->timecreated < $currentintervalstarted) {
+                    $intervalstart = (floor($elapsed / $timeinterval) * $timeinterval) + $timeavailable;
+                    if ($entry->timecreated < $intervalstart) {
                         return false; // Nop ...
                     }
                 }

@@ -196,10 +196,10 @@ class datalynx_filter {
         }
         // Defines what field should be sorted by.
         // Field ids may be internal string names (e.g. 'timecreated'), so do not coerce to int here.
-        $customfiltersortfield = optional_param('customfiltersortfield', null, PARAM_ALPHANUMEXT);
-        if ($customfiltersortfield) {
-            $customfiltersortdirection = optional_param('customfiltersortdirection', '0', PARAM_INT);
-            $customfiltersort = [$customfiltersortfield => $customfiltersortdirection];
+        $sortfield = optional_param('customfiltersortfield', null, PARAM_ALPHANUMEXT);
+        if ($sortfield) {
+            $sortdirection = optional_param('customfiltersortdirection', '0', PARAM_INT);
+            $customfiltersort = [$sortfield => $sortdirection];
             // Use the union operator, not array_merge(): array_merge() reindexes integer field-id
             // keys (e.g. 178000 => 0) and the sort field would no longer match any field.
             $this->sortfields = $customfiltersort + $this->sortfields;

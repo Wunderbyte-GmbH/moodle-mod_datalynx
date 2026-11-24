@@ -137,7 +137,7 @@ class datalynx_customfilter_backend_form extends datalynx_customfilter_base_form
         $fields = $this->get_possible_customfilter_fields($this->dlx);
         foreach ($fields as $field) {
             $formfieldname = 'fieldlist[' . $field->field->id . '][name]';
-            $formfieldsortablename = 'fieldlist[' . $field->field->id . '][sortable]';
+            $sortablename = 'fieldlist[' . $field->field->id . '][sortable]';
             $grp = [];
             $grp[] = $mform->createElement(
                 'advcheckbox',
@@ -149,7 +149,7 @@ class datalynx_customfilter_backend_form extends datalynx_customfilter_base_form
             );
             $grp[] = $mform->createElement(
                 'advcheckbox',
-                $formfieldsortablename,
+                $sortablename,
                 '',
                 get_string('sortable', 'datalynx'),
                 '',
@@ -157,12 +157,12 @@ class datalynx_customfilter_backend_form extends datalynx_customfilter_base_form
             );
             $mform->addGroup($grp, '', null, ' ', false);
             $mform->setType($formfieldname, PARAM_TEXT);
-            $mform->setType($formfieldsortablename, PARAM_INT);
+            $mform->setType($sortablename, PARAM_INT);
             foreach ($fieldlist as $fid => $listfield) {
                 if ($field->field->id == $fid) {
                     $mform->setDefault($formfieldname, $field->field->name);
                     if ($listfield->sortable) {
-                        $mform->setDefault($formfieldsortablename, 1);
+                        $mform->setDefault($sortablename, 1);
                     }
                     break;
                 }
@@ -182,10 +182,10 @@ class datalynx_customfilter_backend_form extends datalynx_customfilter_base_form
         global $DB;
 
         $fields = [];
-        $customfilterfieldtypes = $dlx->get_customfilterfieldtypes();
+        $filterfieldtypes = $dlx->get_customfilterfieldtypes();
         $fieldsdb = $DB->get_records('datalynx_fields', ['dataid' => $dlx->id()], 'name asc');
         foreach ($fieldsdb as $fieldid => $field) {
-            if (in_array($field->type, $customfilterfieldtypes)) {
+            if (in_array($field->type, $filterfieldtypes)) {
                 $fields[$fieldid] = $dlx->get_field($field);
             }
         }

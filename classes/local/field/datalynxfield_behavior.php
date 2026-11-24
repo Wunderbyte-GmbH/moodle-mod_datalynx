@@ -76,7 +76,7 @@ class datalynxfield_behavior {
             'select', 'radiobutton', 'text', 'teammemberselect', 'time', 'duration'];
 
     /** @var array Per-request cache of matching entry ids keyed by dataid + serialized rule. */
-    private static array $matchingentryidscache = [];
+    private static array $matchcache = [];
 
     /**
      * Reset the per-request condition-evaluation cache. Mainly useful in tests that mutate content
@@ -85,7 +85,7 @@ class datalynxfield_behavior {
      * @return void
      */
     public static function reset_condition_cache(): void {
-        self::$matchingentryidscache = [];
+        self::$matchcache = [];
     }
 
     /**
@@ -693,26 +693,26 @@ class datalynxfield_behavior {
         global $DB;
 
         $cachekey = $dlx->id() . ':' . json_encode($rule);
-        if (array_key_exists($cachekey, self::$matchingentryidscache)) {
-            return self::$matchingentryidscache[$cachekey];
+        if (array_key_exists($cachekey, self::$matchcache)) {
+            return self::$matchcache[$cachekey];
         }
 
         $sourcefieldid = $rule['sourcefieldid'] ?? 0;
         // Internal fields (e.g. 'status', 'approve') use non-numeric string ids — keep them as-is.
         $field = $dlx->get_field_from_id(is_numeric($sourcefieldid) ? (int) $sourcefieldid : $sourcefieldid);
         if (!$field) {
-            return self::$matchingentryidscache[$cachekey] = [];
+            return self::$matchcache[$cachekey] = [];
         }
 
         $search = [$rule['not'] ?? '', $rule['operator'] ?? '', $rule['value'] ?? ''];
         $result = $field->get_search_sql($search);
         if (empty($result)) {
-            return self::$matchingentryidscache[$cachekey] = true;
+            return self::$matchcache[$cachekey] = true;
         }
         [$fieldsql, $params, $fromcontent] = $result;
         if (empty($fieldsql)) {
             // The field imposed no constraint (e.g. a NOT rule that excludes nothing): every entry matches.
-            return self::$matchingentryidscache[$cachekey] = true;
+            return self::$matchcache[$cachekey] = true;
         }
 
         $from = $fromcontent ? $field->get_search_from_sql() : '';
@@ -723,6 +723,6 @@ class datalynxfield_behavior {
                  WHERE e.dataid = :conddataid AND ($fieldsql)";
         $ids = $DB->get_fieldset_sql($sql, $params);
 
-        return self::$matchingentryidscache[$cachekey] = array_map('intval', $ids);
+        return self::$matchcache[$cachekey] = array_map('intval', $ids);
     }
 }

@@ -50,7 +50,6 @@ class manager {
      * @return base[] List of format objects.
      */
     public static function get_formats_for_instance(int $datalynxid, string $fieldtype = ''): array {
-        global $DB;
         $cachekey = $datalynxid . ':' . $fieldtype;
         if (isset(self::$instancecache[$cachekey])) {
             return self::$instancecache[$cachekey];

@@ -152,7 +152,6 @@ class datalynx_filter_manager {
      * @return array|false
      */
     public function get_filters($exclude = null, $menu = false, $forceget = false): array|false {
-        global $DB;
         if (!$this->filters || $forceget) {
             $this->filters = [];
             $filters = \mod_datalynx\local\definition_cache::get_records($this->dlx->id(), 'filters');

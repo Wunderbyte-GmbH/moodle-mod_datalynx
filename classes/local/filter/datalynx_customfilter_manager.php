@@ -134,7 +134,6 @@ class datalynx_customfilter_manager {
      * @return array|false
      */
     public function get_filters($exclude = null, $menu = false, $forceget = false): array|false {
-        global $DB;
         if (!$this->customfilters || $forceget) {
             $this->customfilters = [];
             if ($filters = \mod_datalynx\local\definition_cache::get_records($this->dlx->id(), 'customfilters')) {

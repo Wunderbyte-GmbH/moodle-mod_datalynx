@@ -32,7 +32,7 @@ require_once("$CFG->dirroot/mod/datalynx/backup/moodle2/restore_datalynx_stepsli
  */
 class restore_datalynx_activity_task extends restore_activity_task {
     /** @var int|null datalynx version that made the backup, null if the backup does not say */
-    protected ?int $datalynxbackupversion = null;
+    protected ?int $backupversion = null;
 
     /**
      * Record the datalynx version that made the backup (restore step, from the activity element).
@@ -40,7 +40,7 @@ class restore_datalynx_activity_task extends restore_activity_task {
      * @param int|null $version null for backups made before the version was written
      */
     public function set_datalynx_backup_version(?int $version): void {
-        $this->datalynxbackupversion = $version;
+        $this->backupversion = $version;
     }
 
     /**
@@ -54,7 +54,7 @@ class restore_datalynx_activity_task extends restore_activity_task {
      * @return bool
      */
     public function datalynx_backup_predates(int $version): bool {
-        return $this->datalynxbackupversion === null || $this->datalynxbackupversion < $version;
+        return $this->backupversion === null || $this->backupversion < $version;
     }
 
     /** @var int User id of designated owner of content. */

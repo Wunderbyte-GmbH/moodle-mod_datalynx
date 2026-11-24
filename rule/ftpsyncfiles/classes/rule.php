@@ -140,7 +140,7 @@ class rule extends base {
 
         $this->fs = get_file_storage();
         // Download files to $this->files array indexed by draftitemid.
-        $this->download_files((int) $did);
+        $this->download_files();
 
         if (!empty($this->files)) {
             foreach ($this->files as $draftitemid => $file) {
@@ -166,10 +166,9 @@ class rule extends base {
     /**
      * Download the files from the server and place in draftitemid.
      *
-     * @param int $did
      * @return void
      */
-    private function download_files(int $did): void {
+    private function download_files(): void {
         global $USER;
         $server = $this->sftpserver;
         $remotedir = $this->sftppath;

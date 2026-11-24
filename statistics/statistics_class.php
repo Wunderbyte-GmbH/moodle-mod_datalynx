@@ -127,7 +127,7 @@ class datalynx_statistics_class {
                         'This should not happen'
                     );
             }
-            [$total, $approved, $deleted, $visits] = $this->get_count($params->mode, $from, $to);
+            [$total, $approved, $deleted, $visits] = $this->get_count($from, $to);
             $dateformat = get_string('strftimedate', 'langconfig');
             $title = get_string('statisticsfor', 'datalynx', $this->dlx->name());
             $timestring = get_string(
@@ -193,14 +193,13 @@ class datalynx_statistics_class {
     }
 
     /**
-     * Get statistics counts for a given mode and time range.
+     * Get statistics counts for a time range.
      *
-     * @param int $mode Mode constant.
      * @param int $from Start timestamp.
      * @param int $to End timestamp.
      * @return array Array containing counts for total, approved, deleted, and visits.
      */
-    private function get_count($mode, $from = 0, $to = PHP_INT_MAX): array {
+    private function get_count($from = 0, $to = PHP_INT_MAX): array {
         global $DB;
 
         $params = ['dataid' => $this->dlx->id(), 'fromdate' => $from,
