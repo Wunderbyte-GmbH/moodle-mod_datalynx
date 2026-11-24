@@ -117,16 +117,20 @@
                         <ion-select-option *ngFor="let o of f.choices" [value]="o.value" [disabled]="o.disabled">{{ o.label }}</ion-select-option>
                     </ion-select>
                 </ion-item>
-                <!-- An itinerary: one address per stop, looked up on save. Stops can be added, removed and moved. -->
+                <!-- An itinerary: one address per stop, with suggestions while typing; a picked place keeps its
+                     position, any other address is looked up on save. Stops can be added, removed and moved. -->
                 <ng-container *ngIf="f.control === 'itinerary'">
                     <ion-item lines="none" class="ion-text-wrap">
                         <ion-label><p class="item-heading">{{ f.name + (f.required ? ' *' : '') }}</p></ion-label>
                     </ion-item>
-                    <ion-item *ngFor="let s of f.stops; let i = index; let last = last">
+                    <ng-container *ngFor="let s of f.stops; let i = index; let last = last">
+                    <ion-item>
                         <ion-input class="mod-datalynx-mobile-control" labelPlacement="stacked"
                                 [label]="i === 0 ? f.labels.start : (last ? f.labels.end : f.labels.via)"
-                                [name]="f.formnames.waypoints + '__' + i" [value]="s.address"
-                                (ionInput)="s.address = $event.detail.value"></ion-input>
+                                [name]="f.formnames.waypoints + '__' + i" [value]="s.address" autocomplete="off"
+                                (ionInput)="dlxSuggest(f, s, $event.detail.value)"></ion-input>
+                        <ion-input class="ion-hide" [name]="f.formnames.waypoints + '__' + i + '__lat'" [value]="s.lat"></ion-input>
+                        <ion-input class="ion-hide" [name]="f.formnames.waypoints + '__' + i + '__lng'" [value]="s.lng"></ion-input>
                         <ion-button *ngIf="i > 0" slot="end" fill="clear" type="button" [attr.aria-label]="f.labels.up"
                                 (click)="f.stops.splice(i - 1, 0, f.stops.splice(i, 1)[0])">
                             <ion-icon name="fas-arrow-up" aria-hidden="true"></ion-icon>
@@ -140,8 +144,15 @@
                             <ion-icon name="fas-xmark" aria-hidden="true"></ion-icon>
                         </ion-button>
                     </ion-item>
+                    <ion-item *ngFor="let p of s.suggestions" button [detail]="false" class="mod-datalynx-mobile-suggestion"
+                            (click)="dlxPick(s, p)">
+                        <ion-icon name="fas-location-dot" slot="start" aria-hidden="true"></ion-icon>
+                        <ion-label class="ion-text-wrap">{{ p.address }}</ion-label>
+                    </ion-item>
+                    </ng-container>
                     <ion-item *ngIf="f.stops.length < f.maxstops" lines="none">
-                        <ion-button fill="outline" size="small" type="button" (click)="f.stops.splice(f.stops.length - 1, 0, {address: ''})">
+                        <ion-button fill="outline" size="small" type="button"
+                                (click)="f.stops.splice(f.stops.length - 1, 0, {address: '', lat: '', lng: ''})">
                             <ion-icon name="fas-plus" slot="start" aria-hidden="true"></ion-icon>
                             {{ f.labels.add }}
                         </ion-button>

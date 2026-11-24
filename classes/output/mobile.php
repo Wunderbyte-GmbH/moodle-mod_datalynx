@@ -45,6 +45,44 @@ class mobile {
     const PERPAGE = 20;
 
     /**
+     * @var string The script of the edit page: address suggestions for the stops of an itinerary,
+     * from the server's geocoder (mod_datalynx_geocode_search) as on the web. Typing clears the
+     * position of a picked place; the server looks up an address without one on save.
+     */
+    const EDIT_JAVASCRIPT = <<<'JS'
+var page = this;
+page.dlxSuggest = function(field, stop, text) {
+    stop.address = text || '';
+    stop.lat = '';
+    stop.lng = '';
+    clearTimeout(stop.timer);
+    stop.suggestions = [];
+    var query = stop.address.trim();
+    if (query.length < 3) {
+        return;
+    }
+    stop.timer = setTimeout(function() {
+        page.CoreSitesProvider.getCurrentSite().read('mod_datalynx_geocode_search', {fieldid: field.fieldid, query: query},
+            {getFromCache: false, saveToCache: false}).then(function(result) {
+            if (stop.address.trim() === query) {
+                stop.suggestions = result.places;
+            }
+            return result;
+        }).catch(function() {
+            stop.suggestions = [];
+        });
+    }, 400);
+};
+page.dlxPick = function(stop, place) {
+    clearTimeout(stop.timer);
+    stop.address = place.address;
+    stop.lat = place.lat;
+    stop.lng = place.lng;
+    stop.suggestions = [];
+};
+JS;
+
+    /**
      * Browse the entries of the activity.
      *
      * The app opens this with cmid and courseid. View switching, searching and growing the list
@@ -200,7 +238,7 @@ class mobile {
             'templates' => [
                 ['id' => 'main', 'html' => $html],
             ],
-            'javascript' => '',
+            'javascript' => self::EDIT_JAVASCRIPT,
             'otherdata' => self::otherdata(self::edit_state($form) + [
                 'parts' => $parts,
                 'viewid' => (int) $args->viewid,
@@ -221,10 +259,12 @@ class mobile {
         $stops = [];
         foreach ((array) json_decode((string) $field['show']['waypoints'], true) as $stop) {
             if (is_array($stop) && trim((string) ($stop['address'] ?? '')) !== '') {
-                $stops[] = ['address' => (string) $stop['address']];
+                $known = is_numeric($stop['lat'] ?? null) && is_numeric($stop['lng'] ?? null);
+                $stops[] = ['address' => (string) $stop['address'], 'lat' => $known ? (float) $stop['lat'] : '',
+                    'lng' => $known ? (float) $stop['lng'] : ''];
             }
         }
-        $stops = array_pad($stops, 2, ['address' => '']);
+        $stops = array_pad($stops, 2, ['address' => '', 'lat' => '', 'lng' => '']);
         $strings = ['start' => 'appstopstart', 'via' => 'appstopvia', 'end' => 'appstopend', 'add' => 'addwaypoint',
             'remove' => 'dropwaypoint', 'up' => 'moveup', 'down' => 'movedown'];
         $labels = array_map(fn(string $stringid): string => get_string($stringid, 'datalynxfield_itinerary'), $strings);

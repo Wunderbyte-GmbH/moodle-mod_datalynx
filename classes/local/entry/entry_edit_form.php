@@ -175,7 +175,8 @@ final class entry_edit_form {
      *
      * The form's inputs are named ef_{fieldid}__{input name}. Lists arrive as "a,b" (multiple
      * selects); a datetime as YYYY-MM-DD or YYYY-MM-DDTHH:MM in the user's timezone; a duration
-     * in minutes. An itinerary sends one address per stop (ef_{fieldid}__waypoints__{n}), a
+     * in minutes. An itinerary sends one address per stop (ef_{fieldid}__waypoints__{n}), with the
+     * position of a place picked from the suggestions (…__{n}__lat, …__{n}__lng), a
      * schedule its weekdays as one list (ef_{fieldid}__days). Each is turned into the value the
      * field's input contract takes.
      *
@@ -205,9 +206,15 @@ final class entry_edit_form {
                     $stops = [];
                     for ($n = 0; $n < (int) ($control['maxstops'] ?? 0); $n++) {
                         $address = $arg("{$name}__{$n}");
-                        if ($address !== null && $address !== '') {
-                            $stops[] = ['address' => $address];
+                        if ($address === null || $address === '') {
+                            continue;
                         }
+                        // A place picked from the suggestions comes with its position.
+                        $lat = $arg("{$name}__{$n}__lat");
+                        $lng = $arg("{$name}__{$n}__lng");
+                        $stops[] = is_numeric($lat) && is_numeric($lng) && abs((float) $lat) <= 90 && abs((float) $lng) <= 180
+                            ? ['address' => $address, 'lat' => (float) $lat, 'lng' => (float) $lng]
+                            : ['address' => $address];
                     }
                     $raw = json_encode($stops, JSON_UNESCAPED_UNICODE);
                 } else if ($control['control'] === 'schedule' && preg_match('/^day(\d)$/', $input['name'], $day)) {

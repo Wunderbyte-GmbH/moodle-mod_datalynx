@@ -201,3 +201,9 @@
     font-size: 0.75em;
     transform: none;
 }
+
+/* Address suggestions below a stop of an itinerary. */
+.mod-datalynx-mobile .mod-datalynx-mobile-suggestion {
+    --padding-start: 1.5rem;
+    font-size: 0.875em;
+}

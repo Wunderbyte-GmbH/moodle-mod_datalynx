@@ -129,10 +129,11 @@ $functions = [
                 'classname'   => 'mod_datalynx\external\geocode_search',
                 'methodname'  => 'execute',
                 'classpath'   => '',
-                'description' => 'Look up places matching an address query for a location field.',
+                'description' => 'Look up places matching an address query for a location or itinerary field.',
                 'type'        => 'read',
                 'capabilities' => 'mod/datalynx:viewentry',
                 'ajax'        => true,
+                'services'    => [MOODLE_OFFICIAL_MOBILE_SERVICE],
         ],
         'mod_datalynx_geocode_reverse' => [
                 'classname'   => 'mod_datalynx\external\geocode_reverse',

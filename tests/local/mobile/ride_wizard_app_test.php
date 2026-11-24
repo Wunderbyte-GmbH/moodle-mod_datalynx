@@ -186,7 +186,8 @@ final class ride_wizard_app_test extends advanced_testcase {
         $this->assertSame('Weiter zum Termin', $state['submitlabel']);
         $route = $this->field($state, $this->ids['Route']);
         $this->assertSame('itinerary', $route['control']);
-        $this->assertSame([['address' => ''], ['address' => '']], $route['stops']);
+        $empty = ['address' => '', 'lat' => '', 'lng' => ''];
+        $this->assertSame([$empty, $empty], $route['stops']);
         $this->assertSame(3, $route['maxstops']);
 
         $result = $this->save('step1', 0, $state, [
@@ -270,7 +271,7 @@ final class ride_wizard_app_test extends advanced_testcase {
             $this->ids['Route'] => ['stops' => ['Wien', 'Wiener Neustadt', 'Graz', 'Klagenfurt']],
             $this->ids['Termin'] => ['mode' => 'once', 'date' => '2026-11-30', 'start' => '480'],
         ]);
-        $this->assertNotEmpty($result['javascript']);
+        $this->assertStringContainsString('this.updateContent(', $result['javascript']);
         $entryid = (int) $DB->get_field('datalynx_entries', 'id', ['dataid' => $this->dlx->id()], MUST_EXIST);
         $this->assertSame(3, $DB->count_records('datalynx_waypoints', ['entryid' => $entryid]));
     }
@@ -304,6 +305,48 @@ final class ride_wizard_app_test extends advanced_testcase {
             $before,
             $DB->get_field('datalynx_contents', 'content', ['entryid' => $entryid, 'fieldid' => $this->ids['Route']])
         );
+    }
+
+    /**
+     * A place picked from the suggestions is saved with its position, without a lookup; an
+     * address typed without one is looked up, and a position out of range is ignored.
+     */
+    public function test_picked_places_keep_their_position(): void {
+        global $DB;
+
+        $this->save('request', 0, $this->open('request'), [
+            $this->ids['Route'] => ['stops' => [['Westbahnhof, 1150 Wien', '48.1967', '16.3378'], ['Graz', '91', '15']]],
+            $this->ids['Termin'] => ['mode' => 'once', 'date' => '2026-11-30', 'start' => '480'],
+        ]);
+
+        $this->assertSame(['graz'], array_map('strtolower', $this->geocoder->queries));
+        $entryid = (int) $DB->get_field('datalynx_entries', 'id', ['dataid' => $this->dlx->id()], MUST_EXIST);
+        $stops = json_decode($DB->get_field('datalynx_contents', 'content', ['entryid' => $entryid,
+            'fieldid' => $this->ids['Route']]), true);
+        $this->assertSame(['Westbahnhof, 1150 Wien', 'Hauptplatz, 8010 Graz'], array_column($stops, 'address'));
+        $this->assertEqualsWithDelta(48.1967, $stops[0]['lat'], 0.0001);
+        $this->assertEqualsWithDelta(16.3378, $stops[0]['lng'], 0.0001);
+
+        // The form shows the stops with their positions, so saving again keeps them.
+        $route = $this->field($this->open('request', $entryid), $this->ids['Route']);
+        $this->assertEqualsWithDelta(48.1967, $route['stops'][0]['lat'], 0.0001);
+    }
+
+    /**
+     * The edit page brings the script of the address suggestions, which asks the server's
+     * geocoder through a function of the app's service.
+     */
+    public function test_edit_page_suggests_addresses(): void {
+        global $DB;
+
+        $result = mobile::mobile_edit_entry(array_map('strval', ['cmid' => $this->dlx->cm->id,
+            'courseid' => $this->course->id, 'viewid' => $this->views['request']]));
+
+        $this->assertStringContainsString("'mod_datalynx_geocode_search'", $result['javascript']);
+        $this->assertStringContainsString('dlxSuggest(f, s, $event.detail.value)', $result['templates'][0]['html']);
+        $serviceid = $DB->get_field('external_services', 'id', ['shortname' => MOODLE_OFFICIAL_MOBILE_SERVICE]);
+        $this->assertTrue($DB->record_exists('external_services_functions', ['externalserviceid' => $serviceid,
+            'functionname' => 'mod_datalynx_geocode_search']));
     }
 
     /**
@@ -408,8 +451,12 @@ final class ride_wizard_app_test extends advanced_testcase {
             $field = $this->field($state, $fieldid);
             foreach ($inputs as $name => $value) {
                 if ($name === 'stops') {
-                    foreach ($value as $n => $address) {
+                    foreach ($value as $n => $stop) {
+                        // A place picked from the suggestions: [label, lat, lng].
+                        [$address, $lat, $lng] = is_array($stop) ? $stop : [$stop, '', ''];
                         $args[$field['formnames']['waypoints'] . '__' . $n] = $address;
+                        $args[$field['formnames']['waypoints'] . '__' . $n . '__lat'] = $lat;
+                        $args[$field['formnames']['waypoints'] . '__' . $n . '__lng'] = $lng;
                     }
                 } else if ($name === 'days') {
                     $args[$field['daysname']] = $value;
@@ -432,7 +479,7 @@ final class ride_wizard_app_test extends advanced_testcase {
      */
     private function save_and_stay(string $view, int $entryid, array $values): array {
         $result = $this->save($view, $entryid, $this->open($view, $entryid), $values);
-        $this->assertSame('', $result['javascript']);
+        $this->assertSame(mobile::EDIT_JAVASCRIPT, $result['javascript']);
 
         return json_decode($result['otherdata']['state'], true);
     }
