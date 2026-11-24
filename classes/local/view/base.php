@@ -486,7 +486,8 @@ abstract class base {
         }
 
         if (!trim($text)) {
-            $this->tags = [];
+            // Empty templates have no tags; the shape stays what readers of the tags expect.
+            $this->tags = ['view' => [], 'field' => []];
             return;
         }
 

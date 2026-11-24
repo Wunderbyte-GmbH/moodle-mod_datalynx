@@ -342,6 +342,28 @@ final class get_pdf_view_data_test extends advanced_testcase {
     }
 
     /**
+     * A PDF view without any template (stored that way by older versions) still returns its payload.
+     *
+     * @covers ::execute
+     */
+    public function test_execute_with_empty_templates(): void {
+        global $DB;
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        [$dlx, $view] = $this->create_pdf_fixture();
+        $DB->update_record('datalynx_views', (object) ['id' => $view->id, 'section' => '', 'param2' => '',
+            'param3' => '', 'param4' => '']);
+        \mod_datalynx\local\definition_cache::purge();
+
+        $result = get_pdf_view_data::execute($dlx->id(), $view->id);
+        $result = external_api::clean_returnvalue(get_pdf_view_data::execute_returns(), $result);
+
+        $this->assertSame($view->id, $result['viewid']);
+        $this->assertSame('pdf', $result['viewtype']);
+    }
+
+    /**
      * PDF AJAX payloads must preserve active custom search state.
      *
      * @covers ::execute
