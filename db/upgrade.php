@@ -1432,6 +1432,39 @@ function xmldb_datalynx_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2026111800, 'datalynx');
     }
 
+    if ($oldversion < 2026112400) {
+        // The userinfo field type was removed with the field formats (2026060900); its
+        // registration stayed behind as a plugin missing from disk.
+        mod_datalynx_upgrade_uninstall_userinfo();
+
+        upgrade_mod_savepoint(true, 2026112400, 'datalynx');
+    }
+
+    return true;
+}
+
+/**
+ * Remove the registration of the deleted datalynxfield_userinfo subplugin (2026112400).
+ *
+ * Runs only when the plugin directory is gone and no userinfo field is left: the field formats
+ * migration has turned those fields into entryauthor formats. Datalynx subplugins cannot be
+ * uninstalled through the admin interface, so the upgrade does it, as core does for plugins it
+ * removed.
+ *
+ * @return bool whether the plugin was uninstalled
+ */
+function mod_datalynx_upgrade_uninstall_userinfo(): bool {
+    global $CFG, $DB;
+    require_once($CFG->libdir . '/adminlib.php');
+
+    $installed = $DB->record_exists('config_plugins', ['plugin' => 'datalynxfield_userinfo', 'name' => 'version']);
+    if (!$installed || file_exists($CFG->dirroot . '/mod/datalynx/field/userinfo/version.php')) {
+        return false;
+    }
+    if ($DB->record_exists('datalynx_fields', ['type' => 'userinfo'])) {
+        return false;
+    }
+    uninstall_plugin('datalynxfield', 'userinfo');
     return true;
 }
 
