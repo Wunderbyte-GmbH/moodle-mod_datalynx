@@ -349,7 +349,11 @@ JS;
                 $field['formnames'][$input['name']] = $input['formname'];
             }
             unset($input);
-            if ($field['control'] === 'itinerary') {
+            if ($field['control'] === 'slider') {
+                // The position the slider starts at.
+                $positions = array_column($field['choices'], 'value');
+                $field['index'] = max(0, (int) array_search($field['inputs'][0]['show'], $positions, true));
+            } else if ($field['control'] === 'itinerary') {
                 $field += self::itinerary_state($field);
             } else if ($field['control'] === 'schedule') {
                 $field += self::schedule_state($field);

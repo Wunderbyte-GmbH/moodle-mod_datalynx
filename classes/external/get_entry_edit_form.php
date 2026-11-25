@@ -106,7 +106,8 @@ class get_entry_edit_form extends external_api {
                 'fieldid' => new external_value(PARAM_ALPHANUMEXT, 'Field ID, or the name of an internal field'),
                 'name' => new external_value(PARAM_TEXT, 'Field name'),
                 'control' => new external_value(PARAM_ALPHA, 'text, number, textarea, url, select, radio, multiselect, '
-                    . 'checkbox, datetime, duration, itinerary, schedule, toggle, hidden or static'),
+                    . 'checkbox, datetime, duration, slider, itinerary, schedule, toggle, hidden or static. A slider '
+                    . 'takes one of its choices, its positions in order'),
                 'required' => new external_value(PARAM_BOOL, 'Whether a value is required'),
                 'multiple' => new external_value(PARAM_BOOL, 'Whether several choices can be chosen'),
                 'inputs' => new external_multiple_structure(new external_single_structure([

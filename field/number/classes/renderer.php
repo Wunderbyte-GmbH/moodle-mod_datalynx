@@ -297,15 +297,32 @@ class renderer extends TextRenderer {
     }
 
     /**
-     * A number.
+     * A number; with a slider format, a slider over the positions of its scale, as on the web.
+     *
+     * The slider's positions come as the choices of the control, each with the label the web's
+     * readout shows. The value is the position the slider starts at: the stored value snapped to
+     * the scale, or the first position for an empty value (the web slider writes it as well).
      *
      * @param stdClass $entry
      * @param array $options
      * @return array|null
      */
     public function get_edit_control(stdClass $entry, array $options): ?array {
-        return $this->edit_control('number', ['' => $entry->{"c{$this->field->id()}_content"} ?? ''], $options, [
-            'inputmode' => 'decimal',
-        ]);
+        $content = (string) ($entry->{"c{$this->field->id()}_content"} ?? '');
+        $fieldformat = $options['field_format'] ?? null;
+        $values = $fieldformat instanceof field_format ? $fieldformat->get_slider_values() : [];
+        if (!$values) {
+            return $this->edit_control('number', ['' => $content], $options, ['inputmode' => 'decimal']);
+        }
+
+        $unit = (string) $fieldformat->get_setting('sliderunit', '');
+        $menu = [];
+        foreach ($values as $value) {
+            $menu[(string) $value] = $this->format_slider_label($value, $unit);
+        }
+        $control = $this->edit_control('slider', ['' => (string) $values[$this->get_slider_index($values, $content)]], $options);
+        $control['choices'] = self::edit_choices($menu);
+
+        return $control;
     }
 }

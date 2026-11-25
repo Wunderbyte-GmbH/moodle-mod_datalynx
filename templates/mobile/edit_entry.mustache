@@ -117,6 +117,19 @@
                         <ion-select-option *ngFor="let o of f.choices" [value]="o.value" [disabled]="o.disabled">{{ o.label }}</ion-select-option>
                     </ion-select>
                 </ion-item>
+                <!-- A slider: its positions are the choices; the hidden input carries the value of the chosen one. -->
+                <ion-item *ngIf="f.control === 'slider'">
+                    <ion-range class="mod-datalynx-mobile-control" labelPlacement="stacked" [min]="0" [max]="f.choices.length - 1"
+                            [step]="1" [snaps]="true" [ticks]="f.choices.length <= 25" [value]="f.index"
+                            (ionInput)="f.index = $event.detail.value">
+                        <div slot="label" class="mod-datalynx-mobile-label">
+                            {{ f.name + (f.required ? ' *' : '') }}: <strong>{{ f.choices[f.index].label }}</strong>
+                        </div>
+                        <ion-text slot="start">{{ f.choices[0].label }}</ion-text>
+                        <ion-text slot="end">{{ f.choices[f.choices.length - 1].label }}</ion-text>
+                    </ion-range>
+                    <ion-input class="ion-hide" [name]="f.inputs[0].formname" [value]="f.choices[f.index].value"></ion-input>
+                </ion-item>
                 <!-- An itinerary: one address per stop, with suggestions while typing; a picked place keeps its
                      position, any other address is looked up on save. Stops can be added, removed and moved. -->
                 <ng-container *ngIf="f.control === 'itinerary'">
