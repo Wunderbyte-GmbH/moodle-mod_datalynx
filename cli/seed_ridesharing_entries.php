@@ -148,10 +148,9 @@ $rides = [
         'wochentage' => [1, 3, 5],
         'abfahrt' => 15, // 07:00 in half hour slots, 1 = 00:00.
         'ankunft' => 20, // 09:30.
-        'fahrzeugart' => 4, // Kombi.
-        'fahrzeug' => 'Škoda Octavia Combi',
+        'marke' => 'Skoda',
+        'modell' => 'Octavia Combi',
         'kennzeichen' => 'W-12345A',
-        'kraftstoff' => 2, // Hybrid.
         'plaetze' => 3,
         'gepaeck' => 3, // 1 Koffer.
         'mitfahrende' => 1,
@@ -165,10 +164,9 @@ $rides = [
         'stops' => ['wienhbf', 'stpoelten', 'linz'],
         'muster' => 1,
         'times' => [3 * $day + 8 * HOURSECS, 3 * $day + 10 * HOURSECS + 30 * MINSECS],
-        'fahrzeugart' => 2,
-        'fahrzeug' => 'BMW 320d',
+        'marke' => 'BMW',
+        'modell' => '320d',
         'kennzeichen' => 'W-88112B',
-        'kraftstoff' => 1,
         'plaetze' => 2,
         'gepaeck' => 4,
         'mitfahrende' => 1,
@@ -184,10 +182,9 @@ $rides = [
         'wochentage' => [2, 4],
         'abfahrt' => 33, // 16:00.
         'ankunft' => 37, // 18:00.
-        'fahrzeugart' => 5,
-        'fahrzeug' => 'Hyundai Tucson',
+        'marke' => 'Hyundai',
+        'modell' => 'Tucson',
         'kennzeichen' => 'G-4711C',
-        'kraftstoff' => 3, // E-Auto.
         'plaetze' => 4,
         'gepaeck' => 4,
         'mitfahrende' => 1,
@@ -200,10 +197,9 @@ $rides = [
         'stops' => ['linz', 'salzburg'],
         'muster' => 1,
         'times' => [5 * $day + 9 * HOURSECS, 5 * $day + 10 * HOURSECS + 45 * MINSECS],
-        'fahrzeugart' => 1,
-        'fahrzeug' => 'VW Polo',
+        'marke' => 'Volkswagen',
+        'modell' => 'Polo',
         'kennzeichen' => 'L-2020D',
-        'kraftstoff' => 1,
         'plaetze' => 3,
         'gepaeck' => 2, // Handtasche.
         'mitfahrende' => 3, // Weiblich.
@@ -216,10 +212,9 @@ $rides = [
         'stops' => ['wien', 'brno'],
         'muster' => 1,
         'times' => [7 * $day + 6 * HOURSECS + 30 * MINSECS, 7 * $day + 8 * HOURSECS + 30 * MINSECS],
-        'fahrzeugart' => 3,
-        'fahrzeug' => 'Mazda MX-5',
+        'marke' => 'Mazda',
+        'modell' => 'MX-5',
         'kennzeichen' => 'W-77777E',
-        'kraftstoff' => 1,
         'plaetze' => 1,
         'gepaeck' => 2,
         'mitfahrende' => 1,
@@ -235,10 +230,9 @@ $rides = [
         'wochentage' => [1, 2, 3, 4, 5],
         'abfahrt' => 14, // 06:30.
         'ankunft' => 16, // 07:30.
-        'fahrzeugart' => 7, // Kleinbus.
-        'fahrzeug' => 'Ford Transit',
+        'marke' => 'Ford',
+        'modell' => 'Transit',
         'kennzeichen' => 'WN-9001F',
-        'kraftstoff' => 1,
         'plaetze' => 8,
         'gepaeck' => 4,
         'mitfahrende' => 1,
@@ -251,10 +245,9 @@ $rides = [
         'stops' => ['innsbruck', 'salzburg'],
         'muster' => 1,
         'times' => [10 * $day + 13 * HOURSECS, 10 * $day + 15 * HOURSECS + 15 * MINSECS],
-        'fahrzeugart' => 6, // Mini Van.
-        'fahrzeug' => 'Renault Scenic',
+        'marke' => 'Renault',
+        'modell' => 'Scenic',
         'kennzeichen' => 'I-3003G',
-        'kraftstoff' => 2,
         'plaetze' => 4,
         'gepaeck' => 4,
         'mitfahrende' => 1,
@@ -269,10 +262,9 @@ $rides = [
         'wochentage' => [1, 2, 3],
         'abfahrt' => 17, // 08:00.
         'ankunft' => 19, // 09:00.
-        'fahrzeugart' => 1,
-        'fahrzeug' => 'Toyota Yaris',
+        'marke' => 'Toyota',
+        'modell' => 'Yaris',
         'kennzeichen' => 'W-5150H',
-        'kraftstoff' => 2,
         'plaetze' => 2,
         'gepaeck' => 2,
         'mitfahrende' => 1,
@@ -390,11 +382,13 @@ foreach ($rides as $index => $ride) {
     $setcontent($entryid, 'Wochentage', $ride['wochentage'] ?? null);
     $setcontent($entryid, 'Abfahrtszeit', $ride['abfahrt'] ?? null);
     $setcontent($entryid, 'Ankunftszeit', $ride['ankunft'] ?? null);
-    $setcontent($entryid, 'Fahrzeugart', $ride['fahrzeugart'] ?? null);
-    $setcontent($entryid, 'Fahrzeug', $ride['fahrzeug'] ?? null);
+    // A choice is stored as the position of its option.
+    $brand = isset($ride['marke']) ? array_search($ride['marke'], \mod_datalynx\local\ride\vehicle::BRANDS) + 1 : null;
+    $setcontent($entryid, 'Marke', $brand);
+    $setcontent($entryid, 'Modell', $ride['modell'] ?? null);
     $setcontent($entryid, 'Kennzeichen', $ride['kennzeichen'] ?? null);
-    $setcontent($entryid, 'Kraftstoff', $ride['kraftstoff'] ?? null);
-    $setcontent($entryid, 'Freie Plätze', $ride['plaetze'] ?? null);
+    // The options of the free seats start at 0.
+    $setcontent($entryid, 'Freie Plätze', isset($ride['plaetze']) ? $ride['plaetze'] + 1 : null);
     $setcontent($entryid, 'Gepäck', $ride['gepaeck'] ?? null);
     $setcontent($entryid, 'Mitfahrende', $ride['mitfahrende'] ?? null);
     $setcontent($entryid, 'Fahrkosten', $ride['kosten'] ?? null);

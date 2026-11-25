@@ -58,6 +58,7 @@ $addons = [
             ['mobilesavedraft', 'datalynx'],
             ['mobilesaveentry', 'datalynx'],
             ['mobilesubmitentry', 'datalynx'],
+            ['mobiletypetosearch', 'datalynx'],
             ['mobileunsupportedfields', 'datalynx'],
             ['entryaddnew', 'datalynx'],
             ['fileexist', 'datalynx'],

@@ -106,3 +106,27 @@ Feature: Add and edit datalynx entries in the Moodle App
     Then I should find "The entry has been saved." in the app
     And I should find "On these days" in the app
     And I should not find "Choose a date" in the app
+
+  Scenario: Pick a choice of a long list by typing its first letters
+    Given I log in as "admin"
+    And I am on "Course 1" course homepage
+    And I add to the "Fruits" datalynx the following fields:
+      | type   | name  | description | param1                                      | param2 | param3 |
+      | select | Brand |             | Audi,BMW,Opel,Volkswagen,Volvo,Skoda,Andere |        |        |
+    And I click on "Datalynx field Brand" "link"
+    And I set the field "Autocompletion" to "Yes"
+    And I press "Save changes"
+    And the "Cards" view of "Fruits" datalynx has the entry template "[[Datalynx field Title]] [[Datalynx field Brand]] ##edit##"
+    And I log out
+    And I entered the course "Course 1" as "student1" in the app
+    And I press "Fruits" in the app
+    When I press "Add a new entry" in the app
+    And I set the field "Datalynx field Brand" to "vo" in the app
+    Then I should find "Volkswagen" in the app
+    And I should find "Volvo" in the app
+    And I should not find "Audi" in the app
+    When I press "Volkswagen" in the app
+    Then I should not find "Volvo" in the app
+    When I press "Save" in the app
+    Then I should find "The entry has been saved." in the app
+    And the field "Datalynx field Brand" matches value "Volkswagen" in the app

@@ -108,7 +108,7 @@ $require = function (array $have, array $wanted, string $what): void {
 
 $require($fieldids, [
     'Fahrttyp', 'Route', 'Umweg', 'Fahrtmuster', 'Wochentage', 'Abfahrtszeit', 'Ankunftszeit',
-    'Fahrzeugart', 'Fahrzeug', 'Kennzeichen', 'Kraftstoff', 'Freie Plätze', 'Gepäck',
+    'Marke', 'Modell', 'Kennzeichen', 'Freie Plätze', 'Gepäck',
     'Mitfahrende', 'Fahrkosten', 'Fixbetrag', 'Bemerkungen',
 ], 'fields');
 $require($behaviorids, ['pflicht', 'angebot', 'angebotpflicht', 'regelmaessig', 'nurlesen'], 'behaviors');
@@ -238,8 +238,8 @@ $steptemplates = [
         'Womit fahre ich?',
         $stepper(3),
         'Beschreiben Sie das Fahrzeug, mit dem Sie unterwegs sind.',
-        $tag('Fahrzeugart', 'angebotpflicht', 'l_fahrzeugart') . $tag('Fahrzeug', 'angebot', 'l_fahrzeug')
-            . $tag('Kennzeichen', 'angebot', 'l_kennzeichen') . $tag('Kraftstoff', 'angebot', 'l_kraftstoff')
+        $tag('Marke', 'angebotpflicht', 'l_marke') . $tag('Modell', 'angebot', 'l_modell')
+            . $tag('Kennzeichen', 'angebot', 'l_kennzeichen')
             . $tag('Freie Plätze', 'angebotpflicht', 'l_sitzplaetze') . $tag('Gepäck', 'angebot', 'l_gepaeck'),
         'Weiter_zur_Mitnahme'
     ),
@@ -263,10 +263,9 @@ $steptemplates = [
             . $tag('Wochentage', 'nurlesenregelmaessig', 'l_wochentage')
             . $tag('Abfahrtszeit', 'nurlesenregelmaessig', 'l_abfahrtszeit')
             . $tag('Ankunftszeit', 'nurlesenregelmaessig', 'l_ankunftszeit')
-            . $tag('Fahrzeugart', 'nurlesenangebot', 'l_fahrzeugart')
-            . $tag('Fahrzeug', 'nurlesenangebot', 'l_fahrzeug')
+            . $tag('Marke', 'nurlesenangebot', 'l_marke')
+            . $tag('Modell', 'nurlesenangebot', 'l_modell')
             . $tag('Kennzeichen', 'nurlesenangebot', 'l_kennzeichen')
-            . $tag('Kraftstoff', 'nurlesenangebot', 'l_kraftstoff')
             . $tag('Freie Plätze', 'nurlesenangebot', 'l_sitzplaetze')
             . $tag('Gepäck', 'nurlesenangebot', 'l_gepaeck')
             . $tag('Mitfahrende', 'nurlesenangebot', 'l_mitfahrende')
@@ -343,8 +342,8 @@ $emailtemplate = '<div style="font-family: sans-serif; font-size: 15px; color: #
     . $tag('Fahrttyp', '', 'l_fahrttyp') . $tag('Route', '', 'l_route')
     . $tag('Fahrtmuster', '', 'l_fahrtmuster') . $tag('Wochentage', '', 'l_wochentage')
     . $tag('Abfahrtszeit', '', 'l_abfahrtszeit') . $tag('Ankunftszeit', '', 'l_ankunftszeit')
-    . $tag('Freie Plätze', '', 'l_sitzplaetze') . $tag('Fahrzeugart', '', 'l_fahrzeugart')
-    . $tag('Fahrzeug', '', 'l_fahrzeug') . $tag('Kraftstoff', '', 'l_kraftstoff')
+    . $tag('Freie Plätze', '', 'l_sitzplaetze') . $tag('Marke', '', 'l_marke')
+    . $tag('Modell', '', 'l_modell')
     . $tag('Gepäck', '', 'l_gepaeck') . $tag('Mitfahrende', '', 'l_mitfahrende')
     . $tag('Fahrkosten', '', 'l_fahrkosten') . $tag('Fixbetrag', '', 'l_fixbetrag')
     . $tag('Bemerkungen', '', 'l_bemerkungen')

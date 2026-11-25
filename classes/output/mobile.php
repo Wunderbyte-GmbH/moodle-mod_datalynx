@@ -80,6 +80,40 @@ page.dlxPick = function(stop, place) {
     stop.lng = place.lng;
     stop.suggestions = [];
 };
+page.dlxFilter = function(field, text) {
+    var fold = function(value) {
+        return String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+    };
+    var query = fold(text);
+    field.typed = text || '';
+    field.inputs[0].show = '';
+    field.matches = [];
+    if (!query) {
+        return;
+    }
+    var starts = [];
+    var contains = [];
+    field.choices.forEach(function(choice) {
+        var label = fold(choice.label);
+        if (choice.disabled) {
+            return;
+        }
+        if (label === query) {
+            field.inputs[0].show = choice.value;
+        }
+        if (label.indexOf(query) === 0) {
+            starts.push(choice);
+        } else if (label.indexOf(query) > 0) {
+            contains.push(choice);
+        }
+    });
+    field.matches = starts.concat(contains).slice(0, 8);
+};
+page.dlxChoose = function(field, choice) {
+    field.typed = choice.label;
+    field.inputs[0].show = choice.value;
+    field.matches = [];
+};
 page.dlxToggle = function(list, value) {
     var at = list.indexOf(value);
     if (at < 0) {
@@ -382,6 +416,10 @@ JS;
                 // The position the slider starts at.
                 $positions = array_column($field['choices'], 'value');
                 $field['index'] = max(0, (int) array_search($field['inputs'][0]['show'], $positions, true));
+            } else if (!empty($field['autocomplete'])) {
+                // What the search box of an autocomplete shows: the label of the choice.
+                $labels = array_column($field['choices'], 'label', 'value');
+                $field['typed'] = $labels[$field['inputs'][0]['show']] ?? '';
             } else if ($field['control'] === 'itinerary') {
                 $field += self::itinerary_state($field);
             } else if ($field['control'] === 'schedule') {

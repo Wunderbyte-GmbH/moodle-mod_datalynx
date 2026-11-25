@@ -662,6 +662,7 @@ $string['mobilesortby'] = 'Sortieren nach';
 $string['mobilesortdescending'] = 'Absteigend';
 $string['mobilesortdirection'] = 'Reihenfolge';
 $string['mobilesubmitentry'] = 'Abgeben';
+$string['mobiletypetosearch'] = 'Zum Suchen tippen';
 $string['mobileunsupportedfields'] = 'Diese Felder können nur im Web bearbeitet werden: {$a}';
 $string['mobileviewnotsupported'] = 'Diese Ansicht kann in der App nicht angezeigt werden.';
 $string['mobileviewselect'] = 'Ansicht';

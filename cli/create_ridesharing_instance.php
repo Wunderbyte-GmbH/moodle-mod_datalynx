@@ -221,20 +221,19 @@ $fielddefs = [
         'hint' => '',
         'params' => ['param1' => implode("\n", $halfhours), 'param6' => 1],
     ],
-    'fahrzeugart' => [
+    // The brand is picked from the brands sold in Germany, found by typing (autocomplete).
+    'marke' => [
         'type' => 'select',
-        'name' => 'Fahrzeugart',
-        'label' => 'Art des Fahrzeugs',
-        'hint' => '',
-        'params' => [
-            'param1' => "Kompaktwagen\nLimousine\nCabrio\nKombi\nSUV\nMini Van\nKleinbus\nReisebus",
-        ],
+        'name' => 'Marke',
+        'label' => 'Marke',
+        'hint' => 'Tippen Sie die ersten Buchstaben, zum Beispiel „Volks“ für Volkswagen.',
+        'params' => ['param1' => implode("\n", \mod_datalynx\local\ride\vehicle::BRANDS), 'param6' => 1],
     ],
-    'fahrzeug' => [
+    'modell' => [
         'type' => 'text',
-        'name' => 'Fahrzeug',
-        'label' => 'Bezeichnung',
-        'hint' => 'Zum Beispiel: VW Polo',
+        'name' => 'Modell',
+        'label' => 'Modell',
+        'hint' => 'Zum Beispiel: Polo',
         'params' => ['param2' => 30, 'param3' => 'px'],
     ],
     'kennzeichen' => [
@@ -244,19 +243,12 @@ $fielddefs = [
         'hint' => 'Hilft beim Wiedererkennen am Treffpunkt.',
         'params' => ['param2' => 20, 'param3' => 'px'],
     ],
-    'kraftstoff' => [
-        'type' => 'select',
-        'name' => 'Kraftstoff',
-        'label' => 'Antrieb',
-        'hint' => '',
-        'params' => ['param1' => "Verbrenner\nHybrid\nE-Auto"],
-    ],
     'sitzplaetze' => [
         'type' => 'select',
         'name' => 'Freie Plätze',
         'label' => 'Freie Plätze',
         'hint' => 'Wie viele Personen kann ich auf dieser Fahrt mitnehmen?',
-        'params' => ['param1' => implode("\n", range(1, 8))],
+        'params' => ['param1' => implode("\n", range(0, 8))],
     ],
     'gepaeck' => [
         'type' => 'select',
@@ -524,7 +516,7 @@ $ridecard = '<div class="card h-100 shadow-sm border-0">'
     . '<span class="small text-muted">##author:name##</span></div>'
     . $tag('route')
     . $tag('fahrtmuster') . $tag('wochentage') . $tag('abfahrtszeit') . $tag('ankunftszeit')
-    . $tag('sitzplaetze') . $tag('fahrzeugart') . $tag('fahrzeug') . $tag('kraftstoff')
+    . $tag('sitzplaetze') . $tag('marke') . $tag('modell')
     . $tag('gepaeck') . $tag('mitfahrende') . $tag('fahrkosten') . $tag('fixbetrag')
     . $tag('bemerkungen')
     . '</div>'
@@ -636,8 +628,8 @@ $createview('step3', [
         'Womit fahre ich?',
         'Diese Angaben brauchen nur Fahrten, die angeboten werden. Wer eine Mitfahrgelegenheit sucht, '
             . 'geht direkt weiter.',
-        $tag('fahrzeugart', 'angebotpflicht') . $tag('fahrzeug', 'angebot') . $tag('kennzeichen', 'angebot')
-            . $tag('kraftstoff', 'angebot') . $tag('sitzplaetze', 'angebotpflicht') . $tag('gepaeck', 'angebot'),
+        $tag('marke', 'angebotpflicht') . $tag('modell', 'angebot') . $tag('kennzeichen', 'angebot')
+            . $tag('sitzplaetze', 'angebotpflicht') . $tag('gepaeck', 'angebot'),
         '##submit:text=Weiter_zur_Mitnahme##'
     ),
 ]);
@@ -681,8 +673,8 @@ $createview('step5', [
         . $tag('fahrttyp', 'nurlesen') . $tag('route', 'nurlesen') . $tag('umweg', 'nurlesen')
         . $tag('fahrtmuster', 'nurlesen') . $tag('wochentage', 'nurlesenregelmaessig')
         . $tag('abfahrtszeit', 'nurlesenregelmaessig') . $tag('ankunftszeit', 'nurlesenregelmaessig')
-        . $tag('fahrzeugart', 'nurlesenangebot') . $tag('fahrzeug', 'nurlesenangebot')
-        . $tag('kennzeichen', 'nurlesenangebot') . $tag('kraftstoff', 'nurlesenangebot')
+        . $tag('marke', 'nurlesenangebot') . $tag('modell', 'nurlesenangebot')
+        . $tag('kennzeichen', 'nurlesenangebot')
         . $tag('sitzplaetze', 'nurlesenangebot') . $tag('gepaeck', 'nurlesenangebot')
         . $tag('mitfahrende', 'nurlesenangebot') . $tag('fahrkosten', 'nurlesenangebot')
         . $tag('fixbetrag', 'nurlesenfestbetrag') . $tag('bemerkungen', 'nurlesen')

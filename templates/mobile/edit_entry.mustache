@@ -132,7 +132,22 @@
                     <ng-container *ngTemplateOutlet="dlxdate; context: {f: f, key: f.inputs[0].name, formname: f.inputs[0].formname,
                             label: f.name + (f.required ? ' *' : ''), clear: !f.required}"></ng-container>
                 </ng-container>
-                <ion-item *ngIf="f.control === 'select' || f.control === 'radio' || f.control === 'multiselect' || f.control === 'checkbox'">
+                <!-- A choice with autocomplete: type, then pick one of the matching choices; the hidden input carries it. -->
+                <ng-container *ngIf="f.control === 'select' && f.autocomplete">
+                    <div class="mod-datalynx-mobile-field">
+                        <ion-input class="mod-datalynx-mobile-control" labelPlacement="stacked" fill="outline" autocomplete="off"
+                                [label]="f.name + (f.required ? ' *' : '')" [value]="f.typed"
+                                [placeholder]="'plugin.mod_datalynx.mobiletypetosearch' | translate"
+                                (ionInput)="dlxFilter(f, $event.detail.value)"></ion-input>
+                    </div>
+                    <ion-item *ngFor="let o of f.matches" button [detail]="false" class="mod-datalynx-mobile-suggestion"
+                            (click)="dlxChoose(f, o)">
+                        <ion-label class="ion-text-wrap">{{ o.label }}</ion-label>
+                    </ion-item>
+                    <ion-input class="ion-hide" [name]="f.inputs[0].formname" [value]="f.inputs[0].show"></ion-input>
+                </ng-container>
+                <ion-item *ngIf="(f.control === 'select' && !f.autocomplete) || f.control === 'radio' || f.control === 'multiselect'
+                        || f.control === 'checkbox'">
                     <!-- The label in its slot wraps; a label attribute would be cut off after one line. -->
                     <ion-select class="mod-datalynx-mobile-control" labelPlacement="stacked" interface="alert"
                             [placeholder]="'core.choosedots' | translate"

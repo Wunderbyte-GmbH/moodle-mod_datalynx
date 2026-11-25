@@ -121,6 +121,11 @@ class get_entry_edit_form extends external_api {
                     'disabled' => new external_value(PARAM_BOOL, 'Whether it cannot be chosen'),
                 ])),
                 'inputmode' => new external_value(PARAM_ALPHA, 'Keyboard hint', VALUE_OPTIONAL),
+                'autocomplete' => new external_value(
+                    PARAM_BOOL,
+                    'For a select: whether the choice is found by typing (many choices)',
+                    VALUE_OPTIONAL
+                ),
                 'includetime' => new external_value(
                     PARAM_BOOL,
                     'For a datetime: whether the time of day is entered',

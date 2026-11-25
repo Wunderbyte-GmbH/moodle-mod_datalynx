@@ -259,7 +259,8 @@ class renderer extends datalynxfield_renderer {
     }
 
     /**
-     * A single choice is edited with a select.
+     * A single choice is edited with a select; with autocomplete (param6) the app lets the user
+     * type and pick from the matching choices, as the web does.
      *
      * @param stdClass $entry
      * @param array $options
@@ -272,6 +273,7 @@ class renderer extends datalynxfield_renderer {
 
         return $this->edit_control('select', ['' => $selected ?: ''], $options, [
             'choices' => self::edit_choices($this->get_ordered_labels(), $disabled),
+            'autocomplete' => !empty($this->field->get('param6')),
         ]);
     }
 }
