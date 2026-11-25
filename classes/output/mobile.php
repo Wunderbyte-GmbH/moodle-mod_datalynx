@@ -80,6 +80,35 @@ page.dlxPick = function(stop, place) {
     stop.lng = place.lng;
     stop.suggestions = [];
 };
+page.dlxToggle = function(list, value) {
+    var at = list.indexOf(value);
+    if (at < 0) {
+        list.push(value);
+    } else {
+        list.splice(at, 1);
+    }
+};
+page.dlxMode = function(field, value) {
+    if (value) {
+        field.mode = value;
+    }
+};
+page.dlxSetDate = function(field, key, value) {
+    value = Array.isArray(value) ? value[0] : value;
+    field.show[key] = value ? String(value).substring(0, field.includetime ? 16 : 10) : '';
+};
+page.dlxDate = function(value, lang) {
+    var p = String(value || '').split(/[-T:]/).map(Number);
+    if (p.length < 3 || isNaN(p[2])) {
+        return '';
+    }
+    var options = {weekday: 'short', day: 'numeric', month: 'long', year: 'numeric'};
+    if (p.length > 4) {
+        options.hour = '2-digit';
+        options.minute = '2-digit';
+    }
+    return new Date(p[0], p[1] - 1, p[2], p[3] || 0, p[4] || 0).toLocaleString(lang || undefined, options);
+};
 JS;
 
     /**
@@ -361,6 +390,8 @@ JS;
         }
         unset($field);
         $form['unsupportedlist'] = implode(', ', $form['unsupportedfields']);
+        // The language dates are written in (de, en, …).
+        $form['lang'] = explode('_', current_language())[0];
 
         return $form;
     }

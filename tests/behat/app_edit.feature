@@ -74,3 +74,34 @@ Feature: Add and edit datalynx entries in the Moodle App
     And I press "Search" in the app
     Then I should find "Fruit: Cherry" in the app
     But I should not find "Edit" in the app
+
+  Scenario: Add an entry with a weekly schedule, its days tapped and its dates picked in a calendar
+    Given I log in as "admin"
+    And I am on "Course 1" course homepage
+    And I add to the "Fruits" datalynx the following fields:
+      | type     | name    | description | param1 | param2 | param3 |
+      | schedule | Harvest |             |        |        |        |
+    And the "Cards" view of "Fruits" datalynx has the entry template "[[Datalynx field Title]] [[Datalynx field Harvest]] ##edit##"
+    And I log out
+    And I entered the course "Course 1" as "student1" in the app
+    And I press "Fruits" in the app
+    When I press "Add a new entry" in the app
+    And I set the field "Datalynx field Title" to "Plum" in the app
+    Then I should find "Choose a date" in the app
+    And I should not find "On these days" in the app
+    When I press "Every week" in the app
+    And I press "Monday" in the app
+    And I press "Wednesday" in the app
+    And I press "Runs from" in the app
+    And I press "Next month" in the app
+    And I press "28" in the app
+    And I press "OK" in the app
+    And I press "Runs until" in the app
+    And I press "Next month" in the app
+    And I press "28" in the app
+    And I press "OK" in the app
+    Then I should not find "Choose a date" in the app
+    When I press "Save" in the app
+    Then I should find "The entry has been saved." in the app
+    And I should find "On these days" in the app
+    And I should not find "Choose a date" in the app

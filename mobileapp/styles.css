@@ -207,3 +207,55 @@
     --padding-start: 1.5rem;
     font-size: 0.875em;
 }
+
+/* The heading of a field made of several inputs (route, schedule). */
+.mod-datalynx-mobile-edit .mod-datalynx-mobile-group h2 {
+    margin-top: 0.75em;
+    font-size: 1.1em;
+    font-weight: bold;
+}
+
+/* A date row that has no date yet asks for one, in the colour of a link, so it reads as something to tap. */
+.mod-datalynx-mobile-edit .mod-datalynx-mobile-placeholder {
+    color: var(--ion-color-primary);
+}
+
+/* The weekdays of a schedule: a label above a row of buttons that wraps. */
+.mod-datalynx-mobile-edit .mod-datalynx-mobile-days {
+    width: 100%;
+    padding: 0.5em 0;
+}
+.mod-datalynx-mobile-edit .mod-datalynx-mobile-days .mod-datalynx-mobile-label {
+    margin: 0 0 0.25em;
+    font-size: 0.75em;
+}
+.mod-datalynx-mobile-edit .mod-datalynx-mobile-days ion-chip {
+    margin: 0.2em 0.4em 0.2em 0;
+}
+.mod-datalynx-mobile-edit .mod-datalynx-mobile-days ion-chip.mod-datalynx-mobile-chip-on {
+    --background: var(--ion-color-primary);
+    --color: var(--ion-color-primary-contrast);
+}
+
+/* The calendar opens as a sheet from the bottom, as high as it needs. */
+ion-modal.mod-datalynx-mobile-datemodal {
+    --height: auto;
+}
+ion-modal.mod-datalynx-mobile-datemodal ion-datetime {
+    width: 100%;
+    max-width: 100%;
+}
+
+/* Text inputs are boxes with their label on the frame (Ionic's outline fill), outside of an item as Ionic asks. */
+.mod-datalynx-mobile-edit .mod-datalynx-mobile-field {
+    padding: 0.5em 16px;
+}
+/* A stop of a route: its address box, then the buttons to move or remove it. */
+.mod-datalynx-mobile-edit .mod-datalynx-mobile-stop {
+    display: flex;
+    align-items: center;
+    gap: 0.25em;
+}
+.mod-datalynx-mobile-edit .mod-datalynx-mobile-stop ion-input {
+    flex: 1 1 auto;
+}

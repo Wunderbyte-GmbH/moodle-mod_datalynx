@@ -58,6 +58,27 @@
 
     <ng-container *ngIf="CONTENT_OTHERDATA.state.allowed && CONTENT_OTHERDATA.state.supported">
     <form name="dlxeditentry">
+        <!-- A date: a row naming the chosen day, or asking for one, that opens a calendar (see the picker below each
+             field); the hidden input carries YYYY-MM-DD, or YYYY-MM-DDTHH:MM with the time. -->
+        <ng-template #dlxdate let-f="f" let-key="key" let-label="label" let-formname="formname" let-clear="clear">
+            <ion-item button [detail]="false" (click)="f.pickkey = key; f.picking = true">
+                <ion-icon name="fas-calendar-days" slot="start" color="primary" aria-hidden="true"></ion-icon>
+                <ion-label class="ion-text-wrap">
+                    <p class="mod-datalynx-mobile-label">{{ label }}</p>
+                    <ng-container *ngIf="f.show[key]">
+                        <h3>{{ dlxDate(f.show[key], CONTENT_OTHERDATA.state.lang) }}</h3>
+                    </ng-container>
+                    <ng-container *ngIf="!f.show[key]">
+                        <h3 class="mod-datalynx-mobile-placeholder">{{ 'plugin.mod_datalynx.mobilechoosedate' | translate }}</h3>
+                    </ng-container>
+                </ion-label>
+                <ion-button *ngIf="clear && f.show[key]" slot="end" fill="clear" color="medium" type="button"
+                        [attr.aria-label]="'core.remove' | translate" (click)="$event.stopPropagation(); f.show[key] = ''">
+                    <ion-icon name="fas-xmark" aria-hidden="true"></ion-icon>
+                </ion-button>
+            </ion-item>
+            <ion-input class="ion-hide" [name]="formname" [value]="f.show[key]"></ion-input>
+        </ng-template>
         <ion-list class="mod-datalynx-mobile-entry">
             <!-- The entry template of the view: its HTML, links to other views and the place of each input. -->
             <ng-container *ngFor="let part of CONTENT_OTHERDATA.state.parts">
@@ -90,27 +111,31 @@
                     </ion-label>
                 </ion-item>
                 <ng-container *ngIf="f.control === 'text' || f.control === 'number' || f.control === 'url' || f.control === 'duration'">
-                    <ion-item *ngFor="let i of f.inputs">
-                        <ion-input class="mod-datalynx-mobile-control" labelPlacement="stacked" [name]="i.formname" [value]="i.show"
+                    <!-- A box with its label on the frame, so that an empty input reads as one; Ionic wants it outside an item. -->
+                    <ng-container *ngFor="let i of f.inputs">
+                    <div class="mod-datalynx-mobile-field">
+                        <ion-input class="mod-datalynx-mobile-control" labelPlacement="stacked" fill="outline" [name]="i.formname" [value]="i.show"
                                 [label]="(i.name === 'alt' ? ('plugin.mod_datalynx.mobilelinktext' | translate)
                                     : f.control === 'duration' ? f.name + ' (' + ('plugin.mod_datalynx.mobileminutes' | translate) + ')'
                                     : f.name) + (f.required && i.name !== 'alt' ? ' *' : '')"
                                 [type]="f.control === 'number' || f.control === 'duration' ? 'text' : (i.name === 'url' ? 'url' : 'text')"
                                 [attr.inputmode]="f.control === 'duration' ? 'decimal' : f.inputmode"></ion-input>
-                    </ion-item>
+                    </div>
+                    </ng-container>
                 </ng-container>
+                <!-- The app frames a text area itself. -->
                 <ion-item *ngIf="f.control === 'textarea'">
                     <ion-textarea class="mod-datalynx-mobile-control" labelPlacement="stacked" [label]="f.name + (f.required ? ' *' : '')" [autoGrow]="true"
                             [name]="f.inputs[0].formname" [value]="f.inputs[0].show"></ion-textarea>
                 </ion-item>
-                <ion-item *ngIf="f.control === 'datetime'">
-                    <ion-input class="mod-datalynx-mobile-control" labelPlacement="stacked" [label]="f.name + (f.required ? ' *' : '')"
-                            [type]="f.includetime ? 'datetime-local' : 'date'"
-                            [name]="f.inputs[0].formname" [value]="f.inputs[0].show"></ion-input>
-                </ion-item>
+                <ng-container *ngIf="f.control === 'datetime'">
+                    <ng-container *ngTemplateOutlet="dlxdate; context: {f: f, key: f.inputs[0].name, formname: f.inputs[0].formname,
+                            label: f.name + (f.required ? ' *' : ''), clear: !f.required}"></ng-container>
+                </ng-container>
                 <ion-item *ngIf="f.control === 'select' || f.control === 'radio' || f.control === 'multiselect' || f.control === 'checkbox'">
                     <!-- The label in its slot wraps; a label attribute would be cut off after one line. -->
                     <ion-select class="mod-datalynx-mobile-control" labelPlacement="stacked" interface="alert"
+                            [placeholder]="'core.choosedots' | translate"
                             [multiple]="f.multiple" [name]="f.inputs[0].formname" [value]="f.inputs[0].show">
                         <div slot="label" class="mod-datalynx-mobile-label">{{ f.name + (f.required ? ' *' : '') }}</div>
                         <ion-select-option *ngIf="!f.multiple" value="">{{ 'core.choosedots' | translate }}</ion-select-option>
@@ -133,30 +158,30 @@
                 <!-- An itinerary: one address per stop, with suggestions while typing; a picked place keeps its
                      position, any other address is looked up on save. Stops can be added, removed and moved. -->
                 <ng-container *ngIf="f.control === 'itinerary'">
-                    <ion-item lines="none" class="ion-text-wrap">
-                        <ion-label><p class="item-heading">{{ f.name + (f.required ? ' *' : '') }}</p></ion-label>
+                    <ion-item lines="none" class="ion-text-wrap mod-datalynx-mobile-group">
+                        <ion-label><h2>{{ f.name + (f.required ? ' *' : '') }}</h2></ion-label>
                     </ion-item>
                     <ng-container *ngFor="let s of f.stops; let i = index; let last = last">
-                    <ion-item>
-                        <ion-input class="mod-datalynx-mobile-control" labelPlacement="stacked"
+                    <div class="mod-datalynx-mobile-field mod-datalynx-mobile-stop">
+                        <ion-input class="mod-datalynx-mobile-control" labelPlacement="stacked" fill="outline"
                                 [label]="i === 0 ? f.labels.start : (last ? f.labels.end : f.labels.via)"
                                 [name]="f.formnames.waypoints + '__' + i" [value]="s.address" autocomplete="off"
                                 (ionInput)="dlxSuggest(f, s, $event.detail.value)"></ion-input>
                         <ion-input class="ion-hide" [name]="f.formnames.waypoints + '__' + i + '__lat'" [value]="s.lat"></ion-input>
                         <ion-input class="ion-hide" [name]="f.formnames.waypoints + '__' + i + '__lng'" [value]="s.lng"></ion-input>
-                        <ion-button *ngIf="i > 0" slot="end" fill="clear" type="button" [attr.aria-label]="f.labels.up"
+                        <ion-button *ngIf="i > 0" fill="clear" type="button" [attr.aria-label]="f.labels.up"
                                 (click)="f.stops.splice(i - 1, 0, f.stops.splice(i, 1)[0])">
                             <ion-icon name="fas-arrow-up" aria-hidden="true"></ion-icon>
                         </ion-button>
-                        <ion-button *ngIf="!last" slot="end" fill="clear" type="button" [attr.aria-label]="f.labels.down"
+                        <ion-button *ngIf="!last" fill="clear" type="button" [attr.aria-label]="f.labels.down"
                                 (click)="f.stops.splice(i + 1, 0, f.stops.splice(i, 1)[0])">
                             <ion-icon name="fas-arrow-down" aria-hidden="true"></ion-icon>
                         </ion-button>
-                        <ion-button *ngIf="f.stops.length > 2" slot="end" fill="clear" color="danger" type="button"
+                        <ion-button *ngIf="f.stops.length > 2" fill="clear" color="danger" type="button"
                                 [attr.aria-label]="f.labels.remove" (click)="f.stops.splice(i, 1)">
                             <ion-icon name="fas-xmark" aria-hidden="true"></ion-icon>
                         </ion-button>
-                    </ion-item>
+                    </div>
                     <ion-item *ngFor="let p of s.suggestions" button [detail]="false" class="mod-datalynx-mobile-suggestion"
                             (click)="dlxPick(s, p)">
                         <ion-icon name="fas-location-dot" slot="start" aria-hidden="true"></ion-icon>
@@ -173,53 +198,71 @@
                 </ng-container>
                 <!-- A schedule: once on a date, or weekly on some days; the departure, and the arrival if asked for. -->
                 <ng-container *ngIf="f.control === 'schedule'">
-                    <ion-item lines="none" class="ion-text-wrap">
-                        <ion-label><p class="item-heading">{{ f.name + (f.required ? ' *' : '') }}</p></ion-label>
+                    <ion-item lines="none" class="ion-text-wrap mod-datalynx-mobile-group">
+                        <ion-label><h2>{{ f.name + (f.required ? ' *' : '') }}</h2></ion-label>
                     </ion-item>
-                    <ion-item *ngIf="f.modes.length > 1">
-                        <ion-select class="mod-datalynx-mobile-control" labelPlacement="stacked" interface="alert"
-                                [name]="f.formnames.mode" [value]="f.mode" (ionChange)="f.mode = $event.detail.value">
-                            <div slot="label" class="mod-datalynx-mobile-label">{{ f.labels.mode }}</div>
-                            <ion-select-option *ngFor="let o of f.modes" [value]="o.value">{{ o.label }}</ion-select-option>
-                        </ion-select>
+                    <!-- How often: a choice of two side by side. -->
+                    <ion-item *ngIf="f.modes.length > 1" lines="none">
+                        <ion-segment [value]="f.mode" (ionChange)="dlxMode(f, $event.detail.value)" [attr.aria-label]="f.labels.mode">
+                            <ion-segment-button *ngFor="let o of f.modes" [value]="o.value">
+                                <ion-label>{{ o.label }}</ion-label>
+                            </ion-segment-button>
+                        </ion-segment>
                     </ion-item>
-                    <ion-item *ngIf="f.mode === 'once'">
-                        <ion-input class="mod-datalynx-mobile-control" labelPlacement="stacked" type="date" [label]="f.labels.date"
-                                [name]="f.formnames.date" [value]="f.show.date"></ion-input>
-                    </ion-item>
-                    <ion-item *ngIf="f.mode === 'weekly'">
-                        <ion-select class="mod-datalynx-mobile-control" labelPlacement="stacked" interface="alert" [multiple]="true"
-                                [name]="f.daysname" [value]="f.days">
-                            <div slot="label" class="mod-datalynx-mobile-label">{{ f.labels.days }}</div>
-                            <ion-select-option *ngFor="let o of f.weekdays" [value]="o.value">{{ o.label }}</ion-select-option>
-                        </ion-select>
-                    </ion-item>
+                    <ion-input class="ion-hide" [name]="f.formnames.mode" [value]="f.mode"></ion-input>
+                    <ng-container *ngIf="f.mode === 'once'">
+                        <ng-container *ngTemplateOutlet="dlxdate; context: {f: f, key: 'date', formname: f.formnames.date,
+                                label: f.labels.date, clear: false}"></ng-container>
+                    </ng-container>
+                    <!-- The weekdays as buttons to tap on and off. -->
+                    <ng-container *ngIf="f.mode === 'weekly'">
+                        <ion-item>
+                            <div class="mod-datalynx-mobile-days">
+                                <p class="mod-datalynx-mobile-label">{{ f.labels.days }}</p>
+                                <ion-chip *ngFor="let o of f.weekdays" role="checkbox" [attr.aria-checked]="f.days.indexOf(o.value) >= 0"
+                                        [outline]="f.days.indexOf(o.value) < 0" [class.mod-datalynx-mobile-chip-on]="f.days.indexOf(o.value) >= 0"
+                                        (click)="dlxToggle(f.days, o.value)">
+                                    <ion-icon *ngIf="f.days.indexOf(o.value) >= 0" name="fas-check" aria-hidden="true"></ion-icon>
+                                    <ion-label>{{ o.label }}</ion-label>
+                                </ion-chip>
+                            </div>
+                        </ion-item>
+                        <ion-input class="ion-hide" [name]="f.daysname" [value]="f.days.join(',')"></ion-input>
+                    </ng-container>
                     <ion-item>
+                        <ion-icon name="fas-clock" slot="start" color="primary" aria-hidden="true"></ion-icon>
                         <ion-select class="mod-datalynx-mobile-control" labelPlacement="stacked" interface="alert"
-                                [name]="f.formnames.start" [value]="f.show.start">
+                                [placeholder]="'core.choosedots' | translate" [name]="f.formnames.start" [value]="f.show.start">
                             <div slot="label" class="mod-datalynx-mobile-label">{{ f.labels.start }}</div>
                             <ion-select-option *ngFor="let o of f.times" [value]="o.value">{{ o.label }}</ion-select-option>
                         </ion-select>
                     </ion-item>
                     <ion-item *ngIf="f.formnames.end">
+                        <ion-icon name="fas-clock" slot="start" color="primary" aria-hidden="true"></ion-icon>
                         <ion-select class="mod-datalynx-mobile-control" labelPlacement="stacked" interface="alert"
-                                [name]="f.formnames.end" [value]="f.show.end">
+                                [placeholder]="'core.choosedots' | translate" [name]="f.formnames.end" [value]="f.show.end">
                             <div slot="label" class="mod-datalynx-mobile-label">{{ f.labels.end }}</div>
                             <ion-select-option value="">{{ 'core.choosedots' | translate }}</ion-select-option>
                             <ion-select-option *ngFor="let o of f.times" [value]="o.value">{{ o.label }}</ion-select-option>
                         </ion-select>
                     </ion-item>
                     <ng-container *ngIf="f.mode === 'weekly'">
-                        <ion-item>
-                            <ion-input class="mod-datalynx-mobile-control" labelPlacement="stacked" type="date" [label]="f.labels.from"
-                                    [name]="f.formnames.from" [value]="f.show.from"></ion-input>
-                        </ion-item>
-                        <ion-item>
-                            <ion-input class="mod-datalynx-mobile-control" labelPlacement="stacked" type="date" [label]="f.labels.until"
-                                    [name]="f.formnames.until" [value]="f.show.until"></ion-input>
-                        </ion-item>
+                        <ng-container *ngTemplateOutlet="dlxdate; context: {f: f, key: 'from', formname: f.formnames.from,
+                                label: f.labels.from, clear: true}"></ng-container>
+                        <ng-container *ngTemplateOutlet="dlxdate; context: {f: f, key: 'until', formname: f.formnames.until,
+                                label: f.labels.until, clear: true}"></ng-container>
                     </ng-container>
                 </ng-container>
+                <!-- The calendar of the date rows of a field. -->
+                <ion-modal *ngIf="f.control === 'datetime' || f.control === 'schedule'" class="mod-datalynx-mobile-datemodal"
+                        [isOpen]="f.picking" (didDismiss)="f.picking = false" [initialBreakpoint]="1" [breakpoints]="[0, 1]">
+                    <ng-template>
+                        <ion-datetime [presentation]="f.includetime ? 'date-time' : 'date'" [value]="f.show[f.pickkey] || undefined"
+                                [firstDayOfWeek]="1" [locale]="CONTENT_OTHERDATA.state.lang" [showDefaultButtons]="true"
+                                [doneText]="'core.ok' | translate" [cancelText]="'core.cancel' | translate"
+                                (ionChange)="dlxSetDate(f, f.pickkey, $event.detail.value)"></ion-datetime>
+                    </ng-template>
+                </ion-modal>
                 <ng-container *ngIf="f.error">
                     <ion-item lines="none">
                         <ion-note color="danger">{{ f.error }}</ion-note>

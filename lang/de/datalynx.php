@@ -642,6 +642,7 @@ $string['minteamsizeerrorvalue'] = 'Die Mindestzahl an Teammitgliedern darf nich
 $string['mobileapplyfilter'] = 'Anwenden';
 $string['mobileapproveentry'] = 'Freigeben';
 $string['mobilecheckentry'] = 'Bitte prüfen Sie die unten markierten Felder.';
+$string['mobilechoosedate'] = 'Datum wählen';
 $string['mobileclearfilters'] = 'Zurücksetzen';
 $string['mobiledisapproveentry'] = 'Freigabe zurücknehmen';
 $string['mobileentrysaved'] = 'Der Eintrag wurde gespeichert.';

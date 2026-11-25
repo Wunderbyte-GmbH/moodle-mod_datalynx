@@ -140,14 +140,14 @@ These field types can be edited in the app:
 
 | Field type | Control in the app |
 |---|---|
-| Text, Number, URL | Text input (URL with an optional link text) |
+| Text, Number, URL | Text input (URL with an optional link text); a number shown with a slider format is a slider |
 | Text area | Multi-line input |
 | Single choice (select), Radio buttons | Choice list |
 | Multiple choice, Checkboxes | Choice list with several selections |
-| Date / time | Date picker, with a time if the field stores a time |
+| Date / time | A row reading **Choose a date** that opens a calendar, with a time if the field stores a time; an optional date can be removed with the cross |
 | Duration | Number of minutes |
-| Itinerary (route) | One address per stop; stops can be added, removed and moved. On saving, each address is looked up, and the place found names the stop |
-| Schedule | Once on a date or weekly on some days, with the departure (and arrival) time |
+| Itinerary (route) | One address per stop, with suggestions while typing; stops can be added, removed and moved. On saving, each address is looked up, and the place found names the stop |
+| Schedule | A switch between **Once** and **Every week**; the date or the weekdays (buttons to tap on and off) and the dates it runs from and until, each picked in a calendar; the departure (and arrival) time from a list |
 | Status | **Save draft** and **Submit** buttons |
 | Identifier | Filled in automatically |
 | Grade item | Shown as text |

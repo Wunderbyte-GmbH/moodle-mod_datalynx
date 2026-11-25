@@ -40,7 +40,7 @@ $addons = [
                 'method' => 'mobile_course_view',
                 'styles' => [
                     'url' => $CFG->wwwroot . '/mod/datalynx/mobileapp/styles.css',
-                    'version' => 6,
+                    'version' => 7,
                 ],
             ],
         ],
@@ -51,6 +51,7 @@ $addons = [
             ['mobileapproveentry', 'datalynx'],
             ['mobiledisapproveentry', 'datalynx'],
             ['mobilecheckentry', 'datalynx'],
+            ['mobilechoosedate', 'datalynx'],
             ['mobileentrysaved', 'datalynx'],
             ['mobilelinktext', 'datalynx'],
             ['mobileminutes', 'datalynx'],

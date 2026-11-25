@@ -644,6 +644,7 @@ $string['minteamsizeerrorvalue'] = 'Minimum team size cannot be greater than the
 $string['mobileapplyfilter'] = 'Apply';
 $string['mobileapproveentry'] = 'Approve';
 $string['mobilecheckentry'] = 'Please check the fields marked below.';
+$string['mobilechoosedate'] = 'Choose a date';
 $string['mobileclearfilters'] = 'Clear';
 $string['mobiledisapproveentry'] = 'Withdraw approval';
 $string['mobileentrysaved'] = 'The entry has been saved.';
