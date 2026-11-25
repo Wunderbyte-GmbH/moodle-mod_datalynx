@@ -216,17 +216,16 @@
                     </ng-container>
                     <!-- The weekdays as buttons to tap on and off. -->
                     <ng-container *ngIf="f.mode === 'weekly'">
-                        <ion-item>
-                            <div class="mod-datalynx-mobile-days">
-                                <p class="mod-datalynx-mobile-label">{{ f.labels.days }}</p>
-                                <ion-chip *ngFor="let o of f.weekdays" role="checkbox" [attr.aria-checked]="f.days.indexOf(o.value) >= 0"
-                                        [outline]="f.days.indexOf(o.value) < 0" [class.mod-datalynx-mobile-chip-on]="f.days.indexOf(o.value) >= 0"
-                                        (click)="dlxToggle(f.days, o.value)">
-                                    <ion-icon *ngIf="f.days.indexOf(o.value) >= 0" name="fas-check" aria-hidden="true"></ion-icon>
-                                    <ion-label>{{ o.label }}</ion-label>
-                                </ion-chip>
-                            </div>
-                        </ion-item>
+                        <!-- The app takes taps only on chips of the class clickable. -->
+                        <div class="mod-datalynx-mobile-field mod-datalynx-mobile-days">
+                            <p class="mod-datalynx-mobile-label">{{ f.labels.days }}</p>
+                            <ion-chip *ngFor="let o of f.weekdays" class="clickable" role="checkbox" [attr.aria-checked]="f.days.indexOf(o.value) >= 0"
+                                    [outline]="f.days.indexOf(o.value) < 0" [class.mod-datalynx-mobile-chip-on]="f.days.indexOf(o.value) >= 0"
+                                    (click)="dlxToggle(f.days, o.value)">
+                                <ion-icon *ngIf="f.days.indexOf(o.value) >= 0" name="fas-check" aria-hidden="true"></ion-icon>
+                                <ion-label>{{ o.label }}</ion-label>
+                            </ion-chip>
+                        </div>
                         <ion-input class="ion-hide" [name]="f.daysname" [value]="f.days.join(',')"></ion-input>
                     </ng-container>
                     <ion-item>

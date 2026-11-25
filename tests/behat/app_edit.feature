@@ -90,8 +90,9 @@ Feature: Add and edit datalynx entries in the Moodle App
     Then I should find "Choose a date" in the app
     And I should not find "On these days" in the app
     When I press "Every week" in the app
-    And I press "Monday" in the app
-    And I press "Wednesday" in the app
+    # A real click: the app ignores taps on chips that are not marked clickable, which "I press" does not notice.
+    And I click on "//ion-chip[contains(., 'Monday')]" "xpath_element"
+    And I click on "//ion-chip[contains(., 'Wednesday')]" "xpath_element"
     And I press "Runs from" in the app
     And I press "Next month" in the app
     And I press "28" in the app
