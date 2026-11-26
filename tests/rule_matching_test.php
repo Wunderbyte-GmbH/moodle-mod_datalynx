@@ -205,12 +205,19 @@ final class rule_matching_test extends advanced_testcase {
     }
 
     /**
-     * Unapproved entries are left out unless the rule says otherwise.
+     * Unapproved entries are left out unless the rule says otherwise, where the instance requires
+     * approval; without approval entries stay unapproved and match all the same.
      */
     public function test_unapproved_entries_are_excluded_by_default(): void {
+        global $DB;
         $subject = $this->make_entry($this->author, 'Rust');
         $this->make_entry($this->other, 'Rust', 0);
+        $this->assertCount(2, $this->sweep($this->make_rule(), $subject));
 
+        $DB->set_field('datalynx', 'approval', 1, ['id' => $this->dlx->id()]);
+        $this->dlx = new datalynx($this->dlx->id());
+        $subject = $this->make_entry($this->author, 'Go');
+        $this->make_entry($this->other, 'Go', 0);
         $this->assertCount(0, $this->sweep($this->make_rule(), $subject));
         $this->assertCount(2, $this->sweep($this->make_rule(['requireapproved' => 0]), $subject));
     }

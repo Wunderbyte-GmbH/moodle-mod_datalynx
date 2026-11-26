@@ -270,7 +270,8 @@ abstract class base {
      * @param int $subjectentryid the entry to search around, always excluded from the result
      * @param array $conditions customsearch aggregated by field id
      * @param array $options 'excludeownauthor' (default true) drops the entries of the subject's
-     *                       author, 'requireapproved' (default true) drops unapproved entries,
+     *                       author, 'requireapproved' (default true) drops unapproved entries
+     *                       of an instance that requires approval,
      *                       'limit' caps the number of results (0 for no cap)
      * @return int[] entry ids
      */
@@ -290,7 +291,9 @@ abstract class base {
             $params['condauthor'] = (int) $DB->get_field('datalynx_entries', 'userid', ['id' => $subjectentryid]);
             $extra .= ' AND e.userid <> :condauthor';
         }
-        if ($options['requireapproved'] ?? true) {
+        // Like the views: entries wait for approval only where the instance asks for it. Without
+        // approval they stay unapproved, and nothing would ever match.
+        if (($options['requireapproved'] ?? true) && !empty($this->dlx()->data->approval)) {
             $extra .= ' AND e.approved = 1';
         }
 
