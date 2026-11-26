@@ -301,6 +301,17 @@ class datalynxview_patterns {
         if ($viewid === false || ($this->get_cached_all_view_records()[$viewid]->type ?? '') !== 'pdf') {
             return '';
         }
+        // Only an entry the PDF view holds (its filter, e.g. submitted ones): otherwise the PDF is empty.
+        $pdfview = $this->get_cached_named_view($viewname);
+        if (!$pdfview || !$pdfview->get_filter()) {
+            return '';
+        }
+        $filter = clone $pdfview->get_filter();
+        $filter->eids = (int) $entry->id;
+        $held = (new \mod_datalynx\local\datalynx_entries($this->view->get_dlx(), $filter))->get_entries();
+        if (empty($held->entries)) {
+            return '';
+        }
         $url = new moodle_url('/mod/datalynx/view.php', ['d' => $this->view->get_dlx()->id(), 'view' => $viewid,
             'pdfexportentry' => (int) $entry->id, 'sesskey' => sesskey()]);
         $label = $label !== '' ? format_string($label) : get_string('download');

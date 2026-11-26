@@ -220,6 +220,11 @@ final class ride_billing_test extends advanced_testcase {
         $link = $billing->patternclass()->get_replacements([$tag], $entry)[$tag];
         $this->assertStringContainsString('pdfexportentry=' . $ride, $link);
         $this->assertStringContainsString('PDF herunterladen', $link);
+        // A draft is not in the PDF view (submitted ones only): no link to an empty PDF.
+        $DB->set_field('datalynx_entries', 'status', 1, ['id' => $ride]);
+        $draft = $DB->get_record('datalynx_entries', ['id' => $ride]);
+        $this->assertSame('', $billing->patternclass()->get_replacements([$tag], $draft)[$tag]);
+        $DB->set_field('datalynx_entries', 'status', 2, ['id' => $ride]);
         $nopdf = '##pdfdownload:Fahrt abrechnen##';
         $this->assertSame('', $billing->patternclass()->get_replacements([$nopdf], $entry)[$nopdf]);
 

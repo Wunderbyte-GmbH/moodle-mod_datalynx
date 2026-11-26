@@ -838,9 +838,10 @@ class board_builder {
             $filters['submitted'] = ['name' => 'Eingereichte Fahrtenscheine', 'customsearch' => [
                 'status' => ['AND' => [['', '=', 2]]],
             ]];
+            // One's own Fahrtenscheine, saved as a draft or submitted.
             $filters['mytickets'] = ['name' => 'Meine Fahrtenscheine', 'customsearch' => [
                 'userid' => ['AND' => [['', 'ME', '']]],
-                'status' => ['AND' => [['', '=', 2]]],
+                'status' => ['OR' => [['', '=', 1], ['', '=', 2]]],
             ]];
         }
         return $filters + [
@@ -1235,15 +1236,20 @@ class board_builder {
                 'type' => 'grid',
                 'data' => [
                     'perpage' => 20,
-                    'esection' => $list('Meine Fahrtenscheine', '<p class="text-muted">Ihre eingereichten Fahrtenscheine. '
-                        . 'Leiten Sie das PDF an die Abrechnungsstelle weiter.</p>##entries##'),
+                    'esection' => $list('Meine Fahrtenscheine', '<p class="text-muted">Ihre Fahrtenscheine: Entwürfe '
+                        . 'reichen Sie über „Bearbeiten“ ein; von eingereichten laden Sie das PDF herunter und leiten es an '
+                        . 'die Abrechnungsstelle weiter.</p>##entries##'),
                     'eparam2' => '<div class="card h-100 shadow-sm border-0"><div class="card-body">'
+                        . '<div class="mb-2"><span class="badge bg-secondary">##status##</span></div>'
                         . $this->tags(['termin', 'anlass', 'rueckfahrt'], 'abrechnunglesen')
                         . '<div class="d-flex justify-content-between align-items-start gap-3 border-bottom py-1">'
                         . '<span class="small fw-semibold text-nowrap">Abrechnungs-Kilometer</span>'
                         . '<span class="text-end fw-bold">[[Route:billeddistance|abrechnunglesen]]</span></div>'
-                        . '</div><div class="card-footer bg-transparent border-0">##pdfdownload:' . self::VIEWS['pdf']
-                        . ';PDF herunterladen;btn btn-outline-primary##</div></div>',
+                        . '</div><div class="card-footer bg-transparent border-0 d-flex gap-2 align-items-center">'
+                        . '##pdfdownload:' . self::VIEWS['pdf'] . ';PDF herunterladen;btn btn-outline-primary##'
+                        // A draft is completed in the billing view; a submitted one is locked (ifeditable).
+                        . '##viewsesslink:' . self::VIEWS['billing'] . ';Bearbeiten;editentries=##entryid##|eids=##entryid##;'
+                        . 'btn btn-link;ifeditable##</div></div>',
                 ],
                 'filter' => 'mytickets',
             ],
