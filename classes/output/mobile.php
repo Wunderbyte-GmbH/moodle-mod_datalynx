@@ -45,11 +45,11 @@ class mobile {
     const PERPAGE = 20;
 
     /**
-     * @var string The script of the edit page: address suggestions for the stops of an itinerary,
-     * from the server's geocoder (mod_datalynx_geocode_search) as on the web. Typing clears the
+     * @var string Address suggestions from the server's geocoder (mod_datalynx_geocode_search) as on
+     * the web, for the stops of an itinerary and the pickup point of a request. Typing clears the
      * position of a picked place; the server looks up an address without one on save.
      */
-    const EDIT_JAVASCRIPT = <<<'JS'
+    const SUGGEST_JAVASCRIPT = <<<'JS'
 var page = this;
 page.dlxSuggest = function(field, stop, text) {
     stop.address = text || '';
@@ -79,6 +79,77 @@ page.dlxPick = function(stop, place) {
     stop.lat = place.lat;
     stop.lng = place.lng;
     stop.suggestions = [];
+};
+JS;
+
+    /**
+     * @var string The script of the browse page: the actions of a team (request a seat, approve,
+     * decline, withdraw, mod_datalynx#278) through mod_datalynx_team_subscription, as on the web. A
+     * refused action shows why; a done one reloads the page, so that it shows the team as it is.
+     */
+    const VIEW_JAVASCRIPT = self::SUGGEST_JAVASCRIPT . <<<'JS'
+page.dlxTeam = function(action, data) {
+    var site = page.CoreSitesProvider.getCurrentSite();
+    return page.CoreLoadingsService.show().then(function(loading) {
+        return site.write('mod_datalynx_team_subscription', {
+            d: action.d, entryid: action.entryid, fieldid: action.fieldid, userid: action.userid,
+            action: action.action, data: data ? JSON.stringify(data) : ''
+        }, {getFromCache: false, saveToCache: false}).then(function(result) {
+            loading.dismiss();
+            if (!result.success) {
+                page.CoreAlertsService.showError(result.error);
+                return result;
+            }
+            return page.refreshContent(false);
+        }).catch(function(error) {
+            loading.dismiss();
+            page.CoreAlertsService.showError(error);
+        });
+    });
+};
+page.dlxPickupFor = function(action) {
+    action.pickup = action.pickup || {address: '', lat: '', lng: '', suggestions: []};
+    action.open = true;
+};
+JS;
+
+    /**
+     * @var string The script of the edit page: address suggestions, choices filtered while typing,
+     * dates shown in the user's language, and saving with files (mod_datalynx#334): the files of
+     * each file or picture field go to a draft area first, whose id the save then sends.
+     */
+    const EDIT_JAVASCRIPT = self::SUGGEST_JAVASCRIPT . <<<'JS'
+page.dlxSave = function(kind) {
+    var fields = page.CONTENT_OTHERDATA.state.fields.filter(function(field) {
+        return field.control === 'files';
+    });
+    return page.CoreLoadingsService.show().then(function(loading) {
+        return Promise.all(fields.map(function(field) {
+            if (!field.files.length) {
+                field.draftid = 0;
+                return null;
+            }
+            var uploader = page.CoreFileUploaderProvider;
+            return uploader.uploadOrReuploadFiles(field.files, 'mod_datalynx', page.CONTENT_OTHERDATA.state.viewid)
+                .then(function(itemid) {
+                    field.draftid = itemid;
+                    return itemid;
+                });
+        })).then(function() {
+            loading.dismiss();
+            // The form takes the draft ids once they are rendered; then the save button of the page sends it.
+            setTimeout(function() {
+                var buttons = document.querySelectorAll('[data-dlx-save="' + kind + '"]');
+                if (buttons.length) {
+                    buttons[buttons.length - 1].click();
+                }
+            }, 50);
+            return true;
+        }).catch(function(error) {
+            loading.dismiss();
+            page.CoreAlertsService.showError(error);
+        });
+    });
 };
 page.dlxFilter = function(field, text) {
     var fold = function(value) {
@@ -146,6 +217,44 @@ page.dlxDate = function(value, lang) {
 JS;
 
     /**
+     * @var string The script the app runs when it loads the plugin: links to view.php?d= (the
+     * links of notifications and of entries) open the view in the app instead of the browser
+     * (mod_datalynx#280). Links with id= are the app's own module links.
+     */
+    const INIT_JAVASCRIPT = <<<'JS'
+var app = this;
+class AddonModDatalynxViewLinkHandler extends app.CoreContentLinksHandlerBase {
+    constructor() {
+        super();
+        this.name = 'AddonModDatalynxViewLinkHandler';
+        this.pattern = new RegExp('/mod/datalynx/view\\.php.*[?&]d=\\d+');
+    }
+    getActions(siteIds, url, params) {
+        return [{
+            action: function(siteId) {
+                var args = {d: parseInt(params.d, 10), viewid: parseInt(params.view || 0, 10), eids: params.eids || ''};
+                return app.CoreNavigatorService.navigateToSitePath(
+                    'siteplugins/content/mod_datalynx/mobile_course_view/d' + args.d + 'v' + args.viewid + 'e' + args.eids,
+                    {params: {title: '', args: args, ptrEnabled: true}, siteId: siteId}
+                );
+            }
+        }];
+    }
+}
+app.CoreContentLinksDelegateService.registerHandler(new AddonModDatalynxViewLinkHandler());
+JS;
+
+    /**
+     * Run when the app loads the plugin: the link handler of INIT_JAVASCRIPT.
+     *
+     * @param array $args
+     * @return array javascript
+     */
+    public static function mobile_init(array $args): array {
+        return ['templates' => [], 'javascript' => self::INIT_JAVASCRIPT, 'otherdata' => ''];
+    }
+
+    /**
      * Browse the entries of the activity.
      *
      * The app opens this with cmid and courseid. View switching, searching and growing the list
@@ -160,6 +269,8 @@ JS;
         $rawargs = $args;
         $args = self::args($args, [
             'cmid' => PARAM_INT,
+            // The instance, where a link to view.php?d= opened the page (mod_datalynx#280).
+            'd' => PARAM_INT,
             'courseid' => PARAM_INT,
             'viewid' => PARAM_INT,
             'filterid' => PARAM_INT,
@@ -171,6 +282,9 @@ JS;
             'customfilterid' => PARAM_INT,
             'customvalues' => PARAM_RAW,
         ]);
+        if (!$args->cmid && $args->d) {
+            $args->cmid = (int) get_coursemodule_from_instance('datalynx', $args->d, 0, false, MUST_EXIST)->id;
+        }
         [$cm] = self::context($args->cmid);
 
         $dlx = new datalynx($cm->instance);
@@ -211,7 +325,7 @@ JS;
             'templates' => [
                 ['id' => 'main', 'html' => $html],
             ],
-            'javascript' => '',
+            'javascript' => self::VIEW_JAVASCRIPT,
             'otherdata' => self::otherdata($otherdata),
         ];
     }

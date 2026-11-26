@@ -93,7 +93,7 @@ class renderer extends datalynxfield_renderer {
         // Joining needs the author's approval: requests instead of the subscribe link (mod_datalynx#341).
         if ($subscribeenabled && $field->needs_approval() && (int) $entry->id > 0) {
             $label = $format ? trim((string) ($format->get_settings()['label'] ?? '')) : '';
-            return $str . $this->render_requests((int) $entry->id, $label);
+            return $str . $this->render_requests((int) $entry->id, $label, $options);
         }
         $selected = isset($entry->{"c{$fieldid}_content"}) ? json_decode(
             $entry->{"c{$fieldid}_content"},
@@ -115,6 +115,16 @@ class renderer extends datalynxfield_renderer {
             $subscribeenabled && $hasadmissiblerole && (!$teamfull || $userismember) &&
                 (!$userismember || $canunsubscribe)
         ) {
+            // A client of its own (the app) renders the action itself (render option actionrenderer).
+            if (isset($options['actionrenderer']) && is_callable($options['actionrenderer'])) {
+                return $str . $options['actionrenderer']($this->team_action(
+                    $userismember ? 'unsubscribe' : 'subscribe',
+                    (int) $entry->id,
+                    (int) $USER->id,
+                    get_string($userismember ? 'unsubscribe' : 'subscribe', 'datalynx'),
+                    $userismember ? 'btn-outline-secondary' : 'btn-primary'
+                ));
+            }
             $userurl = new moodle_url(
                 '/user/view.php',
                 ['course' => $field->dlx()->course->id, 'id' => $USER->id]
@@ -163,30 +173,38 @@ class renderer extends datalynxfield_renderer {
      * The team of an entry whose joining needs the author's approval: what the current user can do
      * (request, withdraw, leave) and, for the author, the open requests to approve or decline.
      *
-     * Buttons only; the actions go through the web service mod_datalynx_team_subscription.
+     * Buttons only; the actions go through the web service mod_datalynx_team_subscription. A client
+     * of its own (the app) renders them itself: render option actionrenderer, a callable taking
+     * the action (see team_action()) and returning its HTML.
      *
      * @param int $entryid
      * @param string $label the label of the request button, empty for the default
+     * @param array $options render options
      * @return string
      */
-    protected function render_requests(int $entryid, string $label): string {
+    protected function render_requests(int $entryid, string $label, array $options = []): string {
         global $USER, $PAGE;
         $field = $this->field;
         $membership = $field->membership($entryid);
-        $pickupfield = $field->get_pickup_field();
-        $button = function (string $action, int $userid, string $text, string $class) use ($field, $entryid, $pickupfield): string {
+        $renderer = isset($options['actionrenderer']) && is_callable($options['actionrenderer'])
+            ? $options['actionrenderer'] : null;
+        $button = function (string $action, int $userid, string $text, string $class) use ($entryid, $renderer): string {
+            $team = $this->team_action($action, $entryid, $userid, $text, $class);
+            if ($renderer) {
+                return $renderer($team);
+            }
             $attributes = [
                 'type' => 'button',
                 'class' => "btn btn-sm $class me-1 mb-1",
                 'data-dlx-team-action' => $action,
-                'data-d' => $field->dlx()->id(),
+                'data-d' => $team['d'],
                 'data-entryid' => $entryid,
-                'data-fieldid' => $field->id(),
+                'data-fieldid' => $team['fieldid'],
                 'data-userid' => $userid,
             ];
             // A request asks for the pickup point first (mod_datalynx#327).
-            if ($action === 'request' && $pickupfield) {
-                $attributes['data-pickupfield'] = $pickupfield->id();
+            if ($team['pickupfield']) {
+                $attributes['data-pickupfield'] = $team['pickupfield'];
             }
             return html_writer::tag('button', s($text), $attributes);
         };
@@ -257,12 +275,41 @@ class renderer extends datalynxfield_renderer {
         }
 
         if ($html !== '') {
-            $PAGE->requires->js_call_amd('mod_datalynx/teamrequests', 'init');
+            if (!$renderer) {
+                $PAGE->requires->js_call_amd('mod_datalynx/teamrequests', 'init');
+            }
             $html = html_writer::div($html, 'datalynxfield_teamactions mt-1');
         }
         return $html;
     }
     // phpcs:enable moodle.PHP.ForbiddenGlobalUse.BadGlobal
+
+    /**
+     * One action on the team of an entry, as every client renders it: the arguments of the web
+     * service mod_datalynx_team_subscription, its label and look.
+     *
+     * @param string $action subscribe, unsubscribe, request, withdraw, approve or decline
+     * @param int $entryid
+     * @param int $userid the user the action is about
+     * @param string $label
+     * @param string $style a Bootstrap button class (btn-primary, btn-outline-danger, ...)
+     * @return array action, d, entryid, fieldid, userid, label, style, pickupfield (the field to
+     *               ask the pickup point for, 0 for none) and pickuplabel
+     */
+    public function team_action(string $action, int $entryid, int $userid, string $label, string $style): array {
+        $pickupfield = $action === 'request' ? $this->field->get_pickup_field() : null;
+        return [
+            'action' => $action,
+            'd' => (int) $this->field->dlx()->id(),
+            'entryid' => $entryid,
+            'fieldid' => (int) $this->field->id(),
+            'userid' => $userid,
+            'label' => $label,
+            'style' => $style,
+            'pickupfield' => $pickupfield ? (int) $pickupfield->id() : 0,
+            'pickuplabel' => $pickupfield ? get_string('pickupaddress', 'datalynxfield_teammemberselect') : '',
+        ];
+    }
 
     /** @var array Cached user list. */
     private static $userlist = [];

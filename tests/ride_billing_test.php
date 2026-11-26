@@ -240,6 +240,16 @@ final class ride_billing_test extends advanced_testcase {
             'Fahrtenschein_##entryid##_##author:lastname##'
         );
         $this->assertSame(clean_param('Fahrtenschein_' . $ride . '_' . $this->driver->lastname, PARAM_FILE) . '.pdf', $name);
+
+        // In the app: a file the app downloads with its token (pluginfile.php), the PDF made on request (#334).
+        $applink = $billing->patternclass()->get_replacements([$tag], $entry, ['app' => true])[$tag];
+        $this->assertStringContainsString('/pluginfile.php/' . $dlx->context->id . '/mod_datalynx/pdfexport/'
+            . $pdfview->id() . '/' . $ride . '/', $applink);
+        $pdfview = $dlx->get_view_from_id($pdfview->id());
+        [$filename, $content] = $pdfview->get_entry_pdf($ride);
+        $this->assertSame($name, $filename);
+        $this->assertStringStartsWith('%PDF', $content);
+        $this->assertNull($dlx->get_view_from_id($pdfview->id())->get_entry_pdf($ride + 1000));
     }
 
     /**

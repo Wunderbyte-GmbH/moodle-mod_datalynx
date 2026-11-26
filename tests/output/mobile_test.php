@@ -90,7 +90,8 @@ final class mobile_test extends advanced_testcase {
         $this->assertStringNotContainsString('Mock', $html);
         // Entry content travels as data, never in the template source.
         $this->assertStringNotContainsString('Graz', $html);
-        $this->assertSame('', $result['javascript']);
+        // The page script: the actions of a team and address suggestions (mod_datalynx#278).
+        $this->assertSame(mobile::VIEW_JAVASCRIPT, $result['javascript']);
 
         $data = $result['otherdata'];
         $this->assertSame($viewid, $data['viewid']);

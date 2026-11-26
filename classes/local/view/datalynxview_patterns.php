@@ -265,7 +265,7 @@ class datalynxview_patterns {
      */
     protected function get_regexp_replacements($tag, $entry = null, ?array $options = null): string {
         if (strpos($tag, '##pdfdownload:') === 0) {
-            return $this->get_pdf_download($tag, $entry);
+            return $this->get_pdf_download($tag, $entry, $options ?? []);
         }
         $link = $this->get_view_link($tag, $entry, $options ?? []);
         if ($link !== null) {
@@ -286,13 +286,15 @@ class datalynxview_patterns {
     /**
      * Resolve ##pdfdownload:<view>[;<label>;<class>]##: a link that downloads the entry as the PDF
      * of a PDF view (mod_datalynx#332). Only for a PDF view the user can see; the PDF view applies its
-     * own filter, so an entry it may not show yields no PDF.
+     * own filter, so an entry it may not show yields no PDF. In the Moodle App (render option app)
+     * the link is a pluginfile.php address, which the app downloads with its token (#334).
      *
      * @param string $tag
      * @param mixed $entry
+     * @param array $options render options
      * @return string
      */
-    protected function get_pdf_download(string $tag, $entry): string {
+    protected function get_pdf_download(string $tag, $entry, array $options = []): string {
         if (empty($entry->id) || (int) $entry->id <= 0) {
             return '';
         }
@@ -312,8 +314,20 @@ class datalynxview_patterns {
         if (empty($held->entries)) {
             return '';
         }
-        $url = new moodle_url('/mod/datalynx/view.php', ['d' => $this->view->get_dlx()->id(), 'view' => $viewid,
-            'pdfexportentry' => (int) $entry->id, 'sesskey' => sesskey()]);
+        if (!empty($options['app'])) {
+            // The app downloads files through pluginfile.php with its token (mod_datalynx#334).
+            $url = moodle_url::make_pluginfile_url(
+                $this->view->get_dlx()->context->id,
+                'mod_datalynx',
+                'pdfexport',
+                $viewid,
+                '/' . (int) $entry->id . '/',
+                clean_filename($viewname) . '_' . (int) $entry->id . '.pdf'
+            );
+        } else {
+            $url = new moodle_url('/mod/datalynx/view.php', ['d' => $this->view->get_dlx()->id(), 'view' => $viewid,
+                'pdfexportentry' => (int) $entry->id, 'sesskey' => sesskey()]);
+        }
         $label = $label !== '' ? format_string($label) : get_string('download');
         return html_writer::link($url, $label, ['class' => $class !== '' ? $class : 'btn btn-outline-secondary btn-sm']);
     }

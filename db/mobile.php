@@ -38,9 +38,11 @@ $addons = [
                 ],
                 'delegate' => 'CoreCourseModuleDelegate',
                 'method' => 'mobile_course_view',
+                // Registers the link handler for view.php?d= (mod_datalynx#280).
+                'init' => 'mobile_init',
                 'styles' => [
                     'url' => $CFG->wwwroot . '/mod/datalynx/mobileapp/styles.css',
-                    'version' => 8,
+                    'version' => 9,
                 ],
             ],
         ],

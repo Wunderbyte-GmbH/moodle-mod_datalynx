@@ -242,11 +242,61 @@ class view extends base {
     }
 
     /**
-     * Process PDF export
+     * Process PDF export: send the PDF as the view's settings say (shown or downloaded).
      *
      * @param string|int $export Export type or entry ID
      */
     public function process_export($export = self::EXPORT_PAGE): void {
+        $built = $this->build_pdf($export);
+        if ($built === null) {
+            return;
+        }
+        [$documentname, $pdf] = $built;
+        $destination = optional_param('dest', $this->settings->destination, PARAM_ALPHA);
+        $pdf->Output("$documentname", $destination);
+        $this->remove_tmpfiles();
+
+        exit();
+    }
+
+    /**
+     * The PDF of one entry the view holds, as a file: for the Moodle App, which downloads it
+     * through pluginfile.php (mod_datalynx#334).
+     *
+     * @param int $entryid
+     * @return array|null [file name, PDF content], null when the view does not hold the entry
+     */
+    public function get_entry_pdf(int $entryid): ?array {
+        $built = $this->build_pdf($entryid);
+        if ($built === null) {
+            return null;
+        }
+        [$documentname, $pdf] = $built;
+        $content = $pdf->Output($documentname, 'S');
+        $this->remove_tmpfiles();
+
+        return [$documentname, $content];
+    }
+
+    /**
+     * Remove the temporary files the PDF was built with.
+     */
+    protected function remove_tmpfiles(): void {
+        foreach ($this->tmpfiles ?: [] as $filepath) {
+            if (is_file($filepath)) {
+                unlink($filepath);
+            }
+        }
+        $this->tmpfiles = [];
+    }
+
+    /**
+     * Build the PDF of the view's entries.
+     *
+     * @param string|int $export Export type or entry ID
+     * @return array|null [document name, the PDF], null without entries
+     */
+    protected function build_pdf($export = self::EXPORT_PAGE): ?array {
         $settings = $this->settings;
         $this->tmpfiles = [];
 
@@ -304,7 +354,7 @@ class view extends base {
 
         // Exit if no entries.
         if (!$this->entries->entries()) {
-            return;
+            return null;
         }
 
         if ($settings->pagebreak == 'entry') {
@@ -384,20 +434,9 @@ class view extends base {
         // Set document signature.
         $this->set_signature($pdf);
 
-        // Send the pdf.
         $documentname = optional_param('docname', $this->get_documentname($settings->docname), PARAM_TEXT);
-        $destination = optional_param('dest', $settings->destination, PARAM_ALPHA);
 
-        $pdf->Output("$documentname", $destination);
-
-        // Clean up temp files.
-        if ($this->tmpfiles) {
-            foreach ($this->tmpfiles as $filepath) {
-                unlink($filepath);
-            }
-        }
-
-        exit();
+        return [$documentname, $pdf];
     }
 
     /**

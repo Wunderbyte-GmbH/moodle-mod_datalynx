@@ -49,7 +49,7 @@ final class entry_edit_form {
     /** @var base */
     private base $view;
 
-    /** @var array field id => [prefix, suffix] of the field layout of its edit tag, see build() */
+    /** @var array field id => [prefix, suffix] of the field layout of its tag (edited or shown), see build() */
     private array $layouts = [];
 
     /**
@@ -68,7 +68,7 @@ final class entry_edit_form {
      * @param array $posted fieldid => input name => value: values to show instead of the stored
      *                      ones, e.g. those just submitted when the save found errors
      * @return array ['entryid', 'formentryid', 'allowed', 'denyreason', 'supported', 'unsupportedfields',
-     *               'fields', 'hasstatus', 'status', 'browserurl', 'submitlabel' (the label of the view's
+     *               'fields', 'hasstatus', 'hasfiles', 'status', 'browserurl', 'submitlabel' (the label of the view's
      *               ##submit## tag, '' for none)]
      */
     public function build(int $entryid, array $posted = []): array {
@@ -85,6 +85,8 @@ final class entry_edit_form {
             'unsupportedfields' => [],
             'fields' => [],
             'hasstatus' => false,
+            // Files the app uploads to a draft area before it saves (mod_datalynx#334).
+            'hasfiles' => false,
             'status' => (int) ($entry->status ?? 0),
             'browserurl' => $this->browser_url($entryid),
             'submitlabel' => '',
@@ -128,6 +130,8 @@ final class entry_edit_form {
                 if ($entryid <= 0) {
                     continue;
                 }
+                // Shown, not edited: its display layout labels it, as on the web.
+                $this->layouts[(string) $fieldid] = $renderer->get_display_layout((string) ($state['tags'][0] ?? ''));
                 $control = $renderer->get_static_control($entry, $state['options']);
                 // Internal fields that show nothing here (entry actions, cancel) get no control.
                 if ($field->is_internal() && trim(strip_tags((string) ($control['html'] ?? ''), '<img>')) === '') {
@@ -136,6 +140,9 @@ final class entry_edit_form {
             }
             if ((string) $fieldid === 'status' && $control['control'] === 'toggle') {
                 $form['hasstatus'] = true;
+            }
+            if ($control['control'] === 'files') {
+                $form['hasfiles'] = true;
             }
             $control['name'] = $name;
             $control['required'] = (bool) $state['required'];
@@ -198,6 +205,12 @@ final class entry_edit_form {
                     $raw = (string) $status;
                 } else if ($control['control'] === 'hidden') {
                     $raw = (string) $input['value'];
+                } else if ($control['control'] === 'files') {
+                    // The draft area the app uploaded the files to; without one the stored files stay.
+                    $raw = $arg($name);
+                    if ($raw === null || (int) $raw <= 0) {
+                        continue;
+                    }
                 } else if ($control['control'] === 'itinerary' && $input['name'] === 'waypoints') {
                     // One address per stop, ef_{fieldid}__waypoints__{n}; the field looks them up.
                     if ($arg("{$name}__0") === null) {

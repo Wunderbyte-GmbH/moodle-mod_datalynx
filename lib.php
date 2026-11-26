@@ -594,6 +594,25 @@ function mod_datalynx_pluginfile($course, $cm, $context, $filearea, $args, $forc
     // Check permissions, if anonymous access is allowed login user.
     require_course_login($course, true, $cm);
 
+    // The PDF of one entry, made by a PDF view the user can see: /{viewid}/{entryid}/{name}.pdf. The
+    // Moodle App downloads it this way, with its token (mod_datalynx#334).
+    if ($filearea === 'pdfexport' && $context->contextlevel == CONTEXT_MODULE) {
+        require_capability('mod/datalynx:viewentry', $context);
+        $viewid = (int) array_shift($args);
+        $entryid = (int) array_shift($args);
+        $dlx = new \mod_datalynx\datalynx($cm->instance);
+        $record = $dlx->get_view_records()[$viewid] ?? null;
+        if (!$record || $record->type !== 'pdf' || $entryid <= 0) {
+            return false;
+        }
+        $pdf = $dlx->get_view($record->type, $record)->get_entry_pdf($entryid);
+        if ($pdf === null) {
+            return false;
+        }
+        [$filename, $content] = $pdf;
+        send_file($content, $filename, 0, 0, true, true, 'application/pdf');
+    }
+
     // FIELD CONTENT files.
     if (
         ($filearea === 'content' || $filearea === 'thumb') &&

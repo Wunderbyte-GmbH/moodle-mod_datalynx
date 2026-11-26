@@ -79,6 +79,8 @@ final class app_links {
     public function render_options(): array {
         return [
             'linkrenderer' => fn(array $link): string => $this->placeholder($link),
+            // Actions of fields (joining a team, mod_datalynx#278) become buttons of the app as well.
+            'actionrenderer' => fn(array $action): string => $this->action_placeholder($action),
             'pagecontrols' => false,
             // Fields that draw on the web with JavaScript render their static form for the app.
             'app' => true,
@@ -98,6 +100,35 @@ final class app_links {
     }
 
     /**
+     * Keep an action of a field (see datalynxfield_teammemberselect\renderer::team_action()) and
+     * return the placeholder it leaves in the HTML.
+     *
+     * @param array $action
+     * @return string
+     */
+    public function action_placeholder(array $action): string {
+        $this->links[] = ['team' => $action + ['color' => self::color($action['style'] ?? ''),
+            'fill' => str_contains((string) ($action['style'] ?? ''), 'outline') ? 'outline' : 'solid']];
+
+        return sprintf(self::PLACEHOLDER, count($this->links) - 1);
+    }
+
+    /**
+     * The colour of an app button for a Bootstrap button class.
+     *
+     * @param string $class e.g. btn-success, btn-outline-danger
+     * @return string an Ionic colour
+     */
+    public static function color(string $class): string {
+        foreach (['success', 'danger', 'warning', 'secondary', 'primary', 'dark', 'light'] as $color) {
+            if (preg_match('/\b(?:btn|bg|text)-(?:outline-)?' . $color . '\b/', $class)) {
+                return $color === 'secondary' ? 'medium' : $color;
+            }
+        }
+        return 'primary';
+    }
+
+    /**
      * Cut rendered HTML at its link placeholders, and at ##entries## when $entries is set.
      *
      * Each HTML part is cleaned for the app on its own, which also closes the elements a cut left
@@ -105,7 +136,8 @@ final class app_links {
      *
      * @param string $html
      * @param bool $entries whether ##entries## marks where the entries are listed
-     * @return array parts, each with html (string) and entries (bool), and a link part with link
+     * @return array parts, each with html (string) and entries (bool), a link part with link and an
+     *               action part with action
      */
     public function parts(string $html, bool $entries = false): array {
         $placeholder = str_replace('%d', '\\d+', preg_quote(self::PLACEHOLDER, '/'));
@@ -128,7 +160,9 @@ final class app_links {
                 }
             } else {
                 $index = (int) preg_replace('/\D/', '', $piece);
-                if (isset($this->links[$index])) {
+                if (isset($this->links[$index]['team'])) {
+                    $parts[] = ['html' => '', 'entries' => false, 'action' => $this->links[$index]['team']];
+                } else if (isset($this->links[$index])) {
                     $parts[] = ['html' => '', 'entries' => false, 'link' => $this->links[$index]];
                 }
             }
@@ -201,9 +235,13 @@ final class app_links {
         // A session key of the app's web service session is of no use in the browser.
         $url->remove_params('sesskey');
 
+        $label = self::label_text((string) $link['label']);
         $projected = [
-            'label' => self::label_text((string) $link['label']),
-            'title' => $record ? format_string($record->name, true, ['context' => $this->dlx->context]) : '',
+            'label' => $label,
+            // The title of the page the link opens: what the user tapped. A chain of steps keeps it,
+            // where the name of the first step's view would stay on every step.
+            'title' => $label !== '' ? $label
+                : ($record ? format_string($record->name, true, ['context' => $this->dlx->context]) : ''),
             'method' => '',
             'viewid' => (int) $link['viewid'],
             'entryid' => 0,
@@ -265,15 +303,21 @@ final class app_links {
      * How the app's button looks, from the classes the author gave the link.
      *
      * Bootstrap buttons become filled buttons (outline buttons outlined), full-width ones expand.
-     * The add link of ##addnewentry## is the app's add button. Other links stay plain.
+     * The add link of ##addnewentry## is the app's add button. A badge becomes a small round filled
+     * button in its colour. Other links stay plain.
      *
      * @param string $cssclass
-     * @return array fill (solid, outline or clear) and expand (bool)
+     * @return array fill (solid, outline or clear), expand (bool), color (Ionic), size ('' or
+     *               small) and round (bool)
      */
     private static function appearance(string $cssclass): array {
         $classes = preg_split('/\s+/', trim($cssclass), -1, PREG_SPLIT_NO_EMPTY);
+        $look = ['color' => self::color($cssclass), 'size' => '', 'round' => false];
         if (in_array('addnewentry', $classes, true)) {
-            return ['fill' => 'solid', 'expand' => true];
+            return ['fill' => 'solid', 'expand' => true] + $look;
+        }
+        if (in_array('badge', $classes, true)) {
+            return ['fill' => 'solid', 'expand' => false, 'size' => 'small', 'round' => true] + $look;
         }
         $fill = 'clear';
         foreach ($classes as $class) {
@@ -289,6 +333,6 @@ final class app_links {
         return [
             'fill' => $fill,
             'expand' => (bool) array_intersect($classes, ['w-100', 'btn-block', 'd-block']),
-        ];
+        ] + $look;
     }
 }

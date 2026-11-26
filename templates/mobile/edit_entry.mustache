@@ -87,14 +87,16 @@
                     [courseId]="<% courseid %>"></core-format-text>
             <ng-container *ngIf="part.link">
                 <div class="ion-padding-horizontal">
-                    <ion-button *ngIf="part.link.method" class="mod-datalynx-mobile-link" [fill]="part.link.fill"
+                    <ion-button *ngIf="part.link.method" class="mod-datalynx-mobile-link" [fill]="part.link.fill" [color]="part.link.color || 'primary'"
+                [size]="part.link.size || undefined" [shape]="part.link.round ? 'round' : undefined"
                             [expand]="part.link.expand ? 'block' : undefined" core-site-plugins-new-content component="mod_datalynx"
                             [method]="part.link.method" [title]="part.link.title || part.link.label"
                             [args]="{cmid: <% cmid %>, courseid: <% courseid %>, viewid: part.link.viewid, entryid: part.link.entryid,
                                 filterid: part.link.filterid, eids: part.link.eids}" [preSets]="{getFromCache: false}">
                         {{ part.link.label }}
                     </ion-button>
-                    <ion-button *ngIf="!part.link.method" class="mod-datalynx-mobile-link" [fill]="part.link.fill"
+                    <ion-button *ngIf="!part.link.method" class="mod-datalynx-mobile-link" [fill]="part.link.fill" [color]="part.link.color || 'primary'"
+                [size]="part.link.size || undefined" [shape]="part.link.round ? 'round' : undefined"
                             [expand]="part.link.expand ? 'block' : undefined" [href]="part.link.url" core-link autoLogin="yes">
                         {{ part.link.label }}
                         <ion-icon name="fas-up-right-from-square" slot="end" aria-hidden="true"></ion-icon>
@@ -211,6 +213,16 @@
                         </ion-button>
                     </ion-item>
                 </ng-container>
+                <!-- Files or a picture (mod_datalynx#334): the app's attachments with camera, gallery and files. The draft
+                     area they are uploaded to on save is sent as the field's input; without it the stored files stay. -->
+                <ng-container *ngIf="f.control === 'files'">
+                    <ion-item lines="none" class="ion-text-wrap mod-datalynx-mobile-group">
+                        <ion-label><h2>{{ f.name + (f.required ? ' *' : '') }}</h2></ion-label>
+                    </ion-item>
+                    <core-attachments [files]="f.files" [maxSize]="f.maxbytes" [maxSubmissions]="f.maxfiles" component="mod_datalynx"
+                            [componentId]="<% cmid %>" [allowOffline]="false" [acceptedTypes]="f.accepted"></core-attachments>
+                    <ion-input *ngIf="f.draftid" class="ion-hide" [name]="f.inputs[0].formname" [value]="f.draftid"></ion-input>
+                </ng-container>
                 <!-- A schedule: once on a date, or weekly on some days; the departure, and the arrival if asked for. -->
                 <ng-container *ngIf="f.control === 'schedule'">
                     <ion-item lines="none" class="ion-text-wrap mod-datalynx-mobile-group">
@@ -293,11 +305,13 @@
         <div class="ion-padding-horizontal">
             <ng-container *ngIf="CONTENT_OTHERDATA.state.hasstatus">
                 <ion-button expand="block" fill="outline" type="button" form="dlxeditentry" core-site-plugins-new-content [samePage]="true"
+                        data-dlx-save="draft" [class.ion-hide]="CONTENT_OTHERDATA.state.hasfiles"
                         [args]="{cmid: <% cmid %>, courseid: <% courseid %>, viewid: CONTENT_OTHERDATA.state.viewid,
                             entryid: CONTENT_OTHERDATA.state.entryid, save: 1, status: 1}">
                     {{ 'plugin.mod_datalynx.mobilesavedraft' | translate }}
                 </ion-button>
                 <ion-button expand="block" type="button" form="dlxeditentry" core-site-plugins-new-content [samePage]="true"
+                        data-dlx-save="final" [class.ion-hide]="CONTENT_OTHERDATA.state.hasfiles"
                         [args]="{cmid: <% cmid %>, courseid: <% courseid %>, viewid: CONTENT_OTHERDATA.state.viewid,
                             entryid: CONTENT_OTHERDATA.state.entryid, save: 1, status: 2}">
                     {{ 'plugin.mod_datalynx.mobilesubmitentry' | translate }}
@@ -305,8 +319,22 @@
             </ng-container>
             <ng-container *ngIf="!CONTENT_OTHERDATA.state.hasstatus">
                 <ion-button expand="block" type="button" form="dlxeditentry" core-site-plugins-new-content [samePage]="true"
+                        data-dlx-save="save" [class.ion-hide]="CONTENT_OTHERDATA.state.hasfiles"
                         [args]="{cmid: <% cmid %>, courseid: <% courseid %>, viewid: CONTENT_OTHERDATA.state.viewid,
                             entryid: CONTENT_OTHERDATA.state.entryid, save: 1}">
+                    {{ CONTENT_OTHERDATA.state.submitlabel || ('plugin.mod_datalynx.mobilesaveentry' | translate) }}
+                </ion-button>
+            </ng-container>
+            <!-- With files (a photo, mod_datalynx#334): upload them to a draft area first, then save with its id. -->
+            <ng-container *ngIf="CONTENT_OTHERDATA.state.hasfiles">
+                <ion-button *ngIf="CONTENT_OTHERDATA.state.hasstatus" expand="block" fill="outline" type="button"
+                        (click)="dlxSave('draft')">
+                    {{ 'plugin.mod_datalynx.mobilesavedraft' | translate }}
+                </ion-button>
+                <ion-button *ngIf="CONTENT_OTHERDATA.state.hasstatus" expand="block" type="button" (click)="dlxSave('final')">
+                    {{ 'plugin.mod_datalynx.mobilesubmitentry' | translate }}
+                </ion-button>
+                <ion-button *ngIf="!CONTENT_OTHERDATA.state.hasstatus" expand="block" type="button" (click)="dlxSave('save')">
                     {{ CONTENT_OTHERDATA.state.submitlabel || ('plugin.mod_datalynx.mobilesaveentry' | translate) }}
                 </ion-button>
             </ng-container>

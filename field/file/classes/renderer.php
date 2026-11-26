@@ -47,6 +47,63 @@ class renderer extends datalynxfield_renderer {
     }
 
     /**
+     * The control of the app (mod_datalynx#334): the app's attachments with camera, gallery and
+     * files. The app uploads them to a draft area on save and sends its id as filemanager; the
+     * stored files are listed so that they stay unless removed.
+     *
+     * @param stdClass $entry
+     * @param array $options
+     * @return array|null
+     */
+    public function get_edit_control(stdClass $entry, array $options): ?array {
+        global $DB;
+        $field = $this->field;
+        $files = [];
+        $contentid = (int) ($entry->id > 0 ? $DB->get_field(
+            'datalynx_contents',
+            'id',
+            ['entryid' => $entry->id, 'fieldid' => $field->id()],
+            IGNORE_MULTIPLE
+        ) : 0);
+        if ($contentid) {
+            $stored = get_file_storage()->get_area_files(
+                $field->dlx()->context->id,
+                'mod_datalynx',
+                'content',
+                $contentid,
+                'filename',
+                false
+            );
+            foreach ($stored as $file) {
+                $files[] = [
+                    'filename' => $file->get_filename(),
+                    'filepath' => $file->get_filepath(),
+                    'filesize' => (int) $file->get_filesize(),
+                    'mimetype' => $file->get_mimetype(),
+                    'timemodified' => (int) $file->get_timemodified(),
+                    'fileurl' => moodle_url::make_webservice_pluginfile_url(
+                        $file->get_contextid(),
+                        $file->get_component(),
+                        $file->get_filearea(),
+                        $file->get_itemid(),
+                        $file->get_filepath(),
+                        $file->get_filename()
+                    )->out(false),
+                ];
+            }
+        }
+        $accepted = trim((string) $field->get('param3'));
+
+        return $this->edit_control('files', ['filemanager' => ''], $options, [
+            'files' => $files,
+            'maxbytes' => (int) $field->get('param1'),
+            'maxfiles' => max(1, (int) $field->get('param2')),
+            'accepted' => $accepted !== '' ? $accepted : '*',
+            'draftid' => 0,
+        ]);
+    }
+
+    /**
      * Renders the edit mode form elements for this field.
      *
      * @param MoodleQuickForm $mform The Moodle form object.

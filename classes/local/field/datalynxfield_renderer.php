@@ -283,6 +283,24 @@ abstract class datalynxfield_renderer {
     }
 
     /**
+     * The HTML of the field layout of a tag around the shown value: [before #value, after it].
+     * ['', ''] when the tag has no custom display template.
+     *
+     * @param string $tag
+     * @return array
+     */
+    public function get_display_layout(string $tag): array {
+        [, , $layout] = $this->process_tag($tag);
+        $template = $layout ? $layout->get_display_template() : null;
+        if (!is_string($template) || strpos($template, '#value') === false) {
+            return ['', ''];
+        }
+        [$prefix, $suffix] = explode('#value', (string) $this->filter_layout_template($template), 2);
+
+        return [$prefix, $suffix];
+    }
+
+    /**
      * Run a custom field layout template through the content filters (multilang, ...).
      *
      * View templates are filtered before their tags are substituted, so a layout template that is
@@ -805,7 +823,7 @@ abstract class datalynxfield_renderer {
      * Describe a control; each input must be one the field's input contract names.
      *
      * @param string $control text, number, textarea, url, select, radio, multiselect, checkbox,
-     *                        datetime, duration, itinerary, schedule, toggle, hidden or static
+     *                        datetime, duration, itinerary, schedule, files, toggle, hidden or static
      * @param array $values content name, as the input contract names it ('' for the value itself) =>
      *                      the current value: text, or a list of texts for a list input
      * @param array $options the render options the input contract is read with

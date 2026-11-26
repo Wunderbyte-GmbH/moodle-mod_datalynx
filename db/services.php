@@ -101,10 +101,11 @@ $functions = [
                 'classname'   => 'mod_datalynx\external\team_subscription',
                 'methodname'  => 'execute',
                 'classpath'   => '',
-                'description' => 'Subscribe or unsubscribe users in a datalynx team.',
+                'description' => 'Join or leave a datalynx team, or request, approve and decline joining it.',
                 'type'        => 'write',
                 'capabilities' => 'mod/datalynx:teamsubscribe',
                 'ajax'        => true,
+                'services'    => [MOODLE_OFFICIAL_MOBILE_SERVICE],
         ],
         'mod_datalynx_toggle_behavior' => [
                 'classname'   => 'mod_datalynx\external\toggle_behavior',

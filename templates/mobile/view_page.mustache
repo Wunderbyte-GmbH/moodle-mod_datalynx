@@ -36,17 +36,51 @@
 {{=<% %>=}}
 <div class="mod-datalynx-mobile">
     <ng-template #dlxlink let-link="link">
-        <ion-button *ngIf="link.method" class="mod-datalynx-mobile-link" [fill]="link.fill" [expand]="link.expand ? 'block' : undefined"
+        <ion-button *ngIf="link.method" class="mod-datalynx-mobile-link" [fill]="link.fill" [color]="link.color || 'primary'"
+                [size]="link.size || undefined" [shape]="link.round ? 'round' : undefined" [expand]="link.expand ? 'block' : undefined"
                 core-site-plugins-new-content component="mod_datalynx" [method]="link.method" [title]="link.title || link.label"
                 [args]="{cmid: <% cmid %>, courseid: <% courseid %>, viewid: link.viewid, entryid: link.entryid,
                     filterid: link.filterid, eids: link.eids}" [preSets]="{getFromCache: false}">
             {{ link.label }}
         </ion-button>
-        <ion-button *ngIf="!link.method" class="mod-datalynx-mobile-link" [fill]="link.fill" [expand]="link.expand ? 'block' : undefined"
+        <ion-button *ngIf="!link.method" class="mod-datalynx-mobile-link" [fill]="link.fill" [color]="link.color || 'primary'"
+                [size]="link.size || undefined" [shape]="link.round ? 'round' : undefined" [expand]="link.expand ? 'block' : undefined"
                 [href]="link.url" core-link autoLogin="yes">
             {{ link.label }}
             <ion-icon name="fas-up-right-from-square" slot="end" aria-hidden="true"></ion-icon>
         </ion-button>
+    </ng-template>
+    <!-- An action on the team of an entry (mod_datalynx#278): a button calling mod_datalynx_team_subscription;
+         a request that needs a pickup point asks for it first, with suggestions while typing. -->
+    <ng-template #dlxaction let-action="action">
+        <ion-button *ngIf="!action.pickupfield" class="mod-datalynx-mobile-link" size="small" [fill]="action.fill"
+                [color]="action.color" (click)="dlxTeam(action)">
+            {{ action.label }}
+        </ion-button>
+        <ng-container *ngIf="action.pickupfield">
+            <ion-button *ngIf="!action.open" class="mod-datalynx-mobile-link" size="small" [fill]="action.fill"
+                    [color]="action.color" (click)="dlxPickupFor(action)">
+                {{ action.label }}
+            </ion-button>
+            <ng-container *ngIf="action.open">
+                <ion-input class="mod-datalynx-mobile-control mod-datalynx-mobile-pickup" labelPlacement="stacked" fill="outline"
+                        [label]="action.pickuplabel" [value]="action.pickup.address" autocomplete="off"
+                        (ionInput)="dlxSuggest({fieldid: action.pickupfield}, action.pickup, $event.detail.value)"></ion-input>
+                <ion-item *ngFor="let p of action.pickup.suggestions" button [detail]="false" class="mod-datalynx-mobile-suggestion"
+                        (click)="dlxPick(action.pickup, p)">
+                    <ion-icon name="fas-location-dot" slot="start" aria-hidden="true"></ion-icon>
+                    <ion-label class="ion-text-wrap">{{ p.address }}</ion-label>
+                </ion-item>
+                <ion-button class="mod-datalynx-mobile-link" size="small" [color]="action.color"
+                        [disabled]="!action.pickup.address.trim()"
+                        (click)="dlxTeam(action, {pickup: {address: action.pickup.address, lat: action.pickup.lat, lng: action.pickup.lng}})">
+                    {{ action.label }}
+                </ion-button>
+                <ion-button class="mod-datalynx-mobile-link" size="small" fill="clear" (click)="action.open = false">
+                    {{ 'core.cancel' | translate }}
+                </ion-button>
+            </ng-container>
+        </ng-container>
     </ng-template>
 
     <core-course-module-description *ngIf="CONTENT_OTHERDATA.state.intro" [description]="CONTENT_OTHERDATA.state.intro"
@@ -245,6 +279,11 @@
                     <ng-container *ngTemplateOutlet="dlxlink; context: {link: part.link}"></ng-container>
                 </div>
             </ng-container>
+            <ng-container *ngIf="part.action">
+                <div class="ion-padding-horizontal">
+                    <ng-container *ngTemplateOutlet="dlxaction; context: {action: part.action}"></ng-container>
+                </div>
+            </ng-container>
             <ng-container *ngIf="part.entries">
                 <ng-container *ngIf="CONTENT_OTHERDATA.state.entriesfiltercount">
                     <p class="ion-padding-horizontal mod-datalynx-mobile-count" aria-live="polite">
@@ -264,6 +303,9 @@
                                     contextLevel="module" [contextInstanceId]="<% cmid %>" [courseId]="<% courseid %>"></core-format-text>
                             <ng-container *ngIf="part.link">
                                 <ng-container *ngTemplateOutlet="dlxlink; context: {link: part.link}"></ng-container>
+                            </ng-container>
+                            <ng-container *ngIf="part.action">
+                                <ng-container *ngTemplateOutlet="dlxaction; context: {action: part.action}"></ng-container>
                             </ng-container>
                         </ng-container>
                     </ion-card-content>
