@@ -69,7 +69,11 @@ class board_builder {
         'all' => 'Alle Fahrten',
         'email' => 'Benachrichtigung: Passende Fahrt',
         'manage' => 'Meine Fahrten verwalten',
+        'billing' => 'Fahrt abrechnen',
     ];
+
+    /** @var string Shortname of the user profile field holding the IBAN (#343). */
+    const IBAN = 'iban';
 
     /** @var string[] Titles of the offer steps. */
     const STEPS = [1 => 'Route', 2 => 'Termin', 3 => 'Fahrzeug', 4 => 'Mitnahme', 5 => 'Übersicht'];
@@ -219,6 +223,9 @@ class board_builder {
      * @return int course module id
      */
     public function build(): int {
+        if ($this->is_billing()) {
+            $this->ensure_iban_field();
+        }
         $this->create_activity();
         $this->create_fields();
         $this->create_layouts();
@@ -242,6 +249,43 @@ class board_builder {
         if ($this->log) {
             ($this->log)($line);
         }
+    }
+
+    /**
+     * The user profile field of the IBAN, made when the site has none (billing variant, #343).
+     *
+     * Kept once per user, private to them; the Fahrtenschein shows and edits it.
+     */
+    protected function ensure_iban_field(): void {
+        global $DB;
+        if ($DB->record_exists('user_info_field', ['shortname' => self::IBAN])) {
+            return;
+        }
+        $categoryid = (int) $DB->get_field_sql('SELECT MIN(id) FROM {user_info_category}');
+        if (!$categoryid) {
+            $categoryid = (int) $DB->insert_record('user_info_category', (object) ['name' => 'Mitfahrbörse', 'sortorder' => 1]);
+        }
+        $DB->insert_record('user_info_field', (object) [
+            'shortname' => self::IBAN,
+            'name' => 'IBAN',
+            'datatype' => 'text',
+            'description' => 'Konto für die Fahrtkostenabrechnung der Mitfahrbörse.',
+            'descriptionformat' => FORMAT_HTML,
+            'categoryid' => $categoryid,
+            'sortorder' => (int) $DB->count_records('user_info_field', ['categoryid' => $categoryid]) + 1,
+            'required' => 0,
+            'locked' => 0,
+            // Visible to the user only.
+            'visible' => 1,
+            'forceunique' => 0,
+            'signup' => 0,
+            'defaultdata' => '',
+            'defaultdataformat' => FORMAT_PLAIN,
+            'param1' => 34,
+            'param2' => 34,
+            'param3' => 0,
+        ]);
+        $this->log('Created the user profile field "iban".');
     }
 
     /**
@@ -459,6 +503,66 @@ class board_builder {
                     . 'einzelne Fahrten aufgeteilt, die Sie unter „Meine Fahrten verwalten“ einzeln absagen oder löschen.',
                 'params' => ['param1' => 'Angaben geprüft – Fahrt veröffentlichen'],
             ];
+            // The Fahrtenschein: billing fields on the ride itself (#343, #331), for the driver and managers.
+            $fields['anlass'] = [
+                'type' => 'text',
+                'name' => 'Anlass',
+                'label' => 'Anlass / Schulung',
+                'hint' => 'Wofür war die Fahrt? Zum Beispiel: Fortbildung, Schulung oder Termin mit Ort.',
+                'params' => ['param2' => 100, 'param3' => '%'],
+            ];
+            $fields['rueckfahrt'] = [
+                'type' => 'checkbox',
+                'name' => 'Rückfahrt',
+                'label' => 'Rückfahrt',
+                'hint' => 'Angehakt verdoppelt die Kilometer.',
+                'params' => ['param1' => 'Rückfahrt (gleiche Strecke zurück)'],
+            ];
+            $fields['beantragtekm'] = [
+                'type' => 'number',
+                'name' => 'Beantragte Kilometer',
+                'label' => 'Beantragte Kilometer, falls abweichend von der Routenplanung',
+                'hint' => 'Nur ausfüllen, wenn Sie mehr oder weniger Kilometer als berechnet abrechnen möchten.',
+                'params' => ['param1' => 1, 'param5' => 0],
+            ];
+            $fields['begruendung'] = [
+                'type' => 'textarea',
+                'name' => 'Begründung',
+                'label' => 'Begründung für Abweichung',
+                'hint' => 'Pflicht, wenn Sie mehr Kilometer beantragen, als die Route ergibt.',
+                'params' => ['param2' => 60, 'param3' => 3],
+                'fullwidth' => true,
+            ];
+            $fields['dienstfahrzeug'] = [
+                'type' => 'checkbox',
+                'name' => 'Dienstfahrzeug',
+                'label' => 'Dienstfahrzeug',
+                'hint' => '',
+                'params' => ['param1' => 'Die Fahrt war mit einem Dienstfahrzeug'],
+            ];
+            // Proof of the trip (#331): a photo of the parked car at the destination, at most 1600 px.
+            $fields['parkfoto'] = [
+                'type' => 'picture',
+                'name' => 'Parkfoto',
+                'label' => 'Parkfoto',
+                'hint' => 'Ein Foto des geparkten Fahrzeugs am Zielort (JPEG oder PNG, höchstens 10 MB).',
+                'params' => ['param1' => 10485760, 'param2' => 1, 'param3' => 'image', 'param7' => 1600, 'param8' => 1600,
+                    'param9' => 320, 'param10' => 320],
+                'fullwidth' => true,
+            ];
+            $fields['eigenerklaerung'] = [
+                'type' => 'checkbox',
+                'name' => 'Eigenerklärung',
+                'label' => 'Eigenerklärung',
+                'hint' => '',
+                'params' => ['param1' => 'Hiermit bestätige ich wahrheitsgemäß, dass ich die angegebene Fahrt am genannten '
+                    . 'Datum selbst als Fahrer/in durchgeführt habe und sowohl die angegebenen Streckendaten als auch die '
+                    . 'aufgeführten mitgenommenen Personen den Tatsachen entsprechen.'],
+                'fullwidth' => true,
+            ];
+            // The distance of the route is billing-relevant: computed on the server (#328).
+            $fields['route']['billing'] = ['returnfield' => 'rueckfahrt', 'requestedfield' => 'beantragtekm',
+                'justificationfield' => 'begruendung'];
             $fields['fahrtstatus'] = [
                 'type' => 'select',
                 'name' => 'Fahrtstatus',
@@ -494,6 +598,16 @@ class board_builder {
                 'description' => $def['description'] ?? '',
             ], $def['params']);
             $this->fieldids[$key] = (int) $DB->insert_record('datalynx_fields', $record);
+        }
+        // The billing settings of a route (param9) name other fields by key.
+        foreach ($this->fielddefs as $key => $def) {
+            if (!empty($def['billing'])) {
+                $billing = ['billing' => 1];
+                foreach ($def['billing'] as $name => $fieldkey) {
+                    $billing[$name] = $this->fieldids[$fieldkey];
+                }
+                $DB->set_field('datalynx_fields', 'param9', json_encode($billing), ['id' => $this->fieldids[$key]]);
+            }
         }
         // Settings naming another field (param10 of a team member select) by key.
         foreach ($this->fielddefs as $key => $def) {
@@ -600,6 +714,11 @@ class board_builder {
                 $behaviors[$name]['editableuntil'] = 'termin';
             }
             $behaviors['bisabfahrt'] = ['required' => 0, 'conditions' => '', 'editableuntil' => 'termin'];
+            // The Fahrtenschein: visible to the driver and managers only (#343).
+            $billing = [datalynx::PERMISSION_MANAGER, datalynx::PERMISSION_TEACHER, datalynx::PERMISSION_AUTHOR];
+            $behaviors['abrechnung'] = ['required' => 0, 'conditions' => '', 'visibleto' => $billing];
+            $behaviors['abrechnungpflicht'] = ['required' => 1, 'conditions' => '', 'visibleto' => $billing];
+            $behaviors['abrechnunglesen'] = ['required' => 0, 'conditions' => '', 'visibleto' => $billing, 'readonly' => true];
         }
         if ($this->has('fahrkosten')) {
             $fixed = $this->option_condition('fahrkosten', ['Festbetrag']);
@@ -662,6 +781,13 @@ class board_builder {
                 'sliderscale' => 'linear', 'sliderstep' => '1', 'sliderunit' => 'km', 'sliderticks' => 1,
             ]],
         ];
+        if ($this->has('parkfoto')) {
+            // The kilometres of the Fahrtenschein (#328), and the IBAN from the driver's profile (#343).
+            $formats['distance'] = ['fieldtype' => 'itinerary', 'settings' => ['show' => 'distance']];
+            $formats['billeddistance'] = ['fieldtype' => 'itinerary', 'settings' => ['show' => 'billeddistance']];
+            $formats['iban'] = ['fieldtype' => 'entryauthor', 'settings' => ['option' => self::IBAN, 'editable' => 1,
+                'mandatory' => 1, 'check' => 'iban']];
+        }
         if ($this->has('passagiere')) {
             // The passengers with the button to request a seat.
             $formats['mitfahren'] = ['fieldtype' => 'teammemberselect',
@@ -697,7 +823,16 @@ class board_builder {
             return [$this->fieldids['fahrttyp'] => ['AND' => [['', 'ANY_OF', [$position]]]]];
         };
         $offers = $type(self::OFFER) + $this->ride_conditions();
-        return [
+        $filters = [];
+        if ($this->has('parkfoto')) {
+            // The driver's own past, not cancelled rides: the ones to bill (#343).
+            $filters['billable'] = ['name' => 'Abzurechnende Fahrten', 'customsearch' => ['userid' => ['AND' => [['', 'ME', '']]]]
+                + $type(self::OFFER) + [
+                    $this->fieldids['termin'] => ['AND' => [['', 'PAST', '']]],
+                    $this->fieldids['fahrtstatus'] => ['AND' => [['NOT', 'ANY_OF', ['2']]]],
+                ]];
+        }
+        return $filters + [
             'own' => ['name' => 'Meine Einträge', 'customsearch' => ['userid' => ['AND' => [['', 'ME', '']]]]],
             'offers' => ['name' => 'Nur Angebote', 'customsearch' => $offers],
             'requests' => ['name' => 'Nur Gesuche', 'customsearch' => $type(self::REQUEST)],
@@ -1005,7 +1140,8 @@ class board_builder {
                     'esection' => $list('Meine Fahrten', '<div class="mb-3">##viewsesslink:' . self::VIEWS['step1']
                         . ';Neue Fahrt eintragen;new=1;btn btn-primary##'
                         . ($this->is_billing() ? ' ##viewlink:' . self::VIEWS['manage']
-                            . ';Meine Fahrten verwalten;;btn btn-outline-primary##' : '')
+                            . ';Meine Fahrten verwalten;;btn btn-outline-primary##'
+                            . ' ##viewlink:' . self::VIEWS['billing'] . ';Fahrt abrechnen;;btn btn-outline-primary##' : '')
                         . '</div>##entries##'),
                     'eparam2' => $this->ridecard(),
                 ],
@@ -1027,6 +1163,37 @@ class board_builder {
                         . '</div><div class="card-footer bg-transparent border-0 d-flex gap-2">##edit####delete##</div></div>',
                 ],
                 'filter' => 'own',
+            ],
+            'billing' => !$this->has('parkfoto') ? null : [
+                'type' => 'grid',
+                'data' => [
+                    'perpage' => 20,
+                    'esection' => $list('Fahrt abrechnen', '<p class="text-muted">Ihre vergangenen Fahrten. Öffnen Sie eine '
+                        . 'Fahrt mit „Bearbeiten“, füllen Sie den Fahrtenschein aus und reichen Sie ihn ein. Danach kann er '
+                        . 'nicht mehr geändert werden.</p>##entries##'),
+                    'eparam2' => $this->card(
+                        'Fahrtenschein',
+                        'Fahrt abrechnen',
+                        '',
+                        'Die Kilometer berechnet der Server aus der Route; mit Rückfahrt zählen sie doppelt.',
+                        $this->tags(['route', 'termin', 'kennzeichen', 'passagiere'], 'nurlesen')
+                            . '<div class="d-flex justify-content-between align-items-start gap-3 border-bottom py-1 mb-3">'
+                            . '<span class="small fw-semibold text-nowrap">Abrechnungs-Kilometer</span>'
+                            . '<span class="text-end fw-bold">[[Route:billeddistance|abrechnunglesen]]</span></div>'
+                            . $this->tag('anlass', 'abrechnungpflicht') . $this->tag('rueckfahrt', 'abrechnung')
+                            . $this->tag('beantragtekm', 'abrechnung') . $this->tag('begruendung', 'abrechnung')
+                            . $this->tag('dienstfahrzeug', 'abrechnung')
+                            . '<div class="mb-3 datalynx-ride-field"><label class="form-label fw-semibold">IBAN</label>'
+                            . '##author:iban##<div class="form-text">Wird in Ihrem Profil gespeichert und für jede Abrechnung '
+                            . 'verwendet.</div></div>'
+                            . $this->tag('parkfoto', 'abrechnungpflicht') . $this->tag('eigenerklaerung', 'abrechnungpflicht')
+                            . '<div class="mb-3 datalynx-ride-field"><label class="form-label fw-semibold">Fahrtenschein '
+                            . 'einreichen</label>##status##<div class="form-text">Eingereicht ist der Fahrtenschein gesperrt.'
+                            . '</div></div>##edit##',
+                        'Fahrtenschein_speichern'
+                    ),
+                ],
+                'filter' => 'billable',
             ],
             'all' => [
                 'type' => 'grid',

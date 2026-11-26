@@ -644,6 +644,11 @@ class renderer extends datalynxfield_renderer {
 
         if (!empty($field->get('mandatory')) && ($value === '' || $value === null)) {
             $errors[$formfieldname] = get_string('fieldrequired', 'datalynx');
+        } else if (
+            $field->get('check') === 'iban' && trim((string) $value) !== ''
+                && !\datalynxfield_text\renderer::is_valid_iban((string) $value)
+        ) {
+            $errors[$formfieldname] = get_string('erriban', 'datalynxfield_text');
         }
 
         return $errors;

@@ -298,6 +298,10 @@ class renderer extends TextRenderer {
         if ($value !== '' && !$errors) {
             $errors = \datalynxfield_teammemberselect\field::limit_errors($this->field, $entryid, $formfieldname, $value);
         }
+        // Kilometres asked for beyond a billed route need a reason (mod_datalynx#328, #343).
+        if ($value !== '' && !$errors) {
+            $errors = \datalynxfield_itinerary\field::requested_km_errors($this->field, $entryid, $formdata);
+        }
 
         return $errors;
     }

@@ -371,6 +371,16 @@ class renderer extends datalynxfield_renderer {
      * @return bool
      */
     protected function validate_iban($value): bool {
+        return self::is_valid_iban((string) $value);
+    }
+
+    /**
+     * Whether a text is an IBAN: its structure and its Modulo 97 checksum.
+     *
+     * @param string $value
+     * @return bool
+     */
+    public static function is_valid_iban(string $value): bool {
         $iban = str_replace([' ', '-'], '', strtoupper($value));
         if (empty($iban)) {
             return false;

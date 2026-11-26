@@ -683,6 +683,34 @@ class field extends datalynxfield_base {
     }
 
     /**
+     * The errors of requested kilometres submitted without the route (the route stays as stored): more
+     * km asked for than billed need a reason. Called by the number field.
+     *
+     * @param datalynxfield_base $number the number field being validated
+     * @param int|string $entryid
+     * @param \stdClass $formdata
+     * @return array element => error
+     */
+    public static function requested_km_errors(datalynxfield_base $number, $entryid, \stdClass $formdata): array {
+        if (!is_numeric($entryid) || (int) $entryid <= 0) {
+            return [];
+        }
+        foreach ($number->dlx()->get_fields() as $field) {
+            if (
+                $field->type !== 'itinerary' || !$field->is_billing()
+                    || (int) ($field->get_billing_settings()['requestedfield'] ?? 0) !== (int) $number->id()
+            ) {
+                continue;
+            }
+            $journey = $field->stored_journey((int) $entryid);
+            if ($journey->is_route()) {
+                return $field->billing_errors($entryid, $journey, "field_{$field->id()}_{$entryid}_waypoints", $formdata);
+            }
+        }
+        return [];
+    }
+
+    /**
      * The errors of a billing route: no route, or more km asked for than billed without a reason.
      *
      * @param int|string $entryid

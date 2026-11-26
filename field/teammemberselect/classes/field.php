@@ -665,6 +665,13 @@ class field extends datalynxfield_base {
             }
         }
 
+        // Members removed in the form take what is bound to them along, e.g. a pickup stop (#327).
+        if ($values && !$this->is_fieldgroup_subfield() && (int) ($entry->id ?? 0) > 0) {
+            foreach (array_diff(array_map('intval', (array) $oldcontent), array_map('intval', (array) $newcontent)) as $left) {
+                $this->member_left((int) $entry->id, $left);
+            }
+        }
+
         // Not submitted (e.g. shown disabled): the team is kept, nobody joined or left.
         // Inside a fieldgroup the field is a list of people, not the entry's team: no notifications.
         if ($values && !$this->is_fieldgroup_subfield()) {

@@ -24,6 +24,7 @@
  */
 
 $string['fieldformat_desc'] = 'Controls which attribute of the entry author is displayed. Type one of the following attributes as the format Name: id, name, firstname, lastname, username, idnumber, email, institution, department, picture, picturelarge, badges, edit. When a custom user profile field shortname is used, the field can optionally be made editable.';
+$string['infofieldcheck'] = 'Check the value';
 $string['infofieldeditable'] = 'Inline editing';
 $string['infofieldeditable_help'] = 'Allow the entry author (and users who may edit their profile) to edit this user profile field inline. Only applies when the format targets a custom user profile field.';
 $string['infofieldmandatory'] = 'Required';

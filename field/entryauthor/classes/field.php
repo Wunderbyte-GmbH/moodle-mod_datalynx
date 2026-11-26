@@ -266,6 +266,7 @@ class field extends datalynxfield_no_content {
                 'param10' => $info ? $info->param3 : null,
                 'editable' => $format->is_editable() ? 1 : 0,
                 'mandatory' => $format->is_mandatory() ? 1 : 0,
+                'check' => (string) $format->get_setting('check', ''),
             ];
         }
 

@@ -23,6 +23,7 @@
  */
 
 $string['fieldformat_desc'] = 'Legt fest, welches Attribut der Autorin/des Autors des Eintrags angezeigt wird. Geben Sie eines der folgenden Attribute als Formatnamen ein: id, name, firstname, lastname, username, idnumber, email, institution, department, picture, picturelarge, badges, edit. Wird der Kurzname eines eigenen Nutzerprofilfelds verwendet, kann das Feld optional bearbeitbar gemacht werden.';
+$string['infofieldcheck'] = 'Wert prüfen';
 $string['infofieldeditable'] = 'Inline-Bearbeitung';
 $string['infofieldeditable_help'] = 'Erlaubt dem Eintragsautor (und Personen, die dessen Profil bearbeiten dürfen), dieses Nutzerprofilfeld direkt zu bearbeiten. Gilt nur, wenn das Format auf ein benutzerdefiniertes Profilfeld verweist.';
 $string['infofieldmandatory'] = 'Pflichtfeld';

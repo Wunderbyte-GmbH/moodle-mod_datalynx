@@ -66,10 +66,21 @@ class field_format_form extends \mod_datalynx\form\field_format_base_form {
         $mform->setType('mandatory', PARAM_BOOL);
         $mform->disabledIf('mandatory', 'editable', 'notchecked');
 
+        // Check the value edited inline, e.g. an IBAN (mod_datalynx#343).
+        $mform->addElement(
+            'select',
+            'check',
+            get_string('infofieldcheck', 'datalynxfield_entryauthor'),
+            ['' => get_string('none'), 'iban' => get_string('iban', 'datalynxfield_text')]
+        );
+        $mform->setType('check', PARAM_ALPHA);
+        $mform->disabledIf('check', 'editable', 'notchecked');
+
         // Hide editable and mandatory when a built-in (non-profile-field) option is selected.
         foreach (\datalynxfield_entryauthor\field_format::get_builtin_options() as $builtin) {
             $mform->hideIf('editable', 'option', 'eq', $builtin);
             $mform->hideIf('mandatory', 'option', 'eq', $builtin);
+            $mform->hideIf('check', 'option', 'eq', $builtin);
         }
     }
 

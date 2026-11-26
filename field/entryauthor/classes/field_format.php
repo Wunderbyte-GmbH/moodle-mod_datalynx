@@ -45,6 +45,16 @@ class field_format extends \mod_datalynx\local\field_format\base {
         $mform->addHelpButton('mandatory', 'infofieldmandatory', 'datalynxfield_entryauthor');
         $mform->setType('mandatory', PARAM_BOOL);
         $mform->disabledIf('mandatory', 'editable', 'notchecked');
+
+        // Check the value edited inline, e.g. an IBAN (mod_datalynx#343).
+        $mform->addElement(
+            'select',
+            'check',
+            get_string('infofieldcheck', 'datalynxfield_entryauthor'),
+            ['' => get_string('none'), 'iban' => get_string('iban', 'datalynxfield_text')]
+        );
+        $mform->setType('check', PARAM_ALPHA);
+        $mform->disabledIf('check', 'editable', 'notchecked');
     }
 
     /**

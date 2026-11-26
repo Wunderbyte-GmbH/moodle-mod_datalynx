@@ -51,14 +51,23 @@ class field extends FileField {
      * @return int|string|bool
      */
     public function update_content(stdClass $entry, ?array $values = null): int|string|bool {
+        global $DB;
         $parentcontentid = parent::update_content($entry, $values);
 
-        // We can read the contentid from entry and update the right files.
-        // TODO: MDL-0000 The parent class should return the correct contentid, why do we do this?
-        $contentid = isset($entry->{"c{$this->field->id}_id"}) ? $entry->{"c{$this->field->id}_id"} : null;
+        // The content id: of the entry, or the row the parent just made.
+        $contentid = $entry->{"c{$this->field->id}_id"} ?? null;
+        if (empty($contentid)) {
+            $contentid = $DB->get_field(
+                'datalynx_contents',
+                'id',
+                ['fieldid' => $this->field->id, 'entryid' => $entry->id],
+                IGNORE_MULTIPLE
+            );
+        }
 
         if (!empty($contentid)) {
-            $this->update_content_files($contentid, ['updatethumb' => true, 'updatefile' => false]);
+            // Pictures larger than the field allows are scaled down (e.g. a parking photo, mod_datalynx#331).
+            $this->update_content_files($contentid, ['updatethumb' => true, 'updatefile' => true]);
         }
 
         return $parentcontentid;
@@ -172,15 +181,27 @@ class field extends FileField {
                     $maxwidth = !empty($this->field->param7) ? $this->field->param7 : '';
                     $maxheight = !empty($this->field->param8) ? $this->field->param8 : '';
 
-                    // If either width or height try to (re)generate.
-                    if ($maxwidth || $maxheight) {
-                        // This may fail for various reasons.
+                    // Scale down a picture larger than the maximum, keeping its aspect ratio.
+                    $info = $file->get_imageinfo();
+                    $toolarge = $info && (($maxwidth && $info['width'] > $maxwidth)
+                        || ($maxheight && $info['height'] > $maxheight));
+                    if ($toolarge) {
+                        // This may fail for various reasons; the picture is then kept as it is.
                         try {
-                            global $DB;
-                            $record = $DB->get_record('files', ['id' => $file->get_id()]);
-                            $fs->convert_image($record, $record->id, $maxwidth, $maxheight, true);
+                            $resized = $fs->convert_image([
+                                'contextid' => $file->get_contextid(),
+                                'component' => $file->get_component(),
+                                'filearea' => $file->get_filearea(),
+                                'itemid' => $file->get_itemid(),
+                                'filepath' => $file->get_filepath(),
+                                'filename' => 'resized_' . $file->get_filename(),
+                            ], $file, $maxwidth ?: null, $maxheight ?: null, true);
+                            if ($resized) {
+                                $file->replace_file_with($resized);
+                                $resized->delete();
+                            }
                         } catch (\Exception $e) {
-                            return false;
+                            debugging('Could not scale down picture: ' . $e->getMessage(), DEBUG_DEVELOPER);
                         }
                     }
                 }

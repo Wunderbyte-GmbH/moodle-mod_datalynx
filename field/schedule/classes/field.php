@@ -493,7 +493,19 @@ class field extends datalynxfield_base {
      * @return array [$sql, $params, $fromcontent]
      */
     public function get_search_sql(array $search): array {
-        [$not, , $value] = $search;
+        [$not, $operator, $value] = $search;
+
+        // Past or upcoming, against today (mod_datalynx#343): a ride to bill, a ride still to come.
+        if ($operator === 'PAST' || $operator === 'UPCOMING') {
+            $suffix = self::next_suffix();
+            $params = ["schtoday{$suffix}" => (int) schedule::day_start(schedule::date_of(time()))];
+            $until = $this->numeric('content4');
+            $conditions = $operator === 'PAST'
+                ? ["{$until} > 0", "{$until} < :schtoday{$suffix}"]
+                : ["({$until} = 0 OR {$until} >= :schtoday{$suffix})"];
+            $sql = $this->wrap($conditions, $params, $suffix);
+            return ['e.id ' . ($not ? 'NOT IN' : 'IN') . " ({$sql})", $params, false];
+        }
 
         if (!is_array($value)) {
             return ['', [], false];
@@ -678,7 +690,11 @@ class field extends datalynxfield_base {
      * @return array
      */
     public function get_supported_search_operators(): array {
-        return ['' => get_string('runson', 'datalynxfield_schedule')];
+        return [
+            '' => get_string('runson', 'datalynxfield_schedule'),
+            'PAST' => get_string('searchpast', 'datalynxfield_schedule'),
+            'UPCOMING' => get_string('searchupcoming', 'datalynxfield_schedule'),
+        ];
     }
 
     /**
