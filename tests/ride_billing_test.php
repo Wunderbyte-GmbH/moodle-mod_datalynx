@@ -237,6 +237,29 @@ final class ride_billing_test extends advanced_testcase {
     }
 
     /**
+     * Cancelling a ride tells its passengers so, in the words of the board's message view.
+     */
+    public function test_cancel_notifies_passengers(): void {
+        global $DB;
+        $passenger = $this->getDataGenerator()->create_and_enrol($this->course, 'student');
+        $ride = $this->ride(3, ['Passagiere' => json_encode([(int) $passenger->id]), 'Fahrtstatus' => '1']);
+        $this->setUser($this->driver);
+        $sink = $this->redirectMessages();
+        $entries = new local\datalynx_entries(new datalynx($this->builder->get_dataid()));
+        $entries->process_entries('update', (string) $ride, (object) ["field_{$this->ids['Fahrtstatus']}_{$ride}" => 2], true);
+        ob_start();
+        $this->run_all_adhoc_tasks();
+        ob_end_clean();
+        $messages = array_values(array_filter($sink->get_messages(), fn($m) => (int) $m->useridto === (int) $passenger->id));
+        $sink->close();
+        $this->assertCount(1, $messages);
+        $this->assertSame('Mitfahrbörse: eine Fahrt wurde abgesagt', $messages[0]->subject);
+        $this->assertStringContainsString('hat die folgende Fahrt abgesagt', $messages[0]->fullmessagehtml);
+        $this->assertSame('2', $DB->get_field('datalynx_contents', 'content', ['entryid' => $ride,
+            'fieldid' => $this->ids['Fahrtstatus']]));
+    }
+
+    /**
      * The parking photo is scaled down to 1600 px on the long edge.
      */
     public function test_photo_downscaled(): void {

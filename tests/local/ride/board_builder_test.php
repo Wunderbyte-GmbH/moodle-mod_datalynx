@@ -107,7 +107,7 @@ final class board_builder_test extends advanced_testcase {
         ], $structure['fields']);
         $this->assertEqualsCanonicalizing(['Meine Einträge', 'Nur Angebote', 'Nur Gesuche'], $structure['filters']);
         $this->assertEqualsCanonicalizing(
-            array_values(array_diff_key(board_builder::VIEWS, ['manage' => 1, 'billing' => 1, 'pdf' => 1, 'tickets' => 1])),
+            array_values(array_diff_key(board_builder::VIEWS, ['manage' => 1, 'billing' => 1, 'pdf' => 1, 'tickets' => 1, 'cancelemail' => 1])),
             array_keys($structure['views']),
             'basic has no view to manage single rides'
         );
@@ -213,6 +213,10 @@ final class board_builder_test extends advanced_testcase {
                 $this->assertStringContainsString('##viewlink:Mitfahrbörse;← Zurück zur Übersicht', $view->section, $view->name);
             }
         }
+        // A cancellation tells the passengers in its own words.
+        $cancel = $DB->get_record('datalynx_rules', ['dataid' => $builder->get_dataid(), 'name' => 'Fahrt abgesagt']);
+        $this->assertEquals($DB->get_field('datalynx_views', 'id', ['dataid' => $builder->get_dataid(),
+            'name' => 'Benachrichtigung: Fahrt abgesagt']), $cancel->param8);
         // The driver cancels in "Meine Fahrten verwalten" but cannot pick passengers there.
         $manage = $DB->get_field('datalynx_views', 'param2', ['dataid' => $builder->get_dataid(),
             'name' => 'Meine Fahrten verwalten']);

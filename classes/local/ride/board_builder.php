@@ -72,6 +72,7 @@ class board_builder {
         'billing' => 'Fahrt abrechnen',
         'pdf' => 'Fahrtenschein PDF',
         'tickets' => 'Meine Fahrtenscheine',
+        'cancelemail' => 'Benachrichtigung: Fahrt abgesagt',
     ];
 
     /** @var string Shortname of the user profile field holding the IBAN (#343). */
@@ -1301,6 +1302,23 @@ class board_builder {
                         . '</div>',
                 ],
             ],
+            // What the passengers of a cancelled ride read.
+            'cancelemail' => !$this->has('fahrtstatus') ? null : [
+                'type' => datalynx::INTERNAL_VIEW_EMAIL,
+                'data' => [
+                    'description' => 'Nachrichtentext, wenn eine Fahrt abgesagt wird',
+                    'visible' => 0,
+                    'perpage' => 0,
+                    'eparam2' => '<div style="font-family: sans-serif; font-size: 15px; color: #2d3339;">'
+                        . '<p>##author:name## hat die folgende Fahrt abgesagt, bei der Sie als Mitfahrer/in eingetragen '
+                        . 'sind. Bitte organisieren Sie sich eine andere Fahrt.</p>'
+                        . '<div style="border: 1px solid #dee2e6; border-radius: 8px; padding: 12px 16px; margin: 16px 0;">'
+                        . $this->tags(['termin', 'route']) . '</div>'
+                        . '<p><strong>##notificationentrylink##</strong></p>'
+                        . '<p style="color: #6a737b; font-size: 0.9em;">Diese Nachricht kommt aus ##notificationdatalynxlink##.</p>'
+                        . '</div>',
+                ],
+            ],
         ];
     }
 
@@ -1465,6 +1483,7 @@ class board_builder {
                 'param4' => '[]',
                 'param6' => 'Mitfahrbörse: eine Fahrt wurde abgesagt',
                 'param7' => '[]',
+                'param8' => $this->viewids['cancelemail'],
                 'param9' => json_encode([
                     $this->fieldids['fahrtstatus'] => ['AND' => [['', 'ANY_OF', ['2']]]],
                     \mod_datalynx\local\rule\base::ONCHANGE_KEY => [$this->fieldids['fahrtstatus']],
