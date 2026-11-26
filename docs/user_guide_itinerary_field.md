@@ -42,6 +42,7 @@ administration page if you have the rights to change them.
 | **Display format** | Map and list, map only, or list only | Map and list |
 | **Default zoom level** | Zoom once stops are known | Site default |
 | **Default match radius (km)** | Pre-filled radius in the search form; searchers can change it | `5` |
+| **Corridor width from field** | A number field holding, per entry, how far beside its route a pickup or drop-off may be (e.g. the detour a driver accepts). Search and match rules then use each journey's own width; journeys without a value use the search radius | none |
 | **Location precision for others** | Exact, or approximate until matched | Approximate |
 | **Country restrictions** | Overrides the site-wide country restriction for this field's address lookup | empty |
 
@@ -154,22 +155,26 @@ half-filled form is ignored rather than guessed at.
 
 The match rule, stated precisely:
 
-> A journey matches when one of its stops is within the radius of **Travelling from**, **and a
-> later stop in the same journey** is within the radius of **Travelling to**.
+> A journey matches when a point of its route is within the radius of **Travelling from**,
+> **and a later point of the same route** is within the radius of **Travelling to**.
+
+The points are the stops and points about every 2 km along the route between them: along the
+road route when a routing service is configured, else along the straight lines between the stops.
+So the radius is a corridor around the whole route, not a circle around each stop. With
+**Corridor width from field** set, the radius is each journey's own value (the driver's detour)
+instead of the searched one.
 
 Two consequences worth knowing, because they surprise people:
 
 - **It is directional.** A journey Vienna → Graz matches a search Vienna → Graz, and does *not*
   match a search Graz → Vienna. That is deliberate: the drop-off has to come after the pickup
   along the route, or you would be offered rides going the wrong way.
-- **It finds journeys you would otherwise miss.** Searching Wiener Neustadt → Graz matches a
-  journey Vienna → Wiener Neustadt → Graz, because the search only needs *some* stop near each
-  end. Plain start-and-destination matching would have missed it, and that case — a passenger
-  living along the way — is most of the value of carpooling.
-
-Matching compares stops, not the drawn line. A journey listing only Vienna and Graz will not
-match a pickup halfway between them even though the line passes nearby: add the intermediate
-stops you are genuinely willing to serve.
+- **It finds journeys you would otherwise miss.** Searching Baden → Wiener Neustadt matches a
+  journey Vienna → Graz: both places lie beside its route, and Wiener Neustadt comes after Baden.
+  Plain start-and-destination matching would have missed it, and that case — a passenger living
+  along the way — is most of the value of carpooling. No intermediate stops are needed for it.
+- **A search with one end only keeps the direction.** "Departing from Graz" does not find a
+  journey that ends in Graz: the journey has to travel on beyond the radius.
 
 ---
 

@@ -30,10 +30,14 @@ Typical rule outcomes include:
 |---|---|---|
 | **Event notification** | Sends notifications based on entry events, optionally to the people behind other entries that match the one just saved | Alert reviewers when a new submission is added; introduce a ride offer and a ride request to each other |
 | **Update field** | Automatically writes a fixed value into a field when the rule is triggered | Set a status to “In review” when an entry is submitted |
+| **Split schedule** | When a weekly schedule is saved (and the trigger conditions hold), creates one entry per date and turns the entry into the first one; the other fields are copied | Rides as single entries: a weekly offer becomes one ride per date, at most a set number of months ahead |
 | **FTP Sync Data** | Synchronizes data/files to FTP destination workflows | Integrate with external downstream process |
 
 > **Important Note**  
 > Keep rule logic easy to understand. One clear rule per goal is better than one large mixed rule.
+
+> **Team requests**  
+> Where a **Team member select** field needs the author's approval, notification rules can react to *Team request made / approved / declined / withdrawn* of that field. Recipient **Related user** is the person who asked; the request details (e.g. the pickup point) are part of the message.
 
 > **Timing**  
 > Most rules act immediately when the entry is saved. A notification rule that looks for **matching entries** is the exception: searching every counterpart entry would slow down each submission, so it runs in the background and its notifications arrive with the next cron run.

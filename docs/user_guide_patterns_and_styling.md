@@ -314,6 +314,15 @@ In the Moodle App, view links become app buttons and open inside the app; see
 > **Tip**  
 > In the TinyMCE editor you can insert and configure these tags through the tag dialog instead of typing them by hand. The dialog's **URL query** field accepts the same `|`-separated syntax shown above.
 
+
+### PDF of an entry (`##pdfdownload##`)
+
+`##pdfdownload:PDFVIEWNAME;LINKTEXT;CSSCLASS##` in an entry template links the entry to its PDF:
+the named view must be a **PDF view** the user can see, and the link appears only for entries that
+view holds (its filter applies — e.g. only submitted entries). LINKTEXT and CSSCLASS are optional
+(default "Download", a small outline button). The PDF view decides layout and file name; field
+tags work in its document name, e.g. `Ticket_##entryid##_##author:lastname##`.
+
 ### Bulk operation patterns
 
 | Pattern | Result |

@@ -12,7 +12,8 @@ A carpooling board for a course or a whole institution:
   provided a routing service is configured for the site.
 - When a new offer and a new request overlap, **both authors are notified automatically** — they
   do not have to keep checking the board.
-- Passengers **claim a seat** on an offer, capacity is enforced, and the driver is notified.
+- Passengers **claim a seat** on an offer, or **ask for one with their pickup point** and the
+  driver approves; capacity per ride is enforced, and both sides are notified.
 
 Everything below is built from existing Datalynx parts. There is no separate ridesharing
 plugin: you are assembling fields, a view, a filter and a handful of rules.
@@ -44,6 +45,19 @@ plugin: you are assembling fields, a view, a filter and a handful of rules.
 > Boards built with an older version are brought up to date with the migration scripts in `cli/`
 > (`update_ridesharing_pathways.php`, `migrate_ridesharing_schedule.php`,
 > `update_ridesharing_vehicle.php`); a new board needs none of them.
+
+> **The billing variant in short**
+> - **Rides as single entries.** An offer is published in the last step; a weekly offer is then
+>   split into one ride per date (rule *Split schedule*, at most 6 months, "runs until" required).
+>   Single rides are deleted or cancelled in *Meine Fahrten verwalten*; a cancelled ride tells its
+>   passengers.
+> - **Requests.** Passengers ask for a seat with their pickup point; the driver approves or
+>   declines; approved pickup points become stops of the route.
+> - **Fahrtenschein = a view of the ride.** After the departure the ride appears in *Fahrt
+>   abrechnen*: purpose, return trip, requested km with reason, company car, parking photo,
+>   declaration, IBAN (stored in the user's profile). The km come from the route on the server.
+>   Submitted, it is locked and *Meine Fahrtenscheine* offers its PDF. Billing data are visible to
+>   the driver, teachers and managers only.
 
 > **Existing boards and the billing variant**
 > The `fahrtenschein` variant has no cost fields (reimbursement is per kilometre). On a board built
@@ -116,6 +130,8 @@ later, open the rules and check their trigger conditions still name the right si
 - **Maximum number of stops**: `8`
 - **Stops shown initially**: `2`
 - **Default match radius (km)**: `10` — generous for intercity trips; use `3`–`5` for a city
+- **Corridor width from field**: the `Detour` number field, once it exists (see 2.4) — each
+  driver then decides how far beside the route passengers are found
 
 The route says **where** a journey goes and in what order. It says nothing about when: a stop
 carries no date and no time. When a ride happens is the Schedule field's job (step 2.3), because a
@@ -152,12 +168,15 @@ a one-off entry has no weekday value and a recurring one has no date, so the two
 deleting it. A single period, so "not in July and August" means ending it in June and re-opening it
 in September; there is no exception list.
 
-### 2.4 `Seats` — Number
+### 2.4 `Seats` and `Detour` — Number
 
 - Type: **Number**
-- Name: `Seats`
+- Name: `Seats`, minimum `0`, maximum `8` (0 = a solo trip)
+- A second number field `Detour` (km), minimum `1`, maximum `20`: how far beside the route the
+  driver will pick someone up. Its maximum also bounds the search, so keep it realistic.
 
-Only meaningful on offers; step 7 hides it on requests.
+Only meaningful on offers; step 7 hides them on requests. Set `Detour` as **Corridor width from
+field** of the `Route` (2.2).
 
 ### 2.5 `Passengers` — Team member select
 
@@ -172,12 +191,15 @@ This is the seat-claiming mechanism, and it already does the work.
 - **User can add him/herself**: **ticked** — this is what lets a passenger claim a seat
 - **Allow manual unsubscription**: **ticked** — so they can withdraw again
 - **Notify team members**: ticked, so existing passengers hear about changes
-
-> **Caveat worth knowing up front.** Capacity comes from the field's **Maximum team size**,
-> which is one number for the whole activity — it is *not* read from each driver's `Seats` value.
-> So `Seats` documents the driver's intent to readers, while the field-level cap is what is
-> actually enforced. Set **Maximum team size** to the largest number of passengers you want to
-> permit anywhere, and treat `Seats` as information rather than a limit.
+- **Team size from field**: `Seats` — each ride's own capacity; **Maximum team size** stays the
+  hard cap above it
+- **Joining needs the author's approval** *(optional)*: passengers ask, the driver approves or
+  declines; confirmed passengers and open requests are kept apart
+- **Pickup point into route field**: `Route`, and **Detour field**: `Detour` *(with approval)*:
+  a request carries the passenger's pickup point, which must lie within the driver's detour around
+  the route; on approval it becomes a stop of the route, bound to that passenger
+- **Entries with members can only be deleted by managers** *(optional)*: a ride with confirmed
+  passengers is cancelled rather than deleted
 
 ### 2.6 `Notes` — Text area
 
@@ -304,6 +326,12 @@ Both rules share everything except their trigger condition and their direction:
 > row needs — a tolerance, a radius, a direction — depends on how you are matching, so they appear
 > once the relation is known.
 
+How the corridor works: every route is indexed with points about every 2 km along it, so a
+request matches an offer when its start **and** its destination lie beside the offer's route —
+within the driver's `Detour` when the route has a **Corridor width from field**, else within the
+radius of row 2 — and the destination comes after the start. Intermediate stops are not needed.
+**Only approved entries** only matters in an activity that requires approval.
+
 **What a rule does when an entry is saved:**
 
 1. Checks its trigger condition, so only the entries on its own side of `Ride type` go further.
@@ -370,7 +398,7 @@ Nothing arrived? Work down this list:
 
 ---
 
-## Step 6 — Add the seat notification rule
+## Step 6 — Add the seat notification rules
 
 **Manage → Rules → Add a rule → Event notification.**
 
@@ -384,6 +412,18 @@ Nothing arrived? Work down this list:
 Add a second event-notification rule on **Entry updated**, restricted with **only on change** to
 the `Route` field, so passengers hear about it when a driver changes the route after they have
 booked.
+
+With **Joining needs the author's approval**, add one rule per request event of `Passengers`:
+
+| Trigger | Recipient | Subject |
+|---|---|---|
+| Team request made | **Author** | "New request for your ride" (the message includes the pickup point) |
+| Team request approved | **Related user** | "Your seat is confirmed" |
+| Team request declined | **Related user** | "Your request was declined" |
+| Team request withdrawn | **Author** | "A passenger withdrew" |
+
+In **Manage → Views**, use **Set as detailed view** on the view that lists rides with their
+passenger buttons, so the link in these messages opens the ride itself rather than the start page.
 
 ---
 
@@ -523,17 +563,15 @@ Stated plainly so you can plan around it:
 
 - **No detour ranking.** Matches are not ordered by how far a driver would deviate, even though
   road routes are now known.
-- **No waitlist or driver approval.** Seats are first-come; a full ride simply cannot be joined.
-  Cancellations free a seat but nobody is promoted automatically.
-- **Capacity is per field, not per ride** — see the caveat in step 2.4.
-- **No stored pickup point.** By design: it is agreed between the two people.
+- **No waitlist.** A full ride cannot be joined or asked for; a cancellation frees a seat, but
+  nobody is promoted automatically.
 - **No combined map of all rides.** Each entry has its own map; a single map view of the whole
   board is planned.
 - **Only partly usable in the Moodle App.** In the app, the portal buttons, "Fahrt suchen" and
   "Meine Fahrten" open as app pages (see
-  [Links between views](user_guide_moodle_app.md#links-between-views)). The route (itinerary
-  field) cannot be searched or edited in the app yet, so the entry steps that need it offer
-  **Open in browser**.
+  [Links between views](user_guide_moodle_app.md#links-between-views)), and an offer can be
+  entered step by step. Asking for a seat, approving requests, the parking photo and the PDF of a
+  Fahrtenschein are not available in the app yet.
 
 ---
 
@@ -550,6 +588,9 @@ Stated plainly so you can plan around it:
       **Update field** rule that stamps it has **trigger follow-up events** on
 - [ ] Cron running — no cron, no match notifications
 - [ ] `mod/datalynx:teamsubscribe` granted to whoever may claim seats
+- [ ] `Route` has **Corridor width from field** = `Detour`, and `Detour` a maximum (e.g. 20 km)
+- [ ] Billing variant: `moodle/user:editownprofile` allowed for authenticated users, or the IBAN
+      cannot be entered in the Fahrtenschein
 - [ ] End-to-end test done with two real accounts (step 5)
 - [ ] Search view set to **Allow all filters**, with **Permitted filters** empty (step 4)
 - [ ] Location precision left approximate, unless you decided otherwise deliberately
