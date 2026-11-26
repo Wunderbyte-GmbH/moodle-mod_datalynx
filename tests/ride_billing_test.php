@@ -202,6 +202,14 @@ final class ride_billing_test extends advanced_testcase {
         $this->setUser($this->driver);
         $this->assertFalse($dlx->user_can_manage_entry($entry));
         $this->assertFalse($dlx->user_can_delete_entry($entry));
+        // No edit link to the billing view either (##viewsesslink:...;ifeditable##): the IBAN of the
+        // profile, which the driver may edit, is locked with the entry.
+        $billing = $dlx->get_view_from_id($DB->get_field('datalynx_views', 'id', ['dataid' => $dlx->id(),
+            'name' => 'Fahrt abrechnen']));
+        $this->assertFalse($billing->entry_has_editable_fields($entry));
+        $entry->status = 1;
+        $this->assertTrue($billing->entry_has_editable_fields($entry));
+        $entry->status = 2;
         $this->setAdminUser();
         $this->assertTrue($dlx->user_can_manage_entry($entry));
     }

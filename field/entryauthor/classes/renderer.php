@@ -447,7 +447,8 @@ class renderer extends datalynxfield_renderer {
 
     /**
      * Author tags that render an input in edit mode count as editable: the inline profile editor
-     * (##author:<profilefield>##) and ##author:edit## (change the author, managers only).
+     * (##author:<profilefield>##, not on a submitted entry) and ##author:edit## (change the author,
+     * managers only).
      *
      * @param string $tag The tag as found in the view template.
      * @param stdClass $entry The entry.
@@ -456,7 +457,12 @@ class renderer extends datalynxfield_renderer {
     public function is_tag_editable(string $tag, stdClass $entry): bool {
         $field = $this->field;
         if ($field->get('internalname') === 'profileeditor') {
-            return !empty($field->get('editable')) && $this->profile_edit_allowed($entry);
+            // A submitted entry is locked for its profile fields too, as for every field (see
+            // behavior_allows_edit()): the view opens no form for it, so an edit link led nowhere.
+            $final = isset($entry->status)
+                && (int) $entry->status === \datalynxfield_status\field::STATUS_FINAL_SUBMISSION
+                && !has_capability('mod/datalynx:editfinalsubmission', $field->dlx()->context);
+            return !$final && !empty($field->get('editable')) && $this->profile_edit_allowed($entry);
         }
         $stripped = trim($tag, '@');
         if (strpos($stripped, '##author:') !== 0) {

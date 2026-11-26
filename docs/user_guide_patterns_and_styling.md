@@ -283,7 +283,7 @@ An "Edit" button in a list view (for example *My applications*) usually points t
 - the **final submission** lock and the behavior's *editable after final* option (or the capability *mod/datalynx:editfinalsubmission*),
 - **lock after save** of single-choice fields.
 
-Inline author profile fields (`##author:PROFILEFIELD##`) and `##author:edit##` (managers) count as editable as well. Action tags such as `##status##`, `##edit##` or `##submit##` do not count.
+Inline author profile fields (`##author:PROFILEFIELD##`) count as editable as well until the entry reaches final submission (then the entry is locked for them, too), and so does `##author:edit##` (managers). Action tags such as `##status##`, `##edit##` or `##submit##` do not count.
 
 Only the target view of the link is checked. In a multi-step form, point the link to a step whose fields use the same behavior as the other steps.
 

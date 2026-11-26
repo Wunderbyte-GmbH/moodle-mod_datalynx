@@ -139,7 +139,8 @@ final class viewlink_ifeditable_test extends advanced_testcase {
     }
 
     /**
-     * Author profile fields edited inline count as editable, even after final submission.
+     * Author profile fields edited inline count as editable, until the entry is submitted: a
+     * submitted entry is locked for them too (the view opens no form for it).
      */
     public function test_author_profile_field_counts_as_editable(): void {
         $this->getDataGenerator()->create_custom_profile_field([
@@ -152,8 +153,10 @@ final class viewlink_ifeditable_test extends advanced_testcase {
             'settings' => json_encode(['option' => 'street', 'editable' => 1, 'mandatory' => 0]),
         ]);
         $this->dlx->get_fields(null, false, true);
-        $link = $this->render_link('[[title|b_locked]]##author:Street##', datalynxfield_status::STATUS_FINAL_SUBMISSION);
+        $link = $this->render_link('[[title|b_locked]]##author:Street##', datalynxfield_status::STATUS_DRAFT);
         $this->assertStringContainsString('editentries=', $link);
+        $link = $this->render_link('[[title|b_locked]]##author:Street##', datalynxfield_status::STATUS_FINAL_SUBMISSION);
+        $this->assertSame('', $link);
     }
 
     /**
