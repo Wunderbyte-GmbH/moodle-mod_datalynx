@@ -892,13 +892,17 @@ class board_builder {
     }
 
     /**
-     * The tag of a field without behaviour and layout: its bare value.
+     * The tag of a field without a layout: its bare value.
      *
      * @param string $key
+     * @param string $behavior
      * @return string
      */
-    protected function plaintag(string $key): string {
-        return $this->has($key) ? '[[' . $this->fielddefs[$key]['name'] . ']]' : '';
+    protected function plaintag(string $key, string $behavior = ''): string {
+        if (!$this->has($key)) {
+            return '';
+        }
+        return '[[' . $this->fielddefs[$key]['name'] . ($behavior !== '' ? '|' . $behavior : '') . ']]';
     }
 
     /**
@@ -1304,19 +1308,21 @@ class board_builder {
                         . $this->pdfrow('Fahrer/in', '##author:name##')
                         . $this->pdfrow('IBAN', '##author:iban##')
                         . $this->pdfrow('Termin', $this->plaintag('termin'))
-                        . $this->pdfrow('Anlass / Schulung', $this->plaintag('anlass'))
-                        . $this->pdfrow('Kennzeichen', $this->plaintag('kennzeichen'))
-                        . $this->pdfrow('Dienstfahrzeug', $this->plaintag('dienstfahrzeug'))
-                        . $this->pdfrow('Rückfahrt', $this->plaintag('rueckfahrt'))
+                        // The billing data as in the web views: for the driver, teachers and managers only
+                        // (anyone may open the PDF view's address with another entry's id).
+                        . $this->pdfrow('Anlass / Schulung', $this->plaintag('anlass', 'abrechnunglesen'))
+                        . $this->pdfrow('Kennzeichen', $this->plaintag('kennzeichen', 'abrechnunglesen'))
+                        . $this->pdfrow('Dienstfahrzeug', $this->plaintag('dienstfahrzeug', 'abrechnunglesen'))
+                        . $this->pdfrow('Rückfahrt', $this->plaintag('rueckfahrt', 'abrechnunglesen'))
                         . $this->pdfrow('Strecke einfach', '[[Route:distance]]')
-                        . $this->pdfrow('Abrechnungs-Kilometer', '<b>[[Route:billeddistance]]</b>')
-                        . $this->pdfrow('Beantragte Kilometer', $this->plaintag('beantragtekm'))
-                        . $this->pdfrow('Begründung', $this->plaintag('begruendung'))
+                        . $this->pdfrow('Abrechnungs-Kilometer', '<b>[[Route:billeddistance|abrechnunglesen]]</b>')
+                        . $this->pdfrow('Beantragte Kilometer', $this->plaintag('beantragtekm', 'abrechnunglesen'))
+                        . $this->pdfrow('Begründung', $this->plaintag('begruendung', 'abrechnunglesen'))
                         . $this->pdfrow('Mitfahrende', $this->plaintag('passagiere'))
                         . '</table>'
                         . '<h2 style="font-size: 12pt;">Route (Start – Stopps – Ziel)</h2>[[Route]]'
-                        . '<h2 style="font-size: 12pt;">Eigenerklärung</h2>' . $this->plaintag('eigenerklaerung')
-                        . '<h2 style="font-size: 12pt;">Parkfoto</h2>' . $this->plaintag('parkfoto')
+                        . '<h2 style="font-size: 12pt;">Eigenerklärung</h2>' . $this->plaintag('eigenerklaerung', 'abrechnunglesen')
+                        . '<h2 style="font-size: 12pt;">Parkfoto</h2>' . $this->plaintag('parkfoto', 'abrechnunglesen')
                         . '</div>',
                 ],
                 'filter' => 'submitted',

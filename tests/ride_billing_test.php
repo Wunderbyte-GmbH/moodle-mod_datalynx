@@ -242,6 +242,27 @@ final class ride_billing_test extends advanced_testcase {
     }
 
     /**
+     * Anyone may open the PDF view with another entry's id: the billing data stay the driver's.
+     */
+    public function test_pdf_hides_billing_data_from_others(): void {
+        global $DB;
+        $ride = $this->ride(-1, ['Anlass' => 'Schulung Erste Hilfe']);
+        $DB->set_field('datalynx_entries', 'status', 2, ['id' => $ride]);
+        $other = $this->getDataGenerator()->create_and_enrol($this->course, 'student');
+        $render = function (\stdClass $user) use ($DB, $ride): string {
+            $this->setUser($user);
+            $dlx = new datalynx($this->builder->get_dataid());
+            $view = $dlx->get_view_from_id($DB->get_field('datalynx_views', 'id', ['dataid' => $dlx->id(),
+                'name' => 'Fahrtenschein PDF']));
+            (new \ReflectionProperty($view, 'filter'))->getValue($view)->eids = $ride;
+            $view->set_content();
+            return $view->display(['export' => true, 'tohtml' => true, 'controls' => false, 'entryactions' => false]);
+        };
+        $this->assertStringContainsString('Schulung Erste Hilfe', $render($this->driver));
+        $this->assertStringNotContainsString('Schulung Erste Hilfe', $render($other));
+    }
+
+    /**
      * Cancelling a ride tells its passengers so, in the words of the board's message view.
      */
     public function test_cancel_notifies_passengers(): void {
