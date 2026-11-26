@@ -107,7 +107,7 @@ final class board_builder_test extends advanced_testcase {
         ], $structure['fields']);
         $this->assertEqualsCanonicalizing(['Meine Einträge', 'Nur Angebote', 'Nur Gesuche'], $structure['filters']);
         $this->assertEqualsCanonicalizing(
-            array_values(array_diff_key(board_builder::VIEWS, ['manage' => 1, 'billing' => 1, 'pdf' => 1])),
+            array_values(array_diff_key(board_builder::VIEWS, ['manage' => 1, 'billing' => 1, 'pdf' => 1, 'tickets' => 1])),
             array_keys($structure['views']),
             'basic has no view to manage single rides'
         );
@@ -173,6 +173,15 @@ final class board_builder_test extends advanced_testcase {
         foreach (['Mitfahrt beantragt', 'Mitfahrt angenommen', 'Mitfahrt abgelehnt', 'Mitfahrt zurückgezogen'] as $rule) {
             $this->assertArrayHasKey($rule, $structure['rules']);
         }
+        // Every grid view but the start page leads back to it; the start page offers billing (#333).
+        foreach ($DB->get_records('datalynx_views', ['dataid' => $builder->get_dataid(), 'type' => 'grid']) as $view) {
+            if ($view->name !== 'Mitfahrbörse') {
+                $this->assertStringContainsString('##viewlink:Mitfahrbörse;← Zurück zur Übersicht', $view->section, $view->name);
+            }
+        }
+        $portal = $DB->get_field('datalynx_views', 'section', ['dataid' => $builder->get_dataid(), 'name' => 'Mitfahrbörse']);
+        $this->assertStringContainsString('##viewlink:Fahrt abrechnen;', $portal);
+        $this->assertStringContainsString('##viewlink:Meine Fahrtenscheine;', $portal);
         $card = $DB->get_field('datalynx_views', 'param2', ['dataid' => $builder->get_dataid(), 'name' => 'Fahrt suchen']);
         $this->assertStringContainsString('[[Passagiere:mitfahren||l_passagiere]]', $card);
     }

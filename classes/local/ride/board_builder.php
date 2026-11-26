@@ -71,6 +71,7 @@ class board_builder {
         'manage' => 'Meine Fahrten verwalten',
         'billing' => 'Fahrt abrechnen',
         'pdf' => 'Fahrtenschein PDF',
+        'tickets' => 'Meine Fahrtenscheine',
     ];
 
     /** @var string Shortname of the user profile field holding the IBAN (#343). */
@@ -987,7 +988,10 @@ class board_builder {
             . '<h1 class="display-6 fw-bold text-primary mb-3">Mitfahrbörse</h1>'
             . '<p class="lead text-muted mx-auto" style="max-width: 640px;">Gemeinsam fahren statt allein: Tragen Sie '
             . 'Ihre Fahrt ein oder suchen Sie eine Mitfahrgelegenheit. Passen ein Angebot und ein Gesuch zusammen, '
-            . 'werden beide Seiten automatisch benachrichtigt.</p></div>'
+            . 'werden beide Seiten automatisch benachrichtigt.'
+            . ($this->is_billing() ? ' Jede Fahrt, deren Kosten erstattet werden, wird hier eingetragen und abgerechnet – '
+                . 'auch allein: „0 Plätze“ heißt, Sie nehmen niemanden mit.' : '')
+            . '</p></div>'
             . '<div class="row g-4">'
             . $tile(
                 'Fahrt eintragen',
@@ -1007,7 +1011,23 @@ class board_builder {
                 'Meine Fahrten',
                 'Eigene Angebote und Gesuche ansehen, ändern oder löschen.',
                 '##viewlink:' . self::VIEWS['mine'] . ';Meine Fahrten;;btn btn-outline-primary w-100 py-2##'
+                    . ($this->is_billing() ? '##viewlink:' . self::VIEWS['manage']
+                        . ';Fahrten verwalten;;btn btn-link w-100##' : ''),
+                $this->is_billing() ? ' d-grid gap-2' : ''
             )
+            . ($this->is_billing()
+                ? $tile(
+                    'Fahrt abrechnen',
+                    'Nach der Fahrt den Fahrtenschein ausfüllen: Anlass, Parkfoto und Eigenerklärung. Die Kilometer '
+                        . 'berechnet das System aus der Route.',
+                    '##viewlink:' . self::VIEWS['billing'] . ';Fahrt abrechnen;;btn btn-primary w-100 py-2 fw-bold##'
+                )
+                . $tile(
+                    'Meine Fahrtenscheine',
+                    'Eingereichte Fahrtenscheine ansehen und als PDF herunterladen.',
+                    '##viewlink:' . self::VIEWS['tickets'] . ';Meine Fahrtenscheine;;btn btn-outline-primary w-100 py-2##'
+                )
+                : '')
             . '</div></div>';
     }
 
@@ -1198,11 +1218,29 @@ class board_builder {
                             . $this->tag('parkfoto', 'abrechnungpflicht') . $this->tag('eigenerklaerung', 'abrechnungpflicht')
                             . '<div class="mb-3 datalynx-ride-field"><label class="form-label fw-semibold">Fahrtenschein '
                             . 'einreichen</label>##status##<div class="form-text">Eingereicht ist der Fahrtenschein gesperrt.'
-                            . '</div></div>##edit## ##pdfdownload:' . self::VIEWS['pdf'] . ';PDF herunterladen;btn btn-outline-secondary##',
+                            . '</div></div>##edit## ##pdfdownload:' . self::VIEWS['pdf']
+                            . ';PDF herunterladen;btn btn-outline-secondary##',
                         'Fahrtenschein_speichern'
                     ),
                 ],
                 'filter' => 'billable',
+                'next' => 'tickets',
+            ],
+            'tickets' => !$this->has('parkfoto') ? null : [
+                'type' => 'grid',
+                'data' => [
+                    'perpage' => 20,
+                    'esection' => $list('Meine Fahrtenscheine', '<p class="text-muted">Ihre eingereichten Fahrtenscheine. '
+                        . 'Leiten Sie das PDF an die Abrechnungsstelle weiter.</p>##entries##'),
+                    'eparam2' => '<div class="card h-100 shadow-sm border-0"><div class="card-body">'
+                        . $this->tags(['termin', 'anlass', 'rueckfahrt'], 'abrechnunglesen')
+                        . '<div class="d-flex justify-content-between align-items-start gap-3 border-bottom py-1">'
+                        . '<span class="small fw-semibold text-nowrap">Abrechnungs-Kilometer</span>'
+                        . '<span class="text-end fw-bold">[[Route:billeddistance|abrechnunglesen]]</span></div>'
+                        . '</div><div class="card-footer bg-transparent border-0">##pdfdownload:' . self::VIEWS['pdf']
+                        . ';PDF herunterladen;btn btn-outline-primary##</div></div>',
+                ],
+                'filter' => 'mytickets',
             ],
             // One Fahrtenschein per PDF, A4 portrait, downloaded (#332).
             'pdf' => !$this->has('parkfoto') ? null : [
@@ -1271,6 +1309,18 @@ class board_builder {
     protected function create_views(): void {
         global $DB;
         $views = array_filter($this->views());
+        $back = '<div class="mb-2">##viewlink:' . self::VIEWS['portal'] . ';← Zurück zur Übersicht;;btn btn-link ps-0##</div>';
+        foreach ($views as $key => &$view) {
+            if ($view['type'] === 'grid' && $key !== 'portal' && isset($view['data']['esection'])) {
+                $view['data']['esection'] = preg_replace(
+                    '/^<div class="container py-4">/',
+                    '$0' . $back,
+                    $view['data']['esection'],
+                    1
+                );
+            }
+        }
+        unset($view);
         foreach ($views as $key => $def) {
             $data = array_merge([
                 'name' => self::VIEWS[$key] ?? $def['name'],
