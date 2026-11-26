@@ -400,6 +400,17 @@ abstract class datalynxfield_base {
     }
 
     /**
+     * The moment the value of an entry stands for, as a timestamp: a date field its date, a
+     * one-off schedule its departure. Null for fields without one, or without a value.
+     *
+     * @param int $entryid
+     * @return int|null
+     */
+    public function get_moment(int $entryid): ?int {
+        return null;
+    }
+
+    /**
      * Update the content of a field in an entry. That happens in table datalynx_conents.
      *
      * @param stdClass $entry

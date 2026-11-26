@@ -86,6 +86,28 @@ class field extends datalynxfield_base {
     protected $forfieldgroup = true;
 
     /**
+     * A one-off schedule: its departure (date and start time, in the site timezone). A weekly
+     * schedule has no single moment.
+     *
+     * @param int $entryid
+     * @return int|null
+     */
+    public function get_moment(int $entryid): ?int {
+        global $DB;
+        $json = $DB->get_field(
+            'datalynx_contents',
+            'content',
+            ['fieldid' => $this->field->id, 'entryid' => $entryid],
+            IGNORE_MULTIPLE
+        );
+        $schedule = schedule::from_json($json ?: null);
+        if ($schedule->mode() !== schedule::MODE_ONCE || ($day = schedule::day_start($schedule->date())) === null) {
+            return null;
+        }
+        return $day + (int) $schedule->start_minute() * MINSECS;
+    }
+
+    /**
      * The form values that together make up one schedule.
      *
      * The value is stored as one JSON blob, but it is entered through a control per part, so

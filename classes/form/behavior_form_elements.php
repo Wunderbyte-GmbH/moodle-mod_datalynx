@@ -231,6 +231,18 @@ trait behavior_form_elements {
         }
         $mform->disabledIf('editableafterfinal', 'editable', 'notchecked');
 
+        // Editable only until the date of a field of the entry.
+        $datefields = [0 => get_string('none')];
+        foreach ($this->get_dlx()->get_fields() as $fieldid => $field) {
+            if (in_array($field->type, ['schedule', 'time'], true)) {
+                $datefields[$fieldid] = $field->field->name;
+            }
+        }
+        $mform->addElement('select', 'editableuntil', get_string('editableuntil', 'datalynx'), $datefields);
+        $mform->addHelpButton('editableuntil', 'editableuntil', 'datalynx');
+        $mform->setType('editableuntil', PARAM_INT);
+        $mform->disabledIf('editableuntil', 'editable', 'notchecked');
+
         // AVAILABILITY CONDITIONS.
         // The individual condition rows (operator + value widgets, which depend on the chosen source
         // field) are built in definition_after_data() so they can reuse each field's own search widget.

@@ -415,6 +415,17 @@ class board_builder {
         if ($this->is_billing()) {
             // Reimbursement is per kilometre through the Fahrtenschein (mod_datalynx#325).
             unset($fields['fahrkosten'], $fields['fixbetrag']);
+            // Seats 0 to 8 as a number: 0 is a solo trip, offered only to be billed (#325).
+            $fields['sitzplaetze'] = [
+                'type' => 'number',
+                'name' => 'Freie Plätze',
+                'label' => 'Plätze für Mitfahrende',
+                'hint' => '0 = ich nehme niemanden mit (nur Abrechnung)',
+                'params' => ['param1' => 0, 'param5' => 0, 'param6' => 8],
+            ];
+            // The licence plate is needed for the billing: required on offers, checked and stored as printed.
+            $fields['kennzeichen']['hint'] = 'Pflichtangabe für die Fahrtkostenabrechnung.';
+            $fields['kennzeichen']['params']['param4'] = 'licenceplate';
             // The passengers: they request a seat, the driver approves (mod_datalynx#341); at most as
             // many as the seats of the ride (mod_datalynx#326).
             $fields['passagiere'] = [
@@ -560,6 +571,13 @@ class board_builder {
             'nurlesen' => ['required' => 0, 'conditions' => '', 'readonly' => true],
             'nurlesenangebot' => ['required' => 0, 'conditions' => $offer, 'readonly' => true],
         ];
+        if ($this->is_billing()) {
+            // An offer can be changed until its departure, then only by managers (#325).
+            foreach (['pflicht', 'angebot', 'angebotpflicht'] as $name) {
+                $behaviors[$name]['editableuntil'] = 'termin';
+            }
+            $behaviors['bisabfahrt'] = ['required' => 0, 'conditions' => '', 'editableuntil' => 'termin'];
+        }
         if ($this->has('fahrkosten')) {
             $fixed = $this->option_condition('fahrkosten', ['Festbetrag']);
             $behaviors['festbetrag'] = ['required' => 0, 'conditions' => $fixed];
@@ -588,6 +606,11 @@ class board_builder {
         ];
         $behaviors = $this->behaviors();
         foreach ($behaviors as $name => $def) {
+            if (!empty($def['editableuntil'])) {
+                $conditions = $def['conditions'] ? json_decode($def['conditions'], true) : [];
+                $conditions['editableuntil'] = $this->fieldids[$def['editableuntil']];
+                $def['conditions'] = json_encode($conditions);
+            }
             $DB->insert_record('datalynx_behaviors', (object) [
                 'dataid' => $this->dataid,
                 'name' => $name,
@@ -650,9 +673,14 @@ class board_builder {
             $position = (string) (array_search($label, $options, true) + 1);
             return [$this->fieldids['fahrttyp'] => ['AND' => [['', 'ANY_OF', [$position]]]]];
         };
+        $offers = $type(self::OFFER);
+        if ($this->has('passagiere')) {
+            // Only rides with a free seat: no solo trips, nothing fully booked (#325).
+            $offers[$this->fieldids['passagiere']] = ['AND' => [['', 'FREEPLACES', '']]];
+        }
         return [
             'own' => ['name' => 'Meine Einträge', 'customsearch' => ['userid' => ['AND' => [['', 'ME', '']]]]],
-            'offers' => ['name' => 'Nur Angebote', 'customsearch' => $type(self::OFFER)],
+            'offers' => ['name' => 'Nur Angebote', 'customsearch' => $offers],
             'requests' => ['name' => 'Nur Gesuche', 'customsearch' => $type(self::REQUEST)],
         ];
     }
@@ -849,6 +877,8 @@ class board_builder {
                 'next' => $number < count(self::STEPS) ? 'step' . ($number + 1) : 'mine',
             ];
         };
+        // Fields of the offer steps without a behaviour of their own: editable until departure (#325).
+        $free = $this->is_billing() ? 'bisabfahrt' : '';
         $list = function (string $heading, string $inner): string {
             return '<div class="container py-4"><h2 class="fw-bold mb-3">' . $heading . '</h2>' . $inner . '</div>';
         };
@@ -865,7 +895,7 @@ class board_builder {
                 'Route',
                 'Tragen Sie Start, Zwischenstopps und Ziel Ihrer Fahrt ein. Der Fahrttyp steht bereits auf „'
                     . self::OFFER . '" – wer mitfahren möchte, legt stattdessen ein Mitfahrgesuch an.',
-                $this->tag('fahrttyp', 'pflicht') . $this->tag('route', 'pflicht') . $this->tag('umweg', '', 'slider'),
+                $this->tag('fahrttyp', 'pflicht') . $this->tag('route', 'pflicht') . $this->tag('umweg', $free, 'slider'),
                 'Weiter_zum_Termin'
             ),
             'step2' => $step(
@@ -873,7 +903,7 @@ class board_builder {
                 'Wann fahre ich?',
                 'Eine einmalige Fahrt hat ein Datum und eine Uhrzeit. Eine regelmäßige Fahrt beschreiben Sie über '
                     . 'Wochentage, Uhrzeit und den Zeitraum, in dem sie gilt.',
-                $this->tag('termin'),
+                $this->tag('termin', $free),
                 'Weiter_zum_Fahrzeug'
             ),
             'step3' => $step(
@@ -881,7 +911,8 @@ class board_builder {
                 'Womit fahre ich?',
                 'Beschreiben Sie das Fahrzeug, mit dem Sie unterwegs sind.',
                 $this->tag('marke', 'angebotpflicht') . $this->tag('modell', 'angebot')
-                    . $this->tag('kennzeichen', 'angebot') . $this->tag('sitzplaetze', 'angebotpflicht')
+                    . $this->tag('kennzeichen', $this->is_billing() ? 'angebotpflicht' : 'angebot')
+                    . $this->tag('sitzplaetze', 'angebotpflicht')
                     . $this->tag('gepaeck', 'angebot'),
                 'Weiter_zur_Mitnahme'
             ),
@@ -892,7 +923,7 @@ class board_builder {
                     ? 'Legen Sie fest, wen Sie mitnehmen und wie die Fahrtkosten aufgeteilt werden.'
                     : 'Legen Sie fest, wen Sie mitnehmen.',
                 $this->tag('mitfahrende', 'angebot') . $this->tag('fahrkosten', 'angebot')
-                    . $this->tag('fixbetrag', 'festbetrag') . $this->tag('bemerkungen'),
+                    . $this->tag('fixbetrag', 'festbetrag') . $this->tag('bemerkungen', $free),
                 'Weiter_zur_Übersicht'
             ),
             'step5' => $step(
@@ -1082,9 +1113,9 @@ class board_builder {
                 'param6' => 'Mitfahrbörse: passende Fahrt gefunden',
                 'param7' => '[]',
                 'param8' => $this->viewids['email'],
-                'param9' => json_encode([
-                    $this->fieldids['fahrttyp'] => ['AND' => [['', 'ANY_OF', [$position($side)]]]],
+                'param9' => json_encode($this->match_conditions($side) + [
                     '_matchcriteria' => [
+                        'counterpart' => $this->match_counterpart($side),
                         'criteria' => [
                             ['fieldid' => $this->fieldids['fahrttyp'], 'op' => 'different'],
                             ['fieldid' => $this->fieldids['route'], 'op' => 'route', 'radius' => 10, 'direction' => $direction],
@@ -1150,6 +1181,36 @@ class board_builder {
             );
         }
         return $rules;
+    }
+
+    /**
+     * The trigger conditions of a matching rule: its side of the ride type, and for offers in the
+     * billing variant a free seat (#325).
+     *
+     * @param string $side self::OFFER or self::REQUEST
+     * @return array customsearch
+     */
+    protected function match_conditions(string $side): array {
+        $types = explode("\n", $this->fielddefs['fahrttyp']['params']['param1']);
+        $position = (string) (array_search($side, $types, true) + 1);
+        $conditions = [$this->fieldids['fahrttyp'] => ['AND' => [['', 'ANY_OF', [$position]]]]];
+        if ($side === self::OFFER && $this->has('passagiere')) {
+            $conditions[$this->fieldids['passagiere']] = ['AND' => [['', 'FREEPLACES', '']]];
+        }
+        return $conditions;
+    }
+
+    /**
+     * What the counterpart of a matching rule must meet: a request finds only offers with a free seat.
+     *
+     * @param string $side
+     * @return array customsearch
+     */
+    protected function match_counterpart(string $side): array {
+        if ($side === self::REQUEST && $this->has('passagiere')) {
+            return [$this->fieldids['passagiere'] => ['AND' => [['', 'FREEPLACES', '']]]];
+        }
+        return [];
     }
 
     /**

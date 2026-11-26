@@ -239,6 +239,15 @@ class rule extends base {
             return false;
         }
 
+        // Conditions the counterpart itself must meet, e.g. a ride with free places (mod_datalynx#325).
+        foreach ((array) ($matchconfig['counterpart'] ?? []) as $fieldid => $groups) {
+            foreach ((array) $groups as $andor => $rows) {
+                foreach ((array) $rows as $row) {
+                    $compiled['customsearch'][$fieldid][$andor][] = $row;
+                }
+            }
+        }
+
         $matches = $this->find_matching_entries($entryid, $compiled['customsearch'], [
             'excludeownauthor' => true,
             'requireapproved' => !empty($matchconfig['requireapproved']),

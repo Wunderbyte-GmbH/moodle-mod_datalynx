@@ -35,6 +35,23 @@ use IntlDateFormatter;
  */
 class field extends datalynxfield_base {
     /**
+     * The date of the entry.
+     *
+     * @param int $entryid
+     * @return int|null
+     */
+    public function get_moment(int $entryid): ?int {
+        global $DB;
+        $content = $DB->get_field(
+            'datalynx_contents',
+            'content',
+            ['fieldid' => $this->field->id, 'entryid' => $entryid],
+            IGNORE_MULTIPLE
+        );
+        return is_numeric($content) && (int) $content > 0 ? (int) $content : null;
+    }
+
+    /**
      * A timestamp; the masked selectors post their parts instead.
      *
      * @param array $options

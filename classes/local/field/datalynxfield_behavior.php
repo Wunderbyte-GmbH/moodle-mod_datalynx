@@ -354,6 +354,7 @@ class datalynxfield_behavior {
         $formdata->conditions = !empty($record->conditions)
                 ? (json_decode($record->conditions, true) ?: ['match' => 'all', 'rules' => []])
                 : ['match' => 'all', 'rules' => []];
+        $formdata->editableuntil = (int) ($formdata->conditions['editableuntil'] ?? 0);
         return $formdata;
     }
 
@@ -392,10 +393,16 @@ class datalynxfield_behavior {
         $record->required = $formdata->required;
         // Only meaningful when the field is editable at all.
         $record->editableafterfinal = (!empty($formdata->editable) && !empty($formdata->editableafterfinal)) ? 1 : 0;
-        $record->conditions = !empty($formdata->conditions['rules'])
-                ? json_encode(['match' => $formdata->conditions['match'] ?? 'all',
-                        'rules' => array_values($formdata->conditions['rules'])])
-                : null;
+        $conditions = [];
+        if (!empty($formdata->conditions['rules'])) {
+            $conditions = ['match' => $formdata->conditions['match'] ?? 'all',
+                'rules' => array_values($formdata->conditions['rules'])];
+        }
+        // Editable only until the date of a field (mod_datalynx#325), kept with the conditions.
+        if (!empty($formdata->editableuntil)) {
+            $conditions['editableuntil'] = (int) $formdata->editableuntil;
+        }
+        $record->conditions = $conditions ? json_encode($conditions) : null;
 
         return $record;
     }
@@ -631,6 +638,34 @@ class datalynxfield_behavior {
      */
     public function get_conditions(): array {
         return $this->conditions;
+    }
+
+    /**
+     * The field whose date ends the editing of fields with this behavior, 0 for none.
+     *
+     * @return int
+     */
+    public function get_editable_until_fieldid(): int {
+        return (int) ($this->conditions['editableuntil'] ?? 0);
+    }
+
+    /**
+     * Whether the date that ends editing has passed for the entry. Managers of entries are not bound.
+     *
+     * @param stdClass $entry
+     * @return bool
+     */
+    public function is_past_editable_until(stdClass $entry): bool {
+        $fieldid = $this->get_editable_until_fieldid();
+        if (
+            !$fieldid || empty($entry->id) || (int) $entry->id <= 0
+                || has_capability('mod/datalynx:manageentries', $this->dlx->context)
+        ) {
+            return false;
+        }
+        $field = $this->dlx->get_field_from_id($fieldid);
+        $moment = $field ? $field->get_moment((int) $entry->id) : null;
+        return $moment !== null && $moment <= time();
     }
 
     /**

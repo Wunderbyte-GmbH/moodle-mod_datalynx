@@ -50,5 +50,12 @@ class form extends datalynxfield_form {
         $mform->addElement('select', 'param1', get_string('decimals', 'datalynxfield_number'), $options);
         $mform->addElement('selectyesno', 'param4', get_string('outputemptystring', 'datalynxfield_number'), $options);
         // Param3 not used anymore former: px, em or %. Param2 was width in integer.
+
+        // Smallest and largest value (param5, param6); empty for no limit.
+        $mform->addElement('text', 'param5', get_string('minvalue', 'datalynxfield_number'), ['size' => 8]);
+        $mform->setType('param5', PARAM_RAW_TRIMMED);
+        $mform->addElement('text', 'param6', get_string('maxvalue', 'datalynxfield_number'), ['size' => 8]);
+        $mform->setType('param6', PARAM_RAW_TRIMMED);
+        $mform->addHelpButton('param6', 'maxvalue', 'datalynxfield_number');
     }
 }

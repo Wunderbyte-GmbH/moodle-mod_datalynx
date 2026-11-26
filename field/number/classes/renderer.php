@@ -283,6 +283,17 @@ class renderer extends TextRenderer {
         if ($value !== '' && !is_numeric($value)) {
             $errors[$formfieldname] = get_string('errnumeric', 'datalynx');
         }
+        // The smallest and largest value the field takes (param5, param6), when set.
+        if ($value !== '' && !$errors) {
+            $min = trim((string) $this->field->get('param5'));
+            $max = trim((string) $this->field->get('param6'));
+            if ((is_numeric($min) && (float) $value < (float) $min) || (is_numeric($max) && (float) $value > (float) $max)) {
+                $errors[$formfieldname] = get_string('errrange', 'datalynxfield_number', (object) [
+                    'min' => is_numeric($min) ? $min : '…',
+                    'max' => is_numeric($max) ? $max : '…',
+                ]);
+            }
+        }
         // A team member select may take its team size from this field: not below its members.
         if ($value !== '' && !$errors) {
             $errors = \datalynxfield_teammemberselect\field::limit_errors($this->field, $entryid, $formfieldname, $value);

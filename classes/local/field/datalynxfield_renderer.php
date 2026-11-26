@@ -354,6 +354,10 @@ abstract class datalynxfield_renderer {
         if ($editable && $this->field->is_locked_for_entry($entry)) {
             $editable = false;
         }
+        // Editable only until the date of a field, e.g. the departure of a ride (mod_datalynx#325).
+        if ($editable && $behavior->is_past_editable_until($entry)) {
+            $editable = false;
+        }
         return $editable;
     }
 

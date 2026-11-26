@@ -26,6 +26,7 @@
 namespace datalynxfield_text;
 
 use mod_datalynx\local\field\datalynxfield_base;
+use stdClass;
 
 /**
  * Text field class.
@@ -48,6 +49,7 @@ class field extends datalynxfield_base {
             'bicswift' => PARAM_TEXT,
             'ipv4' => PARAM_TEXT,
             'phone' => PARAM_TEXT,
+            'licenceplate' => PARAM_TEXT,
         ];
         $default = $this->get('param9') ? PARAM_NOTAGS : PARAM_TEXT;
         return ['' => $formats[(string) $this->get('param4')] ?? $default];
@@ -55,6 +57,21 @@ class field extends datalynxfield_base {
 
     /** @var string Field type */
     public $type = 'text';
+
+    /**
+     * A licence plate is stored as it is printed: trimmed, upper case, single spaces.
+     *
+     * @param stdClass $entry
+     * @param array|null $values
+     * @return array
+     */
+    protected function format_content(stdClass $entry, ?array $values = null): array {
+        [$contents, $oldcontents] = parent::format_content($entry, $values);
+        if ($this->get('param4') === 'licenceplate' && isset($contents[0]) && is_string($contents[0])) {
+            $contents[0] = \core_text::strtoupper(preg_replace('/\s+/u', ' ', trim($contents[0])));
+        }
+        return [$contents, $oldcontents];
+    }
 
     /**
      * Can this field be used in fieldgroups?

@@ -354,6 +354,12 @@ class renderer extends datalynxfield_renderer {
                     return get_string('errphone', 'datalynxfield_text');
                 }
                 break;
+            case 'licenceplate':
+                // 1 to 12 letters, digits, spaces and hyphens, starting with a letter or digit.
+                if (!preg_match('/^[\p{L}0-9][\p{L}0-9 \-]{0,11}$/u', trim($value))) {
+                    return get_string('errlicenceplate', 'datalynxfield_text');
+                }
+                break;
         }
         return null;
     }

@@ -482,6 +482,15 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
             }
             $config['criteria'][$key] = $criterion;
         }
+        // Conditions on the counterpart are keyed by field id.
+        if (!empty($config['counterpart']) && is_array($config['counterpart'])) {
+            $counterpart = [];
+            foreach ($config['counterpart'] as $fieldid => $groups) {
+                $newid = is_numeric($fieldid) ? (int) $this->get_mappingid('datalynx_field', (int) $fieldid) : $fieldid;
+                $counterpart[$newid ?: $fieldid] = $groups;
+            }
+            $config['counterpart'] = $counterpart;
+        }
 
         return $config;
     }
@@ -695,6 +704,10 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
                         }
                     }
                 }
+                $data->conditions = json_encode($decoded);
+            }
+            if (!empty($decoded['editableuntil'])) {
+                $decoded['editableuntil'] = (int) $this->get_mappingid('datalynx_field', (int) $decoded['editableuntil']);
                 $data->conditions = json_encode($decoded);
             }
         }

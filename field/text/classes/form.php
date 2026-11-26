@@ -121,7 +121,8 @@ class form extends datalynxfield_form {
                 'iban' => get_string('iban', 'datalynxfield_text'),
                 'bicswift' => get_string('bicswift', 'datalynxfield_text'),
                 'ipv4' => get_string('ipv4', 'datalynxfield_text'),
-                'phone' => get_string('phone', 'datalynxfield_text')];
+                'phone' => get_string('phone', 'datalynxfield_text'),
+                'licenceplate' => get_string('licenceplate', 'datalynxfield_text')];
         $mform->addElement('select', 'param4', get_string('format'), $options);
 
         // Length (param5, 6, 7) minimum, maximum, range.

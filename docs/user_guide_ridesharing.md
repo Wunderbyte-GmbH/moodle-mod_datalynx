@@ -45,6 +45,13 @@ plugin: you are assembling fields, a view, a filter and a handful of rules.
 > (`update_ridesharing_pathways.php`, `migrate_ridesharing_schedule.php`,
 > `update_ridesharing_vehicle.php`); a new board needs none of them.
 
+> **Existing boards and the billing variant**
+> The `fahrtenschein` variant has no cost fields (reimbursement is per kilometre). On a board built
+> earlier, delete *Fahrkosten* and *Fixbetrag* in *Manage → Fields*; the view templates are cleaned
+> automatically. Its seats are a number from 0 to 8 (0 = a solo trip, only to be billed), the
+> licence plate is required on offers, offers can be changed until their departure, and the search
+> and the matching only show rides with a free seat.
+
 ---
 
 ## Design overview
