@@ -198,6 +198,37 @@ final class ride_billing_test extends advanced_testcase {
     }
 
     /**
+     * ##pdfdownload## links a ride to its PDF; the PDF view makes the PDF of a submitted Fahrtenschein.
+     */
+    public function test_pdf(): void {
+        global $DB;
+        $ride = $this->ride(-1, ['Anlass' => 'Schulung Erste Hilfe']);
+        $DB->set_field('datalynx_entries', 'status', 2, ['id' => $ride]);
+        $dlx = new datalynx($this->builder->get_dataid());
+        $billing = $dlx->get_view_from_id($DB->get_field('datalynx_views', 'id', ['dataid' => $dlx->id(),
+            'name' => 'Fahrt abrechnen']));
+        $entry = $DB->get_record('datalynx_entries', ['id' => $ride]);
+        $tag = '##pdfdownload:Fahrtenschein PDF;PDF herunterladen;btn##';
+        $link = $billing->patternclass()->get_replacements([$tag], $entry)[$tag];
+        $this->assertStringContainsString('pdfexportentry=' . $ride, $link);
+        $this->assertStringContainsString('PDF herunterladen', $link);
+        $nopdf = '##pdfdownload:Fahrt abrechnen##';
+        $this->assertSame('', $billing->patternclass()->get_replacements([$nopdf], $entry)[$nopdf]);
+
+        $pdfview = $dlx->get_view_from_id($DB->get_field('datalynx_views', 'id', ['dataid' => $dlx->id(),
+            'name' => 'Fahrtenschein PDF']));
+        // The file name of the PDF names the Fahrtenschein and the driver (the export itself ends the request).
+        $filter = (new \ReflectionProperty($pdfview, 'filter'))->getValue($pdfview);
+        $filter->eids = $ride;
+        $pdfview->set_content();
+        $name = (new \ReflectionMethod($pdfview, 'get_documentname'))->invoke(
+            $pdfview,
+            'Fahrtenschein_##entryid##_##author:lastname##'
+        );
+        $this->assertSame(clean_param('Fahrtenschein_' . $ride . '_' . $this->driver->lastname, PARAM_FILE) . '.pdf', $name);
+    }
+
+    /**
      * The parking photo is scaled down to 1600 px on the long edge.
      */
     public function test_photo_downscaled(): void {

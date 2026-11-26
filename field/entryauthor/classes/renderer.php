@@ -510,6 +510,35 @@ class renderer extends datalynxfield_renderer {
     }
 
     /**
+     * Whether the current user may see a profile field of a user, by the field's visibility.
+     *
+     * @param string $shortname
+     * @param int $userid
+     * @return bool
+     */
+    protected function may_see_profile_field(string $shortname, int $userid): bool {
+        global $DB, $USER;
+        if ($userid === (int) $USER->id) {
+            return true;
+        }
+        $visible = $DB->get_field('user_info_field', 'visible', ['shortname' => $shortname]);
+        if ($visible === false || (int) $visible === PROFILE_VISIBLE_ALL) {
+            return true;
+        }
+        $context = $this->field->dlx()->context;
+        if (has_capability('mod/datalynx:manageentries', $context)) {
+            return true;
+        }
+        if ((int) $visible === PROFILE_VISIBLE_TEACHERS) {
+            return has_capability('moodle/course:viewhiddenuserfields', $context);
+        }
+        if ((int) $visible === PROFILE_VISIBLE_PRIVATE) {
+            return has_capability('moodle/user:viewalldetails', \context_user::instance($userid));
+        }
+        return false;
+    }
+
+    /**
      * Render the read-only value of the targeted user profile field for the entry author.
      *
      * @param stdClass $entry The entry object.
@@ -524,8 +553,13 @@ class renderer extends datalynxfield_renderer {
         if (empty($userid)) {
             return '';
         }
-        $userprofile = profile_user_record($userid);
         $shortname = $field->get('infoshortname');
+        // The profile field's own visibility holds here too: a private field (e.g. an IBAN, #343) is
+        // shown to the user themselves and to those who see all user details or manage entries.
+        if (!$this->may_see_profile_field((string) $shortname, (int) $userid)) {
+            return '';
+        }
+        $userprofile = profile_user_record($userid);
         $content = ($shortname && isset($userprofile->{$shortname})) ? $userprofile->{$shortname} : '';
         if ($content === '' || $content === null) {
             return '';

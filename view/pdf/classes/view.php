@@ -1017,14 +1017,15 @@ class view extends base {
             $entry = reset($entries);
             foreach ($fields as $field) {
                 $addtags = $field->renderer()->search($namepattern);
-                $additional = $field->get_definitions($foundtags, $entry, []);
+                // The definitions of this field's tags (the tags found so far would leave every name unresolved).
+                $additional = $addtags ? $field->get_definitions($addtags, $entry, []) : [];
                 if ($addtags && $additional) {
-                    $foundtags += $addtags;
+                    $foundtags = array_merge($foundtags, $addtags);
                     $replacements += $additional;
                 }
             }
         }
-        $foundtags += $this->patternclass()->search($namepattern);
+        $foundtags = array_merge($foundtags, $this->patternclass()->search($namepattern));
         $replacements += $this->patternclass()->get_replacements($foundtags);
         foreach ($foundtags as $foundtag) {
             $namepattern = str_replace($foundtag, $replacements[$foundtag][1], $namepattern);

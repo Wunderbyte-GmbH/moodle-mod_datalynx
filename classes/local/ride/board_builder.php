@@ -70,6 +70,7 @@ class board_builder {
         'email' => 'Benachrichtigung: Passende Fahrt',
         'manage' => 'Meine Fahrten verwalten',
         'billing' => 'Fahrt abrechnen',
+        'pdf' => 'Fahrtenschein PDF',
     ];
 
     /** @var string Shortname of the user profile field holding the IBAN (#343). */
@@ -831,6 +832,14 @@ class board_builder {
                     $this->fieldids['termin'] => ['AND' => [['', 'PAST', '']]],
                     $this->fieldids['fahrtstatus'] => ['AND' => [['NOT', 'ANY_OF', ['2']]]],
                 ]];
+            // Submitted Fahrtenscheine (final submission): all of them for the PDF, one's own for the list (#332).
+            $filters['submitted'] = ['name' => 'Eingereichte Fahrtenscheine', 'customsearch' => [
+                'status' => ['AND' => [['', '=', 2]]],
+            ]];
+            $filters['mytickets'] = ['name' => 'Meine Fahrtenscheine', 'customsearch' => [
+                'userid' => ['AND' => [['', 'ME', '']]],
+                'status' => ['AND' => [['', '=', 2]]],
+            ]];
         }
         return $filters + [
             'own' => ['name' => 'Meine Einträge', 'customsearch' => ['userid' => ['AND' => [['', 'ME', '']]]]],
@@ -1189,11 +1198,46 @@ class board_builder {
                             . $this->tag('parkfoto', 'abrechnungpflicht') . $this->tag('eigenerklaerung', 'abrechnungpflicht')
                             . '<div class="mb-3 datalynx-ride-field"><label class="form-label fw-semibold">Fahrtenschein '
                             . 'einreichen</label>##status##<div class="form-text">Eingereicht ist der Fahrtenschein gesperrt.'
-                            . '</div></div>##edit##',
+                            . '</div></div>##edit## ##pdfdownload:' . self::VIEWS['pdf'] . ';PDF herunterladen;btn btn-outline-secondary##',
                         'Fahrtenschein_speichern'
                     ),
                 ],
                 'filter' => 'billable',
+            ],
+            // One Fahrtenschein per PDF, A4 portrait, downloaded (#332).
+            'pdf' => !$this->has('parkfoto') ? null : [
+                'type' => 'pdf',
+                'data' => [
+                    'visible' => 7,
+                    'perpage' => 0,
+                    'param1' => base64_encode(serialize((object) [
+                        'docname' => 'Fahrtenschein_##entryid##_##author:lastname##',
+                        'orientation' => 'P',
+                        'unit' => 'mm',
+                        'format' => 'A4',
+                        'destination' => 'D',
+                        'pagebreak' => 'entry',
+                    ])),
+                    'esection' => '##entries##',
+                    // Frame, watermark, signature and certification of the PDF: none.
+                    'eparam3' => '', 'eparam4' => '', 'eparam5' => '', 'eparam6' => '', 'eparam7' => '', 'eparam8' => '',
+                    'eparam9' => '',
+                    'eparam2' => '<div style="font-family: helvetica; font-size: 10pt;">'
+                        . '<h1 style="font-size: 16pt;">Fahrtenschein</h1>'
+                        . '<p><b>Fahrer/in:</b> ##author:name##<br><b>Fahrtenschein Nr.:</b> ##entryid##</p>'
+                        . '<h2 style="font-size: 12pt;">Fahrt</h2>'
+                        . $this->tags(['termin', 'anlass', 'rueckfahrt', 'dienstfahrzeug', 'kennzeichen'])
+                        . '<p><b>Route (Start – Stopps – Ziel):</b></p>[[Route]]'
+                        . '<p><b>Strecke einfach:</b> [[Route:distance]]<br>'
+                        . '<b>Abrechnungs-Kilometer:</b> [[Route:billeddistance]]</p>'
+                        . $this->tags(['beantragtekm', 'begruendung'])
+                        . '<p><b>IBAN:</b> ##author:iban##</p>'
+                        . '<h2 style="font-size: 12pt;">Mitfahrende</h2>[[Passagiere]]'
+                        . '<h2 style="font-size: 12pt;">Parkfoto</h2>[[Parkfoto]]'
+                        . '<h2 style="font-size: 12pt;">Eigenerklärung</h2>' . $this->tag('eigenerklaerung')
+                        . '</div>',
+                ],
+                'filter' => 'submitted',
             ],
             'all' => [
                 'type' => 'grid',

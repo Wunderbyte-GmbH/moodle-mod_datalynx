@@ -264,6 +264,9 @@ class datalynxview_patterns {
      * @return string
      */
     protected function get_regexp_replacements($tag, $entry = null, ?array $options = null): string {
+        if (strpos($tag, '##pdfdownload:') === 0) {
+            return $this->get_pdf_download($tag, $entry);
+        }
         $link = $this->get_view_link($tag, $entry, $options ?? []);
         if ($link !== null) {
             return $link ? $this->render_view_link($link, $options ?? []) : '';
@@ -278,6 +281,30 @@ class datalynxview_patterns {
         }
 
         return '';
+    }
+
+    /**
+     * Resolve ##pdfdownload:<view>[;<label>;<class>]##: a link that downloads the entry as the PDF
+     * of a PDF view (mod_datalynx#332). Only for a PDF view the user can see; the PDF view applies its
+     * own filter, so an entry it may not show yields no PDF.
+     *
+     * @param string $tag
+     * @param mixed $entry
+     * @return string
+     */
+    protected function get_pdf_download(string $tag, $entry): string {
+        if (empty($entry->id) || (int) $entry->id <= 0) {
+            return '';
+        }
+        [$viewname, $label, $class] = array_pad(explode(';', substr($tag, strlen('##pdfdownload:'), -2)), 3, '');
+        $viewid = array_search($viewname, $this->get_cached_visible_view_names(), true);
+        if ($viewid === false || ($this->get_cached_all_view_records()[$viewid]->type ?? '') !== 'pdf') {
+            return '';
+        }
+        $url = new moodle_url('/mod/datalynx/view.php', ['d' => $this->view->get_dlx()->id(), 'view' => $viewid,
+            'pdfexportentry' => (int) $entry->id, 'sesskey' => sesskey()]);
+        $label = $label !== '' ? format_string($label) : get_string('download');
+        return html_writer::link($url, $label, ['class' => $class !== '' ? $class : 'btn btn-outline-secondary btn-sm']);
     }
 
     /**
@@ -1033,6 +1060,8 @@ class datalynxview_patterns {
                 $viewname = preg_quote($viewname, '/');
                 $patterns["##viewlink:$viewname;[^;]*;[^;]*;[a-z\d\-_\s]*(?:;[a-z,]*)?##"] = [true, $cat];
                 $patterns["##viewsesslink:$viewname;[^;]*;[^;]*;[a-z\d\-_\s]*(?:;[a-z,]*)?##"] = [true, $cat];
+                // Download one entry as the PDF of a PDF view (mod_datalynx#332).
+                $patterns["##pdfdownload:$viewname(?:;[^;#]*;[^;#]*)?##"] = [true, $cat];
             }
         }
 
@@ -1075,6 +1104,9 @@ class datalynxview_patterns {
                     return true;
                 }
                 if (strpos($pattern, "##viewsesslink:$viewname;") === 0) {
+                    return true;
+                }
+                if (strpos($pattern, "##pdfdownload:$viewname") === 0) {
                     return true;
                 }
             }

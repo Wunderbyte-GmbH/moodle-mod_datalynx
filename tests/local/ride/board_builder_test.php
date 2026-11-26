@@ -107,7 +107,7 @@ final class board_builder_test extends advanced_testcase {
         ], $structure['fields']);
         $this->assertEqualsCanonicalizing(['Meine Einträge', 'Nur Angebote', 'Nur Gesuche'], $structure['filters']);
         $this->assertEqualsCanonicalizing(
-            array_values(array_diff_key(board_builder::VIEWS, ['manage' => 1, 'billing' => 1])),
+            array_values(array_diff_key(board_builder::VIEWS, ['manage' => 1, 'billing' => 1, 'pdf' => 1])),
             array_keys($structure['views']),
             'basic has no view to manage single rides'
         );
