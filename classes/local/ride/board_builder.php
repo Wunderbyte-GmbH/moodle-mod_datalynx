@@ -966,9 +966,12 @@ class board_builder {
             . '<div class="d-flex justify-content-between align-items-center mb-2">'
             . '<span class="badge bg-primary">[[Fahrttyp]]</span>'
             . '<span class="small text-muted">##author:name##</span></div>'
-            . $this->tags(['route', 'termin', 'sitzplaetze', 'marke', 'modell', 'gepaeck', 'mitfahrende',
-                'fahrkosten', 'fixbetrag', 'bemerkungen'])
-            . $this->tag('passagiere', '', 'mitfahren')
+            . $this->tags(['route', 'termin'])
+            // The vehicle and what the driver takes along belong to an offer: a request shows (and
+            // edits, in "Meine Fahrten") none of them. Passengers join by request only.
+            . $this->tags(['sitzplaetze', 'marke', 'modell', 'gepaeck', 'mitfahrende', 'fahrkosten', 'fixbetrag'], 'angebot')
+            . $this->tag('bemerkungen')
+            . $this->tag('passagiere', 'nurlesenangebot', 'mitfahren')
             . '</div><div class="card-footer bg-transparent border-0 d-flex gap-2">##edit####delete##</div></div>';
     }
 
