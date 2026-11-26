@@ -75,9 +75,10 @@ final class ride_billing_test extends advanced_testcase {
      *
      * @param int $days
      * @param array $contents more contents by field name
+     * @param int $start departure, minutes after midnight
      * @return int
      */
-    protected function ride(int $days, array $contents = []): int {
+    protected function ride(int $days, array $contents = [], int $start = 480): int {
         global $DB;
         $entryid = (int) $DB->insert_record('datalynx_entries', (object) ['dataid' => $this->builder->get_dataid(),
             'userid' => $this->driver->id, 'groupid' => 0, 'approved' => 1, 'status' => 0,
@@ -88,7 +89,7 @@ final class ride_billing_test extends advanced_testcase {
             schedule::MODE_ONCE,
             date('Y-m-d', strtotime("$days days")),
             [],
-            480
+            $start
         ))->to_json()]);
         $route = $dlx->get_field_from_id($this->ids['Route'], true);
         $route->update_content((object) ['id' => $entryid], ['waypoints' => json_encode([
@@ -151,14 +152,21 @@ final class ride_billing_test extends advanced_testcase {
         global $DB;
         $past = $this->ride(-2);
         $future = $this->ride(2);
+        $expected = ['PAST' => [$past], 'UPCOMING' => [$future]];
+        // Today: departed an hour ago, or leaving in an hour (not around midnight, where that is another day).
+        $minutes = (int) date('G') * 60 + (int) date('i');
+        if ($minutes >= 90 && $minutes <= 22 * 60) {
+            $expected['PAST'][] = $this->ride(0, [], $minutes - 60);
+            $expected['UPCOMING'][] = $this->ride(0, [], $minutes + 60);
+        }
         $field = (new datalynx($this->builder->get_dataid()))->get_field_from_id($this->ids['Termin'], true);
-        foreach (['PAST' => [$past], 'UPCOMING' => [$future]] as $operator => $expected) {
+        foreach ($expected as $operator => $ids) {
             [$sql, $params] = $field->get_search_sql(['', $operator, '']);
             $found = $DB->get_fieldset_sql(
-                "SELECT e.id FROM {datalynx_entries} e WHERE e.dataid = :dataid AND $sql",
+                "SELECT e.id FROM {datalynx_entries} e WHERE e.dataid = :dataid AND $sql ORDER BY e.id",
                 ['dataid' => $this->builder->get_dataid()] + $params
             );
-            $this->assertSame($expected, array_map('intval', $found), $operator);
+            $this->assertSame($ids, array_map('intval', $found), $operator);
         }
     }
 

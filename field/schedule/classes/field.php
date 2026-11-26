@@ -495,14 +495,16 @@ class field extends datalynxfield_base {
     public function get_search_sql(array $search): array {
         [$not, $operator, $value] = $search;
 
-        // Past or upcoming, against today (mod_datalynx#343): a ride to bill, a ride still to come.
+        // Past or upcoming, against now (mod_datalynx#343): a ride to bill, a ride still to come. The
+        // last departure is the departure time on the last day (content4 is that day's last second).
         if ($operator === 'PAST' || $operator === 'UPCOMING') {
             $suffix = self::next_suffix();
-            $params = ["schtoday{$suffix}" => (int) schedule::day_start(schedule::date_of(time()))];
+            $params = ["schnow{$suffix}" => time()];
             $until = $this->numeric('content4');
+            $lastdeparture = "({$until} - " . (DAYSECS - 1) . " + {$this->numeric('content2')} * 60)";
             $conditions = $operator === 'PAST'
-                ? ["{$until} > 0", "{$until} < :schtoday{$suffix}"]
-                : ["({$until} = 0 OR {$until} >= :schtoday{$suffix})"];
+                ? ["{$until} > 0", "{$lastdeparture} < :schnow{$suffix}"]
+                : ["({$until} = 0 OR {$lastdeparture} >= :schnow{$suffix})"];
             $sql = $this->wrap($conditions, $params, $suffix);
             return ['e.id ' . ($not ? 'NOT IN' : 'IN') . " ({$sql})", $params, false];
         }

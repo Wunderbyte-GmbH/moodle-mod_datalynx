@@ -1537,7 +1537,8 @@ class board_builder {
      * @return array customsearch
      */
     protected function ride_conditions(): array {
-        $conditions = [];
+        // A ride that has left is no longer offered.
+        $conditions = [$this->fieldids['termin'] => ['AND' => [['', 'UPCOMING', '']]]];
         if ($this->has('veroeffentlicht')) {
             $conditions[$this->fieldids['veroeffentlicht']] = ['AND' => [['', 'ANY_OF', ['1']]]];
         }
