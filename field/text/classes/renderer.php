@@ -151,6 +151,15 @@ class renderer extends datalynxfield_renderer {
                     '/^\+[1-9][0-9\s\-()]{6,20}$/',
                     'client'
                 );
+            } else if ($format === 'licenceplate') {
+                // Not a QuickForm rule type: the same check as validate() on the client.
+                $mform->addRule(
+                    $fieldname,
+                    get_string('errlicenceplate', 'datalynxfield_text'),
+                    'regex',
+                    '/^\s*[\p{L}0-9][\p{L}0-9 \-]{0,11}\s*$/u',
+                    'client'
+                );
             } else {
                 $mform->addRule($fieldname, null, $format, null, 'client');
             }

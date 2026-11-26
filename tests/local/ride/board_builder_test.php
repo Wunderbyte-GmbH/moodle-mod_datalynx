@@ -148,6 +148,34 @@ final class board_builder_test extends advanced_testcase {
     }
 
     /**
+     * Every field of both boards can be put into an entry form (a field setting without a form rule,
+     * like the licence plate format, broke the vehicle step).
+     *
+     * @dataProvider variants
+     * @param string $variant
+     */
+    public function test_fields_render_in_forms(string $variant): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $builder = $this->build($variant);
+        $dlx = new \mod_datalynx\datalynx($builder->get_dataid());
+        foreach ($builder->get_fieldids_by_name() as $name => $fieldid) {
+            $mform = new \MoodleQuickForm('ride', 'post', 'view.php');
+            $dlx->get_field_from_id($fieldid, true)->renderer()->render_edit_mode($mform, (object) ['id' => -1], []);
+            $this->assertNotEmpty($mform->_elements, $name);
+        }
+    }
+
+    /**
+     * The variants of the board.
+     *
+     * @return array
+     */
+    public static function variants(): array {
+        return ['basic' => [board_builder::VARIANT_BASIC], 'fahrtenschein' => [board_builder::VARIANT_BILLING]];
+    }
+
+    /**
      * The billing variant differs from basic where it should.
      */
     public function test_billing(): void {
