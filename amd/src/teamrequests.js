@@ -78,6 +78,8 @@ const askPickup = async(button) => {
         + '<div class="list-group mt-2" data-region="suggestions"></div>';
     body.querySelector('label').textContent = label;
     const modal = await ModalSaveCancel.create({title: button.textContent, body: body, show: true, removeOnClose: true});
+    // The request is sent with the button the user started from ("Request a seat"), not "Save changes".
+    modal.setSaveButtonText(button.textContent.trim());
     const input = body.querySelector('input');
     const list = body.querySelector('[data-region="suggestions"]');
     let picked = null;

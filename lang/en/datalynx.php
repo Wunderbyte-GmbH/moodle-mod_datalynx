@@ -632,18 +632,18 @@ $string['message_rating_added'] = 'Datalynx rating added';
 $string['message_rating_updated'] = 'Datalynx rating updated';
 $string['message_team_request_approved'] = 'Hello {$a->fullname},
 
-your request to join {$a->fieldname} was approved: {$a->viewlink}.';
+your request was approved, you are now listed in "{$a->fieldname}": {$a->viewlink}.';
 $string['message_team_request_created'] = 'Hello {$a->fullname},
 
-{$a->relatedname} asked to join {$a->fieldname} of this entry: {$a->viewlink}. You can approve or decline the request there.
+{$a->relatedname} asks to be listed in "{$a->fieldname}": {$a->viewlink}. You can approve or decline the request there.
 
 {$a->requestdetails}';
 $string['message_team_request_declined'] = 'Hello {$a->fullname},
 
-your request to join {$a->fieldname} was declined: {$a->viewlink}.';
+your request to be listed in "{$a->fieldname}" was declined: {$a->viewlink}.';
 $string['message_team_request_withdrawn'] = 'Hello {$a->fullname},
 
-{$a->relatedname} withdrew their request or left {$a->fieldname} of this entry: {$a->viewlink}.';
+{$a->relatedname} withdrew their request or is no longer listed in "{$a->fieldname}": {$a->viewlink}.';
 $string['message_team_updated'] = 'Dear {$a->fullname},
 
 {$a->fieldname} membership has been changed by {$a->senderprofilelink}. Please go to {$a->viewlink} for more details.';

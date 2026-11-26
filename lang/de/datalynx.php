@@ -630,18 +630,18 @@ $string['message_rating_added'] = 'Eintrag bewertet';
 $string['message_rating_updated'] = 'Bewertung eines Eintrags aktualisiert';
 $string['message_team_request_approved'] = 'Guten Tag {$a->fullname},
 
-Ihre Anfrage für {$a->fieldname} wurde angenommen: {$a->viewlink}.';
+Ihre Anfrage wurde angenommen, Sie sind jetzt bei „{$a->fieldname}“ eingetragen: {$a->viewlink}.';
 $string['message_team_request_created'] = 'Guten Tag {$a->fullname},
 
-{$a->relatedname} möchte bei {$a->fieldname} dieses Eintrags dabei sein: {$a->viewlink}. Dort können Sie die Anfrage annehmen oder ablehnen.
+{$a->relatedname} bittet darum, bei „{$a->fieldname}“ eingetragen zu werden: {$a->viewlink}. Dort können Sie die Anfrage annehmen oder ablehnen.
 
 {$a->requestdetails}';
 $string['message_team_request_declined'] = 'Guten Tag {$a->fullname},
 
-Ihre Anfrage für {$a->fieldname} wurde abgelehnt: {$a->viewlink}.';
+Ihre Anfrage, bei „{$a->fieldname}“ eingetragen zu werden, wurde abgelehnt: {$a->viewlink}.';
 $string['message_team_request_withdrawn'] = 'Guten Tag {$a->fullname},
 
-{$a->relatedname} hat die Anfrage zurückgezogen oder {$a->fieldname} dieses Eintrags verlassen: {$a->viewlink}.';
+{$a->relatedname} hat die Anfrage zurückgezogen oder ist nicht mehr bei „{$a->fieldname}“ eingetragen: {$a->viewlink}.';
 $string['message_team_updated'] = 'Guten Tag {$a->fullname},
 
  {$a->fieldname} wurde von {$a->senderprofilelink} geändert. Rufen Sie folgenden Link für detaillierte Informationen auf: {$a->viewlink}.';
