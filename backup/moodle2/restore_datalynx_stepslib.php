@@ -1025,6 +1025,27 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
             }
         }
 
+        // The fields of the billing settings of itinerary fields (param9, mod_datalynx#328).
+        foreach (
+            $DB->get_records_menu(
+                'datalynx_fields',
+                ['type' => 'itinerary', 'dataid' => $datalynxnewid],
+                '',
+                'id, param9'
+            ) as $id => $settings
+        ) {
+            $decoded = json_decode((string) $settings, true);
+            if (!is_array($decoded)) {
+                continue;
+            }
+            foreach (['returnfield', 'requestedfield', 'justificationfield'] as $name) {
+                if (!empty($decoded[$name])) {
+                    $decoded[$name] = (int) $this->get_mappingid('datalynx_field', (int) $decoded[$name]);
+                }
+            }
+            $DB->set_field('datalynx_fields', 'param9', json_encode($decoded), ['id' => $id]);
+        }
+
         // The limit field of teammemberselect fields (param10 settings, mod_datalynx#326).
         foreach (
             $DB->get_records_menu(

@@ -190,6 +190,22 @@ class renderer extends datalynxfield_renderer {
     public function render_display_mode(stdClass $entry, array $options): string {
         global $OUTPUT;
 
+        // A field format showing the distance instead of the stops (#328).
+        $format = $options['field_format'] ?? null;
+        $show = $format ? (string) $format->get_setting('show', '') : '';
+        if ($show === 'distance' || $show === 'billeddistance') {
+            $route = $this->field->get_route($entry);
+            if ($route === null) {
+                return '';
+            }
+            $km = $show === 'billeddistance' ? $this->field->billed_km((int) $entry->id, $route->distance_km())
+                : $route->distance_km();
+            return html_writer::span(
+                get_string('kmvalue', 'datalynxfield_itinerary', format_float($km, 1)),
+                'datalynx-itinerary-distance'
+            );
+        }
+
         $journey = $this->field->get_itinerary($entry);
         if (!$journey->is_route()) {
             return html_writer::span(
@@ -499,6 +515,10 @@ class renderer extends datalynxfield_renderer {
         // because it cannot describe a journey.
         if ($journey->count() === 1) {
             $errors[$elementname] = get_string('needtworoutepoints', 'datalynxfield_itinerary');
+        }
+        // A billing-relevant distance: routed on the server, and more km asked for need a reason (#328).
+        if (!$errors) {
+            $errors = $this->field->billing_errors($entryid, $journey, $elementname, $formdata);
         }
 
         return $errors;

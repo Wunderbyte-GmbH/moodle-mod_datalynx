@@ -238,8 +238,12 @@ class field extends datalynxfield_base {
         // This column held the earliest stop time back when a journey carried its own dates.
         // When a ride happens is a schedule field's business now - a date on a stop could not
         // describe a commute that runs every Monday, and left one that did unconstrained in time.
-        $contents[] = '';
-        $contents[] = $this->resolve_route($journey, $values, $oldcontents, $resolved);
+        $route = $this->resolve_route($journey, $values, $oldcontents, $resolved);
+        // Billing mode: which router computed the distance, and when (printed on the Fahrtenschein).
+        $contents[] = $this->is_billing() && $route !== ''
+            ? json_encode(['provider' => \mod_datalynx\local\map\provider_config::router_engine(), 'time' => time()])
+            : '';
+        $contents[] = $route;
 
         return [$contents, $oldcontents];
     }
@@ -317,6 +321,11 @@ class field extends datalynxfield_base {
      * @return string JSON route summary, or an empty string.
      */
     protected function resolve_route(itinerary $journey, array $values, array $oldcontents, bool $lookedup = false): string {
+        // A billing-relevant distance is always routed on the server; what the browser sends is ignored.
+        if ($this->is_billing()) {
+            $route = $this->server_route($journey);
+            return $route !== null ? $route->to_json() : '';
+        }
         if (!empty($values['route'])) {
             $route = route_result::from_json((string) $values['route']);
             if ($route !== null) {
@@ -395,6 +404,155 @@ class field extends datalynxfield_base {
         $DB->delete_records(self::INDEX_TABLE, $conditions);
 
         return $result;
+    }
+
+    /**
+     * The billing settings (param9, JSON; mod_datalynx#328): billing (1 when the distance is
+     * billing-relevant), returnfield (a checkbox doubling the distance), requestedfield (a number of
+     * km the driver asks for) and justificationfield (required when more is asked for).
+     *
+     * @return array
+     */
+    public function get_billing_settings(): array {
+        $settings = json_decode((string) ($this->field->param9 ?? ''), true);
+        return is_array($settings) ? $settings : [];
+    }
+
+    /**
+     * Whether the distance is billing-relevant: computed on the server only.
+     *
+     * @return bool
+     */
+    public function is_billing(): bool {
+        return !empty($this->get_billing_settings()['billing']);
+    }
+
+    /** @var array Routes computed in this request, by stops. */
+    protected static array $serverroutes = [];
+
+    /**
+     * The route of a journey from the site's router. Null when there is no router or no route.
+     *
+     * @param itinerary $journey
+     * @return route_result|null
+     */
+    public function server_route(itinerary $journey): ?route_result {
+        $key = $journey->to_json();
+        if (!array_key_exists($key, self::$serverroutes)) {
+            $router = router_factory::instance();
+            self::$serverroutes[$key] = $router?->route(array_map(
+                static fn(waypoint $stop): array => [$stop->lat, $stop->lng],
+                $journey->waypoints()
+            ));
+        }
+        return self::$serverroutes[$key];
+    }
+
+    /**
+     * Forget the routes of this request (tests).
+     */
+    public static function reset_server_routes(): void {
+        self::$serverroutes = [];
+    }
+
+    /**
+     * The stored value of another field of the entry, or the submitted one when given.
+     *
+     * @param int $fieldid
+     * @param int|string $entryid
+     * @param \stdClass|null $formdata
+     * @return mixed
+     */
+    protected function value_of(int $fieldid, $entryid, ?\stdClass $formdata = null) {
+        global $DB;
+        $name = "field_{$fieldid}_{$entryid}";
+        if ($formdata !== null && property_exists($formdata, $name)) {
+            $value = $formdata->$name;
+            return is_array($value) && isset($value['text']) ? $value['text'] : $value;
+        }
+        return is_numeric($entryid) && (int) $entryid > 0
+            ? $DB->get_field('datalynx_contents', 'content', ['fieldid' => $fieldid, 'entryid' => (int) $entryid], IGNORE_MULTIPLE)
+            : null;
+    }
+
+    /**
+     * Whether the return trip is ticked for an entry.
+     *
+     * @param int|string $entryid
+     * @param \stdClass|null $formdata
+     * @return bool
+     */
+    public function is_return_trip($entryid, ?\stdClass $formdata = null): bool {
+        $fieldid = (int) ($this->get_billing_settings()['returnfield'] ?? 0);
+        if (!$fieldid) {
+            return false;
+        }
+        $value = $this->value_of($fieldid, $entryid, $formdata);
+        if (is_array($value)) {
+            return (bool) array_filter($value, fn($v) => (int) $v > 0);
+        }
+        return trim((string) $value, " #,0") !== '';
+    }
+
+    /**
+     * The billed distance in km: the routed distance, doubled for a return trip.
+     *
+     * @param int $entryid
+     * @param float|null $onewaykm the one-way distance; null to read the stored route
+     * @param \stdClass|null $formdata
+     * @return float|null null without a route
+     */
+    public function billed_km(int $entryid, ?float $onewaykm = null, ?\stdClass $formdata = null): ?float {
+        global $DB;
+        if ($onewaykm === null) {
+            $route = route_result::from_json($DB->get_field(
+                'datalynx_contents',
+                'content4',
+                ['fieldid' => $this->field->id, 'entryid' => $entryid],
+                IGNORE_MULTIPLE
+            ) ?: null);
+            if ($route === null) {
+                return null;
+            }
+            $onewaykm = $route->distance_km();
+        }
+        return $onewaykm * ($this->is_return_trip($entryid, $formdata) ? 2 : 1);
+    }
+
+    /**
+     * The errors of a billing route: no route, or more km asked for than billed without a reason.
+     *
+     * @param int|string $entryid
+     * @param itinerary $journey the submitted stops
+     * @param string $waypointsname the element of the stops
+     * @param \stdClass $formdata
+     * @return array element => error
+     */
+    public function billing_errors($entryid, itinerary $journey, string $waypointsname, \stdClass $formdata): array {
+        if (!$this->is_billing() || !$journey->is_route()) {
+            return [];
+        }
+        $route = $this->server_route($journey);
+        if ($route === null) {
+            return [$waypointsname => get_string('errnoroute', 'datalynxfield_itinerary')];
+        }
+        $settings = $this->get_billing_settings();
+        $requestedid = (int) ($settings['requestedfield'] ?? 0);
+        $justificationid = (int) ($settings['justificationfield'] ?? 0);
+        if (!$requestedid || !$justificationid) {
+            return [];
+        }
+        $requested = $this->value_of($requestedid, $entryid, $formdata);
+        $billed = $this->billed_km(is_numeric($entryid) ? (int) $entryid : 0, $route->distance_km(), $formdata);
+        $justification = trim(strip_tags((string) $this->value_of($justificationid, $entryid, $formdata)));
+        if (is_numeric($requested) && round((float) $requested, 1) > round($billed, 1) && $justification === '') {
+            return ["field_{$justificationid}_{$entryid}" => get_string(
+                'errjustification',
+                'datalynxfield_itinerary',
+                format_float($billed, 1)
+            )];
+        }
+        return [];
     }
 
     /**

@@ -97,6 +97,63 @@ class form extends datalynxfield_form {
         $mform->addElement('text', 'param7', get_string('country_restriction', 'datalynxfield_location'), ['size' => 30]);
         $mform->setType('param7', PARAM_TEXT);
         $mform->addHelpButton('param7', 'country_restriction', 'datalynxfield_location');
+
+        // Billing (param9, JSON): the distance is computed on the server only (mod_datalynx#328).
+        $mform->addElement('header', 'billinghdr', get_string('billing', 'datalynxfield_itinerary'));
+        $mform->addElement('advcheckbox', 'billing', get_string('billingdistance', 'datalynxfield_itinerary'));
+        $mform->addHelpButton('billing', 'billingdistance', 'datalynxfield_itinerary');
+        $fieldsof = function (array $types): array {
+            $menu = [0 => get_string('none')];
+            foreach ($this->dlx->get_fields() as $fieldid => $field) {
+                if (in_array($field->type, $types, true)) {
+                    $menu[$fieldid] = $field->field->name;
+                }
+            }
+            return $menu;
+        };
+        foreach (
+            [
+            'returnfield' => ['checkbox'],
+            'requestedfield' => ['number'],
+            'justificationfield' => ['textarea', 'text'],
+            ] as $name => $types
+        ) {
+            $mform->addElement('select', $name, get_string($name, 'datalynxfield_itinerary'), $fieldsof($types));
+            $mform->setType($name, PARAM_INT);
+            $mform->hideIf($name, 'billing', 'notchecked');
+        }
+        $mform->addHelpButton('justificationfield', 'justificationfield', 'datalynxfield_itinerary');
+    }
+
+    /**
+     * Unpack the billing settings from param9.
+     *
+     * @param \stdClass|array $data
+     */
+    public function set_data($data) {
+        $data = (object) $data;
+        $settings = json_decode((string) ($data->param9 ?? ''), true) ?: [];
+        foreach (['billing', 'returnfield', 'requestedfield', 'justificationfield'] as $name) {
+            $data->$name = (int) ($settings[$name] ?? 0);
+        }
+        parent::set_data($data);
+    }
+
+    /**
+     * Pack the billing settings into param9.
+     *
+     * @return \stdClass|null
+     */
+    public function get_data() {
+        if ($data = parent::get_data()) {
+            $settings = [];
+            foreach (['billing', 'returnfield', 'requestedfield', 'justificationfield'] as $name) {
+                $settings[$name] = (int) ($data->$name ?? 0);
+                unset($data->$name);
+            }
+            $data->param9 = $settings['billing'] ? json_encode($settings) : '';
+        }
+        return $data;
     }
 
     /**
