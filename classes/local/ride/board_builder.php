@@ -1188,7 +1188,8 @@ class board_builder {
                         . '<div class="d-flex justify-content-between align-items-center mb-2">##select##'
                         . '<span class="small text-muted">##author:name##</span></div>'
                         . $this->tags(['route', 'termin'], 'nurlesen') . $this->tag('fahrtstatus', 'angebot')
-                        . $this->tag('passagiere')
+                        // Passengers join by request only: the form would list every participant to pick.
+                        . $this->tag('passagiere', 'nurlesen')
                         . '</div><div class="card-footer bg-transparent border-0 d-flex gap-2">##edit####delete##</div></div>',
                 ],
                 'filter' => 'own',

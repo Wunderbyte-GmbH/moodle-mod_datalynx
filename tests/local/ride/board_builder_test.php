@@ -213,6 +213,10 @@ final class board_builder_test extends advanced_testcase {
                 $this->assertStringContainsString('##viewlink:Mitfahrbörse;← Zurück zur Übersicht', $view->section, $view->name);
             }
         }
+        // The driver cancels in "Meine Fahrten verwalten" but cannot pick passengers there.
+        $manage = $DB->get_field('datalynx_views', 'param2', ['dataid' => $builder->get_dataid(),
+            'name' => 'Meine Fahrten verwalten']);
+        $this->assertStringContainsString('[[Passagiere|nurlesen', $manage);
         $portal = $DB->get_field('datalynx_views', 'section', ['dataid' => $builder->get_dataid(), 'name' => 'Mitfahrbörse']);
         $this->assertStringContainsString('##viewlink:Fahrt abrechnen;', $portal);
         $this->assertStringContainsString('##viewlink:Meine Fahrtenscheine;', $portal);
