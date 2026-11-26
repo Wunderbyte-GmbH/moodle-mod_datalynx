@@ -173,7 +173,7 @@ final class team_actions_app_test extends advanced_testcase {
         $ride = $this->ride();
         $this->ride();
         $init = \mod_datalynx\output\mobile::mobile_init([]);
-        $this->assertStringContainsString('CoreContentLinksDelegateService.registerHandler', $init['javascript']);
+        $this->assertStringContainsString('CoreContentLinksDelegate.registerHandler', $init['javascript']);
         $this->assertStringContainsString("'/mod/datalynx/view\\\\.php.*[?&]d=\\\\d+'", $init['javascript']);
 
         $this->setUser($this->passenger);

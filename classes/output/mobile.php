@@ -241,7 +241,7 @@ class AddonModDatalynxViewLinkHandler extends app.CoreContentLinksHandlerBase {
         }];
     }
 }
-app.CoreContentLinksDelegateService.registerHandler(new AddonModDatalynxViewLinkHandler());
+app.CoreContentLinksDelegate.registerHandler(new AddonModDatalynxViewLinkHandler());
 JS;
 
     /**
