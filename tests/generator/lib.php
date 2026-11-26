@@ -58,4 +58,83 @@ class mod_datalynx_generator extends testing_module_generator {
 
         return parent::create_instance($record, (array) $options);
     }
+
+    /**
+     * A ride sharing board built by the board builder (mod_datalynx#336).
+     *
+     * @param array $record courseid, variant (basic or fahrtenschein, default fahrtenschein), name
+     * @return stdClass the datalynx record with cmid
+     */
+    public function create_ride_board(array $record): stdClass {
+        global $DB;
+        $builder = new \mod_datalynx\local\ride\board_builder(
+            get_course($record['courseid']),
+            $record['variant'] ?? \mod_datalynx\local\ride\board_builder::VARIANT_BILLING,
+            $record['name'] ?? ''
+        );
+        $builder->build();
+        $instance = $DB->get_record('datalynx', ['id' => $builder->get_dataid()], '*', MUST_EXIST);
+        $instance->cmid = $builder->get_cmid();
+        return $instance;
+    }
+
+    /**
+     * A ride offer on a board: a route between two places the test geocoder knows, on a day relative
+     * to today, published.
+     *
+     * @param array $record datalynxid, userid (the driver), from, to (wien, graz, baden, linz), days
+     *                      (default 7), time (default 08:00), seats (default 2), detour (default 20),
+     *                      photo (1 for a parking photo)
+     * @return int the entry id
+     */
+    public function create_ride(array $record): int {
+        global $CFG, $DB, $USER;
+        require_once($CFG->dirroot . '/mod/datalynx/tests/fixtures/stub_geocoder.php');
+        $places = \mod_datalynx\stub_geocoder::BEHAT_PLACES;
+        $dlx = new \mod_datalynx\datalynx((int) $record['datalynxid']);
+        $ids = $DB->get_records_menu('datalynx_fields', ['dataid' => $dlx->id()], '', 'name, id');
+        $entryid = (int) $DB->insert_record('datalynx_entries', (object) ['dataid' => $dlx->id(),
+            'userid' => (int) $record['userid'], 'groupid' => 0, 'approved' => 1, 'status' => 0,
+            'timecreated' => time(), 'timemodified' => time()]);
+        [$hours, $minutes] = array_map('intval', explode(':', $record['time'] ?? '08:00'));
+        $dlx->get_field_from_id((int) $ids['Termin'], true)->update_content((object) ['id' => $entryid], [
+            'schedule' => (new \mod_datalynx\local\ride\schedule(
+                \mod_datalynx\local\ride\schedule::MODE_ONCE,
+                date('Y-m-d', strtotime(((int) ($record['days'] ?? 7)) . ' days')),
+                [],
+                $hours * 60 + $minutes
+            ))->to_json(),
+        ]);
+        $stops = [];
+        foreach ([$record['from'] ?? 'wien', $record['to'] ?? 'graz'] as $place) {
+            [$address, $lat, $lng] = $places[core_text::strtolower($place)];
+            $stops[] = ['address' => $address, 'lat' => $lat, 'lng' => $lng];
+        }
+        $dlx->get_field_from_id((int) $ids['Route'], true)->update_content(
+            (object) ['id' => $entryid],
+            ['waypoints' => json_encode($stops)]
+        );
+        $contents = ['Fahrttyp' => '1', 'Freie Plätze' => (string) ($record['seats'] ?? 2),
+            'Umweg' => (string) ($record['detour'] ?? 20), 'Veröffentlicht' => '#1#', 'Kennzeichen' => 'W-1234A'];
+        foreach ($contents as $name => $content) {
+            if (isset($ids[$name])) {
+                $DB->insert_record('datalynx_contents', (object) ['fieldid' => $ids[$name], 'entryid' => $entryid,
+                    'content' => $content]);
+            }
+        }
+        if (!empty($record['photo']) && isset($ids['Parkfoto'])) {
+            $image = imagecreatetruecolor(800, 600);
+            ob_start();
+            imagejpeg($image);
+            $draftid = file_get_unused_draft_itemid();
+            get_file_storage()->create_file_from_string(['contextid' => context_user::instance($USER->id)->id,
+                'component' => 'user', 'filearea' => 'draft', 'itemid' => $draftid, 'filepath' => '/',
+                'filename' => 'parkfoto.jpg'], ob_get_clean());
+            $dlx->get_field_from_id((int) $ids['Parkfoto'], true)->update_content(
+                (object) ['id' => $entryid],
+                ['filemanager' => $draftid]
+            );
+        }
+        return $entryid;
+    }
 }

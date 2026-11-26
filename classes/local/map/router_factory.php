@@ -56,6 +56,13 @@ class router_factory {
         if (self::$testrouter !== null && defined('PHPUNIT_TEST') && PHPUNIT_TEST) {
             return self::$testrouter;
         }
+        // Acceptance tests never go online: a Behat site set to the router "behat" routes with the
+        // test stub (100 km per leg).
+        if (defined('BEHAT_SITE_RUNNING') && BEHAT_SITE_RUNNING && get_config('mod_datalynx', 'router') === 'behat') {
+            global $CFG;
+            require_once($CFG->dirroot . '/mod/datalynx/tests/fixtures/stub_router.php');
+            return new \mod_datalynx\stub_router();
+        }
         $engine = provider_config::router_engine();
         $url = provider_config::router_url();
         $key = provider_config::router_key();

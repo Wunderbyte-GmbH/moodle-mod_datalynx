@@ -57,6 +57,13 @@ class geocoder_factory {
         if (self::$testgeocoder !== null && defined('PHPUNIT_TEST') && PHPUNIT_TEST) {
             return self::$testgeocoder;
         }
+        // Acceptance tests never go online: a Behat site set to the geocoder "behat" looks up the
+        // places of the test stub.
+        if (defined('BEHAT_SITE_RUNNING') && BEHAT_SITE_RUNNING && get_config('mod_datalynx', 'geocoder') === 'behat') {
+            global $CFG;
+            require_once($CFG->dirroot . '/mod/datalynx/tests/fixtures/stub_geocoder.php');
+            return new \mod_datalynx\stub_geocoder(\mod_datalynx\stub_geocoder::BEHAT_PLACES);
+        }
         $engine = provider_config::geocoder_engine();
         $url = provider_config::geocoder_url();
         $key = provider_config::geocoder_key();

@@ -37,6 +37,14 @@ use mod_datalynx\local\map\place;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class stub_geocoder implements geocoder {
+    /** @var array The places a Behat site set to the geocoder "behat" knows (see geocoder_factory). */
+    const BEHAT_PLACES = [
+        'wien' => ['Karlsplatz, 1010 Wien', 48.2004, 16.3696],
+        'graz' => ['Hauptplatz, 8010 Graz', 47.0710, 15.4385],
+        'baden' => ['Hauptplatz, 2500 Baden', 48.0075, 16.2342],
+        'linz' => ['Hauptplatz, 4020 Linz', 48.3059, 14.2862],
+    ];
+
     /** @var string[] The queries looked up, in order. */
     public array $queries = [];
 
