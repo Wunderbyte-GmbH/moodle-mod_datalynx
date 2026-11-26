@@ -320,6 +320,10 @@ final class app_links {
             return ['fill' => 'solid', 'expand' => false, 'size' => 'small', 'round' => true] + $look;
         }
         $fill = 'clear';
+        // A link styled as a link (btn-link) stays plain, though it is a button too.
+        if (in_array('btn-link', $classes, true)) {
+            return ['fill' => 'clear', 'expand' => false] + $look;
+        }
         foreach ($classes as $class) {
             if (str_starts_with($class, 'btn-outline')) {
                 $fill = 'outline';

@@ -147,6 +147,13 @@ final class app_links_test extends advanced_testcase {
         $this->assertSame($ids['Form'], $change['viewid']);
         $this->assertSame($entryid, $change['entryid']);
         $this->assertSame('solid', $change['fill']);
+        // Colours and badges as the classes say; a btn-link stays a plain link (#334).
+        $look = new \ReflectionMethod(app_links::class, 'appearance');
+        $this->assertEquals(['fill' => 'clear', 'expand' => false, 'color' => 'primary', 'size' => '', 'round' => false],
+            $look->invoke(null, 'btn btn-link ps-0'));
+        $this->assertEquals(['fill' => 'solid', 'expand' => false, 'color' => 'success', 'size' => 'small', 'round' => true],
+            $look->invoke(null, 'badge rounded-pill bg-success p-2'));
+        $this->assertSame('danger', app_links::color('btn btn-sm btn-outline-danger'));
         // The app does not delete through a link: the web page asks for the confirmation.
         $this->assertSame('', $remove['method']);
         $this->assertStringContainsString('delete=' . $entryid, $remove['url']);
