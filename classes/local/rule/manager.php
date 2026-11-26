@@ -69,7 +69,8 @@ class manager {
                 // language string key from the event name: this is the core-idiomatic
                 // way to label an event and avoids fragile string keys (e.g. the
                 // cron_triggered event resolves to the existing 'crontrigger' string).
-                if ($eventname !== 'team_updated') {
+                // Events of a team (team_updated, team_request_*) are offered per team member select field.
+                if (strpos($eventname, 'team_') !== 0) {
                     $eventmenu[$eventname] = $eventclass::get_name();
                 } else {
                     foreach (self::get_team_fields_menu($dataid) as $id => $teamfieldname) {

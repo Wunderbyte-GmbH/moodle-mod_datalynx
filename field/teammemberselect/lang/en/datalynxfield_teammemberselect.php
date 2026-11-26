@@ -22,17 +22,35 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$string['approval'] = 'Joining needs the author\'s approval';
+$string['approval_help'] = 'Users ask to join; the author of the entry (or a manager) approves or declines each request. Approved users become members; the team size and the team size from field still apply. Without this setting users join directly.';
+$string['approve'] = 'Approve';
+$string['confirmed'] = 'Confirmed';
+$string['decline'] = 'Decline';
+$string['declined'] = 'Declined';
 $string['hasfreeplaces'] = 'has free places';
+$string['ihaverequested'] = 'I have asked to join';
+$string['leaveteam'] = 'Leave';
 $string['limitbelowmembers'] = '{$a} people are already in the team of this entry; the value cannot be lower.';
 $string['limitfield'] = 'Team size from field';
 $string['limitfield_help'] = 'A number or select field of the same entry that sets the team size of each entry, for example the seats of a ride. The team size above stays the upper limit. When the field is empty, nobody can join. Users can then search for entries that have free places.';
 $string['limitnone'] = 'None (the team size above for every entry)';
+$string['nomember'] = 'This person is not a member.';
+$string['norequest'] = 'There is no open request of this person.';
 $string['notadmissible'] = 'You cannot join this team.';
 $string['nounsubscription'] = 'You cannot leave this team.';
+$string['openrequests'] = 'Requests';
 $string['pluginname'] = 'Team member select';
 $string['privacy:metadata'] = 'The team member select field stores no data of its own. The user IDs of the selected team members are part of the entry content, which mod_datalynx discovers, exports and removes.';
+$string['remove'] = 'Remove';
+$string['requestdeclined'] = 'Your request was declined; you cannot ask again.';
+$string['requested'] = 'Requested';
+$string['requestjoin'] = 'Ask to join';
+$string['requestlabel'] = 'Label of the request button';
+$string['requestlabel_help'] = 'The text of the button that asks to join when joining needs the author\'s approval, for example "Request a seat". Empty for the default.';
 $string['teamfull'] = 'No free places';
 $string['teammembersnotoffered'] = 'These users are no longer available for selection here, e.g. because they are no longer enrolled: {$a}. Saving the entry removes them from the team, and with it the access the team gives them.';
 $string['teammembersremoved'] = 'Removed from the team in "{$a->field}" because they are no longer available for selection: {$a->users}.';
 $string['teamoptionsfieldgroup'] = 'This field is a subfield of a field group. There it is a plain list of people: the options "user can add self", "notify team members", "allow unsubscription", the team field and "team members can edit the entry" have no effect, nor does making a field visible to its team members.';
 $string['teamsubscriptionfieldgroup'] = 'You cannot add or remove yourself here: in a field group this field is a plain list of people, not a team.';
+$string['withdrawrequest'] = 'Withdraw request';

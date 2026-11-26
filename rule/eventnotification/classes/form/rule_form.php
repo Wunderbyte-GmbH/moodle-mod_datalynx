@@ -79,6 +79,14 @@ class rule_form extends base_rule_form {
         // Recipient.
         $grp = [];
         $grp[] = &$mform->createElement('checkbox', 'author', null, get_string('author', 'datalynx'), ['size' => 1]);
+        // The person a team request is about (the one who asked, was approved or declined).
+        $grp[] = &$mform->createElement(
+            'checkbox',
+            'relateduser',
+            null,
+            get_string('relateduser', 'datalynxrule_eventnotification'),
+            ['size' => 1]
+        );
         $grp[] = &$mform->createElement(
             'checkbox',
             'matchauthors',
@@ -549,6 +557,9 @@ class rule_form extends base_rule_form {
         if (isset($recipients['author'])) {
             $data->author = $recipients['author'];
         }
+        if (isset($recipients['relateduser'])) {
+            $data->relateduser = $recipients['relateduser'];
+        }
         if (isset($recipients['roles'])) {
             $data->roles = $recipients['roles'];
         }
@@ -610,6 +621,9 @@ class rule_form extends base_rule_form {
             $recipients = [];
             if (isset($data->author)) {
                 $recipients['author'] = 1;
+            }
+            if (isset($data->relateduser)) {
+                $recipients['relateduser'] = 1;
             }
 
             if (isset($data->roles)) {

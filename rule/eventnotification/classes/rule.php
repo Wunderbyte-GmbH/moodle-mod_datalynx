@@ -121,12 +121,13 @@ class rule extends base {
      */
     private function checkteam(\core\event\base $event): bool {
         $teamid = (int) ($event->get_data()['other']['fieldid'] ?? 0);
+        $shortname = (new \ReflectionClass($event))->getShortName();
         $param1 = $this->rule->param1 ?? null;
         $triggers = empty($param1) ? [] : (json_decode($param1, true) ?? []);
         foreach ($triggers as $trigger) {
-            // A team trigger is "team_updated:{fieldid}"; field 2 must not match "team_updated:12".
+            // A team trigger is "{event}:{fieldid}", e.g. "team_updated:12"; field 2 must not match it.
             [$eventname, $fieldid] = array_pad(explode(':', (string) $trigger, 2), 2, '');
-            if ($eventname === 'team_updated' && $teamid > 0 && (int) $fieldid === $teamid) {
+            if ($eventname === $shortname && $teamid > 0 && (int) $fieldid === $teamid) {
                 return true;
             }
         }
@@ -183,6 +184,8 @@ class rule extends base {
             'entryid' => $entryid,
             'objectid' => (int) ($event->get_data()['objectid'] ?? 0),
             'teamfieldid' => $teamfieldid,
+            // The person a team request is about.
+            'relateduserid' => (int) ($event->relateduserid ?? 0),
         ];
 
         // Searching for counterparts costs one query per criterion, and one more per candidate
@@ -202,7 +205,12 @@ class rule extends base {
             return true;
         }
 
-        return $this->notify($context, $this->get_recipients($this->author_id($entryid), $entryid), $entryid);
+        $recipients = $this->get_recipients($this->author_id($entryid), $entryid);
+        // The person a team request is about.
+        if (!empty($this->recipient['relateduser']) && !empty($event->relateduserid)) {
+            $recipients = array_values(array_unique(array_merge($recipients, [(int) $event->relateduserid])));
+        }
+        return $this->notify($context, $recipients, $entryid);
     }
 
     /**
@@ -348,6 +356,10 @@ class rule extends base {
         $messagedata->objectid = $context['objectid'];
         if (!empty($context['teamfieldid'])) {
             $messagedata->fieldname = $DB->get_field('datalynx_fields', 'name', ['id' => $context['teamfieldid']]);
+        }
+        if (!empty($context['relateduserid'])) {
+            $related = $DB->get_record('user', ['id' => $context['relateduserid']]);
+            $messagedata->relatedname = $related ? fullname($related) : '';
         }
         if (strpos($eventname, 'comment') !== false) {
             $messagedata->commenttext = $DB->get_field('comments', 'content', ['id' => $context['objectid']]);

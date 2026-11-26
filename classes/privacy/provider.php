@@ -466,7 +466,7 @@ class provider implements
     protected static function get_team_memberships(?array $userids = null, ?\context $context = null): array {
         global $DB;
 
-        $sql = "SELECT dc.id, dc.entryid, dc.content, ctx.id AS contextid
+        $sql = "SELECT dc.id, dc.entryid, dc.content, dc.content1, ctx.id AS contextid
                   FROM {datalynx_contents} dc
                   JOIN {datalynx_fields} df ON df.id = dc.fieldid AND df.type = :fieldtype
                   JOIN {datalynx_entries} de ON de.id = dc.entryid
@@ -484,6 +484,9 @@ class provider implements
             foreach (array_values($userids) as $i => $userid) {
                 $likes[] = $DB->sql_like('dc.content', ":like$i");
                 $params["like$i"] = '%' . $DB->sql_like_escape((string) (int) $userid) . '%';
+                // Requests to join (mod_datalynx#341) are keyed by user id in content1.
+                $likes[] = $DB->sql_like('dc.content1', ":likerequest$i");
+                $params["likerequest$i"] = '%"' . $DB->sql_like_escape((string) (int) $userid) . '"%';
             }
             if (!$likes) {
                 return [];
@@ -495,10 +498,12 @@ class provider implements
         $rs = $DB->get_recordset_sql($sql, $params);
         foreach ($rs as $row) {
             $members = json_decode((string) $row->content, true);
-            if (!is_array($members)) {
-                continue;
+            $members = is_array($members) ? array_map('intval', array_filter($members, 'is_numeric')) : [];
+            // Who asked to join counts like a member: the request is their data on the entry.
+            $requests = json_decode((string) $row->content1, true);
+            if (is_array($requests)) {
+                $members = array_values(array_unique(array_merge($members, array_map('intval', array_keys($requests)))));
             }
-            $members = array_map('intval', array_filter($members, 'is_numeric'));
             if ($userids !== null && !array_intersect($members, $userids)) {
                 continue;
             }

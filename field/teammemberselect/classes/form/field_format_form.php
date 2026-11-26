@@ -31,5 +31,9 @@ class field_format_form extends \mod_datalynx\form\field_format_base_form {
         $mform = &$this->_form;
         $mform->addElement('advcheckbox', 'subscribe', get_string('subscribe', 'datalynx'));
         $mform->setType('subscribe', PARAM_BOOL);
+        // The label of the button that asks to join, when joining needs the author's approval.
+        $mform->addElement('text', 'label', get_string('requestlabel', 'datalynxfield_teammemberselect'));
+        $mform->setType('label', PARAM_TEXT);
+        $mform->addHelpButton('label', 'requestlabel', 'datalynxfield_teammemberselect');
     }
 }

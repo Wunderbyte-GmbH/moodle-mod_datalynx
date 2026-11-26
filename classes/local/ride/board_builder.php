@@ -415,6 +415,25 @@ class board_builder {
         if ($this->is_billing()) {
             // Reimbursement is per kilometre through the Fahrtenschein (mod_datalynx#325).
             unset($fields['fahrkosten'], $fields['fixbetrag']);
+            // The passengers: they request a seat, the driver approves (mod_datalynx#341); at most as
+            // many as the seats of the ride (mod_datalynx#326).
+            $fields['passagiere'] = [
+                'type' => 'teammemberselect',
+                'name' => 'Passagiere',
+                'label' => 'Mitfahrende',
+                'hint' => '',
+                'params' => [
+                    'param1' => 8,
+                    'param2' => json_encode([datalynx::PERMISSION_STUDENT, datalynx::PERMISSION_TEACHER]),
+                    'param3' => 0,
+                    'param4' => \datalynxfield_teammemberselect\field::TEAMMEMBERSELECT_FORMAT_UL,
+                    'param7' => 1,
+                    'param8' => 1,
+                ],
+                // Resolved once the fields exist.
+                'settings' => ['limitfield' => 'sitzplaetze', 'approval' => 1],
+                'fullwidth' => true,
+            ];
         }
         return $fields;
     }
@@ -443,6 +462,16 @@ class board_builder {
                 'description' => $def['description'] ?? '',
             ], $def['params']);
             $this->fieldids[$key] = (int) $DB->insert_record('datalynx_fields', $record);
+        }
+        // Settings naming another field (param10 of a team member select) by key.
+        foreach ($this->fielddefs as $key => $def) {
+            if (!empty($def['settings'])) {
+                $settings = $def['settings'];
+                if (isset($settings['limitfield'])) {
+                    $settings['limitfield'] = $this->fieldids[$settings['limitfield']];
+                }
+                $DB->set_field('datalynx_fields', 'param10', json_encode($settings), ['id' => $this->fieldids[$key]]);
+            }
         }
         definition_cache::invalidate($this->dataid);
         $this->log('Created ' . count($this->fieldids) . ' fields.');
@@ -580,13 +609,19 @@ class board_builder {
      * @return array
      */
     protected function formats(): array {
-        return [
+        $formats = [
             // The detour is a slider.
             'slider' => ['fieldtype' => 'number', 'settings' => [
                 'decimals' => 0, 'inputtype' => 'slider', 'sliderstart' => '1', 'sliderend' => '20',
                 'sliderscale' => 'linear', 'sliderstep' => '1', 'sliderunit' => 'km', 'sliderticks' => 1,
             ]],
         ];
+        if ($this->has('passagiere')) {
+            // The passengers with the button to request a seat.
+            $formats['mitfahren'] = ['fieldtype' => 'teammemberselect',
+                'settings' => ['subscribe' => 1, 'label' => 'Mitfahrt beantragen']];
+        }
+        return $formats;
     }
 
     /**
@@ -740,6 +775,7 @@ class board_builder {
             . '<span class="small text-muted">##author:name##</span></div>'
             . $this->tags(['route', 'termin', 'sitzplaetze', 'marke', 'modell', 'gepaeck', 'mitfahrende',
                 'fahrkosten', 'fixbetrag', 'bemerkungen'])
+            . $this->tag('passagiere', '', 'mitfahren')
             . '</div><div class="card-footer bg-transparent border-0 d-flex gap-2">##edit####delete##</div></div>';
     }
 
@@ -1073,6 +1109,46 @@ class board_builder {
             'param4' => '1',
             'param9' => json_encode([$this->fieldids['fahrttyp'] => ['AND' => [['', '', '']]]]),
         ];
+        if ($this->has('passagiere')) {
+            $team = 'Passagiere';
+            $notify = function (string $event, array $recipient, string $subject, string $description) use ($team): array {
+                return [
+                    'type' => 'eventnotification',
+                    'description' => $description,
+                    'param1' => json_encode([$event . ':' . $this->fieldids['passagiere']]),
+                    'param2' => \datalynxrule_eventnotification\rule::FROM_CURRENT_USER,
+                    'param3' => json_encode($recipient),
+                    'param4' => '[]',
+                    'param6' => $subject,
+                    'param7' => '[]',
+                ];
+            };
+            $rules['Mitfahrt beantragt'] = $notify(
+                'team_request_created',
+                ['author' => 1],
+                'Mitfahrbörse: neue Anfrage für Ihre Fahrt',
+                'Benachrichtigt den Fahrer, wenn jemand mitfahren möchte.'
+            );
+            $rules['Mitfahrt angenommen'] = $notify(
+                'team_request_approved',
+                ['relateduser' => 1],
+                'Mitfahrbörse: Ihre Mitfahrt wurde bestätigt',
+                'Benachrichtigt die Person, deren Anfrage angenommen wurde.'
+            );
+            $rules['Mitfahrt abgelehnt'] = $notify(
+                'team_request_declined',
+                ['relateduser' => 1],
+                'Mitfahrbörse: Ihre Anfrage wurde abgelehnt',
+                'Benachrichtigt die Person, deren Anfrage abgelehnt wurde.'
+            );
+            $rules['Mitfahrt zurückgezogen'] = $notify(
+                'team_request_withdrawn',
+                ['author' => 1],
+                'Mitfahrbörse: eine Mitfahrt wurde abgesagt',
+                'Benachrichtigt den Fahrer, wenn jemand die Anfrage zurückzieht '
+                . 'oder sich austrägt.'
+            );
+        }
         return $rules;
     }
 

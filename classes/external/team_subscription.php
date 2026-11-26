@@ -21,11 +21,21 @@ use core_external\external_api;
 use core_external\external_function_parameters;
 use core_external\external_single_structure;
 use core_external\external_value;
+use datalynxfield_teammemberselect\membership;
 use moodle_exception;
-use stdClass;
 
 /**
- * Web service to subscribe/unsubscribe users in datalynx team fields.
+ * Web service to join and leave the team of an entry, and to decide on requests to join.
+ *
+ * One path for the web (buttons of the display) and the Moodle App. Every action is checked here,
+ * on the server, by {@see membership}:
+ *
+ * | Action | Who | |
+ * |---|---|---|
+ * | subscribe, request | the user themselves | joins, or asks to join when the field needs approval |
+ * | unsubscribe, withdraw | the user themselves | withdraws the request, or leaves the team |
+ * | approve, decline | the entry author, or who manages entries | decides on a request |
+ * | remove | the entry author, or who manages entries | removes a member |
  *
  * @package mod_datalynx
  * @copyright 2024 Wunderbyte GmbH
@@ -42,42 +52,42 @@ class team_subscription extends external_api {
                 'd' => new external_value(PARAM_INT, 'Datalynx instance ID'),
                 'entryid' => new external_value(PARAM_INT, 'Entry ID'),
                 'fieldid' => new external_value(PARAM_INT, 'Field ID'),
-                'userid' => new external_value(PARAM_INT, 'User ID'),
-                'action' => new external_value(PARAM_ALPHA, 'Action: subscribe or unsubscribe'),
+                'userid' => new external_value(PARAM_INT, 'The user who joins, asks or leaves; for approve, decline '
+                    . 'and remove the user decided on'),
+                'action' => new external_value(PARAM_ALPHA, 'subscribe, unsubscribe, request, withdraw, approve, decline '
+                    . 'or remove'),
+                'data' => new external_value(
+                    PARAM_RAW,
+                    'For a request: JSON of extension data (e.g. a pickup point)',
+                    VALUE_DEFAULT,
+                    ''
+                ),
         ]);
     }
 
     /**
-     * Main function to handle the subscription or unsubscription.
+     * Join, leave, request, or decide.
      *
      * @param int $d
      * @param int $entryid
      * @param int $fieldid
      * @param int $userid
      * @param string $action
+     * @param string $data
      * @return array
      */
-    public static function execute($d, $entryid, $fieldid, $userid, $action): array {
+    public static function execute($d, $entryid, $fieldid, $userid, $action, $data = ''): array {
         global $DB, $USER;
 
-        // Validate parameters.
-        $params = self::validate_parameters(self::execute_parameters(), compact('d', 'entryid', 'fieldid', 'userid', 'action'));
+        $params = self::validate_parameters(
+            self::execute_parameters(),
+            compact('d', 'entryid', 'fieldid', 'userid', 'action', 'data')
+        );
 
-        // Get context.
         $cm = get_coursemodule_from_instance('datalynx', $params['d'], 0, false, MUST_EXIST);
         $context = context_module::instance($cm->id);
-
         require_login($cm->course, true, $cm);
-        require_capability('mod/datalynx:teamsubscribe', $context);
 
-        // Ensure the user performing the action matches the session user.
-        if ($params['userid'] != $USER->id) {
-            throw new moodle_exception('invaliduserid', 'error');
-        }
-
-        // Resolve the field so all writes go through the canonical save path
-        // (field::update_content() -> format_content()), exactly like the entry form, CSV import
-        // and the rules. This keeps the stored representation consistent everywhere.
         $dlx = new \mod_datalynx\datalynx($params['d']);
         $field = $dlx->get_field_from_id($params['fieldid']);
         if (empty($field) || $field->type !== 'teammemberselect') {
@@ -90,54 +100,47 @@ class team_subscription extends external_api {
                     'error' => get_string('teamsubscriptionfieldgroup', 'datalynxfield_teammemberselect'),
             ];
         }
-
-        // The entry must belong to this instance, and the user must be someone the field admits.
+        // The entry must belong to this instance.
         if (!$DB->record_exists('datalynx_entries', ['id' => $params['entryid'], 'dataid' => $params['d']])) {
             throw new moodle_exception('invalidrecord', 'error', '', 'datalynx_entries');
         }
-        if (!array_intersect($dlx->get_user_datalynx_permissions($USER->id), (array) $field->admissibleroles)) {
-            return ['success' => false, 'error' => get_string('notadmissible', 'datalynxfield_teammemberselect')];
-        }
 
-        // Fetch the existing content row and current members as integers.
-        $row = $DB->get_record('datalynx_contents', [
-                'fieldid' => $params['fieldid'],
-                'entryid' => $params['entryid'],
-        ]);
-        $existing = ($row && $row->content !== null && $row->content !== '')
-                ? (json_decode($row->content, true) ?? []) : [];
-        $users = array_values(array_unique(array_map('intval', (array) $existing)));
+        $membership = $field->membership((int) $params['entryid']);
         $userid = (int) $params['userid'];
-
-        if ($params['action'] === 'subscribe') {
-            if (!in_array($userid, $users, true)) {
-                // The most members this entry takes: the team size, lowered by its limit field (#326).
-                $limit = $field->get_member_limit((int) $params['entryid']);
-                if ($limit !== null && count($users) >= $limit) {
-                    return [
-                            'success' => false,
-                            'error' => get_string('teamfull', 'datalynxfield_teammemberselect'),
-                    ];
+        $action = $params['action'];
+        try {
+            if (in_array($action, ['subscribe', 'request', 'unsubscribe', 'withdraw'], true)) {
+                // Only for oneself.
+                if ($userid !== (int) $USER->id) {
+                    throw new moodle_exception('invaliduserid', 'error');
                 }
-                $users[] = $userid;
+                require_capability('mod/datalynx:teamsubscribe', $context);
+                if ($action === 'subscribe' || $action === 'request') {
+                    if (!array_intersect($dlx->get_user_datalynx_permissions($USER->id), (array) $field->admissibleroles)) {
+                        return ['success' => false, 'error' => get_string('notadmissible', 'datalynxfield_teammemberselect')];
+                    }
+                    $requestdata = json_decode((string) $params['data'], true);
+                    $membership->request($userid, is_array($requestdata) ? $requestdata : []);
+                } else {
+                    $membership->withdraw($userid);
+                }
+            } else if (in_array($action, ['approve', 'decline', 'remove'], true)) {
+                if (!$membership->can_decide((int) $USER->id)) {
+                    throw new moodle_exception('nopermissions', 'error', '', get_string($action, 'datalynxfield_teammemberselect'));
+                }
+                $membership->$action($userid);
+            } else {
+                throw new moodle_exception('invalidaction', 'error');
             }
-        } else if ($params['action'] === 'unsubscribe') {
-            if (!$field->allowunsubscription) {
-                return ['success' => false, 'error' => get_string('nounsubscription', 'datalynxfield_teammemberselect')];
+        } catch (moodle_exception $e) {
+            // A refused action is an answer, not a failure of the call: full, declined, not allowed to leave.
+            if ($e->module === 'datalynxfield_teammemberselect') {
+                return ['success' => false, 'error' => $e->getMessage(), 'status' => $membership->status($userid)];
             }
-            $users = array_values(array_diff($users, [$userid]));
-        } else {
-            throw new moodle_exception('invalidaction', 'error');
+            throw $e;
         }
 
-        // Write through the field. format_content() normalises to a canonical integer JSON array.
-        $entry = new stdClass();
-        $entry->id = $params['entryid'];
-        $entry->{"c{$params['fieldid']}_id"} = $row ? $row->id : null;
-        $entry->{"c{$params['fieldid']}_content"} = $row ? $row->content : null;
-        $field->update_content($entry, [$users]);
-
-        return ['success' => true];
+        return ['success' => true, 'status' => $membership->status($userid)];
     }
 
     /**
@@ -149,6 +152,11 @@ class team_subscription extends external_api {
         return new external_single_structure([
                 'success' => new external_value(PARAM_BOOL, 'Success status'),
                 'error' => new external_value(PARAM_TEXT, 'Error message (if any)', VALUE_OPTIONAL),
+                'status' => new external_value(
+                    PARAM_ALPHA,
+                    'Where the user now stands: member, requested, declined, none',
+                    VALUE_OPTIONAL
+                ),
         ]);
     }
 }

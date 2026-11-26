@@ -69,6 +69,7 @@ $string['onlyonchange'] = 'Only trigger when these field values change';
 $string['onlyonchange_help'] = 'Select any fields. The notification will only be sent when at least one of these fields actually changed its value during the triggering update — not just when the current value happens to match a condition. This applies independently of the trigger conditions above. Has no effect for "entry created" events.';
 $string['pluginname'] = 'Event notification';
 $string['privacy:metadata'] = 'Even notifications do not store personal data.';
+$string['relateduser'] = 'The person a team request is about';
 $string['roleshelpinfo'] = 'Note: Recipients in the selected roles must have the corresponding notification capability (e.g., "mod/datalynx:notifyentryadded" for entry creation) enabled in their Moodle permissions to receive these notifications.';
 $string['taskfindmatches'] = 'Find the entries matching a saved entry';
 $string['triggerconditions'] = 'Trigger conditions';

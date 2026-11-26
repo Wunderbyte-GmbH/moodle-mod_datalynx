@@ -90,6 +90,11 @@ class renderer extends datalynxfield_renderer {
         }
         // Inside a fieldgroup the field is a list of people: nobody subscribes to a line.
         $subscribeenabled = $subscribeenabled && !$field->is_fieldgroup_subfield();
+        // Joining needs the author's approval: requests instead of the subscribe link (mod_datalynx#341).
+        if ($subscribeenabled && $field->needs_approval() && (int) $entry->id > 0) {
+            $label = $format ? trim((string) ($format->get_settings()['label'] ?? '')) : '';
+            return $str . $this->render_requests((int) $entry->id, $label);
+        }
         $selected = isset($entry->{"c{$fieldid}_content"}) ? json_decode(
             $entry->{"c{$fieldid}_content"},
             true
@@ -150,6 +155,106 @@ class renderer extends datalynxfield_renderer {
         }
 
         return $str;
+    }
+    // phpcs:enable moodle.PHP.ForbiddenGlobalUse.BadGlobal
+
+    // phpcs:disable moodle.PHP.ForbiddenGlobalUse.BadGlobal
+    /**
+     * The team of an entry whose joining needs the author's approval: what the current user can do
+     * (request, withdraw, leave) and, for the author, the open requests to approve or decline.
+     *
+     * Buttons only; the actions go through the web service mod_datalynx_team_subscription.
+     *
+     * @param int $entryid
+     * @param string $label the label of the request button, empty for the default
+     * @return string
+     */
+    protected function render_requests(int $entryid, string $label): string {
+        global $USER, $PAGE;
+        $field = $this->field;
+        $membership = $field->membership($entryid);
+        $button = function (string $action, int $userid, string $text, string $class) use ($field, $entryid): string {
+            return html_writer::tag('button', s($text), [
+                'type' => 'button',
+                'class' => "btn btn-sm $class me-1 mb-1",
+                'data-dlx-team-action' => $action,
+                'data-d' => $field->dlx()->id(),
+                'data-entryid' => $entryid,
+                'data-fieldid' => $field->id(),
+                'data-userid' => $userid,
+            ]);
+        };
+        $badge = fn(string $text, string $class) => html_writer::span(s($text), "badge $class me-1");
+        $component = 'datalynxfield_teammemberselect';
+        $html = '';
+
+        $hasadmissiblerole = array_intersect($field->dlx()->get_user_datalynx_permissions($USER->id), $field->admissibleroles);
+        $isauthor = (int) $USER->id === $membership->author();
+        $limit = $field->get_member_limit($entryid);
+        if (!$isauthor && $hasadmissiblerole && $limit !== 0) {
+            switch ($membership->status((int) $USER->id)) {
+                case membership::MEMBER:
+                    $html .= $badge(get_string('confirmed', $component), 'bg-success');
+                    if ($field->allowunsubscription) {
+                        $html .= $button('withdraw', (int) $USER->id, get_string('leaveteam', $component), 'btn-outline-secondary');
+                    }
+                    break;
+                case membership::REQUESTED:
+                    $html .= $badge(get_string('requested', $component), 'bg-warning text-dark');
+                    $html .= $button(
+                        'withdraw',
+                        (int) $USER->id,
+                        get_string('withdrawrequest', $component),
+                        'btn-outline-secondary'
+                    );
+                    break;
+                case membership::DECLINED:
+                    $html .= $badge(get_string('declined', $component), 'bg-secondary');
+                    break;
+                default:
+                    $html .= $membership->has_room()
+                        ? $button(
+                            'request',
+                            (int) $USER->id,
+                            $label !== '' ? $label : get_string('requestjoin', $component),
+                            'btn-primary'
+                        )
+                        : $badge(get_string('teamfull', $component), 'bg-secondary');
+            }
+        }
+
+        if ($membership->can_decide((int) $USER->id)) {
+            $requests = $membership->open_requests();
+            if ($requests) {
+                global $DB;
+                $users = $DB->get_records_list('user', 'id', array_keys($requests), '', \core_user\fields::for_name()
+                    ->including('id')->get_sql('', false, '', '', false)->selects);
+                $items = '';
+                foreach ($requests as $userid => $request) {
+                    $name = isset($users[$userid]) ? fullname($users[$userid]) : get_string('unknownuser');
+                    $details = $field->describe_request($entryid, $userid, $request['data']);
+                    $items .= html_writer::tag(
+                        'li',
+                        html_writer::span(s($name), 'fw-semibold me-2')
+                        . ($details !== '' ? html_writer::span($details, 'small text-muted me-2') : '')
+                        . $button('approve', $userid, get_string('approve', $component), 'btn-success')
+                        . $button('decline', $userid, get_string('decline', $component), 'btn-outline-danger'),
+                        ['class' => 'mb-1']
+                    );
+                }
+                $html .= html_writer::div(
+                    html_writer::div(get_string('openrequests', $component), 'small fw-semibold mb-1')
+                        . html_writer::tag('ul', $items, ['class' => 'list-unstyled mb-0']),
+                    'datalynxfield_teamrequests mt-2'
+                );
+            }
+        }
+
+        if ($html !== '') {
+            $PAGE->requires->js_call_amd('mod_datalynx/teamrequests', 'init');
+            $html = html_writer::div($html, 'datalynxfield_teamactions mt-1');
+        }
+        return $html;
     }
     // phpcs:enable moodle.PHP.ForbiddenGlobalUse.BadGlobal
 

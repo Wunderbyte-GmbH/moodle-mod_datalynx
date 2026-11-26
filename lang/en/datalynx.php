@@ -347,6 +347,10 @@ $string['event_rating_deleted'] = 'Rating deleted';
 $string['event_rating_updated'] = 'Rating updated';
 $string['event_team_updated'] = 'Team updated';
 $string['eventsettings'] = 'Event settings';
+$string['eventteamrequestapproved'] = 'Team request approved';
+$string['eventteamrequestcreated'] = 'Team request made';
+$string['eventteamrequestdeclined'] = 'Team request declined';
+$string['eventteamrequestwithdrawn'] = 'Team request withdrawn or team left';
 $string['exactly'] = 'exactly';
 $string['existingoptions'] = 'Edit existing options';
 $string['export'] = 'Export';
@@ -624,6 +628,18 @@ The following entry has been updated: {$a->viewlink}.
 {$a->messagecontent}';
 $string['message_rating_added'] = 'Datalynx rating added';
 $string['message_rating_updated'] = 'Datalynx rating updated';
+$string['message_team_request_approved'] = 'Hello {$a->fullname},
+
+your request to join {$a->fieldname} was approved: {$a->viewlink}.';
+$string['message_team_request_created'] = 'Hello {$a->fullname},
+
+{$a->relatedname} asked to join {$a->fieldname} of this entry: {$a->viewlink}. You can approve or decline the request there.';
+$string['message_team_request_declined'] = 'Hello {$a->fullname},
+
+your request to join {$a->fieldname} was declined: {$a->viewlink}.';
+$string['message_team_request_withdrawn'] = 'Hello {$a->fullname},
+
+{$a->relatedname} withdrew their request or left {$a->fieldname} of this entry: {$a->viewlink}.';
 $string['message_team_updated'] = 'Dear {$a->fullname},
 
 {$a->fieldname} membership has been changed by {$a->senderprofilelink}. Please go to {$a->viewlink} for more details.';
@@ -635,6 +651,10 @@ $string['messageprovider:event_entry_disapproved'] = 'Datalynx entry disapproved
 $string['messageprovider:event_entry_updated'] = 'Datalynx entry updated';
 $string['messageprovider:event_rating_added'] = 'Datalynx rating added';
 $string['messageprovider:event_rating_updated'] = 'Datalynx rating updated';
+$string['messageprovider:event_team_request_approved'] = 'Datalynx team request approved';
+$string['messageprovider:event_team_request_created'] = 'Datalynx team request made';
+$string['messageprovider:event_team_request_declined'] = 'Datalynx team request declined';
+$string['messageprovider:event_team_request_withdrawn'] = 'Datalynx team request withdrawn or team left';
 $string['messageprovider:event_team_updated'] = 'Datalynx entry team updated';
 $string['min'] = 'Minimum';
 $string['minteamsize'] = 'Minimum team size';

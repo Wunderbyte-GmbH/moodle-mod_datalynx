@@ -148,11 +148,24 @@ final class board_builder_test extends advanced_testcase {
         $this->resetAfterTest();
         $this->setAdminUser();
 
-        $structure = self::structure($this->build(board_builder::VARIANT_BILLING)->get_dataid());
+        $builder = $this->build(board_builder::VARIANT_BILLING);
+        $structure = self::structure($builder->get_dataid());
         $this->assertArrayNotHasKey('Fahrkosten', $structure['fields']);
         $this->assertArrayNotHasKey('Fixbetrag', $structure['fields']);
         $this->assertArrayNotHasKey('festbetrag', $structure['behaviors']);
         $this->assertArrayHasKey('Termin', $structure['fields']);
+
+        // Passengers request a seat, the driver approves; at most as many as the seats (#326, #341).
+        global $DB;
+        $this->assertSame('teammemberselect', $structure['fields']['Passagiere']);
+        $team = $DB->get_record('datalynx_fields', ['dataid' => $builder->get_dataid(), 'name' => 'Passagiere']);
+        $seats = $DB->get_field('datalynx_fields', 'id', ['dataid' => $builder->get_dataid(), 'name' => 'Freie Plätze']);
+        $this->assertSame(['limitfield' => (int) $seats, 'approval' => 1], json_decode($team->param10, true));
+        foreach (['Mitfahrt beantragt', 'Mitfahrt angenommen', 'Mitfahrt abgelehnt', 'Mitfahrt zurückgezogen'] as $rule) {
+            $this->assertArrayHasKey($rule, $structure['rules']);
+        }
+        $card = $DB->get_field('datalynx_views', 'param2', ['dataid' => $builder->get_dataid(), 'name' => 'Fahrt suchen']);
+        $this->assertStringContainsString('[[Passagiere:mitfahren||l_passagiere]]', $card);
     }
 
     /**

@@ -49,4 +49,12 @@ $messageproviders = [
         'event_rating_updated' => [],
 
         'event_team_updated' => [],
+
+        'event_team_request_created' => [],
+
+        'event_team_request_approved' => [],
+
+        'event_team_request_declined' => [],
+
+        'event_team_request_withdrawn' => [],
 ];

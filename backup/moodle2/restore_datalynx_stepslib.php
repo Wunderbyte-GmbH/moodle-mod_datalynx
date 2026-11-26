@@ -972,6 +972,24 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
             }
         }
 
+        // The requests to join a team (mod_datalynx#341) are keyed by user id.
+        $sql = "SELECT dc.id, dc.content1
+                  FROM {datalynx_contents} dc
+            INNER JOIN {datalynx_fields} df ON dc.fieldid = df.id
+                 WHERE df.type = :type AND df.dataid = :dataid AND dc.content1 IS NOT NULL";
+        foreach ($DB->get_records_sql_menu($sql, ['type' => 'teammemberselect', 'dataid' => $datalynxnewid]) as $id => $content1) {
+            $requests = json_decode((string) $content1, true);
+            if (!is_array($requests) || !$requests) {
+                continue;
+            }
+            $mapped = [];
+            foreach ($requests as $userid => $request) {
+                $newuserid = (int) $this->get_mappingid('user', (int) $userid);
+                $mapped[$newuserid ?: (int) $userid] = $request;
+            }
+            $DB->set_field('datalynx_contents', 'content1', json_encode($mapped), ['id' => $id]);
+        }
+
         // Update teammmemberselect reference field ids. The setting may be empty, so it is read
         // as text: casting '' to a number fails on some databases.
         $results = $DB->get_records_menu(

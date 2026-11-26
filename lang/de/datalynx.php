@@ -346,6 +346,10 @@ $string['event_rating_deleted'] = 'Bewertung gelöscht';
 $string['event_rating_updated'] = 'Bewertung aktualisiert';
 $string['event_team_updated'] = 'Team aktualisiert';
 $string['eventsettings'] = 'Ereigniseinstellungen';
+$string['eventteamrequestapproved'] = 'Teamanfrage angenommen';
+$string['eventteamrequestcreated'] = 'Teamanfrage gestellt';
+$string['eventteamrequestdeclined'] = 'Teamanfrage abgelehnt';
+$string['eventteamrequestwithdrawn'] = 'Teamanfrage zurückgezogen oder Team verlassen';
 $string['exactly'] = 'exakt';
 $string['existingoptions'] = 'Vorhandene Optionen bearbeiten';
 $string['export'] = 'Exportieren';
@@ -622,6 +626,18 @@ Der folgende Eintrag wurde aktualisiert: {$a->viewlink}.
 {$a->messagecontent}';
 $string['message_rating_added'] = 'Eintrag bewertet';
 $string['message_rating_updated'] = 'Bewertung eines Eintrags aktualisiert';
+$string['message_team_request_approved'] = 'Guten Tag {$a->fullname},
+
+Ihre Anfrage für {$a->fieldname} wurde angenommen: {$a->viewlink}.';
+$string['message_team_request_created'] = 'Guten Tag {$a->fullname},
+
+{$a->relatedname} möchte bei {$a->fieldname} dieses Eintrags dabei sein: {$a->viewlink}. Dort können Sie die Anfrage annehmen oder ablehnen.';
+$string['message_team_request_declined'] = 'Guten Tag {$a->fullname},
+
+Ihre Anfrage für {$a->fieldname} wurde abgelehnt: {$a->viewlink}.';
+$string['message_team_request_withdrawn'] = 'Guten Tag {$a->fullname},
+
+{$a->relatedname} hat die Anfrage zurückgezogen oder {$a->fieldname} dieses Eintrags verlassen: {$a->viewlink}.';
 $string['message_team_updated'] = 'Guten Tag {$a->fullname},
 
  {$a->fieldname} wurde von {$a->senderprofilelink} geändert. Rufen Sie folgenden Link für detaillierte Informationen auf: {$a->viewlink}.';
@@ -633,6 +649,10 @@ $string['messageprovider:event_entry_disapproved'] = 'Eintrag deaktiviert';
 $string['messageprovider:event_entry_updated'] = 'Eintrag aktualisiert';
 $string['messageprovider:event_rating_added'] = 'Bewertung hinzugefügt';
 $string['messageprovider:event_rating_updated'] = 'Bewertung aktualisiert';
+$string['messageprovider:event_team_request_approved'] = 'Teamanfrage angenommen';
+$string['messageprovider:event_team_request_created'] = 'Teamanfrage gestellt';
+$string['messageprovider:event_team_request_declined'] = 'Teamanfrage abgelehnt';
+$string['messageprovider:event_team_request_withdrawn'] = 'Teamanfrage zurückgezogen oder Team verlassen';
 $string['messageprovider:event_team_updated'] = 'Teammitglieder aktualisiert';
 $string['min'] = 'Minimum';
 $string['minteamsize'] = 'Mindestzahl an Teammitgliedern';

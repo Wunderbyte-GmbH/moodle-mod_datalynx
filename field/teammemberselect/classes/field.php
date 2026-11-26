@@ -289,12 +289,76 @@ class field extends datalynxfield_base {
      *
      * - limitfield: id of a number or select field of the same instance whose value lowers the team
      *   size per entry (mod_datalynx#326); 0 for none.
+     * - approval: 1 when joining needs the approval of the entry author (mod_datalynx#341).
      *
      * @return array
      */
     public function get_settings(): array {
         $settings = json_decode((string) ($this->field->param10 ?? ''), true);
         return is_array($settings) ? $settings : [];
+    }
+
+    /**
+     * Whether joining needs the approval of the entry author: users request, the author decides.
+     *
+     * @return bool
+     */
+    public function needs_approval(): bool {
+        return !empty($this->get_settings()['approval']);
+    }
+
+    /**
+     * The extension data a request may carry, cleaned. Nothing by default; a use case that needs
+     * more (the pickup point of a ride, mod_datalynx#327) adds it here.
+     *
+     * @param int $entryid
+     * @param int $userid the user asking
+     * @param array $data as submitted
+     * @return array
+     */
+    public function clean_request_data(int $entryid, int $userid, array $data): array {
+        return [];
+    }
+
+    /**
+     * A short description of the extension data of a request, for the author deciding on it.
+     *
+     * @param int $entryid
+     * @param int $userid
+     * @param array $data
+     * @return string HTML; empty by default
+     */
+    public function describe_request(int $entryid, int $userid, array $data): string {
+        return '';
+    }
+
+    /**
+     * Called after a user joined the team through a request (approved, or joined directly).
+     *
+     * @param int $entryid
+     * @param int $userid
+     * @param array $data the data of the request
+     */
+    public function member_joined(int $entryid, int $userid, array $data): void {
+    }
+
+    /**
+     * Called after a member left the team or was removed.
+     *
+     * @param int $entryid
+     * @param int $userid
+     */
+    public function member_left(int $entryid, int $userid): void {
+    }
+
+    /**
+     * The team of an entry: members and requests.
+     *
+     * @param int $entryid
+     * @return membership
+     */
+    public function membership(int $entryid): membership {
+        return new membership($this, $entryid);
     }
 
     /**
@@ -662,6 +726,30 @@ class field extends datalynxfield_base {
         $params = [];
         $usecontent = false;
 
+        if ($operator === 'REQUESTED') {
+            // Entries the current user has an open request on.
+            global $USER;
+            $entryids = [];
+            $rows = $DB->get_records_select_menu(
+                'datalynx_contents',
+                'fieldid = ? AND ' . $DB->sql_like('content1', '?'),
+                [$fieldid, '%"' . (int) $USER->id . '"%'],
+                '',
+                'entryid, content1'
+            );
+            foreach ($rows as $entryid => $content1) {
+                $requests = json_decode((string) $content1, true);
+                if (($requests[$USER->id]['status'] ?? '') === membership::REQUESTED) {
+                    $entryids[] = (int) $entryid;
+                }
+            }
+            if ($entryids) {
+                [$insql, $inparams] = $DB->get_in_or_equal($entryids, SQL_PARAMS_NAMED, "df_{$fieldid}_r_", !$not);
+                return [" (e.id $insql) ", $inparams, false];
+            }
+            return [$not ? ' 1 = 1 ' : ' 1 = 0 ', [], false];
+        }
+
         if ($operator === 'FREEPLACES') {
             // Entries with room for another member: counted in PHP, like the member searches below.
             $entryids = $this->get_entryids_with_free_places();
@@ -815,7 +903,8 @@ class field extends datalynxfield_base {
         return ['' => get_string('empty', 'datalynx'),
             'USER' => get_string('iamteammember', 'datalynx'),
             'OTHER_USER' => get_string('useristeammember', 'datalynx'),
-            'FREEPLACES' => get_string('hasfreeplaces', 'datalynxfield_teammemberselect')];
+            'FREEPLACES' => get_string('hasfreeplaces', 'datalynxfield_teammemberselect'),
+            'REQUESTED' => get_string('ihaverequested', 'datalynxfield_teammemberselect')];
     }
 
     /**
@@ -957,7 +1046,7 @@ class field extends datalynxfield_base {
         global $DB;
 
         $params = [];
-        $sql = "SELECT c.id, c.content
+        $sql = "SELECT c.id, c.content, c.content1
                   FROM {datalynx_contents} c
                   JOIN {datalynx_fields} f ON f.id = c.fieldid
                  WHERE f.type = 'teammemberselect'";
@@ -970,29 +1059,41 @@ class field extends datalynxfield_base {
             if (!$userids) {
                 return 0;
             }
-            // Narrow the rows down; the decoded list below decides.
+            // Narrow the rows down, in the members and in the requests; the decoded lists below decide.
             $likes = [];
             foreach (array_values($userids) as $i => $userid) {
                 $likes[] = $DB->sql_like('c.content', ":like$i");
+                $likes[] = $DB->sql_like('c.content1', ":likerequest$i");
                 $params["like$i"] = '%' . $userid . '%';
+                $params["likerequest$i"] = '%"' . $userid . '"%';
             }
             $sql .= " AND (" . implode(' OR ', $likes) . ")";
         }
 
         $rs = $DB->get_recordset_sql($sql, $params);
         $rows = [];
+        $requestrows = [];
         foreach ($rs as $row) {
             $members = json_decode((string) $row->content, true);
             if (is_array($members) && $members) {
                 $rows[$row->id] = array_map('intval', array_filter($members, 'is_numeric'));
             }
+            // The requests of mod_datalynx#341: user id => request.
+            $requests = json_decode((string) $row->content1, true);
+            if (is_array($requests) && $requests) {
+                $requestrows[$row->id] = $requests;
+            }
         }
         $rs->close();
 
         if ($userids === null) {
-            $allmembers = array_unique(array_merge([], ...array_values($rows)));
+            $allusers = array_unique(array_merge(
+                [],
+                ...array_values($rows),
+                ...array_map(fn($requests) => array_map('intval', array_keys($requests)), array_values($requestrows))
+            ));
             $userids = [];
-            foreach (array_chunk($allmembers, 1000) as $chunk) {
+            foreach (array_chunk($allusers, 1000) as $chunk) {
                 [$insql, $inparams] = $DB->get_in_or_equal($chunk);
                 // Members without a user record at all are gone just the same.
                 $existing = $DB->get_fieldset_select('user', 'id', "deleted = 0 AND id $insql", $inparams);
@@ -1005,6 +1106,13 @@ class field extends datalynxfield_base {
             $remaining = array_values(array_diff($members, $userids));
             if (count($remaining) !== count($members)) {
                 $DB->set_field('datalynx_contents', 'content', json_encode($remaining), ['id' => $contentid]);
+                $updated++;
+            }
+        }
+        foreach ($requestrows as $contentid => $requests) {
+            $remaining = array_diff_key($requests, array_flip($userids));
+            if (count($remaining) !== count($requests)) {
+                $DB->set_field('datalynx_contents', 'content1', $remaining ? json_encode($remaining) : null, ['id' => $contentid]);
                 $updated++;
             }
         }
