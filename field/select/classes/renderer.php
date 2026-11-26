@@ -64,7 +64,8 @@ class renderer extends datalynxfield_renderer {
         }
 
         $disabled = $this->get_disabled_options();
-        $menu = ['' => get_string('choosedots')] + $this->get_ordered_labels();
+        // An autocomplete has its own empty choice; "Choose..." would show as the selected value.
+        $menu = ($autocomplete ? [] : ['' => get_string('choosedots')]) + $this->get_ordered_labels();
         foreach ($menu as $id => $name) {
             if (array_search($id, $disabled) === false || $id == $selected) {
                 $select->addOption($name, $id);

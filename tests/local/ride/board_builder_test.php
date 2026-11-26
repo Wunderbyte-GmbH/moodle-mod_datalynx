@@ -163,6 +163,11 @@ final class board_builder_test extends advanced_testcase {
             $mform = new \MoodleQuickForm('ride', 'post', 'view.php');
             $dlx->get_field_from_id($fieldid, true)->renderer()->render_edit_mode($mform, (object) ['id' => -1], []);
             $this->assertNotEmpty($mform->_elements, $name);
+            if ($mform->_elements[0]->getType() === 'autocomplete') {
+                // The brand list: "Choose..." is no brand (it was shown as the chosen one).
+                $values = array_column($mform->_elements[0]->_options, 'attr');
+                $this->assertNotContains('', array_column($values, 'value'), $name);
+            }
         }
     }
 
