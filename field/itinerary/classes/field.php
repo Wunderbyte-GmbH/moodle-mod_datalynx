@@ -579,6 +579,16 @@ class field extends datalynxfield_base {
     }
 
     /**
+     * The number field whose value is the width of an entry's corridor in km (e.g. the detour a
+     * driver accepts): how far beside the route a traveller may get on or off. 0 for none.
+     *
+     * @return int
+     */
+    public function get_corridor_field(): int {
+        return (int) ($this->get_billing_settings()['corridorfield'] ?? 0);
+    }
+
+    /**
      * Whether the distance is billing-relevant: computed on the server only.
      *
      * @return bool
@@ -768,19 +778,22 @@ class field extends datalynxfield_base {
         $fieldid = (int) $this->field->id;
         $DB->delete_records(self::INDEX_TABLE, ['fieldid' => $fieldid, 'entryid' => $entryid]);
 
-        $content = $DB->get_field(
+        $record = $DB->get_record(
             'datalynx_contents',
-            'content',
             ['fieldid' => $fieldid, 'entryid' => $entryid],
-            IGNORE_MISSING
+            'id, content, content4',
+            IGNORE_MULTIPLE
         );
-        if ($content === false || $content === null || $content === '') {
+        if (!$record || $record->content === null || $record->content === '') {
             return;
         }
 
-        $journey = itinerary::from_json($content, $this->get_max_waypoints());
+        // Not only the stops: points along the whole route, so that a traveller is found who gets on
+        // or off anywhere beside it (within the corridor, see matcher).
+        $journey = itinerary::from_json($record->content, $this->get_max_waypoints());
+        $track = route_result::from_json($record->content4 ?? null);
         $rows = [];
-        foreach ($journey->waypoints() as $seq => $waypoint) {
+        foreach ($journey->corridor_points($track ? $track->points() : []) as $seq => $waypoint) {
             $rows[] = (object) [
                 'entryid' => $entryid,
                 'fieldid' => $fieldid,

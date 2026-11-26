@@ -85,6 +85,17 @@ class form extends datalynxfield_form {
         $mform->setDefault('param5', 5);
         $mform->addHelpButton('param5', 'matchradius', 'datalynxfield_itinerary');
 
+        // Corridor width per entry from a number field (param9 JSON, e.g. the detour a driver accepts).
+        $numbers = [0 => get_string('none')];
+        foreach ($this->dlx->get_fields() as $fieldid => $field) {
+            if ($field->type === 'number') {
+                $numbers[$fieldid] = $field->field->name;
+            }
+        }
+        $mform->addElement('select', 'corridorfield', get_string('corridorfield', 'datalynxfield_itinerary'), $numbers);
+        $mform->setType('corridorfield', PARAM_INT);
+        $mform->addHelpButton('corridorfield', 'corridorfield', 'datalynxfield_itinerary');
+
         // Param6: coordinate precision shown to people who are not participants.
         $mform->addElement('select', 'param6', get_string('precision', 'datalynxfield_itinerary'), [
             'approximate' => get_string('precision_approximate', 'datalynxfield_itinerary'),
@@ -98,7 +109,7 @@ class form extends datalynxfield_form {
         $mform->setType('param7', PARAM_TEXT);
         $mform->addHelpButton('param7', 'country_restriction', 'datalynxfield_location');
 
-        // Billing (param9, JSON): the distance is computed on the server only (mod_datalynx#328).
+        // Billing (param9, JSON, with the corridor field): the distance is computed on the server only (mod_datalynx#328).
         $mform->addElement('header', 'billinghdr', get_string('billing', 'datalynxfield_itinerary'));
         $mform->addElement('advcheckbox', 'billing', get_string('billingdistance', 'datalynxfield_itinerary'));
         $mform->addHelpButton('billing', 'billingdistance', 'datalynxfield_itinerary');
@@ -133,7 +144,7 @@ class form extends datalynxfield_form {
     public function set_data($data) {
         $data = (object) $data;
         $settings = json_decode((string) ($data->param9 ?? ''), true) ?: [];
-        foreach (['billing', 'returnfield', 'requestedfield', 'justificationfield'] as $name) {
+        foreach (['billing', 'returnfield', 'requestedfield', 'justificationfield', 'corridorfield'] as $name) {
             $data->$name = (int) ($settings[$name] ?? 0);
         }
         parent::set_data($data);
@@ -151,7 +162,14 @@ class form extends datalynxfield_form {
                 $settings[$name] = (int) ($data->$name ?? 0);
                 unset($data->$name);
             }
-            $data->param9 = $settings['billing'] ? json_encode($settings) : '';
+            if (!$settings['billing']) {
+                $settings = [];
+            }
+            if (!empty($data->corridorfield)) {
+                $settings['corridorfield'] = (int) $data->corridorfield;
+            }
+            unset($data->corridorfield);
+            $data->param9 = $settings ? json_encode($settings) : '';
         }
         return $data;
     }

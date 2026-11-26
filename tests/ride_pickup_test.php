@@ -157,7 +157,12 @@ final class ride_pickup_test extends advanced_testcase {
         // The route was calculated again: two legs of 100 km with the stub router.
         $content4 = $DB->get_field('datalynx_contents', 'content4', ['entryid' => $this->ride, 'fieldid' => $this->ids['route']]);
         $this->assertEquals(200.0, \mod_datalynx\local\map\route_result::from_json($content4)->distance_km());
-        $this->assertSame(3, $DB->count_records('datalynx_waypoints', ['entryid' => $this->ride]));
+        // The index follows the new route, through the pickup point.
+        $this->assertTrue($DB->record_exists_select(
+            'datalynx_waypoints',
+            'entryid = ? AND ABS(lat - ?) < 0.0001 AND ABS(lng - ?) < 0.0001',
+            [$this->ride, self::NEUSTADT['lat'], self::NEUSTADT['lng']]
+        ));
 
         $this->assertTrue($this->act($anna, 'withdraw')['success']);
         $this->assertCount(2, $this->route()->stored_journey($this->ride)->waypoints());

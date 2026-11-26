@@ -25,6 +25,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'datalynxfield_itinerary';
-$plugin->version   = 2026081000;
+$plugin->version   = 2026112601;
 $plugin->requires  = 2024100400;
 $plugin->maturity  = MATURITY_ALPHA;

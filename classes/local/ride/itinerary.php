@@ -119,6 +119,46 @@ class itinerary {
     }
 
     /**
+     * Points along the journey, in travel order, about every $stepkm: the corridor a traveller can
+     * be picked up or dropped off in. Along the routed track when there is one, else along the
+     * straight legs between the stops, all of which are part of it (the track passes them anyway);
+     * the first and last point are always part of it.
+     *
+     * @param array $track points [lat, lng] of the routed track, empty for none
+     * @param float $stepkm
+     * @return waypoint[]
+     */
+    public function corridor_points(array $track = [], float $stepkm = 2.0): array {
+        $line = $track
+            ? array_map(fn(array $p): waypoint => new waypoint('', (float) $p[0], (float) $p[1]), $track)
+            : $this->waypoints;
+        if (count($line) < 2) {
+            return $line;
+        }
+        $points = [$line[0]];
+        $last = $line[0];
+        for ($i = 1; $i < count($line); $i++) {
+            $from = $line[$i - 1];
+            $to = $line[$i];
+            $length = $from->distance_to($to);
+            // A long leg gets points in between, so that a place beside its middle is covered too.
+            $parts = (int) floor($length / $stepkm);
+            for ($j = 1; $j <= $parts; $j++) {
+                $f = $j * $stepkm / $length;
+                $point = new waypoint('', $from->lat + ($to->lat - $from->lat) * $f, $from->lng + ($to->lng - $from->lng) * $f);
+                if ($point->distance_to($last) >= $stepkm * 0.5) {
+                    $points[] = $last = $point;
+                }
+            }
+            // Every stop stays; a dense track is thinned out to about one point per step.
+            if (!$track || $i === count($line) - 1 || $to->distance_to($last) >= $stepkm) {
+                $points[] = $last = $to;
+            }
+        }
+        return $points;
+    }
+
+    /**
      * The stops, in travel order.
      *
      * @return waypoint[]

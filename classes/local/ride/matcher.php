@@ -19,11 +19,14 @@ namespace mod_datalynx\local\ride;
 /**
  * Finds journeys whose route can carry someone from one place to another.
  *
- * A journey matches when one of its stops lies within the radius of where the
- * traveller wants to be picked up, **and a later stop** lies within the radius of
+ * A journey matches when one of its points lies within the radius of where the
+ * traveller wants to be picked up, **and a later point** lies within the radius of
  * where they want to get off. Requiring the drop-off to come later in the route is
  * what makes the match directional: the same stops travelled the other way round
- * are not a match.
+ * are not a match. The points are the stops and points about every 2 km along the
+ * route between them ({@see itinerary::corridor_points()}), so that the radius is a
+ * corridor around the whole route; its width can come from the journey itself
+ * (the itinerary field's corridor field, e.g. the detour a driver accepts).
  *
  * Either end may be left open, which asks the looser question "what departs near
  * here?" or "what arrives near there?". The direction still holds, because the
@@ -46,6 +49,9 @@ namespace mod_datalynx\local\ride;
 class matcher {
     /** @var string The derived query index table. */
     const TABLE = 'datalynx_waypoints';
+
+    /** @var float Widest corridor when the corridor field sets no maximum, in km. */
+    const MAX_CORRIDOR_KM = 50.0;
 
     /** @var float Kilometres per degree of latitude. */
     const KM_PER_DEGREE = 111.32;
@@ -139,8 +145,23 @@ class matcher {
         $params = ["rmfield{$suffix}" => $fieldid];
         $conditions = [];
 
+        // A journey can carry its own corridor width (e.g. the detour its driver accepts): then that
+        // is the radius around its route, and $radiuskm only stands in where it is not filled in.
+        [$corridorfield, $maxwidth] = self::corridor_of($fieldid);
+        $boxradius = $corridorfield ? max($radiuskm, $maxwidth) : $radiuskm;
+        $join = '';
+        $width = fn(string $placeholder): string => ":{$placeholder}";
+        if ($corridorfield) {
+            $params["rmcw{$suffix}"] = $corridorfield;
+            $join = "\n             LEFT JOIN {datalynx_contents} cw
+                    ON cw.entryid = pickup.entryid AND cw.fieldid = :rmcw{$suffix}";
+            $width = fn(string $placeholder): string => "(CASE WHEN cw.id IS NULL OR "
+                . $DB->sql_compare_text('cw.content', 30) . " = '' THEN :{$placeholder} ELSE "
+                . $DB->sql_cast_char2real('cw.content', true) . ' END)';
+        }
+
         if ($from !== null) {
-            [$dlat, $dlng] = self::bounding_deltas($from->lat, $radiuskm);
+            [$dlat, $dlng] = self::bounding_deltas($from->lat, $boxradius);
             // Each occurrence needs its own placeholder; see distance_expression().
             $params += [
                 "rmpradius{$suffix}" => $radiuskm,
@@ -160,11 +181,11 @@ class matcher {
             );
             $conditions[] = "pickup.lat BETWEEN :rmplatmin{$suffix} AND :rmplatmax{$suffix}";
             $conditions[] = "pickup.lng BETWEEN :rmplngmin{$suffix} AND :rmplngmax{$suffix}";
-            $conditions[] = "{$pickupdistance} <= :rmpradius{$suffix}";
+            $conditions[] = "{$pickupdistance} <= " . $width("rmpradius{$suffix}");
         }
 
         if ($to !== null) {
-            [$dlat, $dlng] = self::bounding_deltas($to->lat, $radiuskm);
+            [$dlat, $dlng] = self::bounding_deltas($to->lat, $boxradius);
             $params += [
                 "rmdradius{$suffix}" => $radiuskm,
                 "rmdlata{$suffix}" => $to->lat,
@@ -183,7 +204,22 @@ class matcher {
             );
             $conditions[] = "dropoff.lat BETWEEN :rmdlatmin{$suffix} AND :rmdlatmax{$suffix}";
             $conditions[] = "dropoff.lng BETWEEN :rmdlngmin{$suffix} AND :rmdlngmax{$suffix}";
-            $conditions[] = "{$dropoffdistance} <= :rmdradius{$suffix}";
+            $conditions[] = "{$dropoffdistance} <= " . $width("rmdradius{$suffix}");
+        }
+
+        // With one end only, the journey has to travel on beyond the radius from it (or come from
+        // beyond): with points along the route, one just before its final stop would else count as
+        // a departure, and one just after its first stop as an arrival.
+        if ($to === null) {
+            $params += ["rmalata{$suffix}" => $from->lat, "rmalatb{$suffix}" => $from->lat, "rmalng{$suffix}" => $from->lng,
+                "rmaradius{$suffix}" => $radiuskm];
+            $conditions[] = self::distance_expression('dropoff', "rmalata{$suffix}", "rmalatb{$suffix}", "rmalng{$suffix}")
+                . ' > ' . $width("rmaradius{$suffix}");
+        } else if ($from === null) {
+            $params += ["rmalata{$suffix}" => $to->lat, "rmalatb{$suffix}" => $to->lat, "rmalng{$suffix}" => $to->lng,
+                "rmaradius{$suffix}" => $radiuskm];
+            $conditions[] = self::distance_expression('pickup', "rmalata{$suffix}", "rmalatb{$suffix}", "rmalng{$suffix}")
+                . ' > ' . $width("rmaradius{$suffix}");
         }
 
         $restrict = '';
@@ -211,11 +247,29 @@ class matcher {
                   JOIN {$table} dropoff
                     ON dropoff.entryid = pickup.entryid
                    AND dropoff.fieldid = pickup.fieldid
-                   AND dropoff.seq > pickup.seq
+                   AND dropoff.seq > pickup.seq{$join}
                  WHERE pickup.fieldid = :rmfield{$suffix}
                        {$restrict}{$criteria}";
 
         return [$sql, $params];
+    }
+
+    /**
+     * The corridor field of an itinerary field and the widest value it can hold, in km.
+     *
+     * @param int $fieldid
+     * @return array [corridor field id or 0, maximum width]
+     */
+    protected static function corridor_of(int $fieldid): array {
+        global $DB;
+        $settings = json_decode((string) $DB->get_field('datalynx_fields', 'param9', ['id' => $fieldid]), true);
+        $corridorfield = (int) (is_array($settings) ? ($settings['corridorfield'] ?? 0) : 0);
+        if (!$corridorfield) {
+            return [0, 0.0];
+        }
+        // The bounding box has to hold the widest corridor: the number field's maximum, if it has one.
+        $max = (float) $DB->get_field('datalynx_fields', 'param6', ['id' => $corridorfield, 'type' => 'number']);
+        return [$corridorfield, $max > 0 ? $max : self::MAX_CORRIDOR_KM];
     }
 
     /**

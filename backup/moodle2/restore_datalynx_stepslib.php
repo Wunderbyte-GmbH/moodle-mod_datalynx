@@ -1038,7 +1038,7 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
             if (!is_array($decoded)) {
                 continue;
             }
-            foreach (['returnfield', 'requestedfield', 'justificationfield'] as $name) {
+            foreach (['returnfield', 'requestedfield', 'justificationfield', 'corridorfield'] as $name) {
                 if (!empty($decoded[$name])) {
                     $decoded[$name] = (int) $this->get_mappingid('datalynx_field', (int) $decoded[$name]);
                 }

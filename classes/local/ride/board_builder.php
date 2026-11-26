@@ -364,8 +364,10 @@ class board_builder {
                 'type' => 'itinerary',
                 'name' => 'Route',
                 'label' => 'Route: von – über – nach',
-                'hint' => 'Adresse eintippen und einen Vorschlag auswählen. Zwischenstopps helfen beim Finden '
-                    . 'von Mitfahrenden entlang der Strecke.',
+                'hint' => 'Adresse eintippen und einen Vorschlag auswählen. Gefunden werden Mitfahrende entlang der '
+                    . 'ganzen Strecke, so weit abseits, wie Ihr Umweg erlaubt.',
+                // Matching corridor around the route: the driver's detour (an offer's "Umweg").
+                'corridor' => 'umweg',
                 'params' => [
                     'param1' => 8, // Maximum stops.
                     'param2' => 2, // Rows shown initially.
@@ -382,7 +384,8 @@ class board_builder {
                 'name' => 'Umweg',
                 'label' => 'Umweg, den ich in Kauf nehme (km)',
                 'hint' => 'Wie weit dürfen Mitfahrende von meiner Strecke entfernt wohnen?',
-                'params' => ['param1' => 0, 'param4' => 1],
+                // 1-20 km, as the slider offers; the maximum also bounds the matching corridor.
+                'params' => ['param1' => 0, 'param4' => 1, 'param5' => 1, 'param6' => 20],
             ],
             'termin' => [
                 'type' => 'schedule',
@@ -603,14 +606,20 @@ class board_builder {
             ], $def['params']);
             $this->fieldids[$key] = (int) $DB->insert_record('datalynx_fields', $record);
         }
-        // The billing settings of a route (param9) name other fields by key.
+        // The billing and corridor settings of a route (param9) name other fields by key.
         foreach ($this->fielddefs as $key => $def) {
+            $settings = [];
             if (!empty($def['billing'])) {
-                $billing = ['billing' => 1];
+                $settings = ['billing' => 1];
                 foreach ($def['billing'] as $name => $fieldkey) {
-                    $billing[$name] = $this->fieldids[$fieldkey];
+                    $settings[$name] = $this->fieldids[$fieldkey];
                 }
-                $DB->set_field('datalynx_fields', 'param9', json_encode($billing), ['id' => $this->fieldids[$key]]);
+            }
+            if (!empty($def['corridor']) && $this->has($def['corridor'])) {
+                $settings['corridorfield'] = $this->fieldids[$def['corridor']];
+            }
+            if ($settings) {
+                $DB->set_field('datalynx_fields', 'param9', json_encode($settings), ['id' => $this->fieldids[$key]]);
             }
         }
         // Settings naming another field (param10 of a team member select) by key.

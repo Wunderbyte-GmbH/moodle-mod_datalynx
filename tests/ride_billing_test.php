@@ -115,7 +115,8 @@ final class ride_billing_test extends advanced_testcase {
         $this->assertTrue($DB->record_exists('user_info_field', ['shortname' => 'iban']));
         $route = json_decode($DB->get_field('datalynx_fields', 'param9', ['id' => $this->ids['Route']]), true);
         $this->assertSame(['billing' => 1, 'returnfield' => $this->ids['Rückfahrt'],
-            'requestedfield' => $this->ids['Beantragte Kilometer'], 'justificationfield' => $this->ids['Begründung']], $route);
+            'requestedfield' => $this->ids['Beantragte Kilometer'], 'justificationfield' => $this->ids['Begründung'],
+            'corridorfield' => $this->ids['Umweg']], $route);
         $photo = $DB->get_record('datalynx_fields', ['id' => $this->ids['Parkfoto']]);
         $this->assertSame(['1600', '1600'], [$photo->param7, $photo->param8]);
 

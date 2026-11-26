@@ -151,13 +151,21 @@ final class matcher_test extends advanced_testcase {
             'seq ASC'
         );
 
-        $this->assertCount(3, $rows);
-        $this->assertEquals([0, 1, 2], array_values(array_map(
+        // The stops and points about every 2 km along the route between them, in travel order.
+        $this->assertGreaterThan(3, count($rows));
+        $this->assertEquals(range(0, count($rows) - 1), array_values(array_map(
             static fn($row) => (int) $row->seq,
             $rows
         )));
         $first = reset($rows);
         $this->assertEqualsWithDelta(48.1852, (float) $first->lat, 0.0001);
+        $points = array_map(
+            fn($row) => new \mod_datalynx\local\ride\waypoint('', (float) $row->lat, (float) $row->lng),
+            array_values($rows)
+        );
+        for ($i = 1; $i < count($points); $i++) {
+            $this->assertLessThanOrEqual(2.01, $points[$i - 1]->distance_to($points[$i]));
+        }
     }
 
     /**
@@ -294,10 +302,11 @@ final class matcher_test extends advanced_testcase {
         $this->create_journey(['wien', 'graz']);
         $this->create_journey(['wien', 'wienerneustadt', 'graz']);
 
+        $indexed = $DB->count_records('datalynx_waypoints');
         $DB->delete_records('datalynx_waypoints', ['fieldid' => $this->field->id()]);
         $this->assertEquals(0, $DB->count_records('datalynx_waypoints'));
 
         $this->assertEquals(2, $this->field->rebuild_index());
-        $this->assertEquals(5, $DB->count_records('datalynx_waypoints'));
+        $this->assertEquals($indexed, $DB->count_records('datalynx_waypoints'));
     }
 }
