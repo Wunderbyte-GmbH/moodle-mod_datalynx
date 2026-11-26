@@ -579,6 +579,12 @@ class datalynx {
         // on every datalynx page (management lists as well as views).
         $PAGE->requires->js_call_amd('mod_datalynx/bulkactions', 'init');
         $PAGE->requires->js_call_amd('mod_datalynx/delegatebuttons', 'init');
+        // Joining a team, by the subscribe link or by request, likewise: the entries of a view can
+        // be rendered by a web service, where the field cannot load its JS.
+        if ($page === 'view' && $this->get_fields_by_type('teammemberselect')) {
+            $PAGE->requires->js_call_amd('mod_datalynx/teammemberselect', 'init');
+            $PAGE->requires->js_call_amd('mod_datalynx/teamrequests', 'init');
+        }
 
         // COMMENTS.
         if (!empty($params->comments)) {

@@ -294,4 +294,19 @@ final class teammemberselect_requests_test extends advanced_testcase {
         $this->assertStringContainsString(fullname($anna), $driverview);
         $this->assertStringContainsString('data-dlx-team-action="approve"', $driverview);
     }
+
+    /**
+     * A view page loads the JS of the team buttons itself: a view rendered by a web service
+     * (the search of the ride board) cannot load it from the field.
+     */
+    public function test_page_loads_team_js(): void {
+        global $PAGE;
+        $this->setUser($this->passengers[0]);
+        $PAGE->set_url('/mod/datalynx/view.php', ['d' => $this->dlx->id()]);
+        $dlx = new datalynx($this->dlx->id());
+        $dlx->set_page('view', ['urlparams' => (object) ['d' => $this->dlx->id(), 'view' => 0]]);
+        $code = $PAGE->requires->get_end_code();
+        $this->assertStringContainsString('mod_datalynx/teamrequests', $code);
+        $this->assertStringContainsString('mod_datalynx/teammemberselect', $code);
+    }
 }
