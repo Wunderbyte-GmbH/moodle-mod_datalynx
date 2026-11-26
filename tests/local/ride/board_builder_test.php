@@ -220,6 +220,9 @@ final class board_builder_test extends advanced_testcase {
         $cancel = $DB->get_record('datalynx_rules', ['dataid' => $builder->get_dataid(), 'name' => 'Fahrt abgesagt']);
         $this->assertEquals($DB->get_field('datalynx_views', 'id', ['dataid' => $builder->get_dataid(),
             'name' => 'Benachrichtigung: Fahrt abgesagt']), $cancel->param8);
+        // Links to a single ride (e.g. in notifications) open "Alle Fahrten", not the start page.
+        $this->assertEquals($DB->get_field('datalynx_views', 'id', ['dataid' => $builder->get_dataid(),
+            'name' => 'Alle Fahrten']), $DB->get_field('datalynx', 'singleview', ['id' => $builder->get_dataid()]));
         // The ride card: offer fields only for offers, passengers by request only (no picker when editing).
         $card = $DB->get_field('datalynx_views', 'param2', ['dataid' => $builder->get_dataid(), 'name' => 'Meine Fahrten']);
         $this->assertStringContainsString('[[Marke|angebot', $card);

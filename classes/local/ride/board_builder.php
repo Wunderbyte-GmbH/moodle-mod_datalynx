@@ -1416,6 +1416,8 @@ class board_builder {
             }
         }
         $DB->set_field('datalynx', 'defaultview', $this->viewids['portal'], ['id' => $this->dataid]);
+        // A link to one ride (notifications, "more") shows it in "Alle Fahrten": the start page has no entries.
+        $DB->set_field('datalynx', 'singleview', $this->viewids['all'], ['id' => $this->dataid]);
         definition_cache::invalidate($this->dataid);
         $this->log('Created ' . count($this->viewids) . ' views and wired the step chain.');
     }
