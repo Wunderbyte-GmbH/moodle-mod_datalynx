@@ -37,6 +37,9 @@
  *   php mod/datalynx/cli/update_ridesharing_vehicle.php --cmid=1162 --dryrun
  *   php mod/datalynx/cli/update_ridesharing_vehicle.php --cmid=1162
  *
+ * Migration tool for boards built before \mod_datalynx\local\ride\board_builder: a board built by
+ * create_ridesharing_instance.php has this already and does not need it.
+ *
  * @package    mod_datalynx
  * @copyright  2026 Wunderbyte GmbH
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

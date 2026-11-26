@@ -24,15 +24,26 @@ plugin: you are assembling fields, a view, a filter and a handful of rules.
 > [Map Services](user_guide_map_services.md). Nothing on this page works until they have.
 
 > **Shortcut for administrators with shell access**
-> A ready-made build of this design, including a five-step entry form, ships with the plugin:
+> A ready-made board ships with the plugin, in two variants:
 > ```bash
-> php mod/datalynx/cli/create_ridesharing_instance.php --course=<id>
-> php mod/datalynx/cli/seed_ridesharing_entries.php --dataid=<id>   # example rides, optional
+> php mod/datalynx/cli/create_ridesharing_instance.php --course=<id> [--variant=basic|fahrtenschein] [--seed]
 > ```
+> - `basic` ("Mitfahrbörse"): offers and requests, route, schedule, vehicle, search and matching.
+> - `fahrtenschein` ("Mitfahrbörse mit Fahrtenschein"): the same without the cost fields, plus
+>   the billing extension (seat requests, single rides, Fahrtenschein).
+>
 > It creates the activity, its fields and layouts, the behaviors, the filters, the search form,
-> the match rules and nine views. Use it as a starting point to adapt, or read the rest of this
-> page to build the same thing by hand. `--reset` rebuilds from scratch, deleting the previous
-> activity of that name in the course, so do not point it at one holding real entries.
+> the match rules and the views. `--seed` adds example rides (the course needs at least four
+> enrolled users). `--reset` rebuilds from scratch, deleting the previous activity of that name in
+> the course, so do not point it at one holding real entries.
+>
+> Without shell access: `--install-site-preset` stores the board in the site presets, from where
+> teachers apply it to a new, empty activity (*Presets → Apply*); `--export-preset=<file>` writes it
+> to a file. Map services are site settings and not part of a preset.
+>
+> Boards built with an older version are brought up to date with the migration scripts in `cli/`
+> (`update_ridesharing_pathways.php`, `migrate_ridesharing_schedule.php`,
+> `update_ridesharing_vehicle.php`); a new board needs none of them.
 
 ---
 

@@ -624,7 +624,9 @@ class datalynx_entries {
      * @return array notificationstrings, list of processed ids
      */
     public function process_entries(string $action, $eids, $data = null, bool $confirmed = false): array {
-        global $DB, $USER;
+        global $CFG, $DB, $USER;
+        // The completion constants; a web page has them already, a CLI script or a task does not.
+        require_once($CFG->libdir . '/completionlib.php');
         $dlx = $this->dlx;
         $errorstring = '';
 
