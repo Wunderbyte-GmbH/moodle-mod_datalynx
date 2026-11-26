@@ -285,6 +285,155 @@ class field extends datalynxfield_base {
     }
 
     /**
+     * The settings kept as JSON in param10 (param1 to param9 are taken).
+     *
+     * - limitfield: id of a number or select field of the same instance whose value lowers the team
+     *   size per entry (mod_datalynx#326); 0 for none.
+     *
+     * @return array
+     */
+    public function get_settings(): array {
+        $settings = json_decode((string) ($this->field->param10 ?? ''), true);
+        return is_array($settings) ? $settings : [];
+    }
+
+    /**
+     * The field whose value is the team size of an entry, if one is set.
+     *
+     * @return datalynxfield_base|null
+     */
+    public function get_limit_field(): ?datalynxfield_base {
+        $fieldid = (int) ($this->get_settings()['limitfield'] ?? 0);
+        if (!$fieldid) {
+            return null;
+        }
+        $field = $this->dlx->get_field_from_id($fieldid);
+        return $field ?: null;
+    }
+
+    /**
+     * The number a limit field holds: a number, or the label of the chosen option of a select.
+     *
+     * @param datalynxfield_base $limitfield
+     * @param mixed $content the stored content (a number, or the position of an option)
+     * @return int an empty value counts as 0
+     */
+    public static function limit_value(datalynxfield_base $limitfield, $content): int {
+        $content = trim((string) $content);
+        if ($content === '') {
+            return 0;
+        }
+        if (in_array($limitfield->type, ['select', 'radiobutton'], true)) {
+            $options = $limitfield->options_menu();
+            $content = trim((string) ($options[(int) $content] ?? ''));
+        }
+        return is_numeric($content) ? max(0, (int) $content) : 0;
+    }
+
+    /**
+     * The most members an entry can have: the team size (param1), lowered by the value of the limit
+     * field of the entry when one is set. An empty limit value counts as 0.
+     *
+     * @param int $entryid
+     * @param mixed $limitcontent the content of the limit field to use instead of the stored one
+     *        (a submitted form), null to read the entry
+     * @return int|null null for no limit
+     */
+    public function get_member_limit(int $entryid, $limitcontent = null): ?int {
+        global $DB;
+        $limit = (int) $this->field->param1 > 0 ? (int) $this->field->param1 : null;
+        if ($limitfield = $this->get_limit_field()) {
+            if ($limitcontent === null) {
+                $limitcontent = $entryid > 0 ? $DB->get_field(
+                    'datalynx_contents',
+                    'content',
+                    ['fieldid' => $limitfield->id(), 'entryid' => $entryid],
+                    IGNORE_MULTIPLE
+                ) : '';
+            }
+            $value = self::limit_value($limitfield, $limitcontent);
+            $limit = $limit === null ? $value : min($limit, $value);
+        }
+        return $limit;
+    }
+
+    /**
+     * The members of an entry.
+     *
+     * @param int $entryid
+     * @return int[] user ids
+     */
+    public function get_members(int $entryid): array {
+        global $DB;
+        $content = $DB->get_field(
+            'datalynx_contents',
+            'content',
+            ['fieldid' => $this->field->id, 'entryid' => $entryid],
+            IGNORE_MULTIPLE
+        );
+        $members = $content ? json_decode($content, true) : [];
+        return array_values(array_filter(array_map('intval', (array) $members), fn($id) => $id > 0));
+    }
+
+    /**
+     * Errors for a submitted value of a limit field that is lower than the members already on the entry.
+     *
+     * Called by the number and select fields: a team member select may take its team size from them.
+     *
+     * @param datalynxfield_base $limitfield the field being validated
+     * @param mixed $entryid
+     * @param string $formfieldname the name of the submitted value
+     * @param mixed $content the submitted value
+     * @return array element name => error
+     */
+    public static function limit_errors(datalynxfield_base $limitfield, $entryid, string $formfieldname, $content): array {
+        if (!is_numeric($entryid) || (int) $entryid <= 0) {
+            return [];
+        }
+        foreach ($limitfield->dlx()->get_fields() as $field) {
+            $uses = $field->type === 'teammemberselect'
+                && (int) ($field->get_settings()['limitfield'] ?? 0) === (int) $limitfield->id();
+            if (!$uses) {
+                continue;
+            }
+            $members = count($field->get_members((int) $entryid));
+            if ($members > 0 && self::limit_value($limitfield, $content) < $members) {
+                return [$formfieldname => get_string('limitbelowmembers', 'datalynxfield_teammemberselect', $members)];
+            }
+        }
+        return [];
+    }
+
+    /**
+     * The entries of the instance that have room for another member.
+     *
+     * @return int[] entry ids
+     */
+    public function get_entryids_with_free_places(): array {
+        global $DB;
+        $entryids = $DB->get_fieldset_select('datalynx_entries', 'id', 'dataid = ?', [$this->dlx->id()]);
+        $members = [];
+        foreach ($DB->get_records_menu('datalynx_contents', ['fieldid' => $this->field->id], '', 'entryid, content') as $id => $c) {
+            $members[$id] = count(array_filter(
+                array_map('intval', (array) (json_decode((string) $c, true) ?: [])),
+                fn($userid) => $userid > 0
+            ));
+        }
+        $limits = [];
+        if ($limitfield = $this->get_limit_field()) {
+            $limits = $DB->get_records_menu('datalynx_contents', ['fieldid' => $limitfield->id()], '', 'entryid, content');
+        }
+        $free = [];
+        foreach ($entryids as $entryid) {
+            $limit = $this->get_member_limit((int) $entryid, $limitfield ? ($limits[$entryid] ?? '') : null);
+            if ($limit === null || ($members[$entryid] ?? 0) < $limit) {
+                $free[] = (int) $entryid;
+            }
+        }
+        return $free;
+    }
+
+    /**
      * Update a teammemberselectfield when editing an entry and notify teammembers of changes
      *
      * @param stdClass $entry The entry object.
@@ -513,6 +662,16 @@ class field extends datalynxfield_base {
         $params = [];
         $usecontent = false;
 
+        if ($operator === 'FREEPLACES') {
+            // Entries with room for another member: counted in PHP, like the member searches below.
+            $entryids = $this->get_entryids_with_free_places();
+            if ($entryids) {
+                [$insql, $inparams] = $DB->get_in_or_equal($entryids, SQL_PARAMS_NAMED, "df_{$fieldid}_f_", !$not);
+                return [" (e.id $insql) ", $inparams, false];
+            }
+            return [$not ? ' 1 = 1 ' : ' 1 = 0 ', [], false];
+        }
+
         if ($operator === 'USER' || $operator === 'OTHER_USER' || $operator === 'ANY_OF') {
             // Resolve membership by decoding the JSON content in PHP rather than matching
             // the raw text with LIKE. This is format-agnostic: it works whether the user
@@ -655,7 +814,8 @@ class field extends datalynxfield_base {
     public function get_supported_search_operators(): array {
         return ['' => get_string('empty', 'datalynx'),
             'USER' => get_string('iamteammember', 'datalynx'),
-            'OTHER_USER' => get_string('useristeammember', 'datalynx')];
+            'OTHER_USER' => get_string('useristeammember', 'datalynx'),
+            'FREEPLACES' => get_string('hasfreeplaces', 'datalynxfield_teammemberselect')];
     }
 
     /**

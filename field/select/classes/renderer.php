@@ -194,6 +194,15 @@ class renderer extends datalynxfield_renderer {
                 }
             }
         }
+        // A team member select may take its team size from this field: not below its members.
+        if (isset($formdata->$formfieldname) && !$errors) {
+            $errors = \datalynxfield_teammemberselect\field::limit_errors(
+                $this->field,
+                $entryid,
+                $this->get_error_element($formfieldname),
+                $formdata->$formfieldname
+            );
+        }
         return $errors;
     }
 

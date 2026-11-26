@@ -994,6 +994,22 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
             }
         }
 
+        // The limit field of teammemberselect fields (param10 settings, mod_datalynx#326).
+        foreach (
+            $DB->get_records_menu(
+                'datalynx_fields',
+                ['type' => 'teammemberselect', 'dataid' => $datalynxnewid],
+                '',
+                'id, param10'
+            ) as $id => $settings
+        ) {
+            $decoded = json_decode((string) $settings, true);
+            if (is_array($decoded) && !empty($decoded['limitfield'])) {
+                $decoded['limitfield'] = (int) $this->get_mappingid('datalynx_field', (int) $decoded['limitfield']);
+                $DB->set_field('datalynx_fields', 'param10', json_encode($decoded), ['id' => $id]);
+            }
+        }
+
         // Update redirect on submit ids.
         $sql = "SELECT dv.id, dv.param10
                   FROM {datalynx_views} dv

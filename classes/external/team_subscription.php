@@ -91,6 +91,14 @@ class team_subscription extends external_api {
             ];
         }
 
+        // The entry must belong to this instance, and the user must be someone the field admits.
+        if (!$DB->record_exists('datalynx_entries', ['id' => $params['entryid'], 'dataid' => $params['d']])) {
+            throw new moodle_exception('invalidrecord', 'error', '', 'datalynx_entries');
+        }
+        if (!array_intersect($dlx->get_user_datalynx_permissions($USER->id), (array) $field->admissibleroles)) {
+            return ['success' => false, 'error' => get_string('notadmissible', 'datalynxfield_teammemberselect')];
+        }
+
         // Fetch the existing content row and current members as integers.
         $row = $DB->get_record('datalynx_contents', [
                 'fieldid' => $params['fieldid'],
@@ -103,17 +111,20 @@ class team_subscription extends external_api {
 
         if ($params['action'] === 'subscribe') {
             if (!in_array($userid, $users, true)) {
-                // Check if max team size is exceeded before adding a new member.
-                $maxteamsize = (int) $field->field->param1;
-                if ($maxteamsize > 0 && count($users) >= $maxteamsize) {
+                // The most members this entry takes: the team size, lowered by its limit field (#326).
+                $limit = $field->get_member_limit((int) $params['entryid']);
+                if ($limit !== null && count($users) >= $limit) {
                     return [
                             'success' => false,
-                            'error' => get_string('maxteamsizeexceeded', 'mod_datalynx', $maxteamsize),
+                            'error' => get_string('teamfull', 'datalynxfield_teammemberselect'),
                     ];
                 }
                 $users[] = $userid;
             }
         } else if ($params['action'] === 'unsubscribe') {
+            if (!$field->allowunsubscription) {
+                return ['success' => false, 'error' => get_string('nounsubscription', 'datalynxfield_teammemberselect')];
+            }
             $users = array_values(array_diff($users, [$userid]));
         } else {
             throw new moodle_exception('invalidaction', 'error');

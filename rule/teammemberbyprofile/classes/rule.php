@@ -120,9 +120,10 @@ class rule extends base {
             $newteam = array_values(array_unique(array_keys($matchedusers)));
         }
 
-        // Respect the team field's maximum size: truncate (ordered by name) and log.
-        $maxsize = (int) $teamfield->field->param1;
-        if ($maxsize > 0 && count($newteam) > $maxsize) {
+        // Respect the most members of the entry (the team size, lowered by the limit field of the
+        // entry when one is set): truncate (ordered by name) and log.
+        $maxsize = $teamfield->get_member_limit((int) $entryid);
+        if ($maxsize !== null && count($newteam) > $maxsize) {
             $newteam = array_slice($this->order_users_by_name($newteam, $matchedusers), 0, $maxsize);
             debugging("datalynxrule_teammemberbyprofile: the matched team for entry {$entryid} exceeded " .
                 "the maximum size {$maxsize} and was truncated.", DEBUG_DEVELOPER);

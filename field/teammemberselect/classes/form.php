@@ -62,6 +62,17 @@ class form extends datalynxfield_form {
         $mform->addRule(['param1', 'zero'], get_string('teamsizeerrorvalue', 'datalynx'), 'compare', 'gt');
 
         // Minimum required team size.
+        // The team size per entry from a number or select field of the entry (kept in param10).
+        $limitfields = [0 => get_string('limitnone', 'datalynxfield_teammemberselect')];
+        foreach ($this->dlx->get_fields() as $candidate) {
+            if (in_array($candidate->type, ['number', 'select'], true)) {
+                $limitfields[$candidate->id()] = $candidate->name();
+            }
+        }
+        $mform->addElement('select', 'limitfield', get_string('limitfield', 'datalynxfield_teammemberselect'), $limitfields);
+        $mform->addHelpButton('limitfield', 'limitfield', 'datalynxfield_teammemberselect');
+        $mform->setType('limitfield', PARAM_INT);
+
         $mform->addElement('text', 'param3', get_string('minteamsize', 'datalynx'), ['size' => 3]);
         $mform->addHelpButton('param3', 'minteamsize', 'datalynx');
         $mform->setType('param3', PARAM_INT);
@@ -154,6 +165,7 @@ class form extends datalynxfield_form {
         $data->param7 = $data->param7 ?? 0;
         $data->param8 = $data->param8 ?? 0;
         $data->teamfieldenable = $data->param5 != 0;
+        $data->limitfield = (int) ($this->field->get_settings()['limitfield'] ?? 0);
         parent::set_data($data);
     }
 
@@ -178,6 +190,11 @@ class form extends datalynxfield_form {
             $data->param6 = $data->param6 ?? 0;
             $data->param7 = $data->param7 ?? 0;
             $data->param8 = $data->param8 ?? 0;
+            // Settings without a param of their own are kept as JSON in param10.
+            $settings = $this->field->get_settings();
+            $settings['limitfield'] = (int) ($data->limitfield ?? 0);
+            $data->param10 = json_encode($settings);
+            unset($data->limitfield);
         }
         return $data;
     }

@@ -283,6 +283,10 @@ class renderer extends TextRenderer {
         if ($value !== '' && !is_numeric($value)) {
             $errors[$formfieldname] = get_string('errnumeric', 'datalynx');
         }
+        // A team member select may take its team size from this field: not below its members.
+        if ($value !== '' && !$errors) {
+            $errors = \datalynxfield_teammemberselect\field::limit_errors($this->field, $entryid, $formfieldname, $value);
+        }
 
         return $errors;
     }

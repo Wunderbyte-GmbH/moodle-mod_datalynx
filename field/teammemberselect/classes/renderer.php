@@ -95,8 +95,10 @@ class renderer extends datalynxfield_renderer {
             true
         ) : [];
         $selected = $selected ? $selected : []; // TODO MDL-000000: Seems obsolete.
-        // Full when it holds as many members as the team size allows (team_subscription refuses more).
-        $teamfull = (int) $field->teamsize > 0 && count($selected) >= (int) $field->teamsize;
+        // Full when it holds as many members as the entry allows (team_subscription refuses more): the
+        // team size, lowered by the limit field of the entry when one is set (mod_datalynx#326).
+        $limit = $field->get_member_limit((int) $entry->id);
+        $teamfull = $limit !== null && count($selected) >= $limit;
         $hasadmissiblerole = array_intersect(
             $field->dlx()->get_user_datalynx_permissions($USER->id),
             $field->admissibleroles
@@ -138,6 +140,12 @@ class renderer extends datalynxfield_renderer {
                 'mod_datalynx/teammemberselect',
                 'init',
                 [$field->dlx()->id(), $fieldid, $userurl->out(false), fullname($USER), $canunsubscribe]
+            );
+        } else if ($subscribeenabled && $hasadmissiblerole && $teamfull && !$userismember && $limit > 0) {
+            // No room left; an entry without any places (limit 0) shows nothing at all.
+            $str .= html_writer::span(
+                get_string('teamfull', 'datalynxfield_teammemberselect'),
+                'datalynxfield_teamfull badge bg-secondary'
             );
         }
 
@@ -333,11 +341,17 @@ class renderer extends datalynxfield_renderer {
         if (isset($formdata->$formfieldname)) {
             $teamsize = count(array_filter((array) $formdata->$formfieldname, fn($userid) => (int) $userid > 0));
             if ($teamsize > 0) {
-                if ($teamsize > $this->field->teamsize) {
+                // The limit of this entry: the limit field as submitted in the same form, else as stored.
+                $limitcontent = null;
+                if ($limitfield = $this->field->get_limit_field()) {
+                    $limitcontent = $formdata->{"field_{$limitfield->id()}_{$entryid}"} ?? null;
+                }
+                $limit = $this->field->get_member_limit(is_numeric($entryid) ? (int) $entryid : 0, $limitcontent);
+                if ($limit !== null && $teamsize > $limit) {
                     $errors[$formfieldname] = get_string(
                         'maxteamsizeerrorform',
                         'datalynx',
-                        $this->field->teamsize
+                        $limit
                     );
                 }
                 if ($teamsize < $this->field->minteamsize) {
