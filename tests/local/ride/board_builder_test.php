@@ -164,9 +164,10 @@ final class board_builder_test extends advanced_testcase {
             $dlx->get_field_from_id($fieldid, true)->renderer()->render_edit_mode($mform, (object) ['id' => -1], []);
             $this->assertNotEmpty($mform->_elements, $name);
             if ($mform->_elements[0]->getType() === 'autocomplete') {
-                // The brand list: "Choose..." is no brand (it was shown as the chosen one).
-                $values = array_column($mform->_elements[0]->_options, 'attr');
-                $this->assertNotContains('', array_column($values, 'value'), $name);
+                // The brand list starts with an empty choice without a label, which the autocomplete
+                // does not show as chosen ("Choose..." was shown; without it the first brand was chosen).
+                $first = $mform->_elements[0]->_options[0];
+                $this->assertSame(['', ''], [$first['attr']['value'], $first['text']], $name);
             }
         }
     }
