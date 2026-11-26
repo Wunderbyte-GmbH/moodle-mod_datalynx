@@ -28,7 +28,7 @@ import Ajax from 'core/ajax';
 import ModalSaveCancel from 'core/modal_save_cancel';
 import ModalEvents from 'core/modal_events';
 import Notification from 'core/notification';
-import Toast from 'core/toast';
+import * as Toast from 'core/toast';
 import {getString} from 'core/str';
 
 let listening = false;

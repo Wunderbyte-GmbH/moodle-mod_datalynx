@@ -22,7 +22,7 @@
  */
 
 import Ajax from 'core/ajax';
-import Toast from 'core/toast';
+import * as Toast from 'core/toast';
 import * as Str from 'core/str';
 
 const configs = [];
