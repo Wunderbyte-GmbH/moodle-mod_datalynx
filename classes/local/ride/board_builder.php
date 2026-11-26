@@ -526,7 +526,8 @@ class board_builder {
                 'name' => 'Beantragte Kilometer',
                 'label' => 'Beantragte Kilometer, falls abweichend von der Routenplanung',
                 'hint' => 'Nur ausfüllen, wenn Sie mehr oder weniger Kilometer als berechnet abrechnen möchten.',
-                'params' => ['param1' => 1, 'param5' => 0],
+                // Not filled in shows nothing, not "0".
+                'params' => ['param1' => 1, 'param4' => 1, 'param5' => 0],
             ];
             $fields['begruendung'] = [
                 'type' => 'textarea',
@@ -888,6 +889,30 @@ class board_builder {
         }
         return '[[' . $this->fielddefs[$key]['name'] . ($format !== '' ? ':' . $format : '') . '|' . $behavior
             . '|l_' . $key . ']]';
+    }
+
+    /**
+     * The tag of a field without behaviour and layout: its bare value.
+     *
+     * @param string $key
+     * @return string
+     */
+    protected function plaintag(string $key): string {
+        return $this->has($key) ? '[[' . $this->fielddefs[$key]['name'] . ']]' : '';
+    }
+
+    /**
+     * A row of the PDF table: label and value; nothing for a field the board does not have.
+     *
+     * @param string $label
+     * @param string $value
+     * @return string
+     */
+    protected function pdfrow(string $label, string $value): string {
+        if ($value === '') {
+            return '';
+        }
+        return '<tr><td width="35%"><b>' . $label . '</b></td><td width="65%">' . $value . '</td></tr>';
     }
 
     /**
@@ -1271,19 +1296,27 @@ class board_builder {
                     // Frame, watermark, signature and certification of the PDF: none.
                     'eparam3' => '', 'eparam4' => '', 'eparam5' => '', 'eparam6' => '', 'eparam7' => '', 'eparam8' => '',
                     'eparam9' => '',
+                    // A table with labels of its own and plain values: TCPDF knows neither the flex
+                    // layouts of the web views nor their labels.
                     'eparam2' => '<div style="font-family: helvetica; font-size: 10pt;">'
-                        . '<h1 style="font-size: 16pt;">Fahrtenschein</h1>'
-                        . '<p><b>Fahrer/in:</b> ##author:name##<br><b>Fahrtenschein Nr.:</b> ##entryid##</p>'
-                        . '<h2 style="font-size: 12pt;">Fahrt</h2>'
-                        . $this->tags(['termin', 'anlass', 'rueckfahrt', 'dienstfahrzeug', 'kennzeichen'])
-                        . '<p><b>Route (Start – Stopps – Ziel):</b></p>[[Route]]'
-                        . '<p><b>Strecke einfach:</b> [[Route:distance]]<br>'
-                        . '<b>Abrechnungs-Kilometer:</b> [[Route:billeddistance]]</p>'
-                        . $this->tags(['beantragtekm', 'begruendung'])
-                        . '<p><b>IBAN:</b> ##author:iban##</p>'
-                        . '<h2 style="font-size: 12pt;">Mitfahrende</h2>[[Passagiere]]'
-                        . '<h2 style="font-size: 12pt;">Parkfoto</h2>[[Parkfoto]]'
-                        . '<h2 style="font-size: 12pt;">Eigenerklärung</h2>' . $this->tag('eigenerklaerung')
+                        . '<h1 style="font-size: 16pt;">Fahrtenschein Nr. ##entryid##</h1>'
+                        . '<table cellpadding="4" border="0" width="100%">'
+                        . $this->pdfrow('Fahrer/in', '##author:name##')
+                        . $this->pdfrow('IBAN', '##author:iban##')
+                        . $this->pdfrow('Termin', $this->plaintag('termin'))
+                        . $this->pdfrow('Anlass / Schulung', $this->plaintag('anlass'))
+                        . $this->pdfrow('Kennzeichen', $this->plaintag('kennzeichen'))
+                        . $this->pdfrow('Dienstfahrzeug', $this->plaintag('dienstfahrzeug'))
+                        . $this->pdfrow('Rückfahrt', $this->plaintag('rueckfahrt'))
+                        . $this->pdfrow('Strecke einfach', '[[Route:distance]]')
+                        . $this->pdfrow('Abrechnungs-Kilometer', '<b>[[Route:billeddistance]]</b>')
+                        . $this->pdfrow('Beantragte Kilometer', $this->plaintag('beantragtekm'))
+                        . $this->pdfrow('Begründung', $this->plaintag('begruendung'))
+                        . $this->pdfrow('Mitfahrende', $this->plaintag('passagiere'))
+                        . '</table>'
+                        . '<h2 style="font-size: 12pt;">Route (Start – Stopps – Ziel)</h2>[[Route]]'
+                        . '<h2 style="font-size: 12pt;">Eigenerklärung</h2>' . $this->plaintag('eigenerklaerung')
+                        . '<h2 style="font-size: 12pt;">Parkfoto</h2>' . $this->plaintag('parkfoto')
                         . '</div>',
                 ],
                 'filter' => 'submitted',
