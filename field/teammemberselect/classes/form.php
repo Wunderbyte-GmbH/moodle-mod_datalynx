@@ -119,6 +119,24 @@ class form extends datalynxfield_form {
         $mform->addHelpButton('approval', 'approval', 'datalynxfield_teammemberselect');
         $mform->setType('approval', PARAM_BOOL);
 
+        // Requests carry a pickup point that joins a route (kept in param10).
+        $routes = [0 => get_string('none')];
+        $numbers = [0 => get_string('none')];
+        foreach ($this->dlx->get_fields() as $candidate) {
+            if ($candidate->type === 'itinerary') {
+                $routes[$candidate->id()] = $candidate->name();
+            } else if ($candidate->type === 'number') {
+                $numbers[$candidate->id()] = $candidate->name();
+            }
+        }
+        $mform->addElement('select', 'pickupfield', get_string('pickupfield', 'datalynxfield_teammemberselect'), $routes);
+        $mform->addHelpButton('pickupfield', 'pickupfield', 'datalynxfield_teammemberselect');
+        $mform->setType('pickupfield', PARAM_INT);
+        $mform->addElement('select', 'detourfield', get_string('detourfield', 'datalynxfield_teammemberselect'), $numbers);
+        $mform->addHelpButton('detourfield', 'detourfield', 'datalynxfield_teammemberselect');
+        $mform->setType('detourfield', PARAM_INT);
+        $mform->hideIf('detourfield', 'pickupfield', 'eq', 0);
+
         // An entry with members can only be deleted by managers (kept in param10).
         $mform->addElement('advcheckbox', 'protectmembers', get_string('protectmembers', 'datalynxfield_teammemberselect'));
         $mform->addHelpButton('protectmembers', 'protectmembers', 'datalynxfield_teammemberselect');
@@ -178,6 +196,8 @@ class form extends datalynxfield_form {
         $data->limitfield = (int) ($this->field->get_settings()['limitfield'] ?? 0);
         $data->approval = (int) ($this->field->get_settings()['approval'] ?? 0);
         $data->protectmembers = (int) ($this->field->get_settings()['protectmembers'] ?? 0);
+        $data->pickupfield = (int) ($this->field->get_settings()['pickupfield'] ?? 0);
+        $data->detourfield = (int) ($this->field->get_settings()['detourfield'] ?? 0);
         parent::set_data($data);
     }
 
@@ -207,8 +227,10 @@ class form extends datalynxfield_form {
             $settings['limitfield'] = (int) ($data->limitfield ?? 0);
             $settings['approval'] = (int) !empty($data->approval);
             $settings['protectmembers'] = (int) !empty($data->protectmembers);
+            $settings['pickupfield'] = (int) ($data->pickupfield ?? 0);
+            $settings['detourfield'] = (int) ($data->detourfield ?? 0);
             $data->param10 = json_encode($settings);
-            unset($data->limitfield, $data->approval, $data->protectmembers);
+            unset($data->limitfield, $data->approval, $data->protectmembers, $data->pickupfield, $data->detourfield);
         }
         return $data;
     }

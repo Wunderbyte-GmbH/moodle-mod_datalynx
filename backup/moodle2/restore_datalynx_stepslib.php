@@ -1056,10 +1056,15 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
             ) as $id => $settings
         ) {
             $decoded = json_decode((string) $settings, true);
-            if (is_array($decoded) && !empty($decoded['limitfield'])) {
-                $decoded['limitfield'] = (int) $this->get_mappingid('datalynx_field', (int) $decoded['limitfield']);
-                $DB->set_field('datalynx_fields', 'param10', json_encode($decoded), ['id' => $id]);
+            if (!is_array($decoded)) {
+                continue;
             }
+            foreach (['limitfield', 'pickupfield', 'detourfield'] as $name) {
+                if (!empty($decoded[$name])) {
+                    $decoded[$name] = (int) $this->get_mappingid('datalynx_field', (int) $decoded[$name]);
+                }
+            }
+            $DB->set_field('datalynx_fields', 'param10', json_encode($decoded), ['id' => $id]);
         }
 
         // Update redirect on submit ids.

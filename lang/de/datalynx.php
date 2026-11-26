@@ -633,7 +633,9 @@ $string['message_team_request_approved'] = 'Guten Tag {$a->fullname},
 Ihre Anfrage für {$a->fieldname} wurde angenommen: {$a->viewlink}.';
 $string['message_team_request_created'] = 'Guten Tag {$a->fullname},
 
-{$a->relatedname} möchte bei {$a->fieldname} dieses Eintrags dabei sein: {$a->viewlink}. Dort können Sie die Anfrage annehmen oder ablehnen.';
+{$a->relatedname} möchte bei {$a->fieldname} dieses Eintrags dabei sein: {$a->viewlink}. Dort können Sie die Anfrage annehmen oder ablehnen.
+
+{$a->requestdetails}';
 $string['message_team_request_declined'] = 'Guten Tag {$a->fullname},
 
 Ihre Anfrage für {$a->fieldname} wurde abgelehnt: {$a->viewlink}.';

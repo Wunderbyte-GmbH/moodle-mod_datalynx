@@ -215,7 +215,8 @@ class renderer extends datalynxfield_renderer {
         }
 
         $exact = $this->viewer_sees_exact($entry);
-        $waypoints = $journey->export($exact);
+        global $USER;
+        $waypoints = $journey->export($exact, (int) $USER->id);
 
         if (!empty($options['app'])) {
             return $this->render_app_mode($entry, $waypoints, $exact);

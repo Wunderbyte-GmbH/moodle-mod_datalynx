@@ -60,6 +60,7 @@ $string['moveup'] = 'Diese Station nach vorne verschieben';
 $string['needtworoutepoints'] = 'Bitte mindestens einen Start und ein Ziel angeben.';
 $string['nowaypoints'] = 'Keine Fahrt eingetragen';
 $string['openinmaps'] = 'Route in Karten öffnen';
+$string['pickupstop'] = 'Zustieg';
 $string['pluginname'] = 'Route (Fahrt mit Stationen)';
 $string['precision'] = 'Ortsgenauigkeit für andere';
 $string['precision_approximate'] = 'Ungefähr, bis ein Treffer bestätigt ist';

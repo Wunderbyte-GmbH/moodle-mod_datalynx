@@ -291,6 +291,9 @@ class field extends datalynxfield_base {
      *   size per entry (mod_datalynx#326); 0 for none.
      * - approval: 1 when joining needs the approval of the entry author (mod_datalynx#341).
      * - protectmembers: 1 when an entry with members can only be deleted by managers (mod_datalynx#342).
+     * - pickupfield: an itinerary field; a request then carries the pickup point of the user, which
+     *   joins the route when the request is approved (mod_datalynx#327).
+     * - detourfield: a number field holding the detour (km) a pickup point may lie off the route.
      *
      * @return array
      */
@@ -318,7 +321,90 @@ class field extends datalynxfield_base {
      * @return array
      */
     public function clean_request_data(int $entryid, int $userid, array $data): array {
-        return [];
+        $route = $this->get_pickup_field();
+        if (!$route) {
+            return [];
+        }
+        // A request needs the pickup point: picked from the suggestions, or typed and looked up.
+        $pickup = is_array($data['pickup'] ?? null) ? $data['pickup'] : [];
+        $address = trim(clean_param((string) ($pickup['address'] ?? ''), PARAM_TEXT));
+        if ($address === '') {
+            throw new \moodle_exception('pickuprequired', 'datalynxfield_teammemberselect');
+        }
+        [$json, $notfound] = $route->resolve_stops(json_encode([[
+            'address' => $address,
+            'lat' => $pickup['lat'] ?? null,
+            'lng' => $pickup['lng'] ?? null,
+        ]]), null);
+        $stops = json_decode($json, true);
+        $point = $notfound || empty($stops[0]) ? null : \mod_datalynx\local\ride\waypoint::from_array($stops[0]);
+        if ($point === null) {
+            throw new \moodle_exception('pickupnotfound', 'datalynxfield_teammemberselect');
+        }
+        // Within the detour the driver accepts, around the route: the routed track when there is one,
+        // else the straight legs between the stops.
+        $detour = $this->get_detour_km($entryid, $route);
+        $journey = $route->stored_journey($entryid)->without_pickup($userid);
+        $summary = $this->route_summary($route, $entryid);
+        $track = $route->get_route((object) ['id' => $entryid, "c{$route->id()}_content4" => $summary]);
+        if ($track && ($points = $track->points())) {
+            $journey = new \mod_datalynx\local\ride\itinerary(array_map(
+                fn(array $p) => new \mod_datalynx\local\ride\waypoint('', $p[0], $p[1]),
+                $points
+            ));
+        }
+        if ($journey->is_route() && $journey->distance_from($point) > $detour) {
+            throw new \moodle_exception('pickupoutside', 'datalynxfield_teammemberselect', '', format_float($detour, 0));
+        }
+        return ['pickup' => ['address' => $point->address, 'lat' => $point->lat, 'lng' => $point->lng]];
+    }
+
+    /**
+     * The stored route summary of an entry's route field.
+     *
+     * @param \datalynxfield_itinerary\field $route
+     * @param int $entryid
+     * @return string|null
+     */
+    protected function route_summary(\datalynxfield_itinerary\field $route, int $entryid): ?string {
+        global $DB;
+        return $DB->get_field(
+            'datalynx_contents',
+            'content4',
+            ['fieldid' => $route->id(), 'entryid' => $entryid],
+            IGNORE_MULTIPLE
+        ) ?: null;
+    }
+
+    /**
+     * The itinerary field the pickup points of requests go into, if one is set.
+     *
+     * @return \datalynxfield_itinerary\field|null
+     */
+    public function get_pickup_field(): ?\datalynxfield_itinerary\field {
+        $fieldid = (int) ($this->get_settings()['pickupfield'] ?? 0);
+        $field = $fieldid ? $this->dlx->get_field_from_id($fieldid) : null;
+        return $field && $field->type === 'itinerary' ? $field : null;
+    }
+
+    /**
+     * The detour (km) a pickup point may lie off the route of an entry: the detour field of the entry,
+     * else the match radius of the route field.
+     *
+     * @param int $entryid
+     * @param \datalynxfield_itinerary\field $route
+     * @return float
+     */
+    public function get_detour_km(int $entryid, \datalynxfield_itinerary\field $route): float {
+        global $DB;
+        $fieldid = (int) ($this->get_settings()['detourfield'] ?? 0);
+        $value = $fieldid ? $DB->get_field(
+            'datalynx_contents',
+            'content',
+            ['fieldid' => $fieldid, 'entryid' => $entryid],
+            IGNORE_MULTIPLE
+        ) : null;
+        return is_numeric($value) && (float) $value > 0 ? (float) $value : $route->get_match_radius();
     }
 
     /**
@@ -330,7 +416,8 @@ class field extends datalynxfield_base {
      * @return string HTML; empty by default
      */
     public function describe_request(int $entryid, int $userid, array $data): string {
-        return '';
+        $address = (string) ($data['pickup']['address'] ?? '');
+        return $address === '' ? '' : s(get_string('pickupat', 'datalynxfield_teammemberselect', $address));
     }
 
     /**
@@ -341,6 +428,17 @@ class field extends datalynxfield_base {
      * @param array $data the data of the request
      */
     public function member_joined(int $entryid, int $userid, array $data): void {
+        // The pickup point joins the route, bound to the passenger (mod_datalynx#327).
+        $route = $this->get_pickup_field();
+        $pickup = $data['pickup'] ?? null;
+        if ($route && is_array($pickup) && is_numeric($pickup['lat'] ?? null) && is_numeric($pickup['lng'] ?? null)) {
+            $route->add_pickup($entryid, new \mod_datalynx\local\ride\waypoint(
+                (string) ($pickup['address'] ?? ''),
+                (float) $pickup['lat'],
+                (float) $pickup['lng'],
+                $userid
+            ));
+        }
     }
 
     /**
@@ -350,6 +448,8 @@ class field extends datalynxfield_base {
      * @param int $userid
      */
     public function member_left(int $entryid, int $userid): void {
+        // The pickup stop leaves the route with the passenger.
+        $this->get_pickup_field()?->remove_pickup($entryid, $userid);
     }
 
     /**
@@ -1137,6 +1237,8 @@ class field extends datalynxfield_base {
                 $updated++;
             }
         }
+        // Their pickup stops leave the routes as well (mod_datalynx#327).
+        $updated += \datalynxfield_itinerary\field::remove_passengers($userids, $dataid);
 
         return $updated;
     }

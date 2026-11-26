@@ -40,7 +40,9 @@ final class board_builder_test extends advanced_testcase {
         $views = $DB->get_records_menu('datalynx_views', ['dataid' => $dataid], 'id', 'id, name');
         $filters = $DB->get_records_menu('datalynx_filters', ['dataid' => $dataid], 'id', 'id, name');
         $field = fn($id) => $fields[$id] ?? "missing field $id";
-        $structure = ['fields' => [], 'views' => [], 'filters' => array_values($filters)];
+        $filternames = array_values($filters);
+        sort($filternames);
+        $structure = ['fields' => [], 'views' => [], 'filters' => $filternames];
         foreach ($DB->get_records('datalynx_fields', ['dataid' => $dataid], 'id') as $record) {
             $structure['fields'][$record->name] = $record->type;
         }
@@ -103,7 +105,7 @@ final class board_builder_test extends advanced_testcase {
             'Gepäck' => 'select', 'Mitfahrende' => 'select', 'Fahrkosten' => 'select', 'Fixbetrag' => 'number',
             'Bemerkungen' => 'textarea',
         ], $structure['fields']);
-        $this->assertSame(['Meine Einträge', 'Nur Angebote', 'Nur Gesuche'], $structure['filters']);
+        $this->assertEqualsCanonicalizing(['Meine Einträge', 'Nur Angebote', 'Nur Gesuche'], $structure['filters']);
         $this->assertEqualsCanonicalizing(
             array_values(array_diff_key(board_builder::VIEWS, ['manage' => 1])),
             array_keys($structure['views']),
@@ -164,8 +166,10 @@ final class board_builder_test extends advanced_testcase {
         $this->assertSame('teammemberselect', $structure['fields']['Passagiere']);
         $team = $DB->get_record('datalynx_fields', ['dataid' => $builder->get_dataid(), 'name' => 'Passagiere']);
         $seats = $DB->get_field('datalynx_fields', 'id', ['dataid' => $builder->get_dataid(), 'name' => 'Freie Plätze']);
-        $this->assertSame(['limitfield' => (int) $seats, 'approval' => 1, 'protectmembers' => 1],
-            json_decode($team->param10, true));
+        $route = $DB->get_field('datalynx_fields', 'id', ['dataid' => $builder->get_dataid(), 'name' => 'Route']);
+        $detour = $DB->get_field('datalynx_fields', 'id', ['dataid' => $builder->get_dataid(), 'name' => 'Umweg']);
+        $this->assertSame(['limitfield' => (int) $seats, 'approval' => 1, 'protectmembers' => 1, 'pickupfield' => (int) $route,
+            'detourfield' => (int) $detour], json_decode($team->param10, true));
         foreach (['Mitfahrt beantragt', 'Mitfahrt angenommen', 'Mitfahrt abgelehnt', 'Mitfahrt zurückgezogen'] as $rule) {
             $this->assertArrayHasKey($rule, $structure['rules']);
         }

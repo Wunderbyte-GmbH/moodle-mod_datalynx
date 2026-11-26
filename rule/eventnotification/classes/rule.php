@@ -366,9 +366,22 @@ class rule extends base {
         if (!empty($context['teamfieldid'])) {
             $messagedata->fieldname = $DB->get_field('datalynx_fields', 'name', ['id' => $context['teamfieldid']]);
         }
+        $messagedata->requestdetails = '';
         if (!empty($context['relateduserid'])) {
             $related = $DB->get_record('user', ['id' => $context['relateduserid']]);
             $messagedata->relatedname = $related ? fullname($related) : '';
+            // What the request says, e.g. the pickup point (mod_datalynx#327).
+            $team = !empty($context['teamfieldid']) ? $this->dlx()->get_field_from_id($context['teamfieldid']) : null;
+            if ($team && $team->type === 'teammemberselect') {
+                $request = $team->membership($entryid)->requests()[(int) $context['relateduserid']] ?? null;
+                if ($request) {
+                    $messagedata->requestdetails = html_to_text($team->describe_request(
+                        $entryid,
+                        (int) $context['relateduserid'],
+                        $request['data']
+                    ));
+                }
+            }
         }
         if (strpos($eventname, 'comment') !== false) {
             $messagedata->commenttext = $DB->get_field('comments', 'content', ['id' => $context['objectid']]);

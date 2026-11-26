@@ -173,8 +173,9 @@ class renderer extends datalynxfield_renderer {
         global $USER, $PAGE;
         $field = $this->field;
         $membership = $field->membership($entryid);
-        $button = function (string $action, int $userid, string $text, string $class) use ($field, $entryid): string {
-            return html_writer::tag('button', s($text), [
+        $pickupfield = $field->get_pickup_field();
+        $button = function (string $action, int $userid, string $text, string $class) use ($field, $entryid, $pickupfield): string {
+            $attributes = [
                 'type' => 'button',
                 'class' => "btn btn-sm $class me-1 mb-1",
                 'data-dlx-team-action' => $action,
@@ -182,7 +183,12 @@ class renderer extends datalynxfield_renderer {
                 'data-entryid' => $entryid,
                 'data-fieldid' => $field->id(),
                 'data-userid' => $userid,
-            ]);
+            ];
+            // A request asks for the pickup point first (mod_datalynx#327).
+            if ($action === 'request' && $pickupfield) {
+                $attributes['data-pickupfield'] = $pickupfield->id();
+            }
+            return html_writer::tag('button', s($text), $attributes);
         };
         $badge = fn(string $text, string $class) => html_writer::span(s($text), "badge $class me-1");
         $component = 'datalynxfield_teammemberselect';

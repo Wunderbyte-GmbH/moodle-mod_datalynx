@@ -47,6 +47,7 @@ class waypoint {
      * @param string $address Human readable label for the stop.
      * @param float $lat Latitude in degrees.
      * @param float $lng Longitude in degrees.
+     * @param int $userid The passenger picked up here; 0 for a stop of the driver.
      */
     public function __construct(
         /** @var string Human readable label for the stop. */
@@ -54,7 +55,9 @@ class waypoint {
         /** @var float Latitude in degrees. */
         public readonly float $lat,
         /** @var float Longitude in degrees. */
-        public readonly float $lng
+        public readonly float $lng,
+        /** @var int The passenger picked up here (mod_datalynx#327); 0 for a stop of the driver. */
+        public readonly int $userid = 0
     ) {
     }
 
@@ -89,7 +92,8 @@ class waypoint {
         return new self(
             clean_param((string) ($data['address'] ?? ''), PARAM_TEXT),
             $lat,
-            $lng
+            $lng,
+            max(0, (int) ($data['userid'] ?? 0))
         );
     }
 
@@ -102,11 +106,36 @@ class waypoint {
     public function to_array(bool $exact = true): array {
         $places = $exact ? self::PRECISION_EXACT : self::PRECISION_COARSE;
 
-        return [
+        $data = [
             'address' => $this->address,
             'lat' => round($this->lat, $places),
             'lng' => round($this->lng, $places),
         ];
+        // The passenger of a pickup stop is kept with the exact value only.
+        if ($exact && $this->userid > 0) {
+            $data['userid'] = $this->userid;
+        }
+        return $data;
+    }
+
+    /**
+     * The distance in km from this point to the segment between two others (flat approximation,
+     * good enough for a detour corridor).
+     *
+     * @param waypoint $a
+     * @param waypoint $b
+     * @return float
+     */
+    public function distance_to_segment(waypoint $a, waypoint $b): float {
+        $scale = cos(deg2rad(($a->lat + $b->lat) / 2)) ?: 1.0;
+        [$ax, $ay] = [$a->lng * $scale, $a->lat];
+        [$bx, $by] = [$b->lng * $scale, $b->lat];
+        [$px, $py] = [$this->lng * $scale, $this->lat];
+        $dx = $bx - $ax;
+        $dy = $by - $ay;
+        $length = $dx * $dx + $dy * $dy;
+        $t = $length > 0 ? max(0.0, min(1.0, (($px - $ax) * $dx + ($py - $ay) * $dy) / $length)) : 0.0;
+        return $this->distance_to(new self('', $ay + $t * $dy, ($ax + $t * $dx) / $scale));
     }
 
     /**

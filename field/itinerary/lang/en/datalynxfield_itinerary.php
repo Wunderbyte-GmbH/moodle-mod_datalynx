@@ -60,6 +60,7 @@ $string['moveup'] = 'Move this stop earlier';
 $string['needtworoutepoints'] = 'Please give at least a start and a destination.';
 $string['nowaypoints'] = 'No journey entered';
 $string['openinmaps'] = 'Open route in maps';
+$string['pickupstop'] = 'Pickup';
 $string['pluginname'] = 'Itinerary (route with stops)';
 $string['precision'] = 'Location precision for others';
 $string['precision_approximate'] = 'Approximate until matched';

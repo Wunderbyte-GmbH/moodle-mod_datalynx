@@ -635,7 +635,9 @@ $string['message_team_request_approved'] = 'Hello {$a->fullname},
 your request to join {$a->fieldname} was approved: {$a->viewlink}.';
 $string['message_team_request_created'] = 'Hello {$a->fullname},
 
-{$a->relatedname} asked to join {$a->fieldname} of this entry: {$a->viewlink}. You can approve or decline the request there.';
+{$a->relatedname} asked to join {$a->fieldname} of this entry: {$a->viewlink}. You can approve or decline the request there.
+
+{$a->requestdetails}';
 $string['message_team_request_declined'] = 'Hello {$a->fullname},
 
 your request to join {$a->fieldname} was declined: {$a->viewlink}.';

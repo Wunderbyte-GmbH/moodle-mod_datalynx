@@ -72,6 +72,53 @@ class itinerary {
     }
 
     /**
+     * The same journey with a pickup stop of a passenger, inserted where it makes the smallest detour
+     * between start and destination.
+     *
+     * @param waypoint $pickup
+     * @return self
+     */
+    public function with_pickup(waypoint $pickup): self {
+        $stops = $this->waypoints;
+        $best = 1;
+        $bestcost = INF;
+        for ($i = 1; $i < count($stops); $i++) {
+            $cost = $stops[$i - 1]->distance_to($pickup) + $pickup->distance_to($stops[$i])
+                - $stops[$i - 1]->distance_to($stops[$i]);
+            if ($cost < $bestcost) {
+                $bestcost = $cost;
+                $best = $i;
+            }
+        }
+        array_splice($stops, $best, 0, [$pickup]);
+        return new self($stops);
+    }
+
+    /**
+     * The same journey without the pickup stops of a passenger.
+     *
+     * @param int $userid
+     * @return self
+     */
+    public function without_pickup(int $userid): self {
+        return new self(array_filter($this->waypoints, fn(waypoint $stop) => $stop->userid !== $userid));
+    }
+
+    /**
+     * How far a point is from the journey, in km: to the nearest of its legs.
+     *
+     * @param waypoint $point
+     * @return float
+     */
+    public function distance_from(waypoint $point): float {
+        $distance = INF;
+        for ($i = 1; $i < count($this->waypoints); $i++) {
+            $distance = min($distance, $point->distance_to_segment($this->waypoints[$i - 1], $this->waypoints[$i]));
+        }
+        return $distance;
+    }
+
+    /**
      * The stops, in travel order.
      *
      * @return waypoint[]
@@ -222,12 +269,19 @@ class itinerary {
      *
      * @param bool $exact False to coarsen coordinates for a viewer who is not
      *                    a participant in this ride.
+     * @param int $viewerid who looks: their own pickup stop is exact
      * @return array
      */
-    public function export(bool $exact = true): array {
+    public function export(bool $exact = true, int $viewerid = 0): array {
         $items = [];
         foreach ($this->waypoints as $index => $waypoint) {
-            $items[] = array_merge($waypoint->to_array($exact), [
+            // A passenger sees their own pickup stop exactly; others see a pickup stop by name only.
+            $own = $waypoint->userid > 0 && $waypoint->userid === $viewerid;
+            $data = $waypoint->to_array($exact || $own);
+            if ($waypoint->userid > 0 && !$exact && !$own) {
+                $data['address'] = get_string('pickupstop', 'datalynxfield_itinerary');
+            }
+            $items[] = array_merge($data, [
                 'seq' => $index,
                 'isfirst' => $index === 0,
                 'islast' => $index === count($this->waypoints) - 1,

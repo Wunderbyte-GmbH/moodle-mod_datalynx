@@ -267,8 +267,13 @@ class field extends datalynxfield_base {
         }
 
         $known = [];
+        $passengers = [];
         foreach (itinerary::from_json($previousjson)->waypoints() as $waypoint) {
             $known[core_text::strtolower(trim($waypoint->address))] = $waypoint;
+            // A pickup stop keeps its passenger (mod_datalynx#327); the browser does not send it.
+            if ($waypoint->userid > 0) {
+                $passengers[round($waypoint->lat, 6) . ',' . round($waypoint->lng, 6)] = $waypoint->userid;
+            }
         }
 
         $result = [];
@@ -279,6 +284,15 @@ class field extends datalynxfield_base {
                 continue;
             }
             if (is_numeric($stop['lat'] ?? null) && is_numeric($stop['lng'] ?? null)) {
+                // Only a stored pickup stop names a passenger; a submitted userid is not trusted, except
+                // when the server itself stores a pickup stop (add_pickup()).
+                if (!$this->trustpassengers) {
+                    unset($stop['userid']);
+                }
+                $key = round((float) $stop['lat'], 6) . ',' . round((float) $stop['lng'], 6);
+                if (isset($passengers[$key]) && empty($stop['userid'])) {
+                    $stop['userid'] = $passengers[$key];
+                }
                 $result[] = $stop;
                 continue;
             }
@@ -379,11 +393,157 @@ class field extends datalynxfield_base {
      * @return int|string|bool
      */
     public function update_content(stdClass $entry, ?array $values = null): int|string|bool {
+        global $DB;
+        $before = $this->passengers_of(itinerary::from_json($DB->get_field(
+            'datalynx_contents',
+            'content',
+            ['fieldid' => $this->field->id, 'entryid' => (int) $entry->id],
+            IGNORE_MULTIPLE
+        ) ?: null));
+
         $result = parent::update_content($entry, $values);
 
         $this->reindex_entry((int) $entry->id);
 
+        // A pickup stop removed from the route takes its passenger out of the team (mod_datalynx#327).
+        $after = $this->passengers_of(itinerary::from_json($DB->get_field(
+            'datalynx_contents',
+            'content',
+            ['fieldid' => $this->field->id, 'entryid' => (int) $entry->id],
+            IGNORE_MULTIPLE
+        ) ?: null));
+        if ($removed = array_diff($before, $after)) {
+            foreach ($this->dlx->get_fields() as $field) {
+                $pickupfield = $field->type === 'teammemberselect' ? (int) ($field->get_settings()['pickupfield'] ?? 0) : 0;
+                if ($pickupfield === (int) $this->field->id) {
+                    $membership = $field->membership((int) $entry->id);
+                    foreach ($removed as $userid) {
+                        if ($membership->status($userid) === \datalynxfield_teammemberselect\membership::MEMBER) {
+                            $membership->remove($userid);
+                        }
+                    }
+                }
+            }
+        }
+
         return $result;
+    }
+
+    /**
+     * Remove the pickup stops of users from the routes (privacy: deleted users, deletion requests).
+     *
+     * @param int[] $userids
+     * @param int|null $dataid one instance, or all
+     * @return int routes changed
+     */
+    public static function remove_passengers(array $userids, ?int $dataid = null): int {
+        global $DB;
+        $userids = array_map('intval', $userids);
+        if (!$userids) {
+            return 0;
+        }
+        $sql = "SELECT c.id, c.entryid, c.fieldid, c.content
+                  FROM {datalynx_contents} c
+                  JOIN {datalynx_fields} f ON f.id = c.fieldid
+                 WHERE f.type = 'itinerary' AND " . $DB->sql_like('c.content', ':userkey');
+        $params = ['userkey' => '%"userid"%'];
+        if ($dataid !== null) {
+            $sql .= ' AND f.dataid = :dataid';
+            $params['dataid'] = $dataid;
+        }
+        $changed = 0;
+        foreach ($DB->get_records_sql($sql, $params) as $row) {
+            $journey = itinerary::from_json($row->content);
+            $kept = array_filter($journey->waypoints(), fn(waypoint $stop) => !in_array($stop->userid, $userids, true));
+            if (count($kept) === $journey->count()) {
+                continue;
+            }
+            $DB->set_field('datalynx_contents', 'content', (new itinerary($kept))->to_json(), ['id' => $row->id]);
+            $dlx = new \mod_datalynx\datalynx((int) $DB->get_field('datalynx_fields', 'dataid', ['id' => $row->fieldid]));
+            $dlx->get_field_from_id((int) $row->fieldid)->reindex_entry((int) $row->entryid);
+            $changed++;
+        }
+        return $changed;
+    }
+
+    /**
+     * The passengers of the pickup stops of a journey.
+     *
+     * @param itinerary $journey
+     * @return int[]
+     */
+    protected function passengers_of(itinerary $journey): array {
+        return array_values(array_filter(array_map(fn(waypoint $stop) => $stop->userid, $journey->waypoints())));
+    }
+
+    /**
+     * Put a passenger's pickup stop into the route of an entry, where it makes the smallest detour,
+     * and route the journey again (mod_datalynx#327).
+     *
+     * @param int $entryid
+     * @param waypoint $pickup with the passenger
+     */
+    public function add_pickup(int $entryid, waypoint $pickup): void {
+        $this->save_journey($entryid, $this->stored_journey($entryid)->without_pickup($pickup->userid)->with_pickup($pickup));
+    }
+
+    /**
+     * Take a passenger's pickup stop out of the route of an entry, and route the journey again.
+     *
+     * @param int $entryid
+     * @param int $userid
+     */
+    public function remove_pickup(int $entryid, int $userid): void {
+        $journey = $this->stored_journey($entryid);
+        if (in_array($userid, $this->passengers_of($journey), true)) {
+            $this->save_journey($entryid, $journey->without_pickup($userid));
+        }
+    }
+
+    /**
+     * The stored journey of an entry.
+     *
+     * @param int $entryid
+     * @return itinerary
+     */
+    public function stored_journey(int $entryid): itinerary {
+        global $DB;
+        return itinerary::from_json($DB->get_field(
+            'datalynx_contents',
+            'content',
+            ['fieldid' => $this->field->id, 'entryid' => $entryid],
+            IGNORE_MULTIPLE
+        ) ?: null, $this->get_max_waypoints());
+    }
+
+    /**
+     * Store a journey for an entry with its route from the site's router.
+     *
+     * @param int $entryid
+     * @param itinerary $journey
+     */
+    protected function save_journey(int $entryid, itinerary $journey): void {
+        global $DB;
+        $row = $DB->get_record('datalynx_contents', ['fieldid' => $this->field->id, 'entryid' => $entryid], '*', IGNORE_MULTIPLE);
+        $entry = (object) ['id' => $entryid];
+        if ($row) {
+            foreach (['', '1', '2', '3', '4'] as $suffix) {
+                $entry->{"c{$this->field->id}_content{$suffix}"} = $row->{"content{$suffix}"};
+            }
+            $entry->{"c{$this->field->id}_id"} = $row->id;
+        }
+        $values = ['waypoints' => $journey->to_json()];
+        $route = $this->server_route($journey);
+        if ($route !== null) {
+            $values['route'] = $route->to_json();
+        }
+        $this->trustpassengers = true;
+        try {
+            parent::update_content($entry, $values);
+        } finally {
+            $this->trustpassengers = false;
+        }
+        $this->reindex_entry($entryid);
     }
 
     /**
@@ -426,6 +586,9 @@ class field extends datalynxfield_base {
     public function is_billing(): bool {
         return !empty($this->get_billing_settings()['billing']);
     }
+
+    /** @var bool Whether the stops being stored come from the server, with their passengers. */
+    protected bool $trustpassengers = false;
 
     /** @var array Routes computed in this request, by stops. */
     protected static array $serverroutes = [];

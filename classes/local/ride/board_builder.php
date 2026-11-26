@@ -443,7 +443,9 @@ class board_builder {
                     'param8' => 1,
                 ],
                 // Resolved once the fields exist. A ride with confirmed passengers is cancelled, not deleted.
-                'settings' => ['limitfield' => 'sitzplaetze', 'approval' => 1, 'protectmembers' => 1],
+                'settings' => ['limitfield' => 'sitzplaetze', 'approval' => 1, 'protectmembers' => 1,
+                    // Passengers give their pickup point, within the driver's detour; it joins the route (#327).
+                    'pickupfield' => 'route', 'detourfield' => 'umweg'],
                 'fullwidth' => true,
             ];
             // Every offer is one ride on one date: a weekly offer is split into single rides when it is
@@ -497,8 +499,10 @@ class board_builder {
         foreach ($this->fielddefs as $key => $def) {
             if (!empty($def['settings'])) {
                 $settings = $def['settings'];
-                if (isset($settings['limitfield'])) {
-                    $settings['limitfield'] = $this->fieldids[$settings['limitfield']];
+                foreach (['limitfield', 'pickupfield', 'detourfield'] as $name) {
+                    if (isset($settings[$name])) {
+                        $settings[$name] = $this->fieldids[$settings[$name]];
+                    }
                 }
                 $DB->set_field('datalynx_fields', 'param10', json_encode($settings), ['id' => $this->fieldids[$key]]);
             }

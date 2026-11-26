@@ -102,6 +102,43 @@ class route_result {
     }
 
     /**
+     * The points of the route geometry, decoded from the polyline (precision 5).
+     *
+     * @return array[] [lat, lng] pairs; empty when there is no usable geometry
+     */
+    public function points(): array {
+        $points = [];
+        $index = 0;
+        $lat = 0;
+        $lng = 0;
+        $length = strlen($this->polyline);
+        while ($index < $length) {
+            foreach (['lat', 'lng'] as $axis) {
+                $shift = 0;
+                $result = 0;
+                do {
+                    if ($index >= $length) {
+                        return [];
+                    }
+                    $byte = ord($this->polyline[$index++]) - 63;
+                    if ($byte < 0) {
+                        return [];
+                    }
+                    $result |= ($byte & 0x1f) << $shift;
+                    $shift += 5;
+                } while ($byte >= 0x20 && $shift < 35);
+                $delta = ($result & 1) ? ~($result >> 1) : ($result >> 1);
+                $$axis += $delta;
+            }
+            if (abs($lat / 1e5) > 90 || abs($lng / 1e5) > 180) {
+                return [];
+            }
+            $points[] = [$lat / 1e5, $lng / 1e5];
+        }
+        return count($points) >= 2 ? $points : [];
+    }
+
+    /**
      * Road distance in kilometres.
      *
      * @return float
