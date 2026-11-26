@@ -400,6 +400,38 @@ abstract class datalynxfield_base {
     }
 
     /**
+     * Whether the value of an entry keeps the current user from deleting the entry. Never by default.
+     *
+     * @param int $entryid
+     * @return bool
+     */
+    public function blocks_deletion(int $entryid): bool {
+        return false;
+    }
+
+    /**
+     * Copy the value of an entry to another entry of the same instance, as it is stored.
+     *
+     * Used when entries are made from an entry (mod_datalynx#342). A field type with files (file,
+     * picture, editor: the files would have to be copied as well), derived data or values that must
+     * not travel overrides this.
+     *
+     * @param int $fromentryid
+     * @param int $toentryid
+     */
+    public function copy_content_to_new_entry(int $fromentryid, int $toentryid): void {
+        global $DB;
+        if (!$this->is_datalynx_content()) {
+            return;
+        }
+        foreach ($DB->get_records('datalynx_contents', ['fieldid' => $this->field->id, 'entryid' => $fromentryid]) as $row) {
+            unset($row->id);
+            $row->entryid = $toentryid;
+            $DB->insert_record('datalynx_contents', $row);
+        }
+    }
+
+    /**
      * The moment the value of an entry stands for, as a timestamp: a date field its date, a
      * one-off schedule its departure. Null for fields without one, or without a value.
      *

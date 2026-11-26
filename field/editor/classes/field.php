@@ -41,6 +41,15 @@ require_once($CFG->dirroot . '/repository/lib.php');
  */
 class field extends datalynxfield_base {
     /**
+     * A copy of an entry starts without the files of this field.
+     *
+     * @param int $fromentryid
+     * @param int $toentryid
+     */
+    public function copy_content_to_new_entry(int $fromentryid, int $toentryid): void {
+    }
+
+    /**
      * The editor posts its text, format and draft item as field_{fieldid}_{entryid}_editor.
      *
      * @param array $options

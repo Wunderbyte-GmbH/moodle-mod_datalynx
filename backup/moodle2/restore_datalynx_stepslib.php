@@ -547,7 +547,7 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
         // datalynx field id) for every rule type that uses the shared condition machinery. Internal
         // string keys (e.g. 'status', 'approve') are stable and must be left untouched. The reserved
         // on-change key holds an array of field ids, whose numeric ids are remapped individually.
-        if (!empty($data->param9) && in_array($data->type, ['eventnotification', 'updatefield'], true)) {
+        if (!empty($data->param9) && in_array($data->type, ['eventnotification', 'updatefield', 'splitschedule'], true)) {
             $old = self::decode_rule_param($data->param9);
             $new = [];
             foreach ($old as $fieldid => $options) {
@@ -568,7 +568,7 @@ class restore_datalynx_activity_structure_step extends restore_activity_structur
         }
 
         // Update the target field reference for the updatefield rule (param2 holds a datalynx field id).
-        if ($data->type == 'updatefield' && !empty($data->param2)) {
+        if (in_array($data->type, ['updatefield', 'splitschedule'], true) && !empty($data->param2)) {
             $data->param2 = $this->get_mappingid('datalynx_field', $data->param2);
         }
 

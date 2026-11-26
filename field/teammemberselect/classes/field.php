@@ -290,6 +290,7 @@ class field extends datalynxfield_base {
      * - limitfield: id of a number or select field of the same instance whose value lowers the team
      *   size per entry (mod_datalynx#326); 0 for none.
      * - approval: 1 when joining needs the approval of the entry author (mod_datalynx#341).
+     * - protectmembers: 1 when an entry with members can only be deleted by managers (mod_datalynx#342).
      *
      * @return array
      */
@@ -349,6 +350,26 @@ class field extends datalynxfield_base {
      * @param int $userid
      */
     public function member_left(int $entryid, int $userid): void {
+    }
+
+    /**
+     * With "protect members" set, an entry with members can only be deleted by managers of entries.
+     *
+     * @param int $entryid
+     * @return bool
+     */
+    public function blocks_deletion(int $entryid): bool {
+        return !empty($this->get_settings()['protectmembers']) && $this->get_members($entryid)
+            && !has_capability('mod/datalynx:manageentries', $this->dlx->context);
+    }
+
+    /**
+     * A copy of an entry starts with an empty team: members and requests belong to the entry.
+     *
+     * @param int $fromentryid
+     * @param int $toentryid
+     */
+    public function copy_content_to_new_entry(int $fromentryid, int $toentryid): void {
     }
 
     /**

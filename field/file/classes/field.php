@@ -39,6 +39,15 @@ require_once("$CFG->dirroot/lib/resourcelib.php");
  */
 class field extends datalynxfield_base {
     /**
+     * A copy of an entry starts without the files of this field.
+     *
+     * @param int $fromentryid
+     * @param int $toentryid
+     */
+    public function copy_content_to_new_entry(int $fromentryid, int $toentryid): void {
+    }
+
+    /**
      * The draft area of the current user that holds the files.
      *
      * @param array $options

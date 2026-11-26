@@ -731,7 +731,9 @@ class datalynx_entries {
                         $errorstring .= get_string('affectedid', 'mod_datalynx', $eid) . '<br>';
                         // Filter managable entries.
                     } else {
-                        if (!$dlx->user_can_manage_entry($entry, $allowfinaledit)) {
+                        $allowed = $action === 'delete' ? $dlx->user_can_delete_entry($entry)
+                            : $dlx->user_can_manage_entry($entry, $allowfinaledit);
+                        if (!$allowed) {
                             unset($entries[$eid]);
                             $capname = get_string('updateentry', 'mod_datalynx');
                             $errorstring .= get_string('missingrequiredcapability', 'webservice', $capname);

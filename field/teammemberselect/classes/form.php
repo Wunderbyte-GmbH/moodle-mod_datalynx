@@ -119,6 +119,11 @@ class form extends datalynxfield_form {
         $mform->addHelpButton('approval', 'approval', 'datalynxfield_teammemberselect');
         $mform->setType('approval', PARAM_BOOL);
 
+        // An entry with members can only be deleted by managers (kept in param10).
+        $mform->addElement('advcheckbox', 'protectmembers', get_string('protectmembers', 'datalynxfield_teammemberselect'));
+        $mform->addHelpButton('protectmembers', 'protectmembers', 'datalynxfield_teammemberselect');
+        $mform->setType('protectmembers', PARAM_BOOL);
+
         $attributes = [];
         $message = '';
         if ($teamfield = $this->field->get_teamfield()) {
@@ -172,6 +177,7 @@ class form extends datalynxfield_form {
         $data->teamfieldenable = $data->param5 != 0;
         $data->limitfield = (int) ($this->field->get_settings()['limitfield'] ?? 0);
         $data->approval = (int) ($this->field->get_settings()['approval'] ?? 0);
+        $data->protectmembers = (int) ($this->field->get_settings()['protectmembers'] ?? 0);
         parent::set_data($data);
     }
 
@@ -200,8 +206,9 @@ class form extends datalynxfield_form {
             $settings = $this->field->get_settings();
             $settings['limitfield'] = (int) ($data->limitfield ?? 0);
             $settings['approval'] = (int) !empty($data->approval);
+            $settings['protectmembers'] = (int) !empty($data->protectmembers);
             $data->param10 = json_encode($settings);
-            unset($data->limitfield, $data->approval);
+            unset($data->limitfield, $data->approval, $data->protectmembers);
         }
         return $data;
     }

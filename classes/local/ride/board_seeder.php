@@ -290,6 +290,9 @@ class board_seeder {
                 $this->set($entryid, 'Mitfahrende', $ride['mitfahrende'] ?? 'jedes Geschlecht');
                 $this->set($entryid, 'Fahrkosten', $ride['kosten'] ?? null);
                 $this->set($entryid, 'Fixbetrag', $ride['fixbetrag'] ?? null);
+                // Billing variant: published, so the offer is a ride others see (#342).
+                $this->set($entryid, 'Veröffentlicht', [['1']]);
+                $this->set($entryid, 'Fahrtstatus', isset($this->fields['Fahrtstatus']) ? 'Geplant' : null);
                 $created['offers'][] = $entryid;
             } else {
                 $created['requests'][] = $entryid;
@@ -304,10 +307,40 @@ class board_seeder {
             ));
         }
         \mod_datalynx\local\definition_cache::invalidate($this->dlx->id());
+        $created['offers'] = array_merge($created['offers'], $this->split($created['offers']));
         if ($match) {
             $this->match($created['requests']);
         }
         return $created;
+    }
+
+    /**
+     * Split weekly offers into single rides, as the board's split rule does when an offer is published.
+     *
+     * @param int[] $offerids
+     * @return int[] the entries made
+     */
+    protected function split(array $offerids): array {
+        global $DB;
+        $made = [];
+        foreach ($DB->get_records('datalynx_rules', ['dataid' => $this->dlx->id(), 'type' => 'splitschedule']) as $record) {
+            $rule = new \datalynxrule_splitschedule\rule($this->dlx, $record);
+            foreach ($offerids as $entryid) {
+                $before = (int) $DB->get_field_sql('SELECT MAX(id) FROM {datalynx_entries} WHERE dataid = ?', [$this->dlx->id()]);
+                if ($rule->split($entryid)) {
+                    $made = array_merge($made, array_map('intval', $DB->get_fieldset_select(
+                        'datalynx_entries',
+                        'id',
+                        'dataid = ? AND id > ?',
+                        [$this->dlx->id(), $before]
+                    )));
+                }
+            }
+        }
+        if ($made) {
+            $this->log('Split weekly offers into ' . count($made) . ' more single rides.');
+        }
+        return $made;
     }
 
     /**

@@ -67,6 +67,11 @@ class form extends datalynxfield_form {
         $mform->setDefault('param4', 0);
         $mform->addHelpButton('param4', 'askarrival', 'datalynxfield_schedule');
 
+        // A weekly schedule needs an end date, at most this many months ahead (param6); empty for no limit.
+        $mform->addElement('text', 'param6', get_string('maxmonths', 'datalynxfield_schedule'), ['size' => 3]);
+        $mform->setType('param6', PARAM_INT);
+        $mform->addHelpButton('param6', 'maxmonths', 'datalynxfield_schedule');
+
         // Param5: leave schedules that have run out out of searches and matches.
         $mform->addElement('selectyesno', 'param5', get_string('hideexpired', 'datalynxfield_schedule'));
         $mform->setType('param5', PARAM_INT);

@@ -68,6 +68,7 @@ class board_builder {
         'mine' => 'Meine Fahrten',
         'all' => 'Alle Fahrten',
         'email' => 'Benachrichtigung: Passende Fahrt',
+        'manage' => 'Meine Fahrten verwalten',
     ];
 
     /** @var string[] Titles of the offer steps. */
@@ -441,9 +442,27 @@ class board_builder {
                     'param7' => 1,
                     'param8' => 1,
                 ],
-                // Resolved once the fields exist.
-                'settings' => ['limitfield' => 'sitzplaetze', 'approval' => 1],
+                // Resolved once the fields exist. A ride with confirmed passengers is cancelled, not deleted.
+                'settings' => ['limitfield' => 'sitzplaetze', 'approval' => 1, 'protectmembers' => 1],
                 'fullwidth' => true,
+            ];
+            // Every offer is one ride on one date: a weekly offer is split into single rides when it is
+            // published, at most 6 months ahead (#342).
+            $fields['termin']['params']['param6'] = 6;
+            $fields['veroeffentlicht'] = [
+                'type' => 'checkbox',
+                'name' => 'Veröffentlicht',
+                'label' => 'Veröffentlichen',
+                'hint' => 'Erst mit diesem Häkchen ist die Fahrt sichtbar. Eine regelmäßige Fahrt wird dann in '
+                    . 'einzelne Fahrten aufgeteilt, die Sie unter „Meine Fahrten verwalten“ einzeln absagen oder löschen.',
+                'params' => ['param1' => 'Angaben geprüft – Fahrt veröffentlichen'],
+            ];
+            $fields['fahrtstatus'] = [
+                'type' => 'select',
+                'name' => 'Fahrtstatus',
+                'label' => 'Fahrtstatus',
+                'hint' => 'Bei „Abgesagt“ werden die Mitfahrenden benachrichtigt; die Fahrt erscheint nicht mehr in der Suche.',
+                'params' => ['param1' => "Geplant\nAbgesagt", 'param2' => 'Geplant'],
             ];
         }
         return $fields;
@@ -673,11 +692,7 @@ class board_builder {
             $position = (string) (array_search($label, $options, true) + 1);
             return [$this->fieldids['fahrttyp'] => ['AND' => [['', 'ANY_OF', [$position]]]]];
         };
-        $offers = $type(self::OFFER);
-        if ($this->has('passagiere')) {
-            // Only rides with a free seat: no solo trips, nothing fully booked (#325).
-            $offers[$this->fieldids['passagiere']] = ['AND' => [['', 'FREEPLACES', '']]];
-        }
+        $offers = $type(self::OFFER) + $this->ride_conditions();
         return [
             'own' => ['name' => 'Meine Einträge', 'customsearch' => ['userid' => ['AND' => [['', 'ME', '']]]]],
             'offers' => ['name' => 'Nur Angebote', 'customsearch' => $offers],
@@ -936,7 +951,8 @@ class board_builder {
                         ['marke', 'modell', 'kennzeichen', 'sitzplaetze', 'gepaeck', 'mitfahrende', 'fahrkosten'],
                         'nurlesenangebot'
                     )
-                    . $this->tag('fixbetrag', 'nurlesenfestbetrag') . $this->tag('bemerkungen', 'nurlesen'),
+                    . $this->tag('fixbetrag', 'nurlesenfestbetrag') . $this->tag('bemerkungen', 'nurlesen')
+                    . $this->tag('veroeffentlicht', 'angebotpflicht'),
                 'Fahrt_speichern'
             ),
             'request' => [
@@ -983,8 +999,28 @@ class board_builder {
                 'data' => [
                     'perpage' => 20,
                     'esection' => $list('Meine Fahrten', '<div class="mb-3">##viewsesslink:' . self::VIEWS['step1']
-                        . ';Neue Fahrt eintragen;new=1;btn btn-primary##</div>##entries##'),
+                        . ';Neue Fahrt eintragen;new=1;btn btn-primary##'
+                        . ($this->is_billing() ? ' ##viewlink:' . self::VIEWS['manage']
+                            . ';Meine Fahrten verwalten;;btn btn-outline-primary##' : '')
+                        . '</div>##entries##'),
                     'eparam2' => $this->ridecard(),
+                ],
+                'filter' => 'own',
+            ],
+            'manage' => !$this->is_billing() ? null : [
+                'type' => 'grid',
+                'data' => [
+                    'perpage' => 50,
+                    'esection' => $list('Meine Fahrten verwalten', '<p class="text-muted">Ihre einzelnen Fahrten. Fahrten '
+                        . 'ohne Mitfahrende können Sie löschen (auch mehrere auf einmal); eine Fahrt mit Mitfahrenden '
+                        . 'sagen Sie über „Bearbeiten“ ab – die Mitfahrenden werden benachrichtigt.</p>'
+                        . '<div class="mb-3">##selectallnone## ##multidelete##</div>##entries##'),
+                    'eparam2' => '<div class="card h-100 shadow-sm border-0"><div class="card-body">'
+                        . '<div class="d-flex justify-content-between align-items-center mb-2">##select##'
+                        . '<span class="small text-muted">##author:name##</span></div>'
+                        . $this->tags(['route', 'termin'], 'nurlesen') . $this->tag('fahrtstatus', 'angebot')
+                        . $this->tag('passagiere')
+                        . '</div><div class="card-footer bg-transparent border-0 d-flex gap-2">##edit####delete##</div></div>',
                 ],
                 'filter' => 'own',
             ],
@@ -1019,7 +1055,7 @@ class board_builder {
      */
     protected function create_views(): void {
         global $DB;
-        $views = $this->views();
+        $views = array_filter($this->views());
         foreach ($views as $key => $def) {
             $data = array_merge([
                 'name' => self::VIEWS[$key] ?? $def['name'],
@@ -1140,6 +1176,35 @@ class board_builder {
             'param4' => '1',
             'param9' => json_encode([$this->fieldids['fahrttyp'] => ['AND' => [['', '', '']]]]),
         ];
+        if ($this->has('veroeffentlicht')) {
+            // A published weekly offer becomes single rides (#342).
+            $rules['Fahrtangebot: einzelne Fahrten anlegen'] = [
+                'type' => 'splitschedule',
+                'description' => 'Teilt ein veröffentlichtes regelmäßiges Angebot in einzelne Fahrten auf.',
+                'param1' => json_encode(['entry_updated', 'entry_created']),
+                'param2' => $this->fieldids['termin'],
+                'param3' => 6,
+                'param9' => json_encode([
+                    $this->fieldids['fahrttyp'] => ['AND' => [['', 'ANY_OF', [$position(self::OFFER)]]]],
+                    $this->fieldids['veroeffentlicht'] => ['AND' => [['', 'ANY_OF', ['1']]]],
+                ]),
+            ];
+            // A cancelled ride tells its passengers.
+            $rules['Fahrt abgesagt'] = [
+                'type' => 'eventnotification',
+                'description' => 'Benachrichtigt die Mitfahrenden, wenn eine Fahrt abgesagt wird.',
+                'param1' => json_encode(['entry_updated']),
+                'param2' => \datalynxrule_eventnotification\rule::FROM_AUTHOR,
+                'param3' => json_encode(['teams' => [$this->fieldids['passagiere']]]),
+                'param4' => '[]',
+                'param6' => 'Mitfahrbörse: eine Fahrt wurde abgesagt',
+                'param7' => '[]',
+                'param9' => json_encode([
+                    $this->fieldids['fahrtstatus'] => ['AND' => [['', 'ANY_OF', ['2']]]],
+                    \mod_datalynx\local\rule\base::ONCHANGE_KEY => [$this->fieldids['fahrtstatus']],
+                ]),
+            ];
+        }
         if ($this->has('passagiere')) {
             $team = 'Passagiere';
             $notify = function (string $event, array $recipient, string $subject, string $description) use ($team): array {
@@ -1194,7 +1259,27 @@ class board_builder {
         $types = explode("\n", $this->fielddefs['fahrttyp']['params']['param1']);
         $position = (string) (array_search($side, $types, true) + 1);
         $conditions = [$this->fieldids['fahrttyp'] => ['AND' => [['', 'ANY_OF', [$position]]]]];
-        if ($side === self::OFFER && $this->has('passagiere')) {
+        if ($side === self::OFFER) {
+            $conditions += $this->ride_conditions();
+        }
+        return $conditions;
+    }
+
+    /**
+     * What makes an offer a ride others can join, in the billing variant: published (#342), not
+     * cancelled, with a free seat (#325). None in the basic variant.
+     *
+     * @return array customsearch
+     */
+    protected function ride_conditions(): array {
+        $conditions = [];
+        if ($this->has('veroeffentlicht')) {
+            $conditions[$this->fieldids['veroeffentlicht']] = ['AND' => [['', 'ANY_OF', ['1']]]];
+        }
+        if ($this->has('fahrtstatus')) {
+            $conditions[$this->fieldids['fahrtstatus']] = ['AND' => [['NOT', 'ANY_OF', ['2']]]];
+        }
+        if ($this->has('passagiere')) {
             $conditions[$this->fieldids['passagiere']] = ['AND' => [['', 'FREEPLACES', '']]];
         }
         return $conditions;
@@ -1207,10 +1292,7 @@ class board_builder {
      * @return array customsearch
      */
     protected function match_counterpart(string $side): array {
-        if ($side === self::REQUEST && $this->has('passagiere')) {
-            return [$this->fieldids['passagiere'] => ['AND' => [['', 'FREEPLACES', '']]]];
-        }
-        return [];
+        return $side === self::REQUEST ? $this->ride_conditions() : [];
     }
 
     /**

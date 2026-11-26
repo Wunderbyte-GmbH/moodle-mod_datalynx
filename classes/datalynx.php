@@ -2588,6 +2588,25 @@ class datalynx {
     }
 
     /**
+     * Whether the current user may delete an entry: they may manage it, and no field of the
+     * instance keeps it (e.g. a team that still has members, mod_datalynx#342).
+     *
+     * @param object $entry with id
+     * @return bool
+     */
+    public function user_can_delete_entry(object $entry): bool {
+        if (!$this->user_can_manage_entry($entry)) {
+            return false;
+        }
+        foreach ($this->get_fields() as $field) {
+            if ($field->blocks_deletion((int) $entry->id)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Has the actual user the right to edit any entries or the optional single entry parameter?
      *
      * @param ?object $entry The entry object to check, or null for any entry.

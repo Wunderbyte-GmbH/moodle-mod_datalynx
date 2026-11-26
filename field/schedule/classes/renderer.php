@@ -372,6 +372,15 @@ class renderer extends datalynxfield_renderer {
 
         $current = field::schedule_from_values($values);
         if ($current->is_valid()) {
+            // A weekly schedule needs an end date, at most param6 months ahead (mod_datalynx#342).
+            $months = (int) $this->field->get('param6');
+            if ($months > 0 && $current->mode() === schedule::MODE_WEEKLY) {
+                $limit = strtotime("+$months months", schedule::day_start(schedule::date_of(time())));
+                $until = $current->until() !== '' ? schedule::day_start($current->until()) : null;
+                if ($until === null || $until > $limit) {
+                    $errors["{$prefix}_until"] = get_string('erruntilrequired', 'datalynxfield_schedule', $months);
+                }
+            }
             return $errors;
         }
 

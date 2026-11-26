@@ -96,7 +96,8 @@ class renderer extends datalynxfield_renderer {
                         $str = $manageable ? $this->display_edit($entry) : '';
                         break;
                     case '##delete##':
-                        $str = $manageable ? $this->display_delete($entry) : '';
+                        $deletable = $manageable && $this->field->dlx()->user_can_delete_entry($entry);
+                        $str = $deletable ? $this->display_delete($entry) : '';
                         break;
                     case '##reset##':
                         $str = $resetavailable ? $this->display_reset($entry, $options) : '';

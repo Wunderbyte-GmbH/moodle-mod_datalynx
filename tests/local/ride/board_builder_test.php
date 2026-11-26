@@ -104,7 +104,11 @@ final class board_builder_test extends advanced_testcase {
             'Bemerkungen' => 'textarea',
         ], $structure['fields']);
         $this->assertSame(['Meine Einträge', 'Nur Angebote', 'Nur Gesuche'], $structure['filters']);
-        $this->assertEqualsCanonicalizing(array_values(board_builder::VIEWS), array_keys($structure['views']));
+        $this->assertEqualsCanonicalizing(
+            array_values(array_diff_key(board_builder::VIEWS, ['manage' => 1])),
+            array_keys($structure['views']),
+            'basic has no view to manage single rides'
+        );
         $this->assertSame('Mitfahrbörse', $structure['default']);
 
         // The wizard chain and the filters of the views.
@@ -160,7 +164,8 @@ final class board_builder_test extends advanced_testcase {
         $this->assertSame('teammemberselect', $structure['fields']['Passagiere']);
         $team = $DB->get_record('datalynx_fields', ['dataid' => $builder->get_dataid(), 'name' => 'Passagiere']);
         $seats = $DB->get_field('datalynx_fields', 'id', ['dataid' => $builder->get_dataid(), 'name' => 'Freie Plätze']);
-        $this->assertSame(['limitfield' => (int) $seats, 'approval' => 1], json_decode($team->param10, true));
+        $this->assertSame(['limitfield' => (int) $seats, 'approval' => 1, 'protectmembers' => 1],
+            json_decode($team->param10, true));
         foreach (['Mitfahrt beantragt', 'Mitfahrt angenommen', 'Mitfahrt abgelehnt', 'Mitfahrt zurückgezogen'] as $rule) {
             $this->assertArrayHasKey($rule, $structure['rules']);
         }

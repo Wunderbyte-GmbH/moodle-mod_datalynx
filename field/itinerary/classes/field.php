@@ -398,6 +398,17 @@ class field extends datalynxfield_base {
     }
 
     /**
+     * Copy the route to another entry, and index its stops there.
+     *
+     * @param int $fromentryid
+     * @param int $toentryid
+     */
+    public function copy_content_to_new_entry(int $fromentryid, int $toentryid): void {
+        parent::copy_content_to_new_entry($fromentryid, $toentryid);
+        $this->reindex_entry($toentryid);
+    }
+
+    /**
      * Rewrite the index rows for one entry from its stored value.
      *
      * @param int $entryid

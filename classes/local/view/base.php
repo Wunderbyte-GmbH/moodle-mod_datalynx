@@ -3040,7 +3040,8 @@ abstract class base {
      * @return bool
      */
     public function user_can_act_on_entry(string $action, stdClass $entry): bool {
-        return $this->dlx->user_can_manage_entry($entry) && $this->confirm_view_action($action, (int) $this->id());
+        $allowed = $action === 'delete' ? $this->dlx->user_can_delete_entry($entry) : $this->dlx->user_can_manage_entry($entry);
+        return $allowed && $this->confirm_view_action($action, (int) $this->id());
     }
 
     /**
