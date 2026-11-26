@@ -1294,10 +1294,14 @@ class board_builder {
                     'visible' => 0,
                     'perpage' => 0,
                     'eparam2' => '<div style="font-family: sans-serif; font-size: 15px; color: #2d3339;">'
-                        . '<p>es gibt eine passende Fahrt zu Ihrem Eintrag in der Mitfahrbörse:</p>'
+                        . '<p>Guten Tag,</p><p>es gibt eine passende Fahrt zu Ihrem Eintrag in der Mitfahrbörse:</p>'
                         . '<div style="border: 1px solid #dee2e6; border-radius: 8px; padding: 12px 16px; margin: 16px 0;">'
-                        . $this->tags(['fahrttyp', 'route', 'termin', 'sitzplaetze', 'marke', 'modell', 'gepaeck',
-                            'mitfahrende', 'fahrkosten', 'fixbetrag', 'bemerkungen'])
+                        . $this->tags(['fahrttyp', 'route', 'termin'])
+                        . $this->tags(
+                            ['sitzplaetze', 'marke', 'modell', 'gepaeck', 'mitfahrende', 'fahrkosten', 'fixbetrag'],
+                            'angebot'
+                        )
+                        . $this->tag('bemerkungen')
                         . '<div style="margin-top: 8px; font-size: 0.9em; color: #6a737b;">Angelegt von ##author:name##</div>'
                         . '</div><p><strong>##notificationentrylink##</strong></p>'
                         . '<p style="color: #6a737b;">Ihr eigener Eintrag: ##notificationotherentrylink##</p>'
@@ -1313,8 +1317,8 @@ class board_builder {
                     'visible' => 0,
                     'perpage' => 0,
                     'eparam2' => '<div style="font-family: sans-serif; font-size: 15px; color: #2d3339;">'
-                        . '<p>##author:name## hat die folgende Fahrt abgesagt, bei der Sie als Mitfahrer/in eingetragen '
-                        . 'sind. Bitte organisieren Sie sich eine andere Fahrt.</p>'
+                        . '<p>Guten Tag,</p><p>##author:name## hat die folgende Fahrt abgesagt, bei der Sie als '
+                        . 'Mitfahrer/in eingetragen sind. Bitte organisieren Sie sich eine andere Fahrt.</p>'
                         . '<div style="border: 1px solid #dee2e6; border-radius: 8px; padding: 12px 16px; margin: 16px 0;">'
                         . $this->tags(['termin', 'route']) . '</div>'
                         . '<p><strong>##notificationentrylink##</strong></p>'
