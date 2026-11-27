@@ -185,6 +185,49 @@ final class select_lock_and_reset_test extends advanced_testcase {
     }
 
     /**
+     * A reset entry ends up as a new entry would: the rules that set a value when an entry is
+     * created set it again. Notifications on creation are not sent again and no entry_created
+     * event is triggered.
+     *
+     * @covers \mod_datalynx\local\rule\manager::reapply_creation_rules
+     */
+    public function test_reset_reapplies_creation_rules_without_notifications(): void {
+        global $DB;
+
+        $statusid = $this->make_field('radiobutton', 0);
+        $DB->insert_record('datalynx_rules', (object) [
+            'dataid' => $this->dlx->id(), 'type' => 'updatefield', 'name' => 'wf_new', 'description' => '',
+            'enabled' => 1, 'param1' => json_encode(['entry_created']), 'param2' => $statusid, 'param3' => '1',
+            'param4' => 0,
+        ]);
+        $DB->insert_record('datalynx_rules', (object) [
+            'dataid' => $this->dlx->id(), 'type' => 'eventnotification', 'name' => 'n_new', 'description' => '',
+            'enabled' => 1, 'param1' => json_encode(['entry_created']),
+            'param2' => \datalynxrule_eventnotification\rule::FROM_CURRENT_USER,
+            'param3' => json_encode(['author' => 1]),
+        ]);
+        \mod_datalynx\local\definition_cache::purge();
+        $this->dlx = new datalynx($this->dlx->id());
+
+        $entryid = $this->make_entry(datalynxfield_status::STATUS_DRAFT);
+        $this->set_content($statusid, $entryid, '2');
+
+        $sink = $this->redirectEvents();
+        $entries = new datalynx_entries($this->dlx, new datalynx_filter((object) ['dataid' => $this->dlx->id()]));
+        $entries->process_entries('reset', (string) $entryid, null, true);
+        $events = array_map(fn($event) => $event->eventname, $sink->get_events());
+        $sink->close();
+
+        $this->assertSame(
+            '1',
+            $DB->get_field('datalynx_contents', 'content', ['entryid' => $entryid, 'fieldid' => $statusid])
+        );
+        $this->assertNotContains('\\mod_datalynx\\event\\entry_created', $events);
+        $this->assertContains('\\mod_datalynx\\event\\entry_updated', $events);
+        $this->assertEmpty(\core\task\manager::get_adhoc_tasks(task\sendmessage_task::class));
+    }
+
+    /**
      * A final-submission entry can never be reset, even by a manager, and its data is left intact.
      */
     public function test_reset_blocked_after_final_submission(): void {

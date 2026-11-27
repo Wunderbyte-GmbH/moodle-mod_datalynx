@@ -1035,6 +1035,46 @@ class behat_mod_datalynx extends behat_base {
     }
 
     /**
+     * Creates "update field" rules directly for the specified datalynx instance.
+     *
+     * Table columns: name, events (comma-separated event names such as entry_created), field (the
+     * field name, with or without the "Datalynx field " prefix) and value (the stored value, e.g.
+     * the option number of a radio button field).
+     *
+     * @Given /^the "(?P<activityname_string>(?:[^"]|\\")*)" datalynx has the following update field rules:$/
+     *
+     * @param string $activityname
+     * @param TableNode $table
+     */
+    public function the_datalynx_has_the_following_update_field_rules($activityname, TableNode $table): void {
+        global $DB;
+
+        $dataid = (int) $DB->get_field('datalynx', 'id', ['name' => $activityname], MUST_EXIST);
+        foreach ($table->getHash() as $row) {
+            $fieldname = self::normalize_field_name($row['field']);
+            $fieldid = $DB->get_field_select(
+                'datalynx_fields',
+                'id',
+                'dataid = :dataid AND (name = :name OR name = :prefixed)',
+                ['dataid' => $dataid, 'name' => $fieldname, 'prefixed' => "Datalynx field {$fieldname}"],
+                MUST_EXIST
+            );
+            $DB->insert_record('datalynx_rules', (object) [
+                'dataid' => $dataid,
+                'type' => 'updatefield',
+                'name' => $row['name'],
+                'description' => '',
+                'enabled' => 1,
+                'param1' => json_encode(array_map('trim', explode(',', $row['events']))),
+                'param2' => $fieldid,
+                'param3' => $row['value'],
+                'param4' => 0,
+            ]);
+        }
+        \mod_datalynx\local\definition_cache::invalidate($dataid);
+    }
+
+    /**
      * Sets the entry template (param2) of a named view directly.
      *
      * @Given /^the "(?P<viewname_string>(?:[^"]|\\")*)" view of "(?P<activityname_string>(?:[^"]|\\")*)" datalynx has the entry template "(?P<template_string>(?:[^"]|\\")*)"$/

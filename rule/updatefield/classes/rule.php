@@ -67,6 +67,15 @@ class rule extends base {
     }
 
     /**
+     * A reset entry gets the value again that this rule writes when an entry is created.
+     *
+     * @return bool
+     */
+    public function reapplies_on_reset(): bool {
+        return true;
+    }
+
+    /**
      * Trigger rule: write the configured value into the target field of the triggering entry.
      *
      * @param \core\event\base $event

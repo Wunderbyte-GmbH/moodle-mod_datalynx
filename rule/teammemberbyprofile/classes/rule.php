@@ -42,6 +42,15 @@ class rule extends base {
     public $type = 'teammemberbyprofile';
 
     /**
+     * A reset entry gets the team again that this rule assigns when an entry is created.
+     *
+     * @return bool
+     */
+    public function reapplies_on_reset(): bool {
+        return true;
+    }
+
+    /**
      * React to an entry_created / entry_updated event by writing the matching users into the
      * configured teammemberselect field.
      *

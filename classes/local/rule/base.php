@@ -126,6 +126,20 @@ abstract class base {
     abstract public function trigger(\core\event\base $event): bool;
 
     /**
+     * Whether the rule runs again for an entry that is reset.
+     *
+     * A reset wipes the entry's data and returns it to the state of a new entry, so rules that set
+     * that initial state when an entry is created (a field value, a team) must set it again; see
+     * {@see manager::reapply_creation_rules()}. Rules that notify people or create other records
+     * must not, which is why the default is false.
+     *
+     * @return bool
+     */
+    public function reapplies_on_reset(): bool {
+        return false;
+    }
+
+    /**
      * Checks if the rule triggers on the given event
      *
      * @param string $eventname full name of the event (with namespaces)

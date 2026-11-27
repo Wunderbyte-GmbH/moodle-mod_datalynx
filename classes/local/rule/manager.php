@@ -136,6 +136,29 @@ class manager {
     }
 
     /**
+     * Run the creation rules again for an entry that was reset.
+     *
+     * A reset wipes all field data and keeps the entry as a draft, so it must end up as a newly
+     * created entry would: the enabled rules that fire on entry_created and set an initial state
+     * (see {@see base::reapplies_on_reset()}) run again. The entry_created event is only built
+     * for them, not triggered: nothing is logged and no notification goes out.
+     *
+     * @param int $entryid
+     */
+    public function reapply_creation_rules(int $entryid): void {
+        $event = \mod_datalynx\event\entry_created::create([
+            'context' => $this->dlx->context,
+            'objectid' => $entryid,
+            'other' => ['dataid' => $this->dlx->id()],
+        ]);
+        foreach ($this->get_rules_for_event('\\mod_datalynx\\event\\entry_created') as $rule) {
+            if ($rule->reapplies_on_reset()) {
+                $rule->trigger($event);
+            }
+        }
+    }
+
+    /**
      * given a rule id return the rule object from get_rules
      * Initializes get_rules if necessary
      *

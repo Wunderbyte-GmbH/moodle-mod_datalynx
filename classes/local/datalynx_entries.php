@@ -601,13 +601,17 @@ class datalynx_entries {
                 'sesskey' => sesskey(), 'confirmed' => true];
         // Preserve the post-action return URL (set by the reset action) across the
         // confirmation step so the redirect after processing lands on the right URL.
+        // Cancel goes back there too (e.g. the edit form the reset was started from), not to the
+        // listing of the view.
+        $cancelurl = new moodle_url($PAGE->url);
         if ($returnurl = optional_param('returnurl', '', PARAM_LOCALURL)) {
             $continueparams['returnurl'] = $returnurl;
+            $cancelurl = new moodle_url($returnurl);
         }
         echo $OUTPUT->confirm(
             get_string("entriesconfirm$action", 'datalynx', count($entries)),
             new moodle_url($PAGE->url, $continueparams),
-            new moodle_url($PAGE->url)
+            $cancelurl
         );
         echo $OUTPUT->footer();
     }
@@ -1242,6 +1246,9 @@ class datalynx_entries {
                                 'timesubmitted' => null,
                                 'timemodified' => time(),
                             ]);
+                            // Back to the state of a new entry: the rules that set initial values
+                            // on creation (e.g. a workflow status) set them again.
+                            (new \mod_datalynx\local\rule\manager($dlx))->reapply_creation_rules((int) $entry->id);
                             $processed[$entry->id] = $entry;
                         }
                         if ($processed) {
