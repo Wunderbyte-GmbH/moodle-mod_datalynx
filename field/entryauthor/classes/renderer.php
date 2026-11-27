@@ -528,17 +528,18 @@ class renderer extends datalynxfield_renderer {
             return true;
         }
         $visible = $DB->get_field('user_info_field', 'visible', ['shortname' => $shortname]);
-        if ($visible === false || (int) $visible === PROFILE_VISIBLE_ALL) {
+        // Core defines the PROFILE_VISIBLE_* constants as strings ('2', '3', ...): compare as integers.
+        if ($visible === false || (int) $visible === (int) PROFILE_VISIBLE_ALL) {
             return true;
         }
         $context = $this->field->dlx()->context;
         if (has_capability('mod/datalynx:manageentries', $context)) {
             return true;
         }
-        if ((int) $visible === PROFILE_VISIBLE_TEACHERS) {
+        if ((int) $visible === (int) PROFILE_VISIBLE_TEACHERS) {
             return has_capability('moodle/course:viewhiddenuserfields', $context);
         }
-        if ((int) $visible === PROFILE_VISIBLE_PRIVATE) {
+        if ((int) $visible === (int) PROFILE_VISIBLE_PRIVATE) {
             return has_capability('moodle/user:viewalldetails', \context_user::instance($userid));
         }
         return false;
