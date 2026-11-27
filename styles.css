@@ -858,7 +858,9 @@ form.mform div.entry div.datalynx-field-wrapper {
  * --------------------------------------------------------------------------- */
 
 /* Toggle: "Comments (N)". Core keeps aria-expanded in sync, so the chevron needs no JS. */
-.datalynx-comment-widget .comment-link {
+/* "a.comment-link" outranks core's ".jsenabled .comment-link { display: block; }", which would
+   otherwise drop the flex gap and let the chevron touch the link text. */
+.datalynx-comment-widget a.comment-link {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
